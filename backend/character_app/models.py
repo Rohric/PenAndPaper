@@ -8,7 +8,7 @@ User = get_user_model()
 
 class CharacterProfile(models.Model):
     name = models.TextField()
-    alter = models.TextField()
+    alter = models.IntegerField(default=0)
     beruf = models.TextField()
     geschlecht = models.TextField()
     beschreibung = models.TextField()

@@ -10,8 +10,11 @@ class Ability(models.Model):
     description_ability = models.TextField()
     grund_punkte = models.IntegerField(default=0)
     bonus_punkte = models.IntegerField(default=0)
-    gesamt_punkte = models.IntegerField(default=0)
     talent = models.ForeignKey(Talent, on_delete=models.CASCADE)
+
+    @property
+    def gesamt_punkte(self):
+        return self.grund_punkte + self.bonus_punkte
 
 
 class SpezialAbility(models.Model):
