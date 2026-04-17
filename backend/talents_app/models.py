@@ -15,3 +15,4 @@ class Talent(models.Model):
     bonus_punkte = models.TextField()
     gesamt_punkte = models.TextField()
     geistesblitz_punkte = models.TextField()
+    character = models.ForeignKey(CharacterProfile, on_delete=models.CASCADE)
