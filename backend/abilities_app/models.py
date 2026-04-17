@@ -14,7 +14,7 @@ class Ability(models.Model):
     talent = models.ForeignKey(Talent, on_delete=models.CASCADE)
 
 
-class SpetialAbility(models.Model):
+class SpezialAbility(models.Model):
 
     name_ability = models.TextField()
     description_ability = models.TextField()
