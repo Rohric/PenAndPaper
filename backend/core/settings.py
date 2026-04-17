@@ -39,13 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
 
-    'characters_app',
+    'character_app',
     'abilities_app',
     'talents_app',
     'weapons_app',
     'inventory_app',
     'combat_app',
     'effects_app',
+    'campaign_app',
+    'player_profile_app',
     'user_auth_app',
 ]
 
