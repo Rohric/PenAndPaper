@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 class PlayerProfile(models.Model):
     ROLE_CHOICES = (
-        ('PLAYER', 'Player'),
+        ('HERO', 'Game Hero'),
         ('MASTER', 'Game Master'),
     )
 
@@ -14,7 +14,7 @@ class PlayerProfile(models.Model):
 
     # Die Rolle in der App (Standardmäßig erstmal Player)
     role = models.CharField(
-        max_length=10, choices=ROLE_CHOICES, default='PLAYER')
+        max_length=10, choices=ROLE_CHOICES, default='HERO')
 
     @property
     def play_name(self):
