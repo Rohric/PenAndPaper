@@ -8,9 +8,9 @@ class PlayerProfile(models.Model):
         ('MASTER', 'Game Master'),
     )
 
-    # Die Verbindung zum reinen Auth-User
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name='player_profile')
+    # Geändert zu ForeignKey: Ein User kann jetzt MEHRERE Profile haben (z.B. 1x Hero, 1x Master)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='player_profiles')
 
     # Die Rolle in der App (Standardmäßig erstmal Player)
     role = models.CharField(
