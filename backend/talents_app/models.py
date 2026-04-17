@@ -11,8 +11,8 @@ class Talent(models.Model):
         ('HANDELN', 'handeln'),
     )
 
-    grund_punkte = models.TextField()
-    bonus_punkte = models.TextField()
-    gesamt_punkte = models.TextField()
-    geistesblitz_punkte = models.TextField()
+    grund_punkte = models.IntegerField(default=0)
+    bonus_punkte = models.IntegerField(default=0)
+    gesamt_punkte = models.IntegerField(default=0)
+    geistesblitz_punkte = models.IntegerField(default=0)
     character = models.ForeignKey(CharacterProfile, on_delete=models.CASCADE)

@@ -12,7 +12,6 @@ class CharacterProfile(models.Model):
     beruf = models.TextField()
     geschlecht = models.TextField()
     beschreibung = models.TextField()
-    beschreibung = models.TextField()
     lore = models.TextField()
     health_points = models.IntegerField(default=0)
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)
