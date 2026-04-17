@@ -8,7 +8,7 @@ class Talent(models.Model):
     ROLE_CHOICES = (
         ('WISSEN', 'wissen'),
         ('SOZIAL', 'sozial'),
-        ('WISSEN', 'wissen'),
+        ('HANDELN', 'handeln'),
     )
 
     grund_punkte = models.TextField()
