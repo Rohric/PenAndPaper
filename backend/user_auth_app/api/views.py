@@ -1,6 +1,6 @@
 from rest_framework import generics
-from user_auth_app.models import UserProfile
-from .serializers import UserProfileSerializer, SimpleUserSerializer
+from user_auth_app.models import PlayerProfile
+from .serializers import PlayerSerializer
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -11,9 +11,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 
 
-class UserProfileList(generics.ListCreateAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+class PlayerProfileList(generics.ListCreateAPIView):
+    queryset = PlayerProfile.objects.all()
+    serializer_class = PlayerSerializer
 
     def get(self, request):
         return super().get(request)
@@ -27,15 +27,9 @@ class UserListView(APIView):
         return Response(list(users))
 
 
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated]
-    queryset = User.objects.all()
-    serializer_class = SimpleUserSerializer
-
-
-class UserProfileDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+class PlayerProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PlayerProfile.objects.all()
+    serializer_class = PlayerSerializer
 
 
 class RegistrationView(APIView):
@@ -50,7 +44,7 @@ class RegistrationView(APIView):
 
             return Response({
                 'token': token.key,
-                'fullname': user.first_name,
+                'fullname': f"{user.first_name} {user.last_name}".strip(),
                 'email': user.email,
                 'user_id': user.id
             }, status=201)
@@ -83,7 +77,7 @@ class LoginView(APIView):
 
         return Response({
             "token": token.key,
-            "fullname": user.first_name,
+            "fullname": f"{user.first_name} {user.last_name}".strip(),
             "email": user.email,
             "user_id": user.id
         }, status=status.HTTP_200_OK)

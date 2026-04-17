@@ -1,38 +1,31 @@
 from rest_framework import serializers
-from user_auth_app.models import UserProfile
+from user_auth_app.models import PlayerProfile
 from django.contrib.auth.models import User
 
 
-class SimpleUserSerializer(serializers.ModelSerializer):
-    fullname = serializers.CharField(source='first_name')
+class PlayerSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
-        model = User
-        fields = ['id', 'email', 'fullname']
-
-    def update(self, instance, validated_data):
-        if 'email' in validated_data:
-            instance.username = validated_data['email']
-        return super().update(instance, validated_data)
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    user = SimpleUserSerializer(read_only=True)
-
-    class Meta:
-        model = UserProfile
-        fields = ['user', 'bio', 'location']
+        model = PlayerProfile
+        fields = ['id', 'username', 'email', 'first_name',
+                  'last_name']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    fullname = serializers.CharField(write_only=True)
+    first_name = serializers.CharField(
+        write_only=True, required=False, allow_blank=True)
+    last_name = serializers.CharField(
+        write_only=True, required=False, allow_blank=True)
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     repeated_password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['fullname', 'email', 'password', 'repeated_password']
+        fields = ['first_name', 'last_name',
+                  'email', 'password', 'repeated_password']
 
     def validate(self, data):
         if data.get('password') != data.get('repeated_password'):
@@ -45,14 +38,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
-        fullname = validated_data.pop('fullname')
+        first_name = validated_data.pop('first_name', '')
+        last_name = validated_data.pop('last_name', '')
         validated_data.pop('repeated_password')
 
         user = User.objects.create_user(
             username=validated_data['email'],
             email=validated_data['email'],
             password=validated_data['password'],
-            first_name=fullname
+            first_name=first_name,
+            last_name=last_name
         )
 
         return user
