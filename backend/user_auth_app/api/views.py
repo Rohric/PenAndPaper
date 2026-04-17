@@ -1,6 +1,4 @@
 from rest_framework import generics
-from user_auth_app.models import PlayerProfile
-from .serializers import PlayerSerializer
 from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -11,25 +9,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 
 
-class PlayerProfileList(generics.ListCreateAPIView):
-    queryset = PlayerProfile.objects.all()
-    serializer_class = PlayerSerializer
-
-    def get(self, request):
-        return super().get(request)
-
-
 class UserListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         users = User.objects.all().values('id', 'email', 'username')
         return Response(list(users))
-
-
-class PlayerProfileDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = PlayerProfile.objects.all()
-    serializer_class = PlayerSerializer
 
 
 class RegistrationView(APIView):

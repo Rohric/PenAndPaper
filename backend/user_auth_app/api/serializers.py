@@ -1,16 +1,5 @@
 from rest_framework import serializers
-from user_auth_app.models import PlayerProfile
 from django.contrib.auth.models import User
-
-
-class PlayerSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(source='user.email', read_only=True)
-    username = serializers.CharField(source='user.username', read_only=True)
-
-    class Meta:
-        model = PlayerProfile
-        fields = ['id', 'username', 'email', 'first_name',
-                  'last_name']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
