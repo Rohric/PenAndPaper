@@ -14,5 +14,5 @@ class CharacterProfile(models.Model):
     beschreibung = models.TextField()
     beschreibung = models.TextField()
     lore = models.TextField()
-    health_points = models.TextField()
+    health_points = models.IntegerField(default=0)
     player = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE)

@@ -5,7 +5,13 @@ from character_app.models import CharacterProfile
 
 
 class Campaign(models.Model):
-
-    name_campaign = models.TextField()
+    name_campaign = models.CharField(max_length=200)
     description_campaign = models.TextField()
-    characters = models.ForeignKey(CharacterProfile)
+
+    # Der Game Master leitet die Runde (darf auch gelöscht werden, ohne dass die Kampagne verschwindet -> SET_NULL)
+    game_master = models.ForeignKey(
+        'player_profile_app.PlayerProfile', on_delete=models.SET_NULL, null=True)
+
+    # ManyToManyField löscht niemals die Charaktere, wenn die Kampagne gelöscht wird!
+    characters = models.ManyToManyField(
+        CharacterProfile, related_name='campaigns')

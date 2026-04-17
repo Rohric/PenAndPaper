@@ -8,9 +8,9 @@ class Ability(models.Model):
 
     name_ability = models.TextField()
     description_ability = models.TextField()
-    grund_punkte = models.TextField()
-    bonus_punkte = models.TextField()
-    gesamt_punkte = models.TextField()
+    grund_punkte = models.IntegerField(default=0)
+    bonus_punkte = models.IntegerField(default=0)
+    gesamt_punkte = models.IntegerField(default=0)
     talent = models.ForeignKey(Talent, on_delete=models.CASCADE)
 
 
@@ -18,4 +18,4 @@ class SpezialAbility(models.Model):
 
     name_ability = models.TextField()
     description_ability = models.TextField()
-    wurd_bedingung = models.TextField()
+    wurf_bedingung = models.TextField()
