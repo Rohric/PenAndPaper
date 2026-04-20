@@ -1,0 +1,35 @@
+<div class="detail-container" *ngIf="character">
+    <button class="back-btn" routerLink="/characters">← Zurück zur Übersicht</button>
+
+    <div class="header-card">
+        <div class="avatar-placeholder">👤</div>
+        <div class="header-info">
+            <h2>{{ character.name }}</h2>
+            <p class="subtitle">{{ character.beruf }} | {{ character.alter }} Jahre | {{ character.geschlecht }}</p>
+            <p class="health">❤️ {{ character.health_points }} Lebenspunkte</p>
+        </div>
+    </div>
+
+    <div class="talents-grid">
+        <div class="talent-column" *ngFor="let talent of character.talents">
+            <div class="talent-header">
+                <h3>
+                    <span *ngIf="talent.name === 'WISSEN'">🧠</span>
+                    <span *ngIf="talent.name === 'SOZIAL'">💬</span>
+                    <span *ngIf="talent.name === 'HANDELN'">⚔️</span>
+                    {{ talent.name }}
+                </h3>
+                <div class="points-info">
+                    <span class="gesamt">Wert: {{ talent.grund_punkte + talent.bonus_punkte }}</span>
+                    <span class="geistesblitz">⚡ GB: {{ talent.geistesblitz_punkte }}</span>
+                </div>
+            </div>
+            <ul class="skills-list">
+                <li *ngFor="let skill of talent.faehigkeiten">
+                    <span class="skill-name">{{ skill.name }}</span>
+                    <span class="skill-value">{{ skill.wert }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

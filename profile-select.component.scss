@@ -1,0 +1,30 @@
+.profile-container {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+.card-grid {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+.role-card {
+  background: #fff;
+  border: 2px solid #e5e7eb;
+  padding: 2.5rem 1.5rem;
+  border-radius: 16px;
+  width: 280px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.role-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+}
+.role-card.hero:hover { border-color: #3b82f6; }
+.role-card.master:hover { border-color: #f59e0b; }
+.role-card .icon { font-size: 4rem; margin-bottom: 1rem; }
+.role-card h3 { margin: 0 0 1rem 0; font-size: 1.5rem; }
+.role-card p { color: #6b7280; margin: 0; line-height: 1.5; }
