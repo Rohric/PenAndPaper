@@ -18,10 +18,11 @@ urlpatterns = [
     path("quests/<int:pk>/", views.QuestDetail.as_view(), name="quest-detail"),
     path("worlds/<int:world_id>/events/", views.EventList.as_view(), name="event-list"),
     path("events/<int:pk>/", views.EventDetail.as_view(), name="event-detail"),
-    path("worlds/<int:world_id>/timeline/", views.TimelineList.as_view(), name="timeline-list"),
-    path("timeline/<int:pk>/", views.TimelineDetail.as_view(), name="timeline-detail"),
+    path("worlds/<int:world_id>/trivia/", views.TriviaList.as_view(), name="trivia-list"),
+    path("trivia/<int:pk>/", views.TriviaDetail.as_view(), name="trivia-detail"),
     path("worlds/<int:world_id>/chapters/", views.ChapterList.as_view(), name="chapter-list"),
     path("chapters/<int:pk>/", views.ChapterDetail.as_view(), name="chapter-detail"),
+    path("worlds/<int:world_id>/scenes/", views.WorldSceneList.as_view(), name="world-scene-list"),
     path("chapters/<int:chapter_id>/scenes/", views.SceneList.as_view(), name="scene-list"),
     path("scenes/<int:pk>/", views.SceneDetail.as_view(), name="scene-detail"),
 ]

@@ -71,11 +71,7 @@
 
   <div class="panel">
     <h2 class="subtitle">Beispielsätze</h2>
-    <app-string-list-editor
-      label="Satz"
-      placeholder="Was die Figur sagen könnte"
-      [items]="draft().phrases"
-      (itemsChange)="set('phrases', $event)"
-    />
+    <p class="soft">Der Auslöser ist freiwillig: wann oder worauf die Figur das sagt.</p>
+    <app-phrase-list-editor [phrases]="draft().phrases" (phrasesChange)="set('phrases', $event)" />
   </div>
 </div>

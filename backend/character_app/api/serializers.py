@@ -71,10 +71,11 @@ def _clean_item(entry):
 
 
 def _clean_phrase(phrase):
-    """Return one trimmed phrase, or raise when it is not a text."""
-    if not isinstance(phrase, str):
-        raise serializers.ValidationError("Jeder Beispielsatz muss ein Text sein.")
-    return phrase.strip()
+    """Return one phrase with its optional trigger; a plain text is a phrase without trigger."""
+    entry = {"text": phrase} if isinstance(phrase, str) else phrase
+    if not isinstance(entry, dict):
+        raise serializers.ValidationError("Jeder Beispielsatz braucht einen Text.")
+    return {"trigger": _clean_text(entry, "trigger"), "text": _clean_text(entry, "text")}
 
 
 class NpcSerializer(serializers.ModelSerializer):
@@ -111,8 +112,8 @@ class NpcSerializer(serializers.ModelSerializer):
         return [_clean_item(entry) for entry in _as_list(items)]
 
     def validate_phrases(self, phrases):
-        """Check every phrase and drop empty ones."""
-        return [text for text in map(_clean_phrase, _as_list(phrases)) if text]
+        """Check every phrase and drop the ones without text."""
+        return [phrase for phrase in map(_clean_phrase, _as_list(phrases)) if phrase["text"]]
 
     def _current(self, data, field, default):
         """Return the new value of a field, or the stored one on a partial update."""

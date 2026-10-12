@@ -263,6 +263,21 @@ textarea.input {
   width: 88px;
 }
 
+// A checkbox with its text.
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: var(--touch);
+}
+
+.check input {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
 // A row of a list editor: one growing input and its buttons.
 .list-row {
   display: flex;
@@ -293,9 +308,75 @@ textarea.input {
   align-items: center;
   min-height: 36px;
   border-color: var(--info);
+  background: transparent;
   color: var(--info);
   font-weight: 600;
   text-decoration: none;
+}
+
+// Reading views: written text keeps its line breaks.
+.prose {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+// Text that is read to the players, set apart from the notes of the game master.
+.read-aloud {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 16px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-2);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.read-aloud .kicker {
+  font-family: var(--font-body);
+}
+
+.plain-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+// Tabs: the parts of a world and of a chapter.
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs__tab {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 8px 16px;
+  border-bottom: 3px solid transparent;
+  color: var(--soft);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.tabs__tab.is-active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+// Dark layer behind a panel or a window that lies over the page.
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(0 0 0 / 55%);
 }
 
 // The name field at the top of an editor.
@@ -312,19 +393,4 @@ textarea.input {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;
-}
-
-// A panel that folds open, used for scenes.
-.fold > summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  min-height: var(--touch);
-  cursor: pointer;
-}
-
-.fold[open] > summary {
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
 }

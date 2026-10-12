@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from world.world_app.models import Chapter, Event, Location, Quest, Scene, TimelineEntry, World, WorldNpc
+from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, World, WorldNpc
 from world.world_app.utils import create_world_npc, lies_inside, next_chapter_number, npcs_in_world
 
 OTHER_WORLD = "Dieser Eintrag gehört zu einer anderen Welt."
@@ -43,6 +43,26 @@ class WorldScopedSerializer(serializers.ModelSerializer):
         """Accept only NPCs of the same world."""
         self._check_npcs(npcs)
         return npcs
+
+    def validate_locations(self, locations):
+        """Accept only locations of the same world."""
+        self._check_same_world(locations)
+        return locations
+
+    def validate_quests(self, quests):
+        """Accept only quests of the same world."""
+        self._check_same_world(quests)
+        return quests
+
+    def validate_events(self, events):
+        """Accept only events of the same world."""
+        self._check_same_world(events)
+        return events
+
+    def validate_trivia(self, trivia):
+        """Accept only knowledge entries of the same world."""
+        self._check_same_world(trivia)
+        return trivia
 
 
 class LocationSerializer(WorldScopedSerializer):
@@ -109,12 +129,12 @@ class EventSerializer(WorldScopedSerializer):
         fields = ["id", "name", "text", "location"]
 
 
-class TimelineEntrySerializer(WorldScopedSerializer):
-    """Serialize one day of the timeline."""
+class TriviaSerializer(WorldScopedSerializer):
+    """Serialize a piece of knowledge with its links to places, NPCs, quests and events."""
 
     class Meta:
-        model = TimelineEntry
-        fields = ["id", "day", "title", "text"]
+        model = Trivia
+        fields = ["id", "name", "category", "text", "locations", "npcs", "quests", "events"]
 
 
 class ChapterSerializer(WorldScopedSerializer):
@@ -133,16 +153,6 @@ class ChapterSerializer(WorldScopedSerializer):
             raise serializers.ValidationError("Diese Kapitelnummer gibt es in der Welt schon.")
         return number
 
-    def validate_quests(self, quests):
-        """Accept only quests of the same world."""
-        self._check_same_world(quests)
-        return quests
-
-    def validate_events(self, events):
-        """Accept only events of the same world."""
-        self._check_same_world(events)
-        return events
-
     def create(self, validated_data):
         """Create the chapter, numbering it automatically when no number was sent."""
         validated_data.setdefault("number", next_chapter_number(validated_data["world"]))
@@ -150,13 +160,25 @@ class ChapterSerializer(WorldScopedSerializer):
 
 
 class SceneSerializer(WorldScopedSerializer):
-    """Serialize a scene of a chapter."""
+    """Serialize a scene of a chapter with everything it points to."""
 
     class Meta:
         model = Scene
-        fields = ["id", "position", "name", "text", "to_read", "location", "npcs"]
+        fields = [
+            "id", "chapter", "position", "optional", "name", "text", "to_read",
+            "location", "npcs", "leads_to", "quests", "events", "trivia",
+        ]
+        read_only_fields = ["chapter"]
 
     def get_world(self):
         """Return the world of the scene's chapter."""
         chapter = self.instance.chapter if self.instance else self.context["chapter"]
         return chapter.world
+
+    def validate_leads_to(self, scenes):
+        """Accept only other scenes of the same world."""
+        if any(scene.chapter.world_id != self.get_world().pk for scene in scenes):
+            raise serializers.ValidationError(OTHER_WORLD)
+        if self.instance and self.instance in scenes:
+            raise serializers.ValidationError("Eine Szene kann nicht zu sich selbst führen.")
+        return scenes

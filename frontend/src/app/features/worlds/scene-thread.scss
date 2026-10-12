@@ -1,0 +1,107 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section {
+  margin-top: 14px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+// One scene: its mark (number or plus), its name, and a hint when the opened scene leads here.
+.scene {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: center;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.scene:hover,
+.scene.is-active {
+  background: var(--surface);
+}
+
+.scene.is-active {
+  border-color: var(--accent);
+}
+
+.scene.is-next {
+  border-color: var(--line-2);
+  border-style: dashed;
+}
+
+.scene__mark {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--accent);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.scene__mark--optional {
+  border-color: var(--line-2);
+  border-style: dashed;
+  color: var(--soft);
+}
+
+.scene.is-active .scene__mark {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.scene__name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+// The thread itself: a line that joins the numbers of the scenes.
+.list--thread .item:not(:last-child)::before {
+  position: absolute;
+  top: 22px;
+  bottom: -26px;
+  left: 25px;
+  width: 2px;
+  background: var(--line-2);
+  content: '';
+}
+
+.item__move {
+  display: flex;
+  gap: 6px;
+  padding-left: 50px;
+}

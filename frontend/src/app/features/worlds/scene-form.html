@@ -1,0 +1,86 @@
+<div class="stack">
+  <div class="panel">
+    <div class="field">
+      <label for="scene-name">Name</label>
+      <input id="scene-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
+    </div>
+    <label class="check">
+      <input type="checkbox" [ngModel]="draft().optional" (ngModelChange)="set('optional', $event)" />
+      Optionale Szene: hängt nicht am roten Faden und kann eingesetzt werden, wo sie passt
+    </label>
+    <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
+  </div>
+
+  <div class="panel">
+    <div class="field">
+      <label for="scene-read">Zum Vorlesen</label>
+      <textarea id="scene-read" class="input" rows="5" [ngModel]="draft().to_read" (ngModelChange)="set('to_read', $event)"></textarea>
+    </div>
+    <div class="field">
+      <label for="scene-text">Was passiert</label>
+      <textarea id="scene-text" class="input" rows="10" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Verknüpfungen</h2>
+    <div class="field">
+      <label for="scene-location">Ort</label>
+      <app-id-select
+        inputId="scene-location"
+        emptyLabel="Kein Ort"
+        [options]="store.locationOptions()"
+        [value]="draft().location"
+        (valueChange)="set('location', $event)"
+      />
+    </div>
+    <div class="field">
+      <span class="label">Figuren in der Szene</span>
+      <app-link-picker
+        label="Figuren"
+        [creatable]="true"
+        [options]="store.npcOptions()"
+        [selected]="draft().npcs"
+        (selectedChange)="set('npcs', $event)"
+        (create)="addNew('npcs', $event)"
+      />
+    </div>
+    <div class="field">
+      <span class="label">Führt zu diesen Szenen</span>
+      <app-link-picker label="Szenen" [options]="otherScenes()" [selected]="draft().leads_to" (selectedChange)="set('leads_to', $event)" />
+    </div>
+    <div class="field">
+      <span class="label">Quests</span>
+      <app-link-picker
+        label="Quests"
+        [creatable]="true"
+        [options]="store.questOptions()"
+        [selected]="draft().quests"
+        (selectedChange)="set('quests', $event)"
+        (create)="addNew('quests', $event)"
+      />
+    </div>
+    <div class="field">
+      <span class="label">Ereignisse</span>
+      <app-link-picker
+        label="Ereignisse"
+        [creatable]="true"
+        [options]="store.eventOptions()"
+        [selected]="draft().events"
+        (selectedChange)="set('events', $event)"
+        (create)="addNew('events', $event)"
+      />
+    </div>
+    <div class="field">
+      <span class="label">Wissen</span>
+      <app-link-picker
+        label="Wissen"
+        [creatable]="true"
+        [options]="store.triviaOptions()"
+        [selected]="draft().trivia"
+        (selectedChange)="set('trivia', $event)"
+        (create)="addNew('trivia', $event)"
+      />
+    </div>
+  </div>
+</div>

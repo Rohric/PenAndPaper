@@ -41,6 +41,8 @@
       </a>
     }
 
+    <button type="button" class="btn" (click)="openHelp()">? Hilfe</button>
+
     <div class="menu__account">
       <span class="soft">{{ auth.account()?.username }}</span>
       <button type="button" class="btn" (click)="auth.logout()">Abmelden</button>

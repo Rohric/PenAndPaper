@@ -1,17 +1,16 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
-import { Npc, Option, WorldNpc } from '../../core/models';
+import { Npc, WorldNpc } from '../../core/models';
 import { IdSelect } from '../../shared/id-select';
 import { NpcEditor } from '../npcs/npc-editor';
 import { NpcService } from '../npcs/npc.service';
-import { EntryLinks } from './entry-links';
 import { WorldStore } from './world-store';
 
 /** Edit an NPC of the world: where it can be met, and the character itself. */
 @Component({
   selector: 'app-world-npc-editor',
-  imports: [NpcEditor, IdSelect, EntryLinks],
+  imports: [NpcEditor, IdSelect],
   template: `
     <div class="stack">
       <div class="panel">
@@ -26,7 +25,6 @@ import { WorldStore } from './world-store';
             (valueChange)="setLocation($event)"
           />
         </div>
-        <app-entry-links label="Quests mit dieser Figur" section="quests" [items]="quests()" />
         @if (error()) {
           <p class="notice notice--error" role="alert">{{ error() }}</p>
         }
@@ -43,18 +41,14 @@ export class WorldNpcEditor {
   private readonly npcService = inject(NpcService);
 
   readonly link = input.required<WorldNpc>();
+  /** Fired after the character was saved. */
+  readonly saved = output<void>();
   /** Fired after the NPC was deleted. */
   readonly closed = output<void>();
 
   protected readonly npc = signal<Npc | null>(null);
   protected readonly error = signal('');
   private readonly npcId = computed(() => this.link().npc);
-  protected readonly quests = computed<Option[]>(() =>
-    this.store
-      .quests()
-      .filter((quest) => quest.giver === this.npcId() || quest.npcs.includes(this.npcId()))
-      .map((quest) => ({ id: quest.id, label: quest.name })),
-  );
 
   constructor() {
     // Load the character whenever another NPC is opened.
@@ -73,6 +67,7 @@ export class WorldNpcEditor {
   protected onSaved(npc: Npc): void {
     this.npc.set(npc);
     this.store.patchLocal('world-npcs', this.link().id, { name: npc.name, profession: npc.profession });
+    this.saved.emit();
   }
 
   /** The character is gone; reload the world, because quests and scenes may have named it. */

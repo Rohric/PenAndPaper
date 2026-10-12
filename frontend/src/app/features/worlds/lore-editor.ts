@@ -1,4 +1,4 @@
-import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { Component, computed, inject, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -28,6 +28,9 @@ export class LoreEditor {
   private readonly store = inject(WorldStore);
   private readonly router = inject(Router);
 
+  /** Fired after name and lore were saved. */
+  readonly saved = output<void>();
+
   protected readonly draft = linkedSignal(() => ({ name: this.store.world()?.name ?? '', lore: this.store.world()?.lore ?? '' }));
   protected readonly dirty = computed(() => {
     const world = this.store.world();
@@ -44,7 +47,7 @@ export class LoreEditor {
   /** Save name and lore. */
   protected save(): void {
     this.busy.set(true);
-    this.store.saveWorld(this.draft()).subscribe({ next: () => this.finish(''), error: (e: unknown) => this.finish(readError(e)) });
+    this.store.saveWorld(this.draft()).subscribe({ next: () => this.done(), error: (e: unknown) => this.finish(readError(e)) });
   }
 
   /** Delete the whole world after the user confirmed. */
@@ -56,6 +59,11 @@ export class LoreEditor {
       next: () => void this.router.navigateByUrl('/gm/worlds'),
       error: (e: unknown) => this.finish(readError(e)),
     });
+  }
+
+  private done(): void {
+    this.finish('');
+    this.saved.emit();
   }
 
   private finish(error: string): void {

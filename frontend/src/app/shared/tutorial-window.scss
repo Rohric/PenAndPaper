@@ -1,0 +1,134 @@
+// One window for both screens: centered, never wider or higher than the screen.
+.window {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: min(560px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  padding: 20px;
+  overflow-y: auto;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--surface);
+  transform: translate(-50%, -50%);
+}
+
+.window__head {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.menu-btn {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch);
+  height: var(--touch);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.window__menu {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+
+.window__link {
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.window__link:hover,
+.window__link.is-active {
+  background: var(--surface-2);
+}
+
+.window__link.is-active {
+  color: var(--accent);
+}
+
+// The line of steps: numbered dots joined by a line.
+.steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps__item {
+  display: flex;
+  align-items: center;
+}
+
+.steps__item:not(:last-child)::after {
+  width: 14px;
+  height: 2px;
+  background: var(--line-2);
+  content: '';
+}
+
+.steps__dot {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--line-2);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--soft);
+  font-weight: 600;
+}
+
+.steps__dot.is-done {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.steps__dot.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.window__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  min-height: 150px;
+}
+
+.window__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.window__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.window__gap {
+  flex: 1;
+}

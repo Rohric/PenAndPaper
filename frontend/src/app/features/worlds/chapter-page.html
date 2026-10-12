@@ -1,0 +1,88 @@
+@if (chapter(); as current) {
+  <div class="stack">
+    <header class="row row--between">
+      <div>
+        <span class="kicker">Kapitel {{ current.number }}</span>
+        <h2 class="subtitle">{{ current.name }}</h2>
+      </div>
+      <div class="row">
+        <a class="btn btn--small" [routerLink]="chaptersLink()">Alle Kapitel</a>
+        <app-tutorial-button [topic]="topic()" />
+      </div>
+    </header>
+
+    <nav class="tabs" aria-label="Teile des Kapitels">
+      @for (item of tabs; track item.id) {
+        <a class="tabs__tab" [routerLink]="[]" [queryParams]="{ tab: item.id }" [class.is-active]="item.id === currentTab()">
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    @if (error()) {
+      <p class="notice notice--error" role="alert">{{ error() }}</p>
+    }
+
+    @switch (currentTab()) {
+      @case ('scenes') {
+        <app-master-detail [list]="threadTpl" [detail]="sceneTpl" [open]="!!openScene()" (back)="closeScene()" />
+      }
+      @case ('quests') {
+        <app-chapter-links kind="quests" [chapter]="current" />
+      }
+      @case ('events') {
+        <app-chapter-links kind="events" [chapter]="current" />
+      }
+      @case ('overview') {
+        @if (editingOverview()) {
+          <button type="button" class="btn btn--small" (click)="editingOverview.set(false)">Zur Leseansicht</button>
+          <app-chapter-editor [entry]="current" (saved)="editingOverview.set(false)" (closed)="leave()" />
+        } @else {
+          <article class="panel">
+            <header class="row row--between">
+              <h3 class="subtitle">Überblick</h3>
+              <button type="button" class="btn btn--small" (click)="editingOverview.set(true)">Bearbeiten</button>
+            </header>
+            @if (current.to_read) {
+              <div class="read-aloud">
+                <span class="kicker">Vorlesen</span>
+                <p class="prose">{{ current.to_read }}</p>
+              </div>
+            }
+            @if (current.text) {
+              <p class="prose">{{ current.text }}</p>
+            } @else {
+              <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ schreibst du, worum es geht.</p>
+            }
+            <app-link-row label="Orte dieses Kapitels" [items]="places()" />
+            <app-link-row label="Figuren dieses Kapitels" [items]="npcs()" />
+          </article>
+        }
+      }
+    }
+  </div>
+} @else {
+  <div class="empty">
+    <p>Dieses Kapitel gibt es nicht.</p>
+    <a class="btn btn--small" [routerLink]="chaptersLink()">Alle Kapitel</a>
+  </div>
+}
+
+<ng-template #threadTpl>
+  <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" (open)="select($event)" (add)="addScene($event)" (move)="moveScene($event)" />
+</ng-template>
+
+<ng-template #sceneTpl>
+  @if (openScene(); as shown) {
+    @if (editing()) {
+      <button type="button" class="btn btn--small" (click)="stopEditing()">Zur Leseansicht</button>
+      <app-scene-form [entry]="shown" (saved)="stopEditing()" (closed)="closeScene()" />
+    } @else {
+      <app-scene-view [scene]="shown" (edit)="editing.set(true)" />
+    }
+  } @else {
+    <div class="empty">
+      <p>Wähle links eine Szene oder leg eine neue an.</p>
+    </div>
+  }
+</ng-template>

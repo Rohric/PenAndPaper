@@ -26,6 +26,8 @@
       }
     </nav>
 
+    <button type="button" class="btn" (click)="tutorial.open('start')">? Hilfe</button>
+
     <div class="account">
       <span class="kicker">Angemeldet als</span>
       <span class="account__name">{{ auth.account()?.username }}</span>

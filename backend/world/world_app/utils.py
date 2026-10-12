@@ -56,6 +56,13 @@ def next_chapter_number(world):
 
 
 @transaction.atomic
+def delete_world(world):
+    """Delete a world together with its NPCs, which would otherwise stay behind without a world."""
+    npcs_in_world(world).delete()
+    world.delete()
+
+
+@transaction.atomic
 def create_world_npc(world, name, location=None):
     """Create an NPC and attach it to the world in one step."""
     npc = Npc.objects.create(owner=world.owner, name=name)

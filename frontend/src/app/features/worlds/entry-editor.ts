@@ -13,6 +13,8 @@ export abstract class EntryEditor<T extends { id: number }> {
   protected abstract readonly kind: Kind;
 
   readonly entry = input.required<T>();
+  /** Fired after the entry was saved. */
+  readonly saved = output<void>();
   /** Fired after the entry was deleted. */
   readonly closed = output<void>();
 
@@ -36,7 +38,7 @@ export abstract class EntryEditor<T extends { id: number }> {
   protected save(): void {
     this.busy.set(true);
     this.store.save<T>(this.kind, this.entry().id, this.draft()).subscribe({
-      next: () => this.finish(''),
+      next: () => this.done(),
       error: (e: unknown) => this.finish(readError(e)),
     });
   }
@@ -50,6 +52,11 @@ export abstract class EntryEditor<T extends { id: number }> {
       next: () => this.closed.emit(),
       error: (e: unknown) => this.finish(readError(e)),
     });
+  }
+
+  private done(): void {
+    this.finish('');
+    this.saved.emit();
   }
 
   private finish(error: string): void {

@@ -107,15 +107,19 @@ export interface WorldEvent {
   location: number | null;
 }
 
-/** One day on the timeline of a world. */
-export interface TimelineEntry {
+/** A piece of knowledge about the world, on its own or attached to other entries. */
+export interface Trivia {
   id: number;
-  day: number;
-  title: string;
+  name: string;
+  category: string;
   text: string;
+  locations: number[];
+  npcs: number[];
+  quests: number[];
+  events: number[];
 }
 
-/** A chapter of the story with its quests and events. */
+/** A chapter of the story with its quests and events; its scenes form the thread of the story. */
 export interface Chapter {
   id: number;
   number: number;
@@ -126,15 +130,44 @@ export interface Chapter {
   events: number[];
 }
 
-/** A scene of a chapter. Position is only the order in the list, not the order of play. */
+/**
+ * A scene of a chapter. Scenes on the thread are numbered by position,
+ * optional scenes stand beside it and can be used wherever they fit.
+ */
 export interface Scene {
   id: number;
+  chapter: number;
   position: number;
+  optional: boolean;
   name: string;
   text: string;
   to_read: string;
   location: number | null;
   npcs: number[];
+  leads_to: number[];
+  quests: number[];
+  events: number[];
+  trivia: number[];
+}
+
+/** Something an NPC might say, with what makes the NPC say it. */
+export interface Phrase {
+  trigger: string;
+  text: string;
+}
+
+/** The kinds of entries that can be linked and looked up. NPCs are named by the id of the character. */
+export type EntryKind = 'locations' | 'npcs' | 'quests' | 'events' | 'trivia' | 'chapters' | 'scenes';
+
+/** A pointer to one entry of the world. */
+export interface EntryRef {
+  kind: EntryKind;
+  id: number;
+}
+
+/** A pointer to an entry together with the text shown for it. */
+export interface EntryLink extends EntryRef {
+  label: string;
 }
 
 /** A character the game master writes. */
@@ -150,5 +183,5 @@ export interface Npc {
   bonus_points_total: number;
   skills: Skill[];
   inventory: InventoryItem[];
-  phrases: string[];
+  phrases: Phrase[];
 }

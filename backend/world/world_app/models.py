@@ -97,24 +97,30 @@ class Event(models.Model):
         return self.name
 
 
-class TimelineEntry(models.Model):
-    """Store one day on the timeline of a world."""
+class Trivia(models.Model):
+    """Store a piece of knowledge about a world, on its own or attached to other entries."""
 
-    world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="timeline_entries")
-    day = models.PositiveIntegerField(default=0)
-    title = models.CharField(max_length=200)
+    world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="trivia")
+    name = models.CharField(max_length=200)
+    # Free text, so the game master forms his own groups: "Tier", "Gegenstand", "Volk".
+    category = models.CharField(max_length=100, blank=True)
     text = models.TextField(blank=True)
+    locations = models.ManyToManyField(Location, blank=True, related_name="trivia")
+    npcs = models.ManyToManyField(Npc, blank=True, related_name="trivia")
+    quests = models.ManyToManyField(Quest, blank=True, related_name="trivia")
+    events = models.ManyToManyField(Event, blank=True, related_name="trivia")
 
     class Meta:
-        ordering = ["day", "id"]
+        ordering = ["name"]
+        verbose_name_plural = "trivia"
 
     def __str__(self):
-        """Return day and title for admin and shell."""
-        return f"Tag {self.day}: {self.title}"
+        """Return the entry's name for admin and shell."""
+        return self.name
 
 
 class Chapter(models.Model):
-    """Store one chapter of a world's story."""
+    """Store one chapter of a world's story; its scenes form the thread of the story."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="chapters")
     number = models.PositiveIntegerField()
@@ -136,16 +142,23 @@ class Chapter(models.Model):
 
 
 class Scene(models.Model):
-    """Store one scene of a chapter; scenes happen in any order or not at all."""
+    """Store one scene of a chapter: numbered on the thread of the story, or optional beside it."""
 
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name="scenes")
-    # Only the order in which the scenes are listed, not the order in which they are played.
+    # The order on the thread of the chapter; there is no day and no date.
     position = models.PositiveIntegerField(default=0)
+    # An optional scene has no place on the thread and can be used wherever it fits.
+    optional = models.BooleanField(default=False)
     name = models.CharField(max_length=200)
     text = models.TextField(blank=True)
     to_read = models.TextField(blank=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="scenes")
     npcs = models.ManyToManyField(Npc, blank=True, related_name="scenes")
+    # One-way: this scene can lead to the others; the way back is "comes_from".
+    leads_to = models.ManyToManyField("self", symmetrical=False, blank=True, related_name="comes_from")
+    quests = models.ManyToManyField(Quest, blank=True, related_name="scenes")
+    events = models.ManyToManyField(Event, blank=True, related_name="scenes")
+    trivia = models.ManyToManyField(Trivia, blank=True, related_name="scenes")
 
     class Meta:
         ordering = ["position", "id"]

@@ -1,7 +1,7 @@
 """Import a world written as JSON for one game master.
 
 Entries are linked by name: a place names its "parent", a character its "location",
-quests, events and scenes name their place and their characters, a chapter its quests and events.
+quests, events, knowledge and scenes name what they point to, a chapter its quests and events.
 """
 
 import json
@@ -11,7 +11,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from auth_app.models import User
-from world.world_app.models import Chapter, Event, Location, Quest, Scene, TimelineEntry, World
+from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, World
 from world.world_app.utils import create_world_npc
 
 
@@ -37,8 +37,15 @@ def pick_all(entries, names, kind):
     return [pick(entries, name, kind) for name in names or []]
 
 
+def as_phrase(phrase):
+    """Return an example phrase with trigger and text; a plain text has no trigger."""
+    if isinstance(phrase, str):
+        return {"trigger": "", "text": phrase}
+    return {"trigger": phrase.get("trigger", ""), "text": phrase["text"]}
+
+
 class Command(BaseCommand):
-    """Create a world with places, characters, quests, events, timeline and chapters from a JSON file."""
+    """Create a world with places, characters, quests, events, knowledge and chapters from a JSON file."""
 
     help = "Import a world (JSON) for the given game master."
 
@@ -65,12 +72,12 @@ class Command(BaseCommand):
         if World.objects.filter(owner=owner, name=data["name"]).exists():
             raise CommandError(f"Die Welt „{data['name']}“ gibt es bei diesem Konto schon.")
         self.world = World.objects.create(owner=owner, name=data["name"], lore=data.get("lore", ""))
-        self.locations, self.npcs, self.quests, self.events = {}, {}, {}, {}
+        self.locations, self.npcs, self.quests, self.events, self.trivia = {}, {}, {}, {}, {}
         self._locations(data.get("locations", []))
         self._npcs(data.get("npcs", []))
         self._quests(data.get("quests", []))
         self._events(data.get("events", []))
-        self._timeline(data.get("timeline", []))
+        self._trivia(data.get("trivia", []))
         self._chapters(data.get("chapters", []))
 
     def _locations(self, entries):
@@ -92,7 +99,7 @@ class Command(BaseCommand):
             npc = create_world_npc(self.world, entry["name"], place).npc
             npc.profession = entry.get("profession", "")
             npc.description = entry.get("description", "")
-            npc.phrases = entry.get("phrases", [])
+            npc.phrases = [as_phrase(phrase) for phrase in entry.get("phrases", [])]
             npc.save()
             self.npcs[entry["name"]] = npc
 
@@ -116,12 +123,17 @@ class Command(BaseCommand):
                 world=self.world, name=entry["name"], text=entry.get("text", ""), location=place
             )
 
-    def _timeline(self, entries):
-        """Create the entries of the timeline."""
+    def _trivia(self, entries):
+        """Create the knowledge entries and attach them to places, characters, quests and events."""
         for entry in entries:
-            TimelineEntry.objects.create(
-                world=self.world, day=entry.get("day", 0), title=entry["title"], text=entry.get("text", "")
+            trivia = Trivia.objects.create(
+                world=self.world, name=entry["name"], category=entry.get("category", ""), text=entry.get("text", "")
             )
+            trivia.locations.set(pick_all(self.locations, entry.get("locations"), "Der Ort"))
+            trivia.npcs.set(pick_all(self.npcs, entry.get("npcs"), "Die Figur"))
+            trivia.quests.set(pick_all(self.quests, entry.get("quests"), "Die Quest"))
+            trivia.events.set(pick_all(self.events, entry.get("events"), "Das Ereignis"))
+            self.trivia[entry["name"]] = trivia
 
     def _chapters(self, entries):
         """Create the chapters with their quests, their events and their scenes."""
@@ -135,14 +147,25 @@ class Command(BaseCommand):
             self._scenes(chapter, entry.get("scenes", []))
 
     def _scenes(self, chapter, entries):
-        """Create the scenes of a chapter in the order of the file."""
+        """Create the scenes of a chapter in the order of the file, then link them to each other."""
+        scenes = {}
         for position, entry in enumerate(entries):
-            scene = Scene.objects.create(
-                chapter=chapter, position=position, name=entry["name"],
-                text=entry.get("text", ""), to_read=entry.get("to_read", ""),
-                location=pick(self.locations, entry.get("location"), "Der Ort"),
-            )
-            scene.npcs.set(pick_all(self.npcs, entry.get("npcs"), "Die Figur"))
+            scenes[entry["name"]] = self._scene(chapter, position, entry)
+        for entry in entries:
+            scenes[entry["name"]].leads_to.set(pick_all(scenes, entry.get("leads_to"), "Die Szene"))
+
+    def _scene(self, chapter, position, entry):
+        """Create one scene with its place, characters, quests, events and knowledge."""
+        scene = Scene.objects.create(
+            chapter=chapter, position=position, optional=entry.get("optional", False), name=entry["name"],
+            text=entry.get("text", ""), to_read=entry.get("to_read", ""),
+            location=pick(self.locations, entry.get("location"), "Der Ort"),
+        )
+        scene.npcs.set(pick_all(self.npcs, entry.get("npcs"), "Die Figur"))
+        scene.quests.set(pick_all(self.quests, entry.get("quests"), "Die Quest"))
+        scene.events.set(pick_all(self.events, entry.get("events"), "Das Ereignis"))
+        scene.trivia.set(pick_all(self.trivia, entry.get("trivia"), "Das Wissen"))
+        return scene
 
     def _report(self):
         """Tell the user what was created."""
@@ -150,6 +173,6 @@ class Command(BaseCommand):
         counts = (
             f"{world.locations.count()} Orte, {world.world_npcs.count()} Figuren, {world.chapters.count()} Kapitel, "
             f"{Scene.objects.filter(chapter__world=world).count()} Szenen, {world.quests.count()} Quests, "
-            f"{world.events.count()} Ereignisse, {world.timeline_entries.count()} Zeitleisten-Einträge"
+            f"{world.events.count()} Ereignisse, {world.trivia.count()} Wissens-Einträge"
         )
         self.stdout.write(self.style.SUCCESS(f"Welt „{world.name}“ angelegt: {counts}."))

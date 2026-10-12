@@ -1,0 +1,69 @@
+@if (tutorial.current(); as current) {
+  <div class="veil" (click)="tutorial.close()"></div>
+  <section class="window" role="dialog" aria-modal="true" [attr.aria-label]="'Tutorial: ' + current.title">
+    <header class="window__head">
+      <button
+        type="button"
+        class="menu-btn"
+        aria-label="Alle Tutorials"
+        [attr.aria-expanded]="menuOpen()"
+        (click)="menuOpen.set(!menuOpen())"
+      >
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M4 7h16" />
+          <path d="M4 12h16" />
+          <path d="M4 17h16" />
+        </svg>
+      </button>
+      <div>
+        <span class="kicker">Tutorial</span>
+        <h2 class="subtitle">{{ current.title }}</h2>
+      </div>
+    </header>
+
+    @if (menuOpen()) {
+      <nav class="window__menu" aria-label="Alle Tutorials">
+        @for (other of tutorial.tutorials; track other.id) {
+          <button type="button" class="window__link" [class.is-active]="other.id === current.id" (click)="switchTo(other.id)">
+            {{ other.title }}
+          </button>
+        }
+      </nav>
+    }
+
+    <ol class="steps" aria-label="Schritte">
+      @for (step of current.steps; track $index) {
+        <li class="steps__item">
+          <button
+            type="button"
+            class="steps__dot"
+            [class.is-active]="$index === tutorial.step()"
+            [class.is-done]="$index < tutorial.step()"
+            [attr.aria-current]="$index === tutorial.step() ? 'step' : null"
+            [attr.aria-label]="'Schritt ' + ($index + 1) + ': ' + step.title"
+            (click)="tutorial.goTo($index)"
+          >
+            {{ $index + 1 }}
+          </button>
+        </li>
+      }
+    </ol>
+
+    @if (shown(); as step) {
+      <div class="window__body">
+        <h3 class="window__title">{{ step.title }}</h3>
+        <p class="prose">{{ step.text }}</p>
+        @if (step.more; as more) {
+          <button type="button" class="btn btn--small" (click)="switchTo(more)">Zum Tutorial „{{ titleOf(more) }}“</button>
+        }
+      </div>
+    }
+
+    <footer class="window__foot">
+      <button type="button" class="btn" (click)="tutorial.close()">Überspringen</button>
+      <span class="window__gap"></span>
+      <button type="button" class="btn" [disabled]="tutorial.step() === 0" (click)="tutorial.back()">Zurück</button>
+      <button type="button" class="btn btn--primary" (click)="tutorial.next()">{{ isLast() ? 'Fertig' : 'Weiter' }}</button>
+    </footer>
+  </section>
+}

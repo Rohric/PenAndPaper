@@ -54,13 +54,7 @@
     </div>
     <div class="field">
       <span class="label">Beteiligte Figuren</span>
-      <app-pill-multi-select
-        label="Beteiligte Figuren"
-        emptyText="Diese Welt hat noch keine Figuren."
-        [options]="store.npcOptions()"
-        [selected]="draft().npcs"
-        (selectedChange)="set('npcs', $event)"
-      />
+      <app-link-picker label="Figuren" [options]="store.npcOptions()" [selected]="draft().npcs" (selectedChange)="set('npcs', $event)" />
     </div>
   </div>
 </div>

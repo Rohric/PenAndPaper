@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../core/auth.service';
+import { TutorialService } from '../core/tutorial.service';
 import { ShellNav } from './shell-nav.service';
 
 /** Desktop frame: menu on the left, page on the right. */
@@ -14,4 +15,5 @@ import { ShellNav } from './shell-nav.service';
 export class ShellDesktop {
   protected readonly nav = inject(ShellNav);
   protected readonly auth = inject(AuthService);
+  protected readonly tutorial = inject(TutorialService);
 }

@@ -1,7 +1,10 @@
 <section class="stack">
-  <header>
-    <span class="kicker">Spielleiter</span>
-    <h1 class="title">Welten</h1>
+  <header class="row row--between">
+    <div>
+      <span class="kicker">Spielleiter</span>
+      <h1 class="title">Welten</h1>
+    </div>
+    <app-tutorial-button topic="start" />
   </header>
 
   <form class="list-row create" (ngSubmit)="create()">
@@ -15,7 +18,7 @@
 
   <div class="cards">
     @for (world of worlds(); track world.id) {
-      <a class="card" [routerLink]="['/gm/worlds', world.id, 'lore']">
+      <a class="card" [routerLink]="['/gm/worlds', world.id]">
         <span class="kicker">Welt</span>
         <span class="card__title">{{ world.name }}</span>
         @if (world.lore) {

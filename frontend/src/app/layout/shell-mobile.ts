@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../core/auth.service';
+import { TutorialService } from '../core/tutorial.service';
 import { Mode, ShellNav } from './shell-nav.service';
 
 /** Mobile frame: bar on top with a menu that folds out, page below. */
@@ -14,7 +15,14 @@ import { Mode, ShellNav } from './shell-nav.service';
 export class ShellMobile {
   protected readonly nav = inject(ShellNav);
   protected readonly auth = inject(AuthService);
+  private readonly tutorial = inject(TutorialService);
   protected readonly open = signal(false);
+
+  /** Open the general tutorial and close the menu. */
+  protected openHelp(): void {
+    this.tutorial.open('start');
+    this.close();
+  }
 
   /** Open or close the menu. */
   protected toggle(): void {

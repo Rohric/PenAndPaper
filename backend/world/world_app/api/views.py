@@ -6,8 +6,8 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from auth_app.api.permissions import IsGameMaster
-from world.world_app.models import Chapter, Event, Location, Quest, Scene, TimelineEntry, WorldNpc
-from world.world_app.utils import chapter_for_user, world_for_user, worlds_for_user
+from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, WorldNpc
+from world.world_app.utils import chapter_for_user, delete_world, world_for_user, worlds_for_user
 
 from .serializers import (
     ChapterSerializer,
@@ -15,12 +15,13 @@ from .serializers import (
     LocationSerializer,
     QuestSerializer,
     SceneSerializer,
-    TimelineEntrySerializer,
+    TriviaSerializer,
     WorldNpcSerializer,
     WorldSerializer,
 )
 
 GAME_MASTER_ONLY = [IsAuthenticated, IsGameMaster]
+SCENE_LINKS = ["npcs", "leads_to", "quests", "events", "trivia"]
 
 
 class WorldList(generics.ListCreateAPIView):
@@ -52,6 +53,10 @@ class WorldDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         """Return only the worlds the requesting user owns."""
         return worlds_for_user(self.request.user)
+
+    def perform_destroy(self, instance):
+        """Delete the world together with its NPCs."""
+        delete_world(instance)
 
 
 class WorldChildList(generics.ListCreateAPIView):
@@ -154,18 +159,18 @@ class EventDetail(WorldChildDetail):
     model = Event
 
 
-class TimelineList(WorldChildList):
-    """List and create the timeline entries of a world."""
+class TriviaList(WorldChildList):
+    """List and create the knowledge entries of a world."""
 
-    serializer_class = TimelineEntrySerializer
-    related_name = "timeline_entries"
+    serializer_class = TriviaSerializer
+    related_name = "trivia"
 
 
-class TimelineDetail(WorldChildDetail):
-    """Retrieve, update or delete one timeline entry."""
+class TriviaDetail(WorldChildDetail):
+    """Retrieve, update or delete one knowledge entry."""
 
-    serializer_class = TimelineEntrySerializer
-    model = TimelineEntry
+    serializer_class = TriviaSerializer
+    model = Trivia
 
 
 class ChapterList(WorldChildList):
@@ -180,6 +185,19 @@ class ChapterDetail(WorldChildDetail):
 
     serializer_class = ChapterSerializer
     model = Chapter
+
+
+class WorldSceneList(generics.ListAPIView):
+    """List the scenes of all chapters of a world, so entries can show where they appear."""
+
+    serializer_class = SceneSerializer
+    permission_classes = GAME_MASTER_ONLY
+
+    def get_queryset(self):
+        """Return the scenes of the user's world in chapter and thread order."""
+        world = world_for_user(self.request.user, self.kwargs["world_id"])
+        scenes = Scene.objects.filter(chapter__world=world).prefetch_related(*SCENE_LINKS)
+        return scenes.order_by("chapter__number", "position", "id")
 
 
 class SceneList(generics.ListCreateAPIView):

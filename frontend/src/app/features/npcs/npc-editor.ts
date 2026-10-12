@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { readError } from '../../core/api-error';
 import { Npc } from '../../core/models';
 import { basePointsLeft, bonusPointsLeft } from '../../core/rules';
-import { StringListEditor } from '../../shared/string-list-editor';
 import { InventoryEditor } from './inventory-editor';
 import { NpcService } from './npc.service';
+import { PhraseListEditor } from './phrase-list-editor';
 import { SkillEditor } from './skill-editor';
 
 type NumberField = 'life_points' | 'skill_points_total' | 'bonus_points_total';
@@ -14,7 +14,7 @@ type NumberField = 'life_points' | 'skill_points_total' | 'bonus_points_total';
 /** Edit one NPC. Changes stay in a draft until the user saves. */
 @Component({
   selector: 'app-npc-editor',
-  imports: [FormsModule, SkillEditor, InventoryEditor, StringListEditor],
+  imports: [FormsModule, SkillEditor, InventoryEditor, PhraseListEditor],
   templateUrl: './npc-editor.html',
 })
 export class NpcEditor {
@@ -65,6 +65,7 @@ export class NpcEditor {
       ...draft,
       skills: draft.skills.filter((skill) => skill.name.trim()),
       inventory: draft.inventory.filter((item) => item.name.trim()),
+      phrases: draft.phrases.filter((phrase) => phrase.text.trim()),
     };
   }
 
