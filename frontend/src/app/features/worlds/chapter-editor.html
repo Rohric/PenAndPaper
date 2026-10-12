@@ -1,0 +1,76 @@
+<div class="stack">
+  <div class="panel">
+    <div class="grid-fields">
+      <div class="field">
+        <label for="chapter-name">Name</label>
+        <input id="chapter-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
+      </div>
+      <div class="field">
+        <label for="chapter-number">Kapitel-Nummer</label>
+        <input
+          id="chapter-number"
+          class="input input--number"
+          type="number"
+          min="1"
+          [ngModel]="draft().number"
+          (ngModelChange)="setChapterNumber($event)"
+        />
+      </div>
+    </div>
+    <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
+  </div>
+
+  <div class="panel">
+    <div class="field">
+      <label for="chapter-text">Text</label>
+      <textarea id="chapter-text" class="input" rows="8" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
+    </div>
+    <div class="field">
+      <label for="chapter-read">Zum Vorlesen</label>
+      <textarea id="chapter-read" class="input" rows="5" [ngModel]="draft().to_read" (ngModelChange)="set('to_read', $event)"></textarea>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Quests und Ereignisse</h2>
+    <div class="field">
+      <span class="label">Quests in diesem Kapitel</span>
+      <app-pill-multi-select
+        label="Quests in diesem Kapitel"
+        emptyText="Diese Welt hat noch keine Quests."
+        [options]="store.questOptions()"
+        [selected]="draft().quests"
+        (selectedChange)="set('quests', $event)"
+      />
+    </div>
+    <div class="field">
+      <span class="label">Ereignisse in diesem Kapitel</span>
+      <app-pill-multi-select
+        label="Ereignisse in diesem Kapitel"
+        emptyText="Diese Welt hat noch keine Ereignisse."
+        [options]="store.eventOptions()"
+        [selected]="draft().events"
+        (selectedChange)="set('events', $event)"
+      />
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Szenen</h2>
+    <p class="soft">Szenen haben keine feste Reihenfolge. Sie passieren oder sie passieren nicht.</p>
+    <form class="list-row" (ngSubmit)="addScene()">
+      <input class="input" name="newScene" aria-label="Name der neuen Szene" placeholder="Name der neuen Szene" [(ngModel)]="newScene" />
+      <button type="submit" class="btn btn--primary" [disabled]="!newScene().trim()">Szene anlegen</button>
+    </form>
+    <app-entry-links label="Orte dieses Kapitels" section="locations" [items]="places()" />
+    <app-entry-links label="Figuren dieses Kapitels" section="npcs" [items]="npcs()" />
+  </div>
+
+  @for (scene of scenes(); track scene.id) {
+    <app-scene-editor [scene]="scene" (saved)="onSceneSaved($event)" (deleted)="onSceneDeleted($event)" />
+  } @empty {
+    <div class="empty">
+      <p>Dieses Kapitel hat noch keine Szene.</p>
+    </div>
+  }
+</div>

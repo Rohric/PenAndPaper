@@ -1,0 +1,61 @@
+@for (item of items(); track $index) {
+  <div class="item">
+    <div class="item__main">
+      <div class="field item__name">
+        <label [for]="'item-name-' + $index">Gegenstand</label>
+        <input [id]="'item-name-' + $index" class="input" [ngModel]="item.name" (ngModelChange)="change($index, { name: $event })" />
+      </div>
+      <div class="field">
+        <label [for]="'item-quantity-' + $index">Anzahl</label>
+        <input
+          [id]="'item-quantity-' + $index"
+          class="input input--number"
+          type="number"
+          min="0"
+          [ngModel]="item.quantity"
+          (ngModelChange)="setNumber($index, 'quantity', $event)"
+        />
+      </div>
+      <div class="field">
+        <label [for]="'item-dice-' + $index">Schaden W10</label>
+        <input
+          [id]="'item-dice-' + $index"
+          class="input input--number"
+          type="number"
+          min="0"
+          max="10"
+          [ngModel]="item.damage_dice"
+          (ngModelChange)="setNumber($index, 'damage_dice', $event)"
+        />
+      </div>
+      <div class="field">
+        <label [for]="'item-bonus-' + $index">Bonus</label>
+        <input
+          [id]="'item-bonus-' + $index"
+          class="input input--number"
+          type="number"
+          min="0"
+          [ngModel]="item.damage_bonus"
+          (ngModelChange)="setNumber($index, 'damage_bonus', $event)"
+        />
+      </div>
+      @if (damageText(item); as damage) {
+        <span class="chip chip--accent">Waffe · {{ damage }}</span>
+      }
+    </div>
+    <div class="list-row">
+      <input
+        class="input"
+        placeholder="Beschreibung"
+        [attr.aria-label]="'Beschreibung von ' + item.name"
+        [ngModel]="item.description"
+        (ngModelChange)="change($index, { description: $event })"
+      />
+      <button type="button" class="btn btn--small" [attr.aria-label]="item.name + ' entfernen'" (click)="remove($index)">Entfernen</button>
+    </div>
+  </div>
+} @empty {
+  <p class="soft">Noch nichts im Inventar.</p>
+}
+
+<button type="button" class="btn btn--small add" (click)="add()">+ Gegenstand</button>

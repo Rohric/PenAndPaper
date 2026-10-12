@@ -1,0 +1,19 @@
+.auth {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 100vh;
+  padding: clamp(16px, 8vh, 96px) 16px 32px;
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 440px;
+  padding: 26px 24px;
+}
+
+.auth__switch {
+  align-self: center;
+  padding: 10px 8px;
+  font-weight: 600;
+}

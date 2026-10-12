@@ -1,0 +1,66 @@
+<div class="stack">
+  <div class="panel">
+    <div class="field">
+      <label for="quest-name">Name</label>
+      <input id="quest-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
+    </div>
+    <div class="row" role="group" aria-label="Art der Quest">
+      @for (kind of kinds; track kind.id) {
+        <button type="button" class="pill" [attr.aria-pressed]="draft().kind === kind.id" (click)="set('kind', kind.id)">
+          {{ kind.label }}
+        </button>
+      }
+    </div>
+    <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
+  </div>
+
+  <div class="panel">
+    <div class="field">
+      <label for="quest-text">Text</label>
+      <textarea id="quest-text" class="input" rows="6" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
+    </div>
+    <div class="field">
+      <label for="quest-goal">Ziel</label>
+      <textarea id="quest-goal" class="input" rows="3" [ngModel]="draft().goal" (ngModelChange)="set('goal', $event)"></textarea>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Checkliste</h2>
+    <app-string-list-editor label="Punkt" placeholder="Was zu tun ist" [items]="draft().checklist" (itemsChange)="set('checklist', $event)" />
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Verknüpfungen</h2>
+    <div class="field">
+      <label for="quest-location">Ort</label>
+      <app-id-select
+        inputId="quest-location"
+        emptyLabel="Kein Ort"
+        [options]="store.locationOptions()"
+        [value]="draft().location"
+        (valueChange)="set('location', $event)"
+      />
+    </div>
+    <div class="field">
+      <label for="quest-giver">Auftraggeber</label>
+      <app-id-select
+        inputId="quest-giver"
+        emptyLabel="Kein Auftraggeber"
+        [options]="store.npcOptions()"
+        [value]="draft().giver"
+        (valueChange)="set('giver', $event)"
+      />
+    </div>
+    <div class="field">
+      <span class="label">Beteiligte Figuren</span>
+      <app-pill-multi-select
+        label="Beteiligte Figuren"
+        emptyText="Diese Welt hat noch keine Figuren."
+        [options]="store.npcOptions()"
+        [selected]="draft().npcs"
+        (selectedChange)="set('npcs', $event)"
+      />
+    </div>
+  </div>
+</div>

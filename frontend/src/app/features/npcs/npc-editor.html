@@ -1,0 +1,81 @@
+<div class="stack">
+  <div class="panel">
+    <div class="field">
+      <label for="npc-name">Name</label>
+      <input id="npc-name" class="input input--title"[ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
+    </div>
+    <div class="row">
+      <button type="button" class="btn btn--primary" [disabled]="!dirty() || busy() || !draft().name.trim()" (click)="save()">
+        Speichern
+      </button>
+      <button type="button" class="btn btn--danger" (click)="remove()">Löschen</button>
+      @if (dirty()) {
+        <span class="soft" role="status">Ungespeicherte Änderungen</span>
+      }
+    </div>
+    @if (error()) {
+      <p class="notice notice--error" role="alert">{{ error() }}</p>
+    }
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Stammdaten</h2>
+    <div class="grid-fields">
+      <div class="field">
+        <label for="npc-age">Alter</label>
+        <input id="npc-age" class="input" [ngModel]="draft().age" (ngModelChange)="set('age', $event)" />
+      </div>
+      <div class="field">
+        <label for="npc-gender">Geschlecht</label>
+        <input id="npc-gender" class="input" [ngModel]="draft().gender" (ngModelChange)="set('gender', $event)" />
+      </div>
+      <div class="field">
+        <label for="npc-profession">Beruf</label>
+        <input id="npc-profession" class="input" [ngModel]="draft().profession" (ngModelChange)="set('profession', $event)" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="npc-description">Beschreibung</label>
+      <textarea id="npc-description" class="input" rows="5" [ngModel]="draft().description" (ngModelChange)="set('description', $event)"></textarea>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Werte</h2>
+    <div class="grid-fields">
+      <div class="field">
+        <label for="npc-life">Lebenspunkte</label>
+        <input id="npc-life" class="input" type="number" min="0" [ngModel]="draft().life_points" (ngModelChange)="setNumber('life_points', $event)" />
+      </div>
+      <div class="field">
+        <label for="npc-base">Budget Grundpunkte</label>
+        <input id="npc-base" class="input" type="number" min="0" [ngModel]="draft().skill_points_total" (ngModelChange)="setNumber('skill_points_total', $event)" />
+      </div>
+      <div class="field">
+        <label for="npc-bonus">Budget Bonuspunkte</label>
+        <input id="npc-bonus" class="input" type="number" min="0" [ngModel]="draft().bonus_points_total" (ngModelChange)="setNumber('bonus_points_total', $event)" />
+      </div>
+    </div>
+    <div class="row">
+      <span class="chip" [class.chip--danger]="baseLeft() < 0">Grundpunkte übrig: {{ baseLeft() }}</span>
+      <span class="chip" [class.chip--danger]="bonusLeft() < 0">Bonuspunkte übrig: {{ bonusLeft() }}</span>
+    </div>
+  </div>
+
+  <app-skill-editor [skills]="draft().skills" (skillsChange)="set('skills', $event)" />
+
+  <div class="panel">
+    <h2 class="subtitle">Inventar und Waffen</h2>
+    <app-inventory-editor [items]="draft().inventory" (itemsChange)="set('inventory', $event)" />
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Beispielsätze</h2>
+    <app-string-list-editor
+      label="Satz"
+      placeholder="Was die Figur sagen könnte"
+      [items]="draft().phrases"
+      (itemsChange)="set('phrases', $event)"
+    />
+  </div>
+</div>

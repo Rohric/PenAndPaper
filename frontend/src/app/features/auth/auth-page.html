@@ -1,0 +1,52 @@
+<main class="auth">
+  <form class="panel auth__card" (ngSubmit)="submit()">
+    <span class="kicker">Pen &amp; Paper · How to be a Hero</span>
+    <h1 class="title">{{ isRegister() ? 'Konto anlegen' : 'Anmelden' }}</h1>
+    <p class="soft">Du brauchst nur einen Namen und ein Passwort.</p>
+
+    <div class="field">
+      <label for="username">Name</label>
+      <input id="username" class="input" name="username" autocomplete="username" required [(ngModel)]="username" />
+    </div>
+
+    <div class="field">
+      <label for="password">Passwort</label>
+      <input
+        id="password"
+        class="input"
+        type="password"
+        name="password"
+        required
+        [autocomplete]="isRegister() ? 'new-password' : 'current-password'"
+        [(ngModel)]="password"
+      />
+    </div>
+
+    @if (isRegister()) {
+      <div class="field">
+        <label for="repeated-password">Passwort wiederholen</label>
+        <input
+          id="repeated-password"
+          class="input"
+          type="password"
+          name="repeatedPassword"
+          autocomplete="new-password"
+          required
+          [(ngModel)]="repeatedPassword"
+        />
+      </div>
+    }
+
+    @if (error()) {
+      <p class="notice notice--error" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" class="btn btn--primary" [disabled]="busy()">
+      {{ isRegister() ? 'Konto anlegen' : 'Anmelden' }}
+    </button>
+
+    <a class="auth__switch" [routerLink]="isRegister() ? '/login' : '/register'">
+      {{ isRegister() ? 'Schon ein Konto? Anmelden' : 'Neu hier? Konto anlegen' }}
+    </a>
+  </form>
+</main>

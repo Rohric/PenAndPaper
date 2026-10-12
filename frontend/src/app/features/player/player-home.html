@@ -1,0 +1,28 @@
+<section class="stack">
+  <header>
+    <span class="kicker">Spieler</span>
+    <h1 class="title">Meine Charaktere</h1>
+  </header>
+
+  <div class="empty">
+    <p>Hier legst du später deine Charaktere an. Dieser Teil kommt, sobald der Spielmodus gebaut wird.</p>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Spielleiter-Menü</h2>
+    @if (auth.isGameMaster()) {
+      <p class="soft">Du bist als Spielleiter freigeschaltet.</p>
+      <div class="row">
+        <a class="btn btn--primary" routerLink="/gm">Zum Spielleiter-Menü</a>
+      </div>
+    } @else {
+      <p class="soft">Ein Admin schaltet das Spielleiter-Menü für dein Konto im Adminpanel frei.</p>
+      <div class="row">
+        <button type="button" class="btn" (click)="checkUnlock()">Freischaltung prüfen</button>
+      </div>
+      @if (checked()) {
+        <p class="notice" role="status">Dein Konto ist noch nicht freigeschaltet.</p>
+      }
+    }
+  </div>
+</section>

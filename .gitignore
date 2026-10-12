@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+env/
+venv/
+.venv/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Secrets
+.env
+
+# Node / Angular (the frontend folder has its own, more detailed file)
+node_modules/
+dist/
+.angular/
+
+# Editors and operating system
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local assistant settings
+.claude/

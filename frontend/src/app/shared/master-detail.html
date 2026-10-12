@@ -1,0 +1,24 @@
+@if (layout.isMobile()) {
+  <div class="mobile">
+    @if (open()) {
+      <button type="button" class="btn back" (click)="back.emit()">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 6l-6 6 6 6" />
+        </svg>
+        Zur Liste
+      </button>
+      <ng-container [ngTemplateOutlet]="detail()" />
+    } @else {
+      <ng-container [ngTemplateOutlet]="list()" />
+    }
+  </div>
+} @else {
+  <div class="desktop">
+    <div class="desktop__list">
+      <ng-container [ngTemplateOutlet]="list()" />
+    </div>
+    <div class="desktop__detail">
+      <ng-container [ngTemplateOutlet]="detail()" />
+    </div>
+  </div>
+}

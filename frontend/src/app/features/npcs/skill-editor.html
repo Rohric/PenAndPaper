@@ -1,0 +1,65 @@
+@for (group of groups(); track group.talent) {
+  <div class="panel">
+    <div class="row row--between">
+      <h2 class="subtitle">{{ group.label }}</h2>
+      <div class="row">
+        <span class="chip chip--accent">Begabungswert {{ group.value }}</span>
+        <span class="chip">Geistesblitzpunkte {{ group.inspiration }}</span>
+      </div>
+    </div>
+
+    @for (row of group.rows; track row.index) {
+      <div class="skill">
+        <div class="skill__main">
+          <div class="field skill__name">
+            <label [for]="'skill-name-' + row.index">Fähigkeit</label>
+            <input [id]="'skill-name-' + row.index" class="input" [ngModel]="row.skill.name" (ngModelChange)="change(row.index, { name: $event })" />
+          </div>
+          <div class="field">
+            <label [for]="'skill-points-' + row.index">Grund</label>
+            <input
+              [id]="'skill-points-' + row.index"
+              class="input input--number"
+              type="number"
+              min="0"
+              max="100"
+              [ngModel]="row.skill.points"
+              (ngModelChange)="setPoints(row.index, $event)"
+            />
+          </div>
+          <div class="field">
+            <label [for]="'skill-bonus-' + row.index">Bonus</label>
+            <input
+              [id]="'skill-bonus-' + row.index"
+              class="input input--number"
+              type="number"
+              min="0"
+              [ngModel]="row.skill.bonus_points"
+              (ngModelChange)="setBonus(row.index, $event)"
+            />
+          </div>
+          <div class="field">
+            <span class="label">Wert</span>
+            <span class="skill__value" [attr.aria-label]="'Wert von ' + row.skill.name">{{ row.value }}</span>
+          </div>
+        </div>
+        <div class="list-row">
+          <input
+            class="input"
+            placeholder="Beschreibung"
+            [attr.aria-label]="'Beschreibung von ' + row.skill.name"
+            [ngModel]="row.skill.description"
+            (ngModelChange)="change(row.index, { description: $event })"
+          />
+          <button type="button" class="btn btn--small" [attr.aria-label]="row.skill.name + ' entfernen'" (click)="remove(row.index)">
+            Entfernen
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <p class="soft">Noch keine Fähigkeit in {{ group.label }}.</p>
+    }
+
+    <button type="button" class="btn btn--small add" (click)="add(group.talent)">+ Fähigkeit</button>
+  </div>
+}

@@ -1,0 +1,25 @@
+// Design tokens taken from the mockup. Every color, font and size lives here once.
+:root {
+  --bg: #111417;
+  --surface: #181d22;
+  --surface-2: #1f252b;
+  --line: #2b333b;
+  --line-2: #3a434c;
+
+  --text: #ebe6dc;
+  --soft: #cfc8ba;
+  --muted: #a9b0b7;
+
+  --accent: #e3a65c;
+  --accent-ink: #111417;
+  --info: #9cc3d1;
+  --danger: #f0b9a8;
+  --ok: #b9d8a6;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'IBM Plex Sans', system-ui, sans-serif;
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --touch: 44px;
+}

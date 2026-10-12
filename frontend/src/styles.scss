@@ -1,0 +1,330 @@
+@use 'styles/tokens';
+
+// Base
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+// Text
+.kicker {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.4vw, 38px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.subtitle {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.soft {
+  color: var(--soft);
+}
+
+// Layout helpers
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.row--between {
+  justify-content: space-between;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+// Surfaces
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  text-decoration: none;
+}
+
+button.card:hover,
+a.card:hover,
+.card.is-active {
+  border-color: var(--accent);
+}
+
+.card__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 24px 22px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+
+.notice {
+  padding: 12px 16px;
+  border: 1px dashed #3d5560;
+  border-radius: 12px;
+  color: var(--info);
+}
+
+.notice--error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+// Controls
+.btn {
+  min-height: var(--touch);
+  padding: 8px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--danger {
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+
+.btn--small {
+  min-height: 36px;
+  padding: 4px 12px;
+  font-size: 14px;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pill {
+  min-height: var(--touch);
+  padding: 8px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pill[aria-pressed='true'],
+.pill.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--soft);
+}
+
+.chip--accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip--info {
+  border-color: var(--info);
+  color: var(--info);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > label,
+.field > .label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.input {
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+}
+
+textarea.input {
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.input--number {
+  width: 88px;
+}
+
+// A row of a list editor: one growing input and its buttons.
+.list-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.list-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+// Short fields next to each other; they wrap by themselves on narrow screens.
+.grid-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.chip--danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+// A chip that leads to another entry.
+.chip--link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  border-color: var(--info);
+  color: var(--info);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+// The name field at the top of an editor.
+.input--title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+// Show at most three lines of a long text on a card.
+.clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+// A panel that folds open, used for scenes.
+.fold > summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  min-height: var(--touch);
+  cursor: pointer;
+}
+
+.fold[open] > summary {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}

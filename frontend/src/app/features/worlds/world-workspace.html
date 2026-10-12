@@ -1,0 +1,97 @@
+<section class="stack">
+  <header class="head">
+    <a class="btn btn--small" routerLink="/gm/worlds">Alle Welten</a>
+    <div>
+      <span class="kicker">Welt</span>
+      <h1 class="title">{{ store.world()?.name }}</h1>
+    </div>
+  </header>
+
+  @if (store.error()) {
+    <p class="notice notice--error" role="alert">{{ store.error() }}</p>
+  }
+
+  <nav class="row" aria-label="Bereiche der Welt">
+    @for (item of sections; track item.id) {
+      <a class="pill" [routerLink]="['/gm/worlds', worldId(), item.id]" routerLinkActive="is-active">{{ item.label }}</a>
+    }
+  </nav>
+
+  @if (store.world()) {
+    @if (current().kind) {
+      <app-master-detail [list]="listTpl" [detail]="detailTpl" [open]="hasOpenEntry()" (back)="close()" />
+    } @else {
+      <app-lore-editor />
+    }
+  }
+</section>
+
+<ng-template #listTpl>
+  <form class="list-row" (ngSubmit)="create()">
+    <input class="input" name="newName" [attr.aria-label]="current().newLabel" [placeholder]="current().newLabel ?? ''" [(ngModel)]="newName" />
+    <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()">Anlegen</button>
+  </form>
+
+  @if (error()) {
+    <p class="notice notice--error" role="alert">{{ error() }}</p>
+  }
+
+  @for (item of items(); track item.id) {
+    <a
+      class="card"
+      [routerLink]="[]"
+      [queryParams]="{ entry: item.id }"
+      [class.is-active]="item.id === entryId()"
+      [style.margin-left.px]="item.depth * 18"
+    >
+      <span class="card__title">{{ item.title }}</span>
+      @if (item.sub) {
+        <span class="soft">{{ item.sub }}</span>
+      }
+    </a>
+  } @empty {
+    <div class="empty">
+      <p>{{ current().empty }}</p>
+    </div>
+  }
+</ng-template>
+
+<ng-template #detailTpl>
+  @if (!hasOpenEntry()) {
+    <div class="empty">
+      <p>Wähle einen Eintrag aus der Liste oder leg einen neuen an.</p>
+    </div>
+  }
+  @switch (current().kind) {
+    @case ('locations') {
+      @if (location(); as opened) {
+        <app-location-editor [entry]="opened" (closed)="close()" />
+      }
+    }
+    @case ('world-npcs') {
+      @if (npc(); as opened) {
+        <app-world-npc-editor [link]="opened" (closed)="close()" />
+      }
+    }
+    @case ('quests') {
+      @if (quest(); as opened) {
+        <app-quest-editor [entry]="opened" (closed)="close()" />
+      }
+    }
+    @case ('events') {
+      @if (event(); as opened) {
+        <app-event-editor [entry]="opened" (closed)="close()" />
+      }
+    }
+    @case ('timeline') {
+      @if (timelineEntry(); as opened) {
+        <app-timeline-editor [entry]="opened" (closed)="close()" />
+      }
+    }
+    @case ('chapters') {
+      @if (chapter(); as opened) {
+        <app-chapter-editor [entry]="opened" (closed)="close()" />
+      }
+    }
+  }
+</ng-template>
