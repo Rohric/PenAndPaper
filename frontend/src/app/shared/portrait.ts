@@ -16,7 +16,7 @@ export type PortraitState = 'plain' | 'turn' | 'out' | 'frozen' | 'poisoned' | '
   template: `
     <span class="portrait" [class]="'portrait portrait--' + state()" [style.width.px]="size()" [style.height.px]="size()">
       @if (image()) {
-        <img class="portrait__image" alt="" [src]="image()" />
+        <img class="portrait__image" alt="" [src]="source()" />
       } @else {
         <app-icon [name]="fallback()" [symbol]="symbol()" [size]="iconSize()" />
       }
@@ -95,5 +95,7 @@ export class Portrait {
   /** Width and height in pixels. */
   readonly size = input(44);
 
+  /** The picture by its path only: the address from the server names a host that a phone cannot reach. */
+  protected readonly source = computed(() => (this.image() ?? '').replace(/^https?:\/\/[^/]+/, ''));
   protected readonly iconSize = computed(() => Math.round(this.size() * 0.55));
 }

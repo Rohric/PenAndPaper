@@ -15,6 +15,7 @@ const MAX_DICE = 10;
 interface Value {
   label: string;
   value: number;
+  talent: string;
 }
 
 /**
@@ -139,8 +140,8 @@ export class RollPanel {
   });
   protected readonly values = computed<Value[]>(() => {
     const skills = this.sheet()?.skills ?? [];
-    const talents = TALENTS.map((talent) => ({ label: talent.label, value: talentValue(skills, talent.id) }));
-    return [...talents, ...skills.map((skill) => ({ label: skill.name, value: skillValue(skill, skills) }))];
+    const talents = TALENTS.map((talent) => ({ label: talent.label, value: talentValue(skills, talent.id), talent: talent.id }));
+    return [...talents, ...skills.map((skill) => ({ label: skill.name, value: skillValue(skill, skills), talent: skill.talent }))];
   });
 
   constructor() {
@@ -150,7 +151,7 @@ export class RollPanel {
 
   /** Roll a check on a value of the picked sheet. */
   protected check(figure: AnyCharacter, value: Value): void {
-    this.order({ who: figure.name, label: value.label, value: value.value, sides: 100, count: 1 });
+    this.order({ who: figure.name, label: value.label, value: value.value, sides: 100, count: 1, talent: value.talent });
   }
 
   /** Roll free dice: one W100, or some W10. */
@@ -164,7 +165,7 @@ export class RollPanel {
   }
 
   /** A player always rolls openly and for the own character. */
-  private order(roll: Pick<RollOrder, 'who' | 'label' | 'value' | 'sides' | 'count'>): void {
+  private order(roll: Pick<RollOrder, 'who' | 'label' | 'value' | 'sides' | 'count' | 'talent'>): void {
     const own = this.gameMaster() ? null : (this.characters()[0]?.id ?? null);
     this.roll.emit({ ...roll, character: own, secret: this.gameMaster() && this.secret() });
   }

@@ -16,15 +16,30 @@
     <p class="notice notice--error" role="alert">{{ error() }}</p>
   }
 
+  @if (characters().length > 1) {
+    <div class="row" role="group" aria-label="Sortierung">
+      <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'name'" (click)="sortBy.set('name')">Name</button>
+      <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'changed'" (click)="sortBy.set('changed')">Zuletzt geändert</button>
+    </div>
+  }
+
   <div class="cards">
-    @for (character of characters(); track character.id) {
+    @for (character of sorted(); track character.id) {
       <a class="card" [routerLink]="['/player/characters', character.id]">
-        <span class="kicker">Charakter</span>
-        <span class="card__title">{{ character.name }}</span>
+        <span class="tile__head">
+          <app-portrait [symbol]="character.symbol" fallback="sheet" [image]="character.shows_image ? character.image : null" [size]="44" />
+          <span class="tile__names">
+            <span class="kicker">Charakter</span>
+            <span class="card__title">{{ character.name }}</span>
+          </span>
+        </span>
         @if (character.profession) {
           <span class="soft">{{ character.profession }}</span>
         }
         <span class="soft">Lebenspunkte {{ character.life_points }}</span>
+        @if (open(character) > 0) {
+          <span class="chip chip--danger">{{ open(character) }} Grundpunkte offen</span>
+        }
         <span class="chip" [class.chip--accent]="!!character.adventure">
           {{ character.adventure ? 'spielt in: ' + character.adventure.name : 'frei' }}
         </span>

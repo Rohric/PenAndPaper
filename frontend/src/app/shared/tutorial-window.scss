@@ -45,6 +45,53 @@
   background: var(--bg);
 }
 
+.window__group {
+  margin: 8px 6px 2px;
+}
+
+.window__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.window__list {
+  align-self: stretch;
+}
+
+.window__box {
+  align-self: stretch;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line-2);
+  border-left: 3px solid var(--info);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  white-space: pre-line;
+}
+
+.window__box--example {
+  border-left-color: var(--accent);
+}
+
+.window__box .kicker {
+  display: block;
+}
+
+// On the phone the window fills the whole screen.
+@media (max-width: 767px) {
+  .window {
+    top: 0;
+    left: 0;
+    width: 100%;
+    max-height: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    transform: none;
+  }
+}
+
 .window__link {
   min-height: 40px;
   padding: 6px 10px;

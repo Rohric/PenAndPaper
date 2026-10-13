@@ -19,6 +19,7 @@ import { WorldSearch } from '../worlds/world-search';
 import { WorldStore } from '../worlds/world-store';
 import { BattleView } from './battle-view';
 import { ChapterCloseForm } from './chapter-close-form';
+import { ChatThread, groupBubbles } from './chat-thread';
 import { CharacterPanel } from './character-tile';
 import { ItemGiftForm, ItemTemplate } from './item-gift-form';
 import { NoteDetail } from './note-detail';
@@ -38,6 +39,7 @@ import { SessionService } from './session.service';
 
 const REFRESH_MS = 5000;
 const SEEN_KEY = 'pnp.notes.seen.';
+const CHAT_KEY = 'pnp.chat.seen.gm.';
 
 /** What the window at the side shows. Only one is open at a time. */
 type Panel =
@@ -47,7 +49,8 @@ type Panel =
   | { kind: 'rolls' }
   | { kind: 'roll' }
   | { kind: 'level' }
-  | { kind: 'members' };
+  | { kind: 'members' }
+  | { kind: 'chat' };
 
 /** What fills the page between the two bars. */
 type View = 'story' | 'quests' | 'notes' | 'players' | 'glossary';
@@ -62,6 +65,7 @@ const PANEL_TITLES: Record<Panel['kind'], string> = {
   roll: 'Würfeln',
   level: 'Kapitel abschließen',
   members: 'Gruppe bearbeiten',
+  chat: 'Chat der Gruppe',
 };
 
 /** How the kinds of a session are called among the entries of a world. */
@@ -85,7 +89,7 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
   selector: 'app-session-cockpit',
   imports: [
     RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
-    ChapterCloseForm, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
+    ChapterCloseForm, ChatThread, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
     SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch,
   ],
   providers: [WorldStore, SessionStore],
@@ -161,10 +165,23 @@ export class SessionCockpit {
   );
   private readonly seen = signal(0);
   protected readonly fresh = computed(() => Math.max(0, this.groupActivity() - this.seen()));
+  /** The id of the last chat message the game master has read. */
+  private readonly chatSeen = signal(0);
+  protected readonly chatUnread = computed(() => this.store.chat().filter((m) => !m.mine && m.id > this.chatSeen()).length);
+  protected readonly chatBubbles = computed(() => groupBubbles(this.store.chat()));
 
   constructor() {
     effect(() => this.store.load(Number(this.sessionId())));
     effect(() => this.seen.set(Number(localStorage.getItem(SEEN_KEY + this.sessionId())) || 0));
+    effect(() => this.chatSeen.set(Number(localStorage.getItem(CHAT_KEY + this.sessionId())) || 0));
+    // While the chat is open, everything in it counts as read.
+    effect(() => {
+      const last = this.store.chat().at(-1)?.id ?? 0;
+      if (this.panel()?.kind === 'chat' && last > this.chatSeen()) {
+        this.chatSeen.set(last);
+        localStorage.setItem(CHAT_KEY + this.sessionId(), String(last));
+      }
+    });
     // Load the world of the session once the session is known.
     effect(() => {
       const world = this.store.session()?.world;
@@ -216,6 +233,13 @@ export class SessionCockpit {
       this.sceneId.set(pin.id);
     } else {
       this.world.peek.set({ kind: pin.kind, id: pin.id });
+    }
+  }
+
+  /** Give all characters their inspiration points back, after asking. */
+  protected newEvening(): void {
+    if (confirm('Neuer Abend: Alle Charaktere der Gruppe bekommen ihre Geistesblitzpunkte zurück. Weiter?')) {
+      this.store.refillInspiration();
     }
   }
 

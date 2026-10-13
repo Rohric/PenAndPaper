@@ -3,7 +3,7 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { questLabel } from '../../core/models';
 import { damageText } from '../../core/rules';
 import {
-  EquipmentLine, PlayerView, QUEST_STATUSES, QuestLog, SessionEntryKind, SharedEntry, SharedQuest, questStatus,
+  EquipmentLine, PlayerView, QUEST_STATUSES, QuestLog, QuestStatus, SessionEntryKind, SharedEntry, SharedQuest, questStatus,
 } from '../../core/session-models';
 import { Icon, IconName } from '../../shared/icon';
 import { Portrait } from '../../shared/portrait';
@@ -67,6 +67,14 @@ export class PlayerPanels {
   readonly logChange = output<{ quest: number; log: QuestLog }>();
   /** Fired with all checked points of a quest after one was checked or unchecked. */
   readonly stepsChange = output<{ quest: number; steps: number[] }>();
+  /** Ids of quests that are new or changed since the player looked last. */
+  readonly fresh = input<number[]>([]);
+
+  protected readonly query = signal('');
+  protected readonly status = signal<'all' | QuestStatus>('all');
+  protected readonly sortBy = signal<'main' | 'name' | 'progress'>('main');
+  protected readonly tag = signal('');
+  protected readonly only = signal('');
 
   protected readonly nothingMore = NOTHING_MORE;
   protected readonly colourOf = tagColour;
@@ -78,24 +86,42 @@ export class PlayerPanels {
     group: this.part() === 'all' || this.part() === 'group',
   }));
   /** Main quests first, in the order of their numbers, then the side quests. */
-  private readonly quests = computed(() =>
-    [...this.view().quests].sort((a, b) => Number(b.main) - Number(a.main) || (a.number ?? Infinity) - (b.number ?? Infinity)),
-  );
+  private readonly quests = computed(() => [...this.view().quests].sort((a, b) => this.compare(a, b)));
+  /** The quests that match the search and the tag. */
+  private readonly matching = computed(() => {
+    const query = this.query().trim().toLowerCase();
+    return this.quests().filter(
+      (quest) => `${quest.name} ${quest.goal}`.toLowerCase().includes(query) && (!this.tag() || (quest.log.tags ?? []).includes(this.tag())),
+    );
+  });
   /** The quest log in its three parts: running, open and finished; an empty part is left out. */
   protected readonly questGroups = computed(() =>
-    QUEST_STATUSES.map((status) => ({ ...status, quests: this.quests().filter((quest) => questStatus(quest) === status.id) })).filter(
-      (group) => group.quests.length,
-    ),
+    QUEST_STATUSES.filter((status) => this.status() === 'all' || this.status() === status.id)
+      .map((status) => ({ ...status, quests: this.matching().filter((quest) => questStatus(quest) === status.id) }))
+      .filter((group) => group.quests.length),
   );
+  protected readonly statusCounts = computed(() =>
+    QUEST_STATUSES.map((status) => ({ ...status, count: this.quests().filter((quest) => questStatus(quest) === status.id).length })),
+  );
+  /** Every tag the group wrote on a quest. */
+  protected readonly tags = computed(() => [...new Set(this.view().quests.flatMap((quest) => quest.log.tags ?? []))].sort());
   /** The parts of the glossary that have something in them, each with its tiles. */
+  protected readonly sectionLabels = computed(() => this.allSections().map((part) => part.label));
   protected readonly sections = computed(() => {
+    const query = this.query().trim().toLowerCase();
+    return this.allSections()
+      .filter((part) => !this.only() || part.label === this.only())
+      .map((part) => ({ ...part, cards: part.cards.filter((card) => `${card.title} ${card.text}`.toLowerCase().includes(query)) }))
+      .filter((part) => part.cards.length);
+  });
+  private readonly allSections = computed(() => {
     const entries = this.view().glossary;
     const parts = PARTS.map((part) => ({ ...part, cards: entries.filter((entry) => entry.kind === part.kind && !isItem(entry)).map(entryCard) }));
     const items = { kind: 'trivia' as const, label: 'Gegenstände', icon: 'gift' as const, tone: 'items', cards: this.items().map(itemCard) };
     return [...parts, items].filter((part) => part.cards.length);
   });
   protected readonly openQuest = computed(() => this.quests().find((quest) => `quest:${quest.id}` === this.openKey()) ?? null);
-  protected readonly openCard = computed(() => this.sections().flatMap((part) => part.cards).find((card) => card.key === this.openKey()) ?? null);
+  protected readonly openCard = computed(() => this.allSections().flatMap((part) => part.cards).find((card) => card.key === this.openKey()) ?? null);
 
   /** What the group carries, one item per name, together with the revealed items of the world nobody carries. */
   private readonly items = computed<CarriedItem[]>(() => {
@@ -104,6 +130,23 @@ export class PlayerPanels {
     const loose = revealed.filter((entry) => !carried.some((item) => item.entry === entry));
     return [...carried, ...loose.map((entry) => ({ name: entry.name, text: entry.description, owners: [], hidden: false, entry }))];
   });
+
+  /** How far the group is with a quest, in percent. */
+  protected percent(quest: SharedQuest): number {
+    return quest.checklist.length ? (this.stepsDone(quest) / quest.checklist.length) * 100 : 0;
+  }
+
+  private compare(a: SharedQuest, b: SharedQuest): number {
+    const main = Number(b.main) - Number(a.main) || (a.number ?? Infinity) - (b.number ?? Infinity);
+    switch (this.sortBy()) {
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'progress':
+        return this.percent(b) - this.percent(a) || main;
+      default:
+        return main;
+    }
+  }
 
   /** How a quest is called: its kind with its number. */
   protected kicker(quest: SharedQuest): string {

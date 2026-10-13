@@ -13,6 +13,33 @@
 }
 
 @if (shows().quests) {
+  @if (view().quests.length) {
+    <div class="stack">
+      <input class="input" aria-label="Quests suchen" placeholder="Quests durchsuchen" [value]="query()" (input)="query.set($any($event.target).value)" />
+      <div class="row" role="group" aria-label="Status">
+        <button type="button" class="pill" [attr.aria-pressed]="status() === 'all'" (click)="status.set('all')">Alle · {{ view().quests.length }}</button>
+        @for (item of statusCounts(); track item.id) {
+          <button type="button" class="pill" [attr.aria-pressed]="status() === item.id" (click)="status.set(item.id)">{{ item.label }} · {{ item.count }}</button>
+        }
+      </div>
+      <div class="row" role="group" aria-label="Sortierung und Tags">
+        <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'main'" (click)="sortBy.set('main')">Haupt zuerst</button>
+        <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'name'" (click)="sortBy.set('name')">A–Z</button>
+        <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'progress'" (click)="sortBy.set('progress')">Fortschritt</button>
+        @for (name of tags(); track name) {
+          <button
+            type="button"
+            class="pill pill--tone"
+            [style.--kind]="colourOf(name)"
+            [attr.aria-pressed]="tag() === name"
+            (click)="tag.set(tag() === name ? '' : name)"
+          >
+            {{ name }}
+          </button>
+        }
+      </div>
+    </div>
+  }
   @for (group of questGroups(); track group.id) {
     <section class="stack">
       <h3 class="section-title kind--quests"><app-icon name="quest" /> {{ group.label }}e Quests · {{ group.quests.length }}</h3>
@@ -29,7 +56,13 @@
             @if (quest.goal) {
               <span class="soft clamp"><strong>Ziel:</strong> {{ quest.goal }}</span>
             }
+            @if (quest.checklist.length) {
+              <span class="meter"><span class="meter__fill" [style.width.%]="percent(quest)"></span></span>
+            }
             <span class="row">
+              @if (fresh().includes(quest.id)) {
+                <span class="chip chip--accent">neu</span>
+              }
               @if (quest.giver) {
                 <span class="chip">Questgeber · {{ quest.giver }}</span>
               }
@@ -55,6 +88,15 @@
 }
 
 @if (shows().glossary) {
+  <div class="stack">
+    <input class="input" aria-label="Glossar durchsuchen" placeholder="Glossar durchsuchen" [value]="query()" (input)="query.set($any($event.target).value)" />
+    <div class="row" role="group" aria-label="Art">
+      <button type="button" class="pill" [attr.aria-pressed]="!only()" (click)="only.set('')">Alle</button>
+      @for (label of sectionLabels(); track label) {
+        <button type="button" class="pill" [attr.aria-pressed]="only() === label" (click)="only.set(only() === label ? '' : label)">{{ label }}</button>
+      }
+    </div>
+  </div>
   @for (section of sections(); track section.label) {
     <section class="stack">
       <h3 [class]="'section-title kind--' + section.tone"><app-icon [name]="section.icon" /> {{ section.label }}</h3>

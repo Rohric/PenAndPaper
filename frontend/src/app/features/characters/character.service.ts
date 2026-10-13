@@ -34,6 +34,18 @@ export class CharacterService {
     return this.api.patch<T>(`${source}/${id}/`, changes);
   }
 
+  /** Upload the picture of a character; it replaces the one before and is shown instead of the symbol. */
+  setImage<T>(source: CharacterSource, id: number, file: File): Observable<T> {
+    const body = new FormData();
+    body.append('image', file);
+    return this.api.put<T>(`${source}/${id}/image/`, body);
+  }
+
+  /** Remove the picture of a character. */
+  removeImage<T>(source: CharacterSource, id: number): Observable<T> {
+    return this.api.delete<T>(`${source}/${id}/image/`);
+  }
+
   /** Delete a character. */
   remove(source: CharacterSource, id: number): Observable<void> {
     return this.api.delete(`${source}/${id}/`);

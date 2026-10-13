@@ -104,6 +104,17 @@ export interface Note {
   created_at: string;
 }
 
+/** A message in the chat of the whole group. */
+export interface ChatMessage {
+  id: number;
+  text: string;
+  created_at: string;
+  author_name: string;
+  /** Whether the reader wrote it, and whether the game master did. */
+  mine: boolean;
+  from_gm: boolean;
+}
+
 /** A secret message between the game master and one player character. */
 export interface Message {
   id: number;
@@ -138,6 +149,10 @@ export interface Roll {
   who: string;
   label: string;
   secret: boolean;
+  /** The character and the talent of a check, so a failed one can be rolled again with an inspiration point. */
+  character?: number;
+  talent?: string;
+  inspired?: boolean;
   value?: number;
   rolled?: number;
   result?: RollResult;
@@ -156,6 +171,10 @@ export interface RollOrder {
   sides: 10 | 100;
   count: number;
   secret: boolean;
+  /** The talent a check belongs to. */
+  talent?: string;
+  /** Roll the last failed check of the own character again with an inspiration point. */
+  inspiration?: boolean;
 }
 
 /** A character as the whole group sees it. */

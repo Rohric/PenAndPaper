@@ -1,48 +1,79 @@
+@for (problem of general(); track $index) {
+  <p class="notice notice--error" role="alert">{{ problem.text }}</p>
+}
+
 @for (group of groups(); track group.talent) {
-  <div class="panel">
+  <section class="panel">
     <div class="row row--between">
       <h2 class="subtitle">{{ group.label }}</h2>
       <div class="row">
         <span class="chip chip--accent">Begabungswert {{ group.value }}</span>
-        <span class="chip">Geistesblitzpunkte {{ group.inspiration }}</span>
+        <span class="chip">Geistesblitz {{ group.inspiration }}</span>
       </div>
     </div>
 
     @for (row of group.rows; track row.index) {
-      <div class="skill">
-        <div class="skill__main">
-          <div class="field skill__name">
-            <label [for]="'skill-name-' + row.index">Fähigkeit</label>
-            <input [id]="'skill-name-' + row.index" class="input" [ngModel]="row.skill.name" (ngModelChange)="change(row.index, { name: $event })" />
-          </div>
-          <div class="field">
-            <label [for]="'skill-points-' + row.index">Grund</label>
+      <div class="skill" [class.skill--error]="row.problems.length">
+        <div class="skill__top">
+          <input
+            class="input skill__name"
+            placeholder="Name der Fähigkeit"
+            [attr.aria-label]="'Name der Fähigkeit ' + (row.index + 1)"
+            [ngModel]="row.skill.name"
+            (ngModelChange)="change(row.index, { name: $event })"
+          />
+          <span class="skill__value" [class.skill__value--capped]="row.capped" [attr.aria-label]="'Wert von ' + row.skill.name">
+            {{ row.value }}
+          </span>
+        </div>
+
+        <div class="skill__points">
+          <div class="stepper">
+            <span class="stepper__label">
+              Grund
+              @if (row.fixed) {
+                <app-icon name="lock" [size]="12" />
+              }
+            </span>
+            <button type="button" class="btn stepper__btn" aria-label="Grundpunkte weniger" [disabled]="row.skill.points <= row.fixed" (click)="stepPoints(row.index, -1)">−</button>
             <input
-              [id]="'skill-points-' + row.index"
-              class="input input--number"
+              class="input input--number stepper__input"
               type="number"
+              inputmode="numeric"
               min="0"
               max="100"
+              [attr.aria-label]="'Grundpunkte ' + row.skill.name"
               [ngModel]="row.skill.points"
               (ngModelChange)="setPoints(row.index, $event)"
             />
+            <button type="button" class="btn stepper__btn" aria-label="Grundpunkte mehr" (click)="stepPoints(row.index, 1)">+</button>
           </div>
-          <div class="field">
-            <label [for]="'skill-bonus-' + row.index">Bonus</label>
+          <div class="stepper">
+            <span class="stepper__label">Dazu</span>
+            <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte weniger" [disabled]="!row.skill.bonus_points" (click)="stepBonus(row.index, -1)">−</button>
             <input
-              [id]="'skill-bonus-' + row.index"
-              class="input input--number"
+              class="input input--number stepper__input"
               type="number"
+              inputmode="numeric"
               min="0"
+              [attr.aria-label]="'Bonuspunkte ' + row.skill.name"
               [ngModel]="row.skill.bonus_points"
               (ngModelChange)="setBonus(row.index, $event)"
             />
-          </div>
-          <div class="field">
-            <span class="label">Wert</span>
-            <span class="skill__value" [attr.aria-label]="'Wert von ' + row.skill.name">{{ row.value }}</span>
+            <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte mehr" (click)="stepBonus(row.index, 1)">+</button>
           </div>
         </div>
+
+        @if (leveling()) {
+          <span class="soft skill__cost">+1 kostet {{ cost(row.skill) }} {{ cost(row.skill) === 1 ? 'Bonuspunkt' : 'Bonuspunkte' }}</span>
+        }
+        @for (problem of row.problems; track $index) {
+          <p class="skill__message skill__message--error" role="alert">{{ problem.text }}</p>
+        }
+        @for (hint of row.hints; track $index) {
+          <p class="skill__message">{{ hint.text }}</p>
+        }
+
         <div class="list-row">
           <input
             class="input"
@@ -51,8 +82,8 @@
             [ngModel]="row.skill.description"
             (ngModelChange)="change(row.index, { description: $event })"
           />
-          <button type="button" class="btn btn--small" [attr.aria-label]="row.skill.name + ' entfernen'" (click)="remove(row.index)">
-            Entfernen
+          <button type="button" class="btn btn--small" [disabled]="!removable(row.index)" [attr.aria-label]="row.skill.name + ' entfernen'" (click)="remove(row.index)">
+            <app-icon name="trash" [size]="16" />
           </button>
         </div>
       </div>
@@ -60,6 +91,6 @@
       <p class="soft">Noch keine Fähigkeit in {{ group.label }}.</p>
     }
 
-    <button type="button" class="btn btn--small add" (click)="add(group.talent)">+ Fähigkeit</button>
-  </div>
+    <button type="button" class="btn add" (click)="add(group.talent)"><app-icon name="plus" [size]="16" /> Fähigkeit</button>
+  </section>
 }

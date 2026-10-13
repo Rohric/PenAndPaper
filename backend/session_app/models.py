@@ -121,6 +121,22 @@ class Comment(models.Model):
         return self.text[:50]
 
 
+class ChatMessage(models.Model):
+    """Store one message in the chat of the whole group of a session."""
+
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name="chat")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        """Return the beginning of the message for admin and shell."""
+        return self.text[:50]
+
+
 class Message(models.Model):
     """Store a secret message between the game master and one player character of a session."""
 

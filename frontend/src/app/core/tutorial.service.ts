@@ -14,15 +14,16 @@ export class TutorialService {
   readonly current = computed(() => TUTORIALS.find((tutorial) => tutorial.id === this.openId()) ?? null);
 
   /** Open a tutorial at its first step; an unknown topic opens the general one. */
-  open(id: string): void {
+  open(id: string, step = 0): void {
     this.openId.set(TUTORIALS.some((tutorial) => tutorial.id === id) ? id : FIRST_TUTORIAL);
     this.step.set(0);
+    this.goTo(step);
   }
 
   /** Show the general tutorial once, the first time the app is used on this device. */
-  openOnFirstVisit(): void {
+  openOnFirstVisit(first = FIRST_TUTORIAL): void {
     if (!localStorage.getItem(SEEN_KEY)) {
-      this.open(FIRST_TUTORIAL);
+      this.open(first);
     }
   }
 

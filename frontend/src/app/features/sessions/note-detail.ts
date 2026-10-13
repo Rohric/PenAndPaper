@@ -1,7 +1,9 @@
-import { Component, computed, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { Component, computed, effect, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Note } from '../../core/session-models';
+
+const AUTOSAVE_MS = 700;
 
 /**
  * One note in the window at the side: write a new one, change an own one, put it into the
@@ -28,6 +30,19 @@ export class NoteDetail {
   protected readonly text = linkedSignal({ source: this.noteId, computation: () => untracked(() => this.note()?.text ?? '') });
   protected readonly dirty = computed(() => this.title() !== (this.note()?.title ?? '') || this.text() !== (this.note()?.text ?? ''));
   protected readonly reply = signal('');
+
+  constructor() {
+    // An own note saves itself a moment after the last change.
+    effect((onCleanup) => {
+      const note = this.note();
+      const title = this.title().trim();
+      const changed = !!note && note.mine && !!title && (title !== note.title || this.text() !== note.text);
+      if (changed) {
+        const timer = setTimeout(() => this.save.emit({ id: note.id, changes: { title, text: this.text(), shared: note.shared } }), AUTOSAVE_MS);
+        onCleanup(() => clearTimeout(timer));
+      }
+    });
+  }
 
   /** Save the note: a new one is created, an own one is changed. */
   protected store(shared: boolean): void {

@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 
 import { TutorialService } from '../core/tutorial.service';
+import { TUTORIAL_GROUPS, groupOf } from './tutorial-content';
 
 /**
  * The tutorial window: a popup with text only. A menu on top leads to every tutorial,
@@ -16,6 +17,10 @@ export class TutorialWindow {
   protected readonly tutorial = inject(TutorialService);
 
   protected readonly menuOpen = signal(false);
+  /** The tutorials in three groups for the menu. */
+  protected readonly groups = computed(() =>
+    TUTORIAL_GROUPS.map((group) => ({ ...group, tutorials: this.tutorial.tutorials.filter((other) => groupOf(other.id) === group.id) })),
+  );
   protected readonly shown = computed(() => this.tutorial.current()?.steps[this.tutorial.step()] ?? null);
   protected readonly isLast = computed(() => this.tutorial.step() >= (this.tutorial.current()?.steps.length ?? 1) - 1);
 

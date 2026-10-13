@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard, gameMasterGuard, guestGuard } from './core/auth.guard';
+import { leaveGuard } from './core/leave.guard';
 import { Shell } from './layout/shell';
 
 export const routes: Routes = [
@@ -36,6 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'player/characters/:id',
+        canDeactivate: [leaveGuard],
         loadComponent: () => import('./features/player/character-page').then((m) => m.CharacterPage),
       },
       {

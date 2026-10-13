@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../core/api.service';
 import {
-  Attack, Battle, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, QuestLog, Roll, RollOrder,
+  Attack, Battle, ChatMessage, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, QuestLog, Roll, RollOrder,
   Session, SessionEntry, SessionEntryKind,
 } from '../../core/session-models';
 
@@ -100,6 +100,21 @@ export class SessionService {
   /** Mark the received messages of one thread as read. */
   markRead(id: number, character: number): Observable<unknown> {
     return this.api.post(`sessions/${id}/messages/read/`, { character });
+  }
+
+  /** The chat of the whole group, oldest message first. */
+  chat(id: number): Observable<ChatMessage[]> {
+    return this.api.get<ChatMessage[]>(`sessions/${id}/chat/`);
+  }
+
+  /** Write into the chat of the group. */
+  sendChat(id: number, text: string): Observable<ChatMessage> {
+    return this.api.post<ChatMessage>(`sessions/${id}/chat/`, { text });
+  }
+
+  /** Give all characters of the session their inspiration points back, for a new evening. */
+  refillInspiration(id: number): Observable<unknown> {
+    return this.api.post(`sessions/${id}/inspiration/`, {});
   }
 
   rolls(id: number): Observable<Roll[]> {

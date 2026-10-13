@@ -32,6 +32,8 @@ export const TALENTS: { id: Talent; label: string }[] = [
 
 /** One skill of a character: base points from creation, bonus points from leveling. */
 export interface Skill {
+  /** Fixed number of the skill, given by the server. */
+  id?: number;
   name: string;
   talent: Talent;
   points: number;
@@ -317,6 +319,8 @@ export interface PlayerCharacter extends Character {
   player: string;
   /** The running adventure the character plays in; null while it is free, also after a finished one. */
   adventure: { id: number; name: string; finished: boolean } | null;
+  /** Spent inspiration points by talent. */
+  inspiration_used: Partial<Record<Talent, number>>;
 }
 
 /** Either kind of character, for the parts of the app that handle both. */

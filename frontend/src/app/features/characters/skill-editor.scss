@@ -1,3 +1,4 @@
+// Phone first: every skill is a block with its name and value on top and the points as steppers below.
 :host {
   display: flex;
   flex-direction: column;
@@ -12,27 +13,83 @@
   border-top: 1px solid var(--line);
 }
 
-.skill__main {
+.skill--error {
+  border-top-color: var(--danger);
+}
+
+.skill__top {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 12px;
-  align-items: flex-end;
+  gap: 12px;
+  align-items: center;
 }
 
 .skill__name {
-  flex: 1 1 180px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .skill__value {
-  display: flex;
-  align-items: center;
-  min-width: 48px;
-  min-height: 46px;
+  min-width: 52px;
   color: var(--accent);
   font-family: var(--font-display);
   font-size: 30px;
   font-weight: 700;
   line-height: 1;
+  text-align: right;
+}
+
+.skill__value--capped {
+  color: var(--danger);
+}
+
+.skill__points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.stepper {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.stepper__label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  min-width: 48px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.stepper__btn {
+  min-width: var(--touch);
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.stepper__input {
+  width: 64px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.skill__cost {
+  font-size: 13px;
+}
+
+.skill__message {
+  margin: 0;
+  font-size: 13px;
+  color: var(--soft);
+}
+
+.skill__message--error {
+  color: var(--danger);
+  font-weight: 600;
 }
 
 .add {

@@ -28,7 +28,7 @@ class BaseCharacter(models.Model):
     # Two budgets: base points from character creation, bonus points from leveling.
     skill_points_total = models.PositiveIntegerField(default=START_SKILL_POINTS)
     bonus_points_total = models.PositiveIntegerField(default=0)
-    # Each skill: name, talent, points, bonus_points, description.
+    # Each skill: id (fixed number), name, talent, points, bonus_points (points won by leveling), description.
     skills = models.JSONField(default=list, blank=True)
     # Each item: name, quantity, damage_dice, damage_bonus, description. Optional: item (id of the
     # world item it comes from) and hidden (then only its owner and the game master see it).
@@ -72,6 +72,8 @@ class PlayerCharacter(BaseCharacter):
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="player_characters")
     backstory = models.TextField(blank=True)
+    # Spent inspiration points by talent, like {"action": 1}. The game master fills them up for a new evening.
+    inspiration_used = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["name"]

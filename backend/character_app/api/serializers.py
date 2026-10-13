@@ -8,7 +8,10 @@ from character_app.utils import (
     MAX_SKILL_POINTS,
     base_points_left,
     bonus_points_left,
+    inspiration_left,
+    skill_problems,
     talent_summary,
+    with_ids,
 )
 from core.knowledge import clean_knowledge
 
@@ -67,10 +70,11 @@ def _clean_skill(entry):
     if entry.get("talent") not in BaseCharacter.Talent.values:
         raise serializers.ValidationError(f"{name}: unbekannte Begabung.")
     return {
+        "id": _clean_link(entry, "id"),
         "name": name,
         "talent": entry["talent"],
         "points": _clean_number(entry, "points", 0, MAX_SKILL_POINTS),
-        "bonus_points": _clean_number(entry, "bonus_points", 0, MAX_AMOUNT),
+        "bonus_points": _clean_number(entry, "bonus_points", 0, MAX_SKILL_POINTS),
         "description": _clean_text(entry, "description"),
     }
 
@@ -119,20 +123,26 @@ def _clean_ability(entry):
 class CharacterSerializer(serializers.ModelSerializer):
     """Base for both kinds of characters: check the lists against the rules and add the calculated values."""
 
+    # Whether leveling costs bonus points by tiers; only player characters pay that way.
+    leveling = False
     talents = serializers.SerializerMethodField()
     points_left = serializers.SerializerMethodField()
     # The picture is uploaded through its own endpoint; here it is only shown.
     image = serializers.ImageField(read_only=True)
 
     def get_talents(self, character):
-        """Return talent value and inspiration points for each talent."""
-        return talent_summary(character.skills)
+        """Return talent value and inspiration points for each talent; a player character also what is left."""
+        summary = talent_summary(character.skills)
+        if hasattr(character, "inspiration_used"):
+            for talent, values in summary.items():
+                values["left"] = inspiration_left(character, talent)
+        return summary
 
     def get_points_left(self, character):
         """Return the unspent points of both budgets."""
         return {
             "base": base_points_left(character.skills, character.skill_points_total),
-            "bonus": bonus_points_left(character.skills, character.bonus_points_total),
+            "bonus": bonus_points_left(character.skills, character.bonus_points_total, self.leveling),
         }
 
     def validate_skills(self, skills):
@@ -156,12 +166,17 @@ class CharacterSerializer(serializers.ModelSerializer):
         return data.get(field, getattr(self.instance, field, default))
 
     def validate(self, data):
-        """Check that the skills do not cost more than the two budgets allow."""
+        """Give every skill an id and check that the skills do not cost more than the two budgets allow."""
+        stored = with_ids(getattr(self.instance, "skills", []), [])
+        if "skills" in data:
+            data["skills"] = with_ids(data["skills"], stored)
         skills = self._current(data, "skills", [])
-        if base_points_left(skills, self._current(data, "skill_points_total", START_SKILL_POINTS)) < 0:
-            raise serializers.ValidationError("Die Grundpunkte der Fähigkeiten übersteigen das Budget.")
-        if bonus_points_left(skills, self._current(data, "bonus_points_total", 0)) < 0:
-            raise serializers.ValidationError("Die Bonuspunkte der Fähigkeiten übersteigen das Budget.")
+        base = base_points_left(skills, self._current(data, "skill_points_total", START_SKILL_POINTS))
+        if base < 0:
+            raise serializers.ValidationError(f"Es sind {-base} Grundpunkte zu viel verteilt.")
+        bonus = bonus_points_left(skills, self._current(data, "bonus_points_total", 0), self.leveling)
+        if bonus < 0:
+            raise serializers.ValidationError(f"Es sind {-bonus} Bonuspunkte zu viel ausgegeben.")
         return self._within_maximum(data)
 
     def _within_maximum(self, data):
@@ -195,13 +210,25 @@ class NpcSerializer(CharacterSerializer):
 class PlayerCharacterSerializer(CharacterSerializer):
     """Serialize a player character for its player; budgets and life points belong to the game master."""
 
+    leveling = True
     player = serializers.CharField(source="owner.username", read_only=True)
     adventure = serializers.SerializerMethodField()
 
     class Meta:
         model = PlayerCharacter
-        fields = CHARACTER_FIELDS + ADVENTURE_FIELDS
-        read_only_fields = LEVEL_FIELDS
+        fields = CHARACTER_FIELDS + ADVENTURE_FIELDS + ["inspiration_used"]
+        read_only_fields = LEVEL_FIELDS + ["inspiration_used"]
+
+    def validate(self, data):
+        """Check the skills against the rules of the player: the maximum, the minimum and the base points."""
+        if "skills" in data:
+            stored = with_ids(getattr(self.instance, "skills", []), [])
+            data["skills"] = with_ids(data["skills"], stored)
+            locked = bool(self.instance and self.instance.sessions.filter(finished=False).exists())
+            problems = skill_problems(data["skills"], stored, locked)
+            if problems:
+                raise serializers.ValidationError({"skills": problems})
+        return super().validate(data)
 
     def get_adventure(self, character):
         """Return the running adventure the character plays in, or None while it is free."""

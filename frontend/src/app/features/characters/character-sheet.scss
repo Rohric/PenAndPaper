@@ -1,3 +1,19 @@
+.life {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.life__text {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.sheet-search {
+  width: 130px;
+}
+
 // The three talents side by side; they wrap below each other on narrow screens.
 .talents {
   display: grid;

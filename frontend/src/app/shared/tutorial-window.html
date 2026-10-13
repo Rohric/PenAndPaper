@@ -23,10 +23,15 @@
 
     @if (menuOpen()) {
       <nav class="window__menu" aria-label="Alle Tutorials">
-        @for (other of tutorial.tutorials; track other.id) {
-          <button type="button" class="window__link" [class.is-active]="other.id === current.id" (click)="switchTo(other.id)">
-            {{ other.title }}
-          </button>
+        @for (group of groups(); track group.id) {
+          <span class="kicker window__group">{{ group.label }}</span>
+          <div class="window__cards">
+            @for (other of group.tutorials; track other.id) {
+              <button type="button" class="window__link" [class.is-active]="other.id === current.id" (click)="switchTo(other.id)">
+                {{ other.title }}
+              </button>
+            }
+          </div>
         }
       </nav>
     }
@@ -53,6 +58,19 @@
       <div class="window__body">
         <h3 class="window__title">{{ step.title }}</h3>
         <p class="prose">{{ step.text }}</p>
+        @if (step.list; as points) {
+          <ul class="plain-list window__list">
+            @for (point of points; track $index) {
+              <li>{{ point }}</li>
+            }
+          </ul>
+        }
+        @if (step.example; as example) {
+          <p class="window__box window__box--example"><span class="kicker">Beispiel</span>{{ example }}</p>
+        }
+        @if (step.tip; as tip) {
+          <p class="window__box"><span class="kicker">Tipp</span>{{ tip }}</p>
+        }
         @if (step.more; as more) {
           <button type="button" class="btn btn--small" (click)="switchTo(more)">Zum Tutorial „{{ titleOf(more) }}“</button>
         }

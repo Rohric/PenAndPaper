@@ -5,9 +5,11 @@ from collections import defaultdict, deque
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
-from battle_app.rules import check, roll_die
+from battle_app.rules import FAILURE, check, roll_die
 from character_app.models import Npc
+from character_app.utils import use_inspiration
 from session_app.models import Session
 from world.world_app.models import Quest
 
@@ -71,9 +73,31 @@ def remember_roll(session, roll):
     return roll
 
 
-def roll_check(session, who, label, value, secret=False):
-    """Roll a check against a value, remember it for the session and return it."""
-    return remember_roll(session, {"who": who, "label": label, "secret": secret, **check(value)})
+def roll_check(session, who, label, value, secret=False, **extra):
+    """Roll a check against a value, remember it for the session and return it; extra is kept with the roll."""
+    return remember_roll(session, {"who": who, "label": label, "secret": secret, **extra, **check(value)})
+
+
+def chat_name(session, user):
+    """Return the name a user chats under in a session: "Spielleiter", or the name of the own character."""
+    if session.owner_id == user.pk:
+        return "Spielleiter"
+    character = session.characters.filter(owner=user).first()
+    return character.name if character else user.username
+
+
+def inspire(session, character):
+    """Roll the last check of a character again, paid with an inspiration point, and return the new roll.
+
+    It works once for a failed check that was no fumble, and only for a check with a talent.
+    """
+    last = next((roll for roll in ROLLS[session.pk] if roll.get("character") == character.pk), None)
+    if not last or last["result"] != FAILURE or last.get("inspired") or not last.get("talent"):
+        raise ValidationError("Ein Geistesblitz geht nur direkt nach einer misslungenen Probe, einmal und nicht nach einem Patzer.")
+    if not use_inspiration(character, last["talent"]):
+        raise ValidationError("Du hast keinen Geistesblitzpunkt mehr in dieser Begabung.")
+    label = f"{last['label']} · Geistesblitz"
+    return roll_check(session, last["who"], label, last["value"], False, character=character.pk, talent=last["talent"], inspired=True)
 
 
 def roll_dice(session, who, label, sides, count, secret=False):

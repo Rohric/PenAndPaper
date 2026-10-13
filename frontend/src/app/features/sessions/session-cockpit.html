@@ -32,6 +32,12 @@
           <span class="chip chip--accent">{{ fresh() }} neu</span>
         }
       </button>
+      <button type="button" class="btn" (click)="openPanel({ kind: 'chat' })">
+        <app-icon name="speech" /> Chat
+        @if (chatUnread()) {
+          <span class="chip chip--accent">{{ chatUnread() }} neu</span>
+        }
+      </button>
       <button type="button" class="btn" (click)="openPanel({ kind: 'archive' })"><app-icon name="archive" /> Archiv</button>
       <button type="button" class="btn" (click)="openPanel({ kind: 'level' })"><app-icon name="flag" /> Kapitel abschließen</button>
       @if (world.world()) {
@@ -80,9 +86,12 @@
         <section class="stack">
           <div class="row row--between">
             <h2 class="section-title kind--npcs"><app-icon name="group" /> Gruppe</h2>
-            <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'members' })">
-              <app-icon name="edit" [size]="16" /> Gruppe bearbeiten
-            </button>
+            <div class="row">
+              <button type="button" class="btn btn--small" (click)="newEvening()"><app-icon name="clock" [size]="16" /> Neuer Abend</button>
+              <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'members' })">
+                <app-icon name="edit" [size]="16" /> Gruppe bearbeiten
+              </button>
+            </div>
           </div>
           <app-session-group (open)="openPanel($event)" />
         </section>
@@ -177,6 +186,10 @@
           [rolls]="store.rolls()"
           (roll)="store.roll($event)"
         />
+      }
+      @case ('chat') {
+        <p class="soft">Alle in der Runde lesen mit.</p>
+        <app-chat-thread [bubbles]="chatBubbles()" emptyText="Noch keine Nachricht." (send)="store.sendChat($event)" />
       }
       @case ('members') {
         <app-session-members />

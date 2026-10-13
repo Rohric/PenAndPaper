@@ -1,23 +1,41 @@
 <article class="panel">
   <header class="row row--between">
-    <div>
-      <span class="kicker">{{ character().player ? 'Charakter von ' + character().player : 'Charakter' }}</span>
-      <h2 class="subtitle">{{ character().name }}</h2>
-      @if (character().profession) {
-        <p class="soft">{{ character().profession }}</p>
-      }
+    <div class="tile__head">
+      <app-portrait [symbol]="character().symbol" fallback="sheet" [image]="character().shows_image ? character().image : null" [size]="56" />
+      <div>
+        <span class="kicker">{{ character().player ? 'Charakter von ' + character().player : 'Charakter' }}</span>
+        <h2 class="subtitle">{{ character().name }}</h2>
+        @if (character().profession) {
+          <p class="soft">{{ character().profession }}</p>
+        }
+      </div>
     </div>
-    <ng-content />
+    <div class="row">
+      @if (editable()) {
+        <button type="button" class="btn btn--small" aria-label="Steckbrief bearbeiten" (click)="edit.emit('profile')">
+          <app-icon name="edit" [size]="16" />
+        </button>
+      }
+      <ng-content />
+    </div>
   </header>
 
+  <div class="life">
+    <span class="life__text">Lebenspunkte {{ character().life_points }} von {{ character().max_life_points }}</span>
+    <span class="meter"><span class="meter__fill meter__fill--life" [style.width.%]="lifePercent()"></span></span>
+  </div>
   <div class="row">
-    <span class="chip chip--accent">Lebenspunkte {{ character().life_points }} von {{ character().max_life_points }}</span>
     @if (facts()) {
       <span class="chip">{{ facts() }}</span>
     }
-    <span class="chip" [class.chip--danger]="baseLeft() < 0">Grundpunkte übrig: {{ baseLeft() }}</span>
-    <span class="chip" [class.chip--danger]="bonusLeft() < 0">Bonuspunkte übrig: {{ bonusLeft() }}</span>
+    @if (character().adventure; as adventure) {
+      <span class="chip chip--accent">spielt in: {{ adventure.name }}</span>
+    } @else if (character().adventure === null) {
+      <span class="chip">frei</span>
+    }
   </div>
+
+  <app-points-overview [skills]="character().skills" [budgets]="budgets()" [leveling]="leveling()" [used]="character().inspiration_used" />
 
   @if (character().description) {
     <div class="field">
@@ -32,11 +50,28 @@
     </div>
   }
 
+  <div class="row row--between">
+    <h3 class="section-title"><app-icon name="sheet" /> Begabungen und Fähigkeiten</h3>
+    <div class="row">
+      @if (character().skills.length >= 8) {
+        <input class="input sheet-search" aria-label="Fähigkeiten suchen" placeholder="Suchen" (input)="query.set($any($event.target).value)" />
+      }
+      <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'value'" (click)="sortBy.set(sortBy() === 'value' ? 'list' : 'value')">
+        Nach Wert
+      </button>
+      <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'name'" (click)="sortBy.set(sortBy() === 'name' ? 'list' : 'name')">
+        A–Z
+      </button>
+      @if (editable()) {
+        <button type="button" class="btn btn--small" aria-label="Skillung bearbeiten" (click)="edit.emit('skills')"><app-icon name="edit" [size]="16" /></button>
+      }
+    </div>
+  </div>
   <div class="talents">
     @for (talent of talents(); track talent.label) {
       <section class="talent">
         @if (rollable()) {
-          <button type="button" class="talent__head talent__head--roll" (click)="roll.emit({ label: talent.label, value: talent.value })">
+          <button type="button" class="talent__head talent__head--roll" (click)="roll.emit({ label: talent.label, value: talent.value, talent: talent.id })">
             <span class="talent__name">{{ talent.label }}</span>
             <span class="talent__value">{{ talent.value }}</span>
           </button>
@@ -49,7 +84,7 @@
         <span class="soft">Geistesblitzpunkte: {{ talent.inspiration }}</span>
         @for (skill of talent.skills; track skill.name) {
           @if (rollable()) {
-            <button type="button" class="skill skill--roll" (click)="roll.emit({ label: skill.name, value: valueOf(skill) })">
+            <button type="button" class="skill skill--roll" (click)="roll.emit({ label: skill.name, value: valueOf(skill), talent: skill.talent })">
               <span>{{ skill.name }}</span>
               <span class="skill__value">{{ valueOf(skill) }}</span>
             </button>
@@ -69,9 +104,14 @@
     }
   </div>
 
-  @if (character().inventory.length) {
+  @if (character().inventory.length || editable()) {
     <div class="field">
-      <span class="label">Inventar und Waffen</span>
+      <div class="row row--between">
+        <span class="label">Inventar und Waffen</span>
+        @if (editable()) {
+          <button type="button" class="btn btn--small" aria-label="Inventar bearbeiten" (click)="edit.emit('inventory')"><app-icon name="edit" [size]="16" /></button>
+        }
+      </div>
       <ul class="plain-list">
         @for (item of character().inventory; track $index) {
           <li>

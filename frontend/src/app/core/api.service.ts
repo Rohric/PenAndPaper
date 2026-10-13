@@ -25,8 +25,13 @@ export class ApiService {
     return this.http.patch<T>(BASE_URL + path, body);
   }
 
+  /** Replace a resource, for example with an uploaded file. */
+  put<T>(path: string, body: unknown): Observable<T> {
+    return this.http.put<T>(BASE_URL + path, body);
+  }
+
   /** Remove a resource. */
-  delete(path: string): Observable<void> {
-    return this.http.delete<void>(BASE_URL + path);
+  delete<T = void>(path: string): Observable<T> {
+    return this.http.delete<T>(BASE_URL + path);
   }
 }

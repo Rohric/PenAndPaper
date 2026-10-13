@@ -6,8 +6,8 @@ from rest_framework import serializers
 
 from character_app.models import PlayerCharacter
 from character_app.utils import MAX_DAMAGE_DICE
-from session_app.models import Comment, Message, Note, Session, SessionEntry
-from session_app.utils import characters_in_other_sessions
+from session_app.models import ChatMessage, Comment, Message, Note, Session, SessionEntry
+from session_app.utils import characters_in_other_sessions, chat_name
 
 MAX_AMOUNT = 9999
 MAX_CHECK_VALUE = 300
@@ -150,6 +150,37 @@ class QuestLogSerializer(serializers.ModelSerializer):
         return sorted((set(steps) & visible) | (set(self.instance.steps) - visible))
 
 
+class ChatMessageSerializer(serializers.ModelSerializer):
+    """Serialize a message of the group chat with the name of its author and whether the reader wrote it."""
+
+    author_name = serializers.SerializerMethodField()
+    mine = serializers.SerializerMethodField()
+    from_gm = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ChatMessage
+        fields = ["id", "text", "created_at", "author_name", "mine", "from_gm"]
+        read_only_fields = ["created_at"]
+
+    def validate_text(self, text):
+        """Reject a message without text."""
+        if not text.strip():
+            raise serializers.ValidationError("Die Nachricht ist leer.")
+        return text.strip()
+
+    def get_author_name(self, message):
+        """Return the name the author chats under."""
+        return chat_name(message.session, message.author)
+
+    def get_mine(self, message):
+        """Return whether the requesting user wrote the message."""
+        return message.author_id == self.context["request"].user.pk
+
+    def get_from_gm(self, message):
+        """Return whether the game master wrote the message."""
+        return message.author_id == message.session.owner_id
+
+
 class CommentSerializer(serializers.ModelSerializer):
     """Serialize a comment with the name of its author."""
 
@@ -198,6 +229,10 @@ class RollSerializer(serializers.Serializer):
     sides = serializers.ChoiceField(choices=[10, 100], default=100)
     count = serializers.IntegerField(min_value=1, max_value=10, default=1)
     secret = serializers.BooleanField(default=False)
+    # The talent the check belongs to, so a failed one can be rolled again with an inspiration point.
+    talent = serializers.ChoiceField(choices=PlayerCharacter.Talent.choices, required=False, allow_blank=True, default="")
+    # Roll the last failed check of the own character again with an inspiration point.
+    inspiration = serializers.BooleanField(default=False)
 
 
 class ItemSerializer(serializers.Serializer):

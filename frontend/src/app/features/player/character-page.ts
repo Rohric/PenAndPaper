@@ -2,13 +2,16 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
+import { Leavable } from '../../core/leave.guard';
 import { AnyCharacter, PlayerCharacter } from '../../core/models';
 import { TutorialButton } from '../../shared/tutorial-button';
-import { CharacterEditor } from '../characters/character-editor';
+import { CharacterEditor, EditorSection } from '../characters/character-editor';
 import { CharacterSheet } from '../characters/character-sheet';
 import { CharacterService } from '../characters/character.service';
 
-/** One character of the player: the sheet to read, and the form to write it. */
+const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'];
+
+/** One character of the player: the sheet to read, and the form to write it. The pencils on the sheet open the form at their part. */
 @Component({
   selector: 'app-character-page',
   imports: [RouterLink, TutorialButton, CharacterSheet, CharacterEditor],
@@ -25,11 +28,18 @@ import { CharacterService } from '../characters/character.service';
 
       @if (character(); as shown) {
         @if (editing()) {
-          <button type="button" class="btn btn--small back" (click)="editing.set(false)">Zum Bogen</button>
-          <app-character-editor kind="player" [character]="shown" (saved)="onSaved($event)" (deleted)="leave()" />
+          <button type="button" class="btn btn--small back" (click)="toSheet()">Zum Bogen</button>
+          <app-character-editor
+            kind="player"
+            [character]="shown"
+            [section]="section()"
+            (saved)="onSaved($event)"
+            (deleted)="leave()"
+            (dirtyChange)="dirty.set($event)"
+          />
         } @else {
-          <app-character-sheet [character]="shown">
-            <button type="button" class="btn btn--small" (click)="editing.set(true)">Bearbeiten</button>
+          <app-character-sheet [character]="shown" [editable]="true" (edit)="open($event)">
+            <button type="button" class="btn btn--small" (click)="open('profile')">Bearbeiten</button>
           </app-character-sheet>
         }
       }
@@ -41,22 +51,26 @@ import { CharacterService } from '../characters/character.service';
     }
   `,
 })
-export class CharacterPage {
+export class CharacterPage implements Leavable {
   private readonly service = inject(CharacterService);
   private readonly router = inject(Router);
 
-  /** From the URL: /player/characters/:id?edit=1 */
+  /** From the URL: /player/characters/:id?edit=1 or ?edit=skills */
   readonly id = input.required<string>();
   readonly edit = input<string>();
 
   protected readonly character = signal<PlayerCharacter | null>(null);
   protected readonly editing = signal(false);
+  protected readonly section = signal<EditorSection>('profile');
+  protected readonly dirty = signal(false);
   protected readonly error = signal('');
 
   constructor() {
     // Load the character whenever another one is opened; a fresh one opens as a form.
     effect(() => {
-      this.editing.set(!!this.edit());
+      const wish = this.edit();
+      this.editing.set(!!wish);
+      this.section.set(SECTIONS.find((section) => section === wish) ?? 'profile');
       this.service.get<PlayerCharacter>('player-characters', Number(this.id())).subscribe({
         next: (character) => this.character.set(character),
         error: (e: unknown) => this.error.set(readError(e)),
@@ -64,14 +78,35 @@ export class CharacterPage {
     });
   }
 
+  /** Ask before leaving a form with unsaved changes. */
+  canLeave(): boolean {
+    return !this.editing() || !this.dirty() || confirm('Du hast ungespeicherte Änderungen. Seite trotzdem verlassen?');
+  }
+
+  /** Open the form at a section. */
+  protected open(section: EditorSection): void {
+    this.section.set(section);
+    this.editing.set(true);
+  }
+
+  /** Back to the sheet, after asking when there are unsaved changes. */
+  protected toSheet(): void {
+    if (!this.dirty() || confirm('Du hast ungespeicherte Änderungen. Wirklich zurück zum Bogen?')) {
+      this.dirty.set(false);
+      this.editing.set(false);
+    }
+  }
+
   /** Show the saved character on the sheet. */
   protected onSaved(saved: AnyCharacter): void {
     this.character.set(saved as PlayerCharacter);
+    this.dirty.set(false);
     this.editing.set(false);
   }
 
   /** The character is gone; go back to the list. */
   protected leave(): void {
+    this.dirty.set(false);
     void this.router.navigateByUrl('/player/characters');
   }
 }

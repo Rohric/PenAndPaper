@@ -12,10 +12,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from auth_app.api.permissions import IsGameMaster
+from character_app.utils import refill_inspiration
 from session_app.models import Note, SessionEntry
 from session_app.utils import (
     close_chapter,
     give_item,
+    inspire,
     latest_rolls,
     player_view,
     roll_check,
@@ -27,6 +29,7 @@ from session_app.utils import (
 )
 
 from .serializers import (
+    ChatMessageSerializer,
     CommentSerializer,
     ItemSerializer,
     LevelSerializer,
@@ -168,6 +171,15 @@ class SessionLevel(GameMasterSessionMixin, APIView):
         return Response(SessionSerializer(self.session, context={"request": request}).data)
 
 
+class SessionInspiration(GameMasterSessionMixin, APIView):
+    """Give the characters of the session all their inspiration points back, for a new evening."""
+
+    def post(self, request, session_id):
+        """Refill the inspiration points and answer without content."""
+        refill_inspiration(self.session.characters.all())
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class SessionItems(GameMasterSessionMixin, APIView):
     """Hand an item to a character of the session; it lands in the character's inventory."""
 
@@ -263,6 +275,26 @@ class MessageList(SessionMixin, generics.ListCreateAPIView):
         serializer.save(session=self.session, character=character, from_gm=self.is_game_master)
 
 
+class ChatList(SessionMixin, generics.ListCreateAPIView):
+    """
+    Read and write the chat of the whole group of a session.
+
+    - GET: all messages of the chat, oldest first.
+    - POST: write a message as the game master or as a player of the session.
+    """
+
+    serializer_class = ChatMessageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Return the messages of the chat of the session."""
+        return self.session.chat.select_related("author", "session")
+
+    def perform_create(self, serializer):
+        """Save the message with the requesting user as its author."""
+        serializer.save(session=self.session, author=self.request.user)
+
+
 class MessagesRead(SessionMixin, APIView):
     """Mark the messages the requesting user received in one thread as read."""
 
@@ -297,12 +329,22 @@ class RollList(SessionMixin, APIView):
         serializer = RollSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
+        if data["inspiration"]:
+            return Response(inspire(self.session, self.inspired(data)), status=status.HTTP_201_CREATED)
         who, secret = self.roller(data), data["secret"] and self.is_game_master
+        character = None if self.is_game_master else data["character"]
         if data["value"] is None:
             roll = roll_dice(self.session, who, data["label"], data["sides"], data["count"], secret)
         else:
-            roll = roll_check(self.session, who, data["label"], data["value"], secret)
+            extra = {"character": character.pk, "talent": data["talent"]} if character else {}
+            roll = roll_check(self.session, who, data["label"], data["value"], secret, **extra)
         return Response(roll, status=status.HTTP_201_CREATED)
+
+    def inspired(self, data):
+        """Return the own character of the player who rolls again with an inspiration point."""
+        if self.is_game_master or data["character"] is None:
+            raise PermissionDenied(NOT_IN_SESSION)
+        return self.own_character(data["character"])
 
     def roller(self, data):
         """Return the name the roll is made under: the own character of a player, or whoever the game master names."""

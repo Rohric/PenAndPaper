@@ -4,7 +4,7 @@ import { Observable, forkJoin } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { EntryKind, PlayerCharacter } from '../../core/models';
 import {
-  ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
+  ChatMessage, ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
 } from '../../core/session-models';
 import { CharacterService } from '../characters/character.service';
 import { SessionService } from './session.service';
@@ -39,6 +39,7 @@ export class SessionStore {
   /** The roll the game master made last. */
   readonly lastRoll = signal<Roll | null>(null);
   readonly messages = signal<Message[]>([]);
+  readonly chat = signal<ChatMessage[]>([]);
   readonly error = signal('');
 
   private readonly states = computed(() => new Map(this.entries().map((entry) => [`${entry.kind}:${entry.entry_id}`, entry])));
@@ -63,6 +64,7 @@ export class SessionStore {
       notes: this.api.notes(session.id),
       rolls: this.api.rolls(session.id),
       messages: this.api.messages(session.id),
+      chat: this.api.chat(session.id),
       characters: this.characterApi.list<PlayerCharacter>('gm/player-characters'),
     };
     this.run(forkJoin(parts), (data) => this.fill(session, data));
@@ -143,6 +145,16 @@ export class SessionStore {
     this.run(this.api.addComment(noteId, text), () => this.refresh());
   }
 
+  /** Write into the chat of the whole group. */
+  sendChat(text: string): void {
+    this.run(this.api.sendChat(this.id(), text), () => this.refresh());
+  }
+
+  /** A new evening: all characters get their inspiration points back. */
+  refillInspiration(): void {
+    this.run(this.api.refillInspiration(this.id()), () => this.refresh());
+  }
+
   send(characterId: number, text: string): void {
     this.run(this.api.sendMessage(this.id(), characterId, text), () => this.refresh());
   }
@@ -182,12 +194,15 @@ export class SessionStore {
 
   private fill(
     session: Session,
-    data: { entries: SessionEntry[]; notes: Note[]; rolls: Roll[]; messages: Message[]; characters: PlayerCharacter[] },
+    data: {
+      entries: SessionEntry[]; notes: Note[]; rolls: Roll[]; messages: Message[]; chat: ChatMessage[]; characters: PlayerCharacter[];
+    },
   ): void {
     this.entries.set(data.entries);
     this.notes.set(data.notes);
     this.rolls.set(data.rolls);
     this.messages.set(data.messages);
+    this.chat.set(data.chat);
     this.everyone.set(data.characters);
     this.characters.set(data.characters.filter((character) => session.characters.includes(character.id)));
     this.error.set('');
