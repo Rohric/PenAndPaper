@@ -59,12 +59,13 @@ function picture(url) {
 
 /** Write the picture into the public folder; a failure only warns, so the frontend still starts. */
 function main() {
-  const address = lanAddress();
-  if (!address) {
+  const address = process.argv[2] ? null : lanAddress();
+  if (!address && !process.argv[2]) {
     console.warn('QR-Code: keine Adresse im Netzwerk gefunden.');
     return;
   }
-  const url = `http://${address}:${PORT}/login`;
+  // An address from the command line, like the one of a tunnel, wins over the one of this computer.
+  const url = process.argv[2] ?? `http://${address}:${PORT}/login`;
   try {
     fs.writeFileSync(TARGET, picture(url), 'utf8');
     console.log(`QR-Code für ${url} liegt in public/login-qr.svg`);

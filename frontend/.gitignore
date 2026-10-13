@@ -8,6 +8,8 @@
 
 # The QR code to the login page; it is drawn anew with every "npm run start:lan".
 /public/login-qr.svg
+# The program that opens the tunnel (about 55 MB), downloaded from github.com/cloudflare/cloudflared.
+/tools/cloudflared.exe
 
 # Node
 /node_modules

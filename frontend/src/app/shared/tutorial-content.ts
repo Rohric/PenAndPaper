@@ -277,7 +277,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Spieler mit dem Handy',
-        text: '„QR-Code für Spieler“ oben in der Rundenübersicht zeigt einen Code, der ein Handy direkt zur Anmeldung bringt. Derselbe Code steht auf der Anmeldeseite, wenn sie an einem großen Bildschirm offen ist.\n\nDamit das klappt, starte das Frontend mit „npm run start:lan“ statt „npm start“. Die Handys müssen im selben WLAN sein wie dein Rechner. Der Code wird bei jedem Start neu erzeugt, mit der Adresse, die dein Rechner gerade hat.',
+        text: '„QR-Code für Spieler“ oben in der Rundenübersicht zeigt einen Code, der ein Handy direkt zur Anmeldung bringt. Derselbe Code steht auf der Anmeldeseite, wenn sie an einem großen Bildschirm offen ist.\n\nDamit das klappt, starte das Frontend mit „npm run start:lan“ statt „npm start“. Die Handys müssen im selben WLAN sein wie dein Rechner. Der Code wird bei jedem Start neu erzeugt, mit der Adresse, die dein Rechner gerade hat.\n\nKlappt das WLAN nicht, zum Beispiel weil ein Repeater das Netz trennt, starte stattdessen „npm run start:tunnel“. Dann bekommt die App eine öffentliche Adresse, die auch über Mobilfunk geht, und der Code zeigt diese. Gib sie nur deinen Spielern und beende den Tunnel nach dem Abend.',
       },
       {
         title: 'Chat und neuer Abend',
