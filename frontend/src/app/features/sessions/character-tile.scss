@@ -1,0 +1,76 @@
+.tile__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  width: 100%;
+  min-height: var(--touch);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.tile__head app-icon {
+  margin-left: auto;
+  color: var(--muted);
+}
+
+// The life points as a bar with the number beside it.
+.life {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--danger);
+}
+
+.life strong {
+  min-width: 70px;
+  color: var(--text);
+  text-align: right;
+}
+
+.life__bar {
+  flex: 1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.life__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ok);
+}
+
+.life__fill--low {
+  background: var(--danger);
+}
+
+// A talent with its skills: names left, values right.
+.values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.values__head,
+.values__row {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.values__head {
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--line);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.values__row {
+  color: var(--soft);
+}

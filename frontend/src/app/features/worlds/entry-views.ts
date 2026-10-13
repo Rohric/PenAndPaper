@@ -1,6 +1,6 @@
 import { Params, Router } from '@angular/router';
 
-import { EntryKind, EntryLink, EntryRef, Npc, Phrase, QUEST_KINDS, Scene, TALENTS } from '../../core/models';
+import { EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, questLabel } from '../../core/models';
 import { damageText, skillValue } from '../../core/rules';
 import { WorldStore } from './world-store';
 
@@ -13,6 +13,8 @@ export interface EntryViewModel {
   title: string;
   sub: string;
   blocks: { label: string; text: string }[];
+  /** Knowledge pieces in two groups: what players can learn, and what only the game master knows. */
+  knowledge: { label: string; gmOnly: boolean; pieces: Knowledge[] }[];
   lists: { label: string; items: string[] }[];
   phrases: Phrase[];
   links: { label: string; items: EntryLink[] }[];
@@ -73,10 +75,30 @@ export function viewOf(store: WorldStore, ref: EntryRef, npc: Npc | null): Entry
   }
 }
 
+/** The two knowledge groups of an entry, labelled by who may read them. */
+function knowledgeOf(entry: Pick<EntryTexts, 'player_knowledge' | 'gm_knowledge'>): EntryViewModel['knowledge'] {
+  return [
+    { label: 'Wissen für Spieler', gmOnly: false, pieces: entry.player_knowledge },
+    { label: 'Wissen nur für dich', gmOnly: true, pieces: entry.gm_knowledge },
+  ];
+}
+
+/** One text that says what an entry is about: its description, or else the first thing the game master knows. */
+export function summaryOf(entry: EntryTexts): string {
+  return entry.description || entry.gm_knowledge[0]?.text || '';
+}
+
+/** Everything written about an entry as one text, to search in. */
+function allText(entry: EntryTexts): string {
+  const pieces = [...entry.player_knowledge, ...entry.gm_knowledge].map((piece) => `${piece.title} ${piece.text}`);
+  return [entry.description, ...pieces].join(' ');
+}
+
 function tidy(view: EntryViewModel): EntryViewModel {
   return {
     ...view,
     blocks: view.blocks.filter((block) => block.text.trim()),
+    knowledge: view.knowledge.filter((group) => group.pieces.length),
     lists: view.lists.filter((list) => list.items.length),
     links: view.links.filter((group) => group.items.length),
   };
@@ -89,8 +111,8 @@ function locationView(store: WorldStore, id: number): EntryViewModel | null {
   }
   const here = <T extends { location: number | null }>(entries: T[]) => entries.filter((e) => e.location === id);
   return tidy({
-    kicker: 'Ort', title: place.name, sub: '', lists: [], phrases: [],
-    blocks: [{ label: 'Beschreibung', text: place.lore }],
+    kicker: 'Ort', title: place.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(place),
+    blocks: [{ label: 'Beschreibung', text: place.description }],
     links: [
       { label: 'Liegt in', items: links('locations', among(store.locations(), [place.parent])) },
       { label: 'Orte darin', items: links('locations', store.locations().filter((l) => l.parent === id)) },
@@ -111,13 +133,15 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
   const loaded = npc?.id === id ? npc : null;
   return tidy({
     kicker: 'Figur', title: link.name, sub: link.profession, phrases: loaded?.phrases ?? [],
+    knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
-      { label: 'Steckbrief', text: loaded ? facts(loaded) : '' },
       { label: 'Beschreibung', text: loaded?.description ?? '' },
+      { label: 'Steckbrief', text: loaded ? facts(loaded) : '' },
     ],
     lists: [
       { label: 'Fähigkeiten', items: loaded ? skillLines(loaded) : [] },
       { label: 'Inventar und Waffen', items: loaded ? itemLines(loaded) : [] },
+      { label: 'Besondere Fähigkeiten', items: loaded ? abilityLines(loaded) : [] },
     ],
     links: [
       { label: 'Anzutreffen in', items: links('locations', among(store.locations(), [link.location])) },
@@ -142,14 +166,19 @@ function itemLines(npc: Npc): string[] {
   return npc.inventory.map((item) => [`${item.quantity}× ${item.name}`, damageText(item)].filter(Boolean).join(' · '));
 }
 
+function abilityLines(npc: Npc): string[] {
+  return npc.special_abilities.map((ability) => [ability.name, ability.description, ability.roll_condition].filter(Boolean).join(' · '));
+}
+
 function questView(store: WorldStore, id: number): EntryViewModel | null {
   const quest = store.quests().find((q) => q.id === id);
   if (!quest) {
     return null;
   }
   return tidy({
-    kicker: QUEST_KINDS.find((k) => k.id === quest.kind)?.label ?? 'Quest', title: quest.name, sub: '', phrases: [],
-    blocks: [{ label: 'Text', text: quest.text }, { label: 'Ziel', text: quest.goal }],
+    kicker: questLabel(quest), title: quest.name, sub: '', phrases: [],
+    knowledge: knowledgeOf(quest),
+    blocks: [{ label: 'Beschreibung', text: quest.description }, { label: 'Ziel', text: quest.goal }],
     lists: [{ label: 'Checkliste', items: quest.checklist }],
     links: [
       { label: 'Ort', items: links('locations', among(store.locations(), [quest.location])) },
@@ -166,8 +195,8 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
     return null;
   }
   return tidy({
-    kicker: 'Ereignis', title: event.name, sub: '', lists: [], phrases: [],
-    blocks: [{ label: 'Was passiert', text: event.text }],
+    kicker: 'Ereignis', title: event.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(event),
+    blocks: [{ label: 'Beschreibung', text: event.description }],
     links: [
       { label: 'Ort', items: links('locations', among(store.locations(), [event.location])) },
       ...usedIn(store, 'events', id),
@@ -191,8 +220,8 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
     return null;
   }
   return tidy({
-    kicker: trivia.category || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [],
-    blocks: [{ label: 'Text', text: trivia.text }],
+    kicker: trivia.category || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(trivia),
+    blocks: [{ label: 'Beschreibung', text: trivia.description }],
     links: [
       { label: 'Orte', items: links('locations', among(store.locations(), trivia.locations)) },
       { label: 'Figuren', items: npcLinks(store, trivia.npcs) },
@@ -209,11 +238,11 @@ export function searchGlossary(store: WorldStore, text: string): SearchHit[] {
   const has = (...texts: string[]) => texts.some((t) => t.toLowerCase().includes(query));
   const hits = (kind: EntryKind, entries: Named[]) => links(kind, entries).map((l) => ({ ...l, kicker: KIND_LABELS[kind] }));
   return [
-    ...hits('locations', store.locations().filter((l) => has(l.name, l.lore))),
+    ...hits('locations', store.locations().filter((l) => has(l.name, allText(l)))),
     ...npcLinks(store, store.npcs().filter((n) => has(n.name, n.profession)).map((n) => n.npc)).map((l) => ({ ...l, kicker: 'Figur' })),
-    ...hits('quests', store.quests().filter((q) => has(q.name, q.text, q.goal))),
-    ...hits('events', store.events().filter((e) => has(e.name, e.text))),
-    ...hits('trivia', store.trivia().filter((t) => has(t.name, t.category, t.text))),
+    ...hits('quests', store.quests().filter((q) => has(q.name, q.goal, allText(q)))),
+    ...hits('events', store.events().filter((e) => has(e.name, allText(e)))),
+    ...hits('trivia', store.trivia().filter((t) => has(t.name, t.category, allText(t)))),
   ];
 }
 
@@ -236,7 +265,11 @@ export function openEntry(store: WorldStore, router: Router, ref: EntryRef): voi
     store.peek.set({ kind: ref.kind, id: ref.id });
     return;
   }
-  const address = entryAddress(store, ref);
   store.peek.set(null);
+  if (ref.kind === 'scenes' && store.openScene) {
+    store.openScene(ref.id);
+    return;
+  }
+  const address = entryAddress(store, ref);
   void router.navigate(address.commands, { queryParams: address.queryParams });
 }

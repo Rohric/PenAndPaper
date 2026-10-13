@@ -77,6 +77,12 @@
   color: var(--soft);
 }
 
+.scene__mark--done {
+  border-color: var(--ok);
+  border-style: solid;
+  color: var(--ok);
+}
+
 .scene.is-active .scene__mark {
   background: var(--accent);
   color: var(--accent-ink);

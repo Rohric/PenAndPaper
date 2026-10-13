@@ -1,0 +1,114 @@
+@if (battle(); as fight) {
+  <div class="stack">
+    <div class="panel">
+      <span class="kicker">{{ fight.round ? 'Runde ' + fight.round : 'Der Kampf beginnt gleich' }}</span>
+      <h2 class="subtitle">{{ fight.name }}</h2>
+      @if (error()) {
+        <p class="notice notice--error" role="alert">{{ error() }}</p>
+      }
+      @for (combatant of fight.combatants; track combatant.id) {
+        <div class="row row--between">
+          <span>
+            @if (combatant.id === fight.current) {
+              <span class="chip chip--accent">ist dran</span>
+            }
+            <strong>{{ combatant.name }}</strong>
+            @if (combatant.mine) {
+              <span class="soft">(du)</span>
+            }
+          </span>
+          <span class="row">
+            @if (combatant.has_parried) {
+              <span class="chip">hat pariert</span>
+            }
+            @if (combatant.out) {
+              <span class="chip chip--danger">kampfunfähig</span>
+            } @else if (combatant.life_points !== null) {
+              <span class="chip">LP {{ combatant.life_points }}</span>
+            }
+          </span>
+        </div>
+      }
+    </div>
+
+    @if (open(); as exchange) {
+      <div class="panel">
+        <app-battle-exchange [exchange]="exchange" />
+        @if (mustParry()) {
+          <div class="field">
+            <label for="own-parry">Dich trifft ein Angriff. Parieren mit</label>
+            <select id="own-parry" class="input" [ngModel]="parrySkill()" (ngModelChange)="parrySkill.set($event)">
+              <option value="">Handeln · {{ actionValue() }}</option>
+              @for (choice of skills(); track choice.name) {
+                <option [value]="choice.name">{{ choice.name }} · {{ choice.value }}</option>
+              }
+            </select>
+            <span class="soft">Eine Parade geht einmal pro Runde.</span>
+          </div>
+          <div class="row">
+            <button type="button" class="btn btn--primary" (click)="parry(true)"><app-icon name="dice" /> Parieren</button>
+            <button type="button" class="btn" (click)="parry(false)">Nicht parieren</button>
+          </div>
+        } @else if (exchange.stage === 'parry') {
+          <p class="soft">Es wird entschieden, ob {{ exchange.defender_name }} pariert.</p>
+        } @else {
+          <p class="soft">Der Spielleiter schließt den Zug ab. Erst dann zählt der Wurf.</p>
+        }
+      </div>
+    } @else if (myTurn()) {
+      <div class="panel">
+        <h3 class="subtitle">Du bist dran</h3>
+        <div class="grid-fields">
+          <div class="field">
+            <label for="own-target">Ziel</label>
+            <select id="own-target" class="input" [ngModel]="target()" (ngModelChange)="defenderId.set($event)">
+              <option [ngValue]="null">Ziel wählen</option>
+              @for (combatant of targets(); track combatant.id) {
+                <option [ngValue]="combatant.id">{{ combatant.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="own-skill">Angriff mit</label>
+            <select id="own-skill" class="input" [ngModel]="skill()" (ngModelChange)="skill.set($event)">
+              <option value="">Handeln · {{ actionValue() }}</option>
+              @for (choice of skills(); track choice.name) {
+                <option [value]="choice.name">{{ choice.name }} · {{ choice.value }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="own-weapon">Waffe</label>
+            <select id="own-weapon" class="input" [ngModel]="weapon()" (ngModelChange)="weapon.set($event)">
+              <option value="">Ohne Waffe · 1W10</option>
+              @for (item of weapons(); track item.name) {
+                <option [value]="item.name">{{ item.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn--primary" [disabled]="target() === null" (click)="attack()">
+            <app-icon name="dice" /> Angriff würfeln
+          </button>
+        </div>
+        <p class="soft">Machst du etwas anderes als einen Angriff, sag es dem Spielleiter. Er gibt dann an den Nächsten weiter.</p>
+      </div>
+    }
+
+    <div class="panel">
+      <h3 class="subtitle">Verlauf</h3>
+      <ul class="plain-list">
+        @for (line of fight.log; track $index) {
+          <li>{{ line }}</li>
+        } @empty {
+          <li class="soft">Noch nichts passiert.</li>
+        }
+      </ul>
+    </div>
+  </div>
+} @else {
+  <div class="empty">
+    <p>Gerade wird nicht gekämpft. Der Spielleiter startet einen Kampf, dann erscheint er hier.</p>
+  </div>
+}

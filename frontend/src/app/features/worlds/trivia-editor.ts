@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 
 import { Trivia } from '../../core/models';
 import { EditorBar } from '../../shared/editor-bar';
+import { EntryTextsEditor } from '../../shared/entry-texts-editor';
 import { LinkPicker } from '../../shared/link-picker';
 import { EntryEditor } from './entry-editor';
 
 /** Edit one piece of knowledge and the entries it is attached to. */
 @Component({
   selector: 'app-trivia-editor',
-  imports: [FormsModule, EditorBar, LinkPicker],
+  imports: [FormsModule, EditorBar, LinkPicker, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -33,12 +34,18 @@ import { EntryEditor } from './entry-editor';
             }
           </datalist>
         </div>
-        <div class="field">
-          <label for="trivia-text">Text</label>
-          <textarea id="trivia-text" class="input" rows="12" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
-        </div>
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
+
+      <app-entry-texts-editor
+        inputId="trivia-description"
+        [description]="draft().description"
+        [playerKnowledge]="draft().player_knowledge"
+        [gmKnowledge]="draft().gm_knowledge"
+        (descriptionChange)="set('description', $event)"
+        (playerKnowledgeChange)="set('player_knowledge', $event)"
+        (gmKnowledgeChange)="set('gm_knowledge', $event)"
+      />
 
       <div class="panel">
         <h2 class="subtitle">Gehört zu</h2>

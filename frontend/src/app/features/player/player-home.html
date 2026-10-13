@@ -1,12 +1,39 @@
 <section class="stack">
-  <header>
-    <span class="kicker">Spieler</span>
-    <h1 class="title">Meine Charaktere</h1>
+  <header class="row row--between">
+    <div>
+      <span class="kicker">Spieler</span>
+      <h1 class="title">Meine Charaktere</h1>
+    </div>
+    <app-tutorial-button topic="my-characters" />
   </header>
 
-  <div class="empty">
-    <p>Hier legst du später deine Charaktere an. Dieser Teil kommt, sobald der Spielmodus gebaut wird.</p>
+  <form class="list-row" (ngSubmit)="create()">
+    <input class="input" name="newName" aria-label="Name des neuen Charakters" placeholder="Name des neuen Charakters" [(ngModel)]="newName" />
+    <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()">Charakter anlegen</button>
+  </form>
+
+  @if (error()) {
+    <p class="notice notice--error" role="alert">{{ error() }}</p>
+  }
+
+  <div class="cards">
+    @for (character of characters(); track character.id) {
+      <a class="card" [routerLink]="['/player/characters', character.id]">
+        <span class="kicker">Charakter</span>
+        <span class="card__title">{{ character.name }}</span>
+        @if (character.profession) {
+          <span class="soft">{{ character.profession }}</span>
+        }
+        <span class="soft">Lebenspunkte {{ character.life_points }}</span>
+      </a>
+    }
   </div>
+
+  @if (!characters().length) {
+    <div class="empty">
+      <p>Noch kein Charakter. Gib oben einen Namen ein und leg deinen ersten an.</p>
+    </div>
+  }
 
   <div class="panel">
     <h2 class="subtitle">Spielleiter-Menü</h2>

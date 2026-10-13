@@ -48,10 +48,27 @@ export interface InventoryItem {
   description: string;
 }
 
-/** One choice in a select or a pill group. */
+/** One choice in a select or in the list of a link picker; the hint says a little more about it. */
 export interface Option {
   id: number;
   label: string;
+  hint?: string;
+}
+
+/** One piece of knowledge about an entry: a text with an optional title. */
+export interface Knowledge {
+  title: string;
+  text: string;
+}
+
+/**
+ * What every entry of a world says. Players see the description once a session revealed the entry,
+ * the knowledge for players piece by piece, the knowledge of the game master never.
+ */
+export interface EntryTexts {
+  description: string;
+  player_knowledge: Knowledge[];
+  gm_knowledge: Knowledge[];
 }
 
 /** A world, which is one adventure. */
@@ -63,11 +80,10 @@ export interface World {
 }
 
 /** A place in a world; parent is the place it lies in. */
-export interface Location {
+export interface Location extends EntryTexts {
   id: number;
   parent: number | null;
   name: string;
-  lore: string;
 }
 
 /** The link between a world and one of its NPCs. `npc` is the id of the character itself. */
@@ -86,12 +102,19 @@ export const QUEST_KINDS: { id: QuestKind; label: string }[] = [
   { id: 'side', label: 'Nebenquest' },
 ];
 
-/** A quest; giver and npcs hold ids of characters. */
-export interface Quest {
+/** How a quest is called by its kind; a main quest with its number, like "Hauptquest 3". */
+export function questLabel(quest: { kind: QuestKind; number: number | null }): string {
+  const label = QUEST_KINDS.find((kind) => kind.id === quest.kind)?.label ?? 'Quest';
+  return quest.kind === 'main' && quest.number ? `${label} ${quest.number}` : label;
+}
+
+/** A quest; giver and npcs hold ids of characters. Players see description, goal and checklist. */
+export interface Quest extends EntryTexts {
   id: number;
   name: string;
   kind: QuestKind;
-  text: string;
+  /** The number of a main quest; side quests have none. */
+  number: number | null;
   goal: string;
   checklist: string[];
   location: number | null;
@@ -100,19 +123,17 @@ export interface Quest {
 }
 
 /** Something that can happen in a world. */
-export interface WorldEvent {
+export interface WorldEvent extends EntryTexts {
   id: number;
   name: string;
-  text: string;
   location: number | null;
 }
 
 /** A piece of knowledge about the world, on its own or attached to other entries. */
-export interface Trivia {
+export interface Trivia extends EntryTexts {
   id: number;
   name: string;
   category: string;
-  text: string;
   locations: number[];
   npcs: number[];
   quests: number[];
@@ -170,18 +191,43 @@ export interface EntryLink extends EntryRef {
   label: string;
 }
 
-/** A character the game master writes. */
-export interface Npc {
+/** Something special a character can do, with the condition for its roll. */
+export interface SpecialAbility {
+  name: string;
+  description: string;
+  roll_condition: string;
+}
+
+/** What every character has, an NPC as well as a player character. */
+export interface Character {
   id: number;
   name: string;
   age: string;
   gender: string;
   profession: string;
   description: string;
+  /** The life points right now, and the most the character can have. */
   life_points: number;
+  max_life_points: number;
   skill_points_total: number;
   bonus_points_total: number;
   skills: Skill[];
   inventory: InventoryItem[];
-  phrases: Phrase[];
+  special_abilities: SpecialAbility[];
 }
+
+/** A character the game master writes. */
+export interface Npc extends Character {
+  phrases: Phrase[];
+  player_knowledge: Knowledge[];
+  gm_knowledge: Knowledge[];
+}
+
+/** A character a player writes and plays; player is the name of the account it belongs to. */
+export interface PlayerCharacter extends Character {
+  backstory: string;
+  player: string;
+}
+
+/** Either kind of character, for the parts of the app that handle both. */
+export type AnyCharacter = Character & Partial<Omit<Npc, keyof Character>> & Partial<Omit<PlayerCharacter, keyof Character>>;

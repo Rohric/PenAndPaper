@@ -22,20 +22,31 @@ class World(models.Model):
         return self.name
 
 
-class Location(models.Model):
+class Entry(models.Model):
+    """Hold what every entry of a world shares: what players may see and what only the game master knows."""
+
+    name = models.CharField(max_length=200)
+    # Players see name and description once a session revealed the entry.
+    description = models.TextField(blank=True)
+    # Each piece: title, text. A session reveals these pieces one by one.
+    player_knowledge = models.JSONField(default=list, blank=True)
+    # Each piece: title, text. Only the game master reads these.
+    gm_knowledge = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        abstract = True
+        ordering = ["name"]
+
+    def __str__(self):
+        """Return the entry's name for admin and shell."""
+        return self.name
+
+
+class Location(Entry):
     """Store a place inside a world; places can lie inside other places."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="locations")
     parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="children")
-    name = models.CharField(max_length=200)
-    lore = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        """Return the location's name for admin and shell."""
-        return self.name
 
 
 class WorldNpc(models.Model):
@@ -54,8 +65,8 @@ class WorldNpc(models.Model):
         return f"{self.npc} in {self.world}"
 
 
-class Quest(models.Model):
-    """Store a quest of a world with its checklist."""
+class Quest(Entry):
+    """Store a quest of a world; players of a session see its description, goal and checklist."""
 
     class Kind(models.TextChoices):
         """Tell main quests and side quests apart."""
@@ -66,57 +77,36 @@ class Quest(models.Model):
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="quests")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="quests")
     giver = models.ForeignKey(Npc, on_delete=models.SET_NULL, null=True, blank=True, related_name="given_quests")
+    # The scene in which the quest comes up; optional like the place and the giver.
+    scene = models.ForeignKey("Scene", on_delete=models.SET_NULL, null=True, blank=True, related_name="started_quests")
     npcs = models.ManyToManyField(Npc, blank=True, related_name="quests")
-    name = models.CharField(max_length=200)
-    text = models.TextField(blank=True)
     goal = models.TextField(blank=True)
     checklist = models.JSONField(default=list, blank=True)
     kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.SIDE)
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        """Return the quest's name for admin and shell."""
-        return self.name
+    # The number of a main quest; side quests have none.
+    number = models.PositiveIntegerField(null=True, blank=True)
 
 
-class Event(models.Model):
+class Event(Entry):
     """Store something that can happen in a world, optionally at a place."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="events")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="events")
-    name = models.CharField(max_length=200)
-    text = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ["name"]
-
-    def __str__(self):
-        """Return the event's name for admin and shell."""
-        return self.name
 
 
-class Trivia(models.Model):
+class Trivia(Entry):
     """Store a piece of knowledge about a world, on its own or attached to other entries."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="trivia")
-    name = models.CharField(max_length=200)
     # Free text, so the game master forms his own groups: "Tier", "Gegenstand", "Volk".
     category = models.CharField(max_length=100, blank=True)
-    text = models.TextField(blank=True)
     locations = models.ManyToManyField(Location, blank=True, related_name="trivia")
     npcs = models.ManyToManyField(Npc, blank=True, related_name="trivia")
     quests = models.ManyToManyField(Quest, blank=True, related_name="trivia")
     events = models.ManyToManyField(Event, blank=True, related_name="trivia")
 
-    class Meta:
-        ordering = ["name"]
+    class Meta(Entry.Meta):
         verbose_name_plural = "trivia"
-
-    def __str__(self):
-        """Return the entry's name for admin and shell."""
-        return self.name
 
 
 class Chapter(models.Model):

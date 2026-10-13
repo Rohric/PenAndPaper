@@ -37,6 +37,15 @@ def pick_all(entries, names, kind):
     return [pick(entries, name, kind) for name in names or []]
 
 
+def texts(entry):
+    """Return what an entry says: its description and its knowledge for players and for the game master."""
+    return {
+        "description": entry.get("description", ""),
+        "player_knowledge": entry.get("player_knowledge", []),
+        "gm_knowledge": entry.get("gm_knowledge", []),
+    }
+
+
 def as_phrase(phrase):
     """Return an example phrase with trigger and text; a plain text has no trigger."""
     if isinstance(phrase, str):
@@ -83,9 +92,7 @@ class Command(BaseCommand):
     def _locations(self, entries):
         """Create all places first, then put each one inside its parent."""
         for entry in entries:
-            self.locations[entry["name"]] = Location.objects.create(
-                world=self.world, name=entry["name"], lore=entry.get("lore", "")
-            )
+            self.locations[entry["name"]] = Location.objects.create(world=self.world, name=entry["name"], **texts(entry))
         for entry in entries:
             if entry.get("parent"):
                 place = self.locations[entry["name"]]
@@ -93,13 +100,14 @@ class Command(BaseCommand):
                 place.save()
 
     def _npcs(self, entries):
-        """Create the characters of the world with profession, description and phrases."""
+        """Create the characters of the world with profession, phrases and what is known about them."""
         for entry in entries:
             place = pick(self.locations, entry.get("location"), "Der Ort")
             npc = create_world_npc(self.world, entry["name"], place).npc
             npc.profession = entry.get("profession", "")
-            npc.description = entry.get("description", "")
             npc.phrases = [as_phrase(phrase) for phrase in entry.get("phrases", [])]
+            for field, value in texts(entry).items():
+                setattr(npc, field, value)
             npc.save()
             self.npcs[entry["name"]] = npc
 
@@ -108,7 +116,8 @@ class Command(BaseCommand):
         for entry in entries:
             quest = Quest.objects.create(
                 world=self.world, name=entry["name"], kind=entry.get("kind", Quest.Kind.SIDE),
-                text=entry.get("text", ""), goal=entry.get("goal", ""), checklist=entry.get("checklist", []),
+                number=entry.get("number"), goal=entry.get("goal", ""), checklist=entry.get("checklist", []),
+                **texts(entry),
                 location=pick(self.locations, entry.get("location"), "Der Ort"),
                 giver=pick(self.npcs, entry.get("giver"), "Die Figur"),
             )
@@ -120,14 +129,14 @@ class Command(BaseCommand):
         for entry in entries:
             place = pick(self.locations, entry.get("location"), "Der Ort")
             self.events[entry["name"]] = Event.objects.create(
-                world=self.world, name=entry["name"], text=entry.get("text", ""), location=place
+                world=self.world, name=entry["name"], location=place, **texts(entry)
             )
 
     def _trivia(self, entries):
         """Create the knowledge entries and attach them to places, characters, quests and events."""
         for entry in entries:
             trivia = Trivia.objects.create(
-                world=self.world, name=entry["name"], category=entry.get("category", ""), text=entry.get("text", "")
+                world=self.world, name=entry["name"], category=entry.get("category", ""), **texts(entry)
             )
             trivia.locations.set(pick_all(self.locations, entry.get("locations"), "Der Ort"))
             trivia.npcs.set(pick_all(self.npcs, entry.get("npcs"), "Die Figur"))

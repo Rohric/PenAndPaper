@@ -1,8 +1,9 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
-import { Chapter, QUEST_KINDS } from '../../core/models';
+import { Chapter, questLabel } from '../../core/models';
 import { LinkPicker } from '../../shared/link-picker';
+import { summaryOf } from './entry-views';
 import { EventScenes } from './event-scenes';
 import { WorldStore } from './world-store';
 
@@ -109,9 +110,8 @@ export class ChapterLinks {
   }
 
   private questCards(): Card[] {
-    const label = (kind: string) => QUEST_KINDS.find((k) => k.id === kind)?.label ?? '';
     const quests = this.store.quests().filter((quest) => this.ids().includes(quest.id));
-    return quests.map((quest) => ({ id: quest.id, name: quest.name, kicker: label(quest.kind), text: quest.text, inChapter: true }));
+    return quests.map((quest) => ({ id: quest.id, name: quest.name, kicker: questLabel(quest), text: summaryOf(quest), inChapter: true }));
   }
 
   /** The events of the chapter together with the events that hang on one of its scenes. */
@@ -119,7 +119,7 @@ export class ChapterLinks {
     const onScenes = this.store.scenesOf(this.chapter().id).flatMap((scene) => scene.events);
     const events = this.store.events().filter((event) => this.ids().includes(event.id) || onScenes.includes(event.id));
     return events.map((event) => ({
-      id: event.id, name: event.name, kicker: '', text: event.text, inChapter: this.ids().includes(event.id),
+      id: event.id, name: event.name, kicker: '', text: summaryOf(event), inChapter: this.ids().includes(event.id),
     }));
   }
 }

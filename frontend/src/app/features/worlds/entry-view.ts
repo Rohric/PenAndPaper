@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { EntryRef, Npc } from '../../core/models';
-import { NpcService } from '../npcs/npc.service';
+import { CharacterService } from '../characters/character.service';
 import { viewOf } from './entry-views';
 import { LinkRow } from './link-row';
 import { WorldStore } from './world-store';
@@ -30,6 +30,20 @@ import { WorldStore } from './world-store';
           <div class="field">
             <span class="label">{{ block.label }}</span>
             <p class="prose">{{ block.text }}</p>
+          </div>
+        }
+
+        @for (group of shown.knowledge; track group.label) {
+          <div class="field">
+            <span class="label">{{ group.label }}</span>
+            @for (piece of group.pieces; track $index) {
+              <div class="knowledge" [class.knowledge--gm]="group.gmOnly">
+                @if (piece.title) {
+                  <span class="kicker">{{ piece.title }}</span>
+                }
+                <p class="prose">{{ piece.text }}</p>
+              </div>
+            }
           </div>
         }
 
@@ -75,7 +89,7 @@ import { WorldStore } from './world-store';
 })
 export class EntryView {
   private readonly store = inject(WorldStore);
-  private readonly npcService = inject(NpcService);
+  private readonly characters = inject(CharacterService);
 
   readonly entry = input.required<EntryRef>();
   /** Whether the edit button is shown. */
@@ -88,7 +102,8 @@ export class EntryView {
   protected readonly view = computed(() => viewOf(this.store, this.entry(), this.npc()));
   protected readonly isEmpty = computed(() => {
     const view = this.view();
-    return !!view && !view.blocks.length && !view.lists.length && !view.phrases.length && !view.links.length;
+    const parts = view ? [view.blocks, view.knowledge, view.lists, view.phrases, view.links] : [];
+    return !!view && parts.every((part) => !part.length);
   });
 
   constructor() {
@@ -99,7 +114,7 @@ export class EntryView {
   private loadNpc(id: number | null): void {
     this.npc.set(null);
     if (id !== null) {
-      this.npcService.get(id).subscribe({ next: (npc) => this.npc.set(npc), error: () => undefined });
+      this.characters.get<Npc>('npcs', id).subscribe({ next: (npc) => this.npc.set(npc), error: () => undefined });
     }
   }
 }

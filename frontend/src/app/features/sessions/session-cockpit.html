@@ -1,0 +1,139 @@
+<section class="cockpit">
+  <header class="bar bar--top">
+    <div class="bar__title">
+      <a class="btn btn--small" routerLink="/gm/sessions" aria-label="Alle Runden"><app-icon name="back" /></a>
+      <div>
+        <span class="kicker">Runde · {{ store.session()?.world_name }}</span>
+        <h1 class="subtitle">{{ store.session()?.name }}</h1>
+      </div>
+      <app-id-select
+        inputId="cockpit-chapter"
+        emptyLabel="Kapitel wählen"
+        [options]="chapterOptions()"
+        [value]="chapterId()"
+        (valueChange)="store.save({ chapter: $event })"
+      />
+    </div>
+    <nav class="row" aria-label="Werkzeuge der Runde">
+      <button type="button" class="btn" [attr.aria-pressed]="view() === 'players'" (click)="show('players')">
+        <app-icon name="eye" /> Spieleransicht
+      </button>
+      <button type="button" class="btn btn--primary" (click)="openBattle()"><app-icon name="sword" /> Kampf</button>
+      <button type="button" class="btn" [attr.aria-pressed]="view() === 'notes'" (click)="show('notes')">
+        <app-icon name="note" /> Notizen
+        @if (fresh()) {
+          <span class="chip chip--accent">{{ fresh() }} neu</span>
+        }
+      </button>
+      <button type="button" class="btn" (click)="openPanel({ kind: 'archive' })"><app-icon name="archive" /> Archiv</button>
+      <button type="button" class="btn" (click)="openPanel({ kind: 'level' })"><app-icon name="flag" /> Kapitel abschließen</button>
+      <app-tutorial-button topic="sessions" />
+    </nav>
+  </header>
+
+  @if (store.error() || error()) {
+    <p class="notice notice--error" role="alert">{{ store.error() || error() }}</p>
+  }
+
+  @if (battleId(); as openBattleId) {
+    <app-battle-view [battleId]="openBattleId" (closed)="battleId.set(null); store.refresh()" />
+  } @else {
+    @switch (view()) {
+      @case ('players') {
+        <p class="notice">So sehen die Spieler diese Runde. Ihre eigenen Notizen und Nachrichten siehst du hier nicht.</p>
+        @if (playerView(); as shown) {
+          <app-player-panels [view]="shown" />
+        }
+      }
+      @case ('notes') {
+        <app-session-notes [notes]="store.notes()" (open)="openPanel({ kind: 'note', noteId: $event })" />
+      }
+      @default {
+        <section class="stack">
+          <h2 class="section-title"><app-icon name="group" /> Gruppe</h2>
+          <app-session-group (open)="openPanel($event)" />
+        </section>
+
+        <div class="story">
+          <div class="story__thread">
+            <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" [editable]="false" [done]="playedScenes()" (open)="sceneId.set($event)" />
+          </div>
+          <div class="story__main">
+            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" />
+          </div>
+        </div>
+      }
+    }
+  }
+
+  <footer class="bar bar--bottom">
+    <div class="row">
+      <app-icon name="pin" />
+      @for (pin of pins(); track pin.kind + pin.id) {
+        <button type="button" class="chip chip--link" (click)="openPin(pin)">{{ pin.label }}</button>
+      } @empty {
+        <span class="soft">Noch nichts angeheftet.</span>
+      }
+    </div>
+    <div class="row">
+      <app-icon name="dice" />
+      @if (lastRoll(); as roll) {
+        <span><strong>{{ roll.who }}</strong> · {{ roll.label }} {{ roll.value }}</span>
+        <span class="chip" [class.chip--accent]="roll.result === 'critical'" [class.chip--danger]="roll.result === 'fumble'">
+          {{ roll.rolled }} · {{ results[roll.result] }}
+        </span>
+      } @else {
+        <span class="soft">Noch kein Wurf.</span>
+      }
+      <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'rolls' })">Alle Würfe</button>
+    </div>
+  </footer>
+</section>
+
+<app-entry-peek>
+  @if (world.peek(); as looked) {
+    <app-session-entry-actions [entry]="looked" />
+  }
+</app-entry-peek>
+
+@if (panel(); as opened) {
+  <app-side-panel [title]="panelTitle()" [wide]="opened.kind === 'sheet'" (closed)="panel.set(null)">
+    @switch (opened.kind) {
+      @case ('sheet') {
+        @if (panelCharacter(); as character) {
+          <app-character-sheet [character]="character" />
+        }
+      }
+      @case ('messages') {
+        @if (panelCharacter(); as character) {
+          <p class="soft">Nur du und {{ character.name }} sehen diese Nachrichten.</p>
+          <app-session-thread [messages]="thread()" [characterName]="character.name" [asGameMaster]="true" (send)="store.send(character.id, $event)" />
+        }
+      }
+      @case ('item') {
+        @if (panelCharacter(); as character) {
+          <p class="soft">Der Gegenstand landet im Inventar von {{ character.name }}.</p>
+          <app-item-gift-form [templates]="items()" (give)="give($event)" />
+        }
+      }
+      @case ('note') {
+        <app-note-detail
+          [note]="panelNote()"
+          (add)="store.addNote($event); panel.set(null)"
+          (save)="store.saveNote($event.id, $event.changes)"
+          (remove)="store.removeNote($event); panel.set(null)"
+          (comment)="store.comment($event.id, $event.text)"
+        />
+      }
+      @case ('archive') {
+        <app-session-archive />
+      }
+      @case ('rolls') {
+        <app-session-rolls [rolls]="store.rolls()" />
+      }
+      @case ('level') {
+        <app-chapter-close-form [characters]="store.characters()" (close)="closeChapter($event)" />
+      }
+    }
+  </app-side-panel>
+}

@@ -3,7 +3,9 @@ import { Observable, forkJoin, tap } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { ApiService } from '../../core/api.service';
-import { Chapter, EntryRef, Location, Option, Quest, Scene, Trivia, World, WorldEvent, WorldNpc } from '../../core/models';
+import {
+  Chapter, EntryRef, EntryTexts, Location, Option, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, questLabel,
+} from '../../core/models';
 
 /** The lists inside a world, named like their part of the API address. */
 export type Kind = 'locations' | 'world-npcs' | 'quests' | 'events' | 'trivia' | 'chapters' | 'scenes';
@@ -26,6 +28,13 @@ interface WorldData {
 type Sorter = (a: never, b: never) => number;
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
+const HINT_LENGTH = 90;
+
+/** The beginning of what is written about an entry, as context in a list to choose from. */
+function excerpt(entry: EntryTexts): string {
+  const text = (entry.description || entry.gm_knowledge[0]?.text || '').replace(/\s+/g, ' ').trim();
+  return text.length > HINT_LENGTH ? `${text.slice(0, HINT_LENGTH)} …` : text;
+}
 
 /** Order of each list, matching the order the backend uses. */
 const SORTERS: Record<Kind, Sorter> = {
@@ -55,13 +64,21 @@ export class WorldStore {
   readonly error = signal('');
   /** The entry that is looked up in the side panel, without leaving the page. */
   readonly peek = signal<EntryRef | null>(null);
+  /** Set by a session: how a scene is opened there, instead of going to its chapter page. */
+  openScene: ((sceneId: number) => void) | null = null;
 
-  readonly locationOptions = computed<Option[]>(() => this.locations().map((l) => ({ id: l.id, label: l.name })));
+  readonly locationOptions = computed<Option[]>(() =>
+    this.locations().map((l) => ({ id: l.id, label: l.name, hint: this.parentHint(l) || excerpt(l) })),
+  );
   /** Characters by their own id, because quests and scenes point to the character. */
-  readonly npcOptions = computed<Option[]>(() => this.npcs().map((n) => ({ id: n.npc, label: n.name })));
-  readonly questOptions = computed<Option[]>(() => this.quests().map((q) => ({ id: q.id, label: q.name })));
-  readonly eventOptions = computed<Option[]>(() => this.events().map((e) => ({ id: e.id, label: e.name })));
-  readonly triviaOptions = computed<Option[]>(() => this.trivia().map((t) => ({ id: t.id, label: t.name })));
+  readonly npcOptions = computed<Option[]>(() => this.npcs().map((n) => ({ id: n.npc, label: n.name, hint: n.profession })));
+  readonly questOptions = computed<Option[]>(() =>
+    this.quests().map((q) => ({ id: q.id, label: q.name, hint: [questLabel(q), excerpt(q)].filter(Boolean).join(' · ') })),
+  );
+  readonly eventOptions = computed<Option[]>(() => this.events().map((e) => ({ id: e.id, label: e.name, hint: excerpt(e) })));
+  readonly triviaOptions = computed<Option[]>(() =>
+    this.trivia().map((t) => ({ id: t.id, label: t.name, hint: [t.category, excerpt(t)].filter(Boolean).join(' · ') })),
+  );
 
   private readonly lists: Record<Kind, WritableSignal<Entry[]>> = {
     locations: this.locations,
@@ -133,6 +150,11 @@ export class WorldStore {
   /** The scenes of one chapter in their order. */
   scenesOf(chapterId: number): Scene[] {
     return this.scenes().filter((scene) => scene.chapter === chapterId);
+  }
+
+  private parentHint(location: Location): string {
+    const parent = this.locations().find((other) => other.id === location.parent);
+    return parent ? `in ${parent.name}` : '';
   }
 
   private created<T extends Entry>(kind: Kind, request: Observable<T>): Observable<T> {

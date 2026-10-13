@@ -14,13 +14,14 @@ export const GM_ROUTES: Routes = [
       { path: '**', redirectTo: 'chapters' },
     ],
   },
+  { path: 'sessions', loadComponent: () => import('../sessions/session-list').then((m) => m.SessionList) },
+  {
+    path: 'sessions/:sessionId',
+    loadComponent: () => import('../sessions/session-cockpit').then((m) => m.SessionCockpit),
+  },
   {
     path: 'characters',
-    data: {
-      title: 'Figuren',
-      text: 'Hier siehst du später die Charaktere deiner Spieler und wählst sie für ein Abenteuer aus. Die Figuren deiner Welt schreibst du direkt in der Welt.',
-    },
-    loadComponent: () => import('./coming-soon').then((m) => m.ComingSoon),
+    loadComponent: () => import('./player-characters').then((m) => m.PlayerCharacters),
   },
   { path: '', pathMatch: 'full', redirectTo: 'worlds' },
 ];

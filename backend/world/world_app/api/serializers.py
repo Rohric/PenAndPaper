@@ -2,6 +2,7 @@
 
 from rest_framework import serializers
 
+from core.knowledge import clean_knowledge
 from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, World, WorldNpc
 from world.world_app.utils import create_world_npc, lies_inside, next_chapter_number, npcs_in_world
 
@@ -64,13 +65,21 @@ class WorldScopedSerializer(serializers.ModelSerializer):
         self._check_same_world(trivia)
         return trivia
 
+    def validate_player_knowledge(self, pieces):
+        """Check the knowledge pieces players can learn."""
+        return clean_knowledge(pieces)
+
+    def validate_gm_knowledge(self, pieces):
+        """Check the knowledge pieces only the game master reads."""
+        return clean_knowledge(pieces)
+
 
 class LocationSerializer(WorldScopedSerializer):
     """Serialize a location; its parent must be another place of the same world."""
 
     class Meta:
         model = Location
-        fields = ["id", "parent", "name", "lore"]
+        fields = ["id", "parent", "name", "description", "player_knowledge", "gm_knowledge"]
 
     def validate_parent(self, parent):
         """Reject a parent from another world and a place that would contain itself."""
@@ -103,11 +112,20 @@ class WorldNpcSerializer(WorldScopedSerializer):
 
 
 class QuestSerializer(WorldScopedSerializer):
-    """Serialize a quest with its checklist and its links to places and NPCs."""
+    """Serialize a quest with its goal, its checklist and its links to a place, a scene and NPCs."""
 
     class Meta:
         model = Quest
-        fields = ["id", "name", "kind", "text", "goal", "checklist", "location", "giver", "npcs"]
+        fields = [
+            "id", "name", "kind", "number", "description", "goal", "checklist",
+            "player_knowledge", "gm_knowledge", "location", "giver", "scene", "npcs",
+        ]
+
+    def validate_scene(self, scene):
+        """Accept only a scene of the same world as the origin of the quest."""
+        if scene and scene.chapter.world_id != self.get_world().pk:
+            raise serializers.ValidationError(OTHER_WORLD)
+        return scene
 
     def validate_giver(self, giver):
         """Accept only an NPC of the same world as quest giver."""
@@ -126,7 +144,7 @@ class EventSerializer(WorldScopedSerializer):
 
     class Meta:
         model = Event
-        fields = ["id", "name", "text", "location"]
+        fields = ["id", "name", "description", "player_knowledge", "gm_knowledge", "location"]
 
 
 class TriviaSerializer(WorldScopedSerializer):
@@ -134,7 +152,10 @@ class TriviaSerializer(WorldScopedSerializer):
 
     class Meta:
         model = Trivia
-        fields = ["id", "name", "category", "text", "locations", "npcs", "quests", "events"]
+        fields = [
+            "id", "name", "category", "description", "player_knowledge", "gm_knowledge",
+            "locations", "npcs", "quests", "events",
+        ]
 
 
 class ChapterSerializer(WorldScopedSerializer):

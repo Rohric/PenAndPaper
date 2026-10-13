@@ -21,16 +21,29 @@ export const routes: Routes = [
     component: Shell,
     canActivate: [authGuard],
     children: [
+      { path: 'player', pathMatch: 'full', redirectTo: 'player/characters' },
       {
-        path: 'player',
+        path: 'player/characters',
         loadComponent: () => import('./features/player/player-home').then((m) => m.PlayerHome),
+      },
+      {
+        path: 'player/sessions',
+        loadComponent: () => import('./features/sessions/my-sessions').then((m) => m.MySessions),
+      },
+      {
+        path: 'player/sessions/:sessionId',
+        loadComponent: () => import('./features/sessions/player-session').then((m) => m.PlayerSession),
+      },
+      {
+        path: 'player/characters/:id',
+        loadComponent: () => import('./features/player/character-page').then((m) => m.CharacterPage),
       },
       {
         path: 'gm',
         canActivate: [gameMasterGuard],
         loadChildren: () => import('./features/gm/gm.routes').then((m) => m.GM_ROUTES),
       },
-      { path: '', pathMatch: 'full', redirectTo: 'player' },
+      { path: '', pathMatch: 'full', redirectTo: 'player/characters' },
     ],
   },
   { path: '**', redirectTo: '' },

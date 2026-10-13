@@ -4,196 +4,837 @@
   "locations": [
     {
       "name": "Skaldingen",
-      "lore": "Die größte und älteste bekannte Insel, benannt nach den Skalden. Vier Völker teilen sie sich: Die Skalden schützen, die Björnsvikinger ernähren, die Varðir bewahren, die Hamarlinge bauen. Keines kommt ohne die anderen aus."
+      "description": "Die größte und älteste bekannte Insel, benannt nach den Skalden. Vier Völker teilen sie sich: Die Skalden schützen, die Björnsvikinger ernähren, die Varðir bewahren, die Hamarlinge bauen. Keines kommt ohne die anderen aus.",
+      "player_knowledge": [],
+      "gm_knowledge": []
     },
     {
       "name": "Die Kreuzung",
       "parent": "Skaldingen",
-      "lore": "Eine Wegkreuzung im Inland, zwei Tagesmärsche vor Skaldeby. Hier treffen sich die Helden zum ersten Mal.\nVorlesen: Ein Runenstein, halb im Moos versunken, und drei Wege, die in den Morgennebel führen. Ihr seid nicht die Einzigen, die hier rasten.\nKapitel: 1"
+      "description": "Eine Wegkreuzung im Inland, zwei Tagesmärsche vor Skaldeby. Hier treffen sich die Helden zum ersten Mal.\n\nEin Runenstein, halb im Moos versunken, und drei Wege, die in den Morgennebel führen. Ihr seid nicht die Einzigen, die hier rasten.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Der Rastplatz am Waldrand",
       "parent": "Skaldingen",
-      "lore": "Eine Lichtung auf halbem Weg nach Skaldeby. Hier lagern die Helden für die Nacht.\nHier gibt’s: Platz für ein Lager · Wild im Wald\nGefahren: Der dreibeinige Grizzly\nKapitel: 1"
+      "description": "Eine Lichtung auf halbem Weg nach Skaldeby. Hier lagern die Helden für die Nacht.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Platz für ein Lager · Wild im Wald"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Gefahren",
+          "text": "Der dreibeinige Grizzly"
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Skaldeby",
       "parent": "Skaldingen",
-      "lore": "Hauptstadt der Skalden an der Küste.\nVorlesen: Salz in der Luft, Möwen über den Masten. Die Langhäuser ducken sich gegen den Wind, und über allem thront das Langhaus des Jarls mit seinen geschnitzten Drachenköpfen. Im Hafen liegen weniger Schiffe als sonst.\nStimmung: Rau, stolz, seit Wochen gereizt. Überall wird von Krieg gesprochen.\nHier gibt’s: Stadttor mit Wache · Markt zum Handeln · Schänke · Langhaus des Jarls · Hafen · Strand, an dem die Helden ihr Schiff bauen\nKapitel: 1"
+      "description": "Hauptstadt der Skalden an der Küste.\n\nSalz in der Luft, Möwen über den Masten. Die Langhäuser ducken sich gegen den Wind, und über allem thront das Langhaus des Jarls mit seinen geschnitzten Drachenköpfen. Im Hafen liegen weniger Schiffe als sonst.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Stadttor mit Wache · Markt zum Handeln · Schänke · Langhaus des Jarls · Hafen · Strand, an dem die Helden ihr Schiff bauen"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Rau, stolz, seit Wochen gereizt. Überall wird von Krieg gesprochen."
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Das Langhaus von Skaldeby",
       "parent": "Skaldeby",
-      "lore": "Halle des Jarls. Hier tagt das Thing der Skalden.\nVorlesen: Das Feuer in der Mitte brennt hoch, doch die Bänke sind so voll, dass viele stehen müssen. Niemand trinkt. Alle warten auf den Jarl.\nStimmung: Angespannt. Ein Volk zwischen Wut und Verdacht.\nKapitel: 1"
+      "description": "Halle des Jarls. Hier tagt das Thing der Skalden.\n\nDas Feuer in der Mitte brennt hoch, doch die Bänke sind so voll, dass viele stehen müssen. Niemand trinkt. Alle warten auf den Jarl.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Angespannt. Ein Volk zwischen Wut und Verdacht."
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Die Straße nach Björnsvig",
       "parent": "Skaldingen",
-      "lore": "Der Weg vom Küstenland ins Herz der Insel.\nGefahren: Krieger aus Helheim, viel zu weit im Inland, die erst sterben, wenn der Kopf ab ist.\nKapitel: 1"
+      "description": "Der Weg vom Küstenland ins Herz der Insel.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Gefahren",
+          "text": "Krieger aus Helheim, viel zu weit im Inland, die erst sterben, wenn der Kopf ab ist."
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Björnsvig",
       "parent": "Skaldingen",
-      "lore": "Die große Stadt der Björnsvikinger im Herzen der Insel, Marktplatz Skaldingens und Sitz von Jarl Rotbart.\nVorlesen: Felder bis zum Horizont, dann Palisaden und dahinter eine Stadt, die nach Malz und Rauch riecht. Zum Bierfest hängen Banner aus allen Inseln über den Gassen. Fässer stapeln sich höher als die Dächer.\nStimmung: Reich und geschäftig. Während des Fests laut, betrunken, voller Fremder. Darunter Misstrauen gegen alles, was nach Skalde aussieht.\nHier gibt’s: Stadttor · Kneipe Zum Bodenlosen Fass · Markt · Festplatz mit den Brauständen · Langhaus des Jarls · Verlies\nHinweise: Krieger aus Drakkarheim sind in der Stadt. Drakkarheim hat nach den Überfällen Hilfe geschickt.\nKapitel: 1"
+      "description": "Die große Stadt der Björnsvikinger im Herzen der Insel, Marktplatz Skaldingens und Sitz von Jarl Rotbart.\n\nFelder bis zum Horizont, dann Palisaden und dahinter eine Stadt, die nach Malz und Rauch riecht. Zum Bierfest hängen Banner aus allen Inseln über den Gassen. Fässer stapeln sich höher als die Dächer.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Stadttor · Kneipe Zum Bodenlosen Fass · Markt · Festplatz mit den Brauständen · Langhaus des Jarls · Verlies"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Krieger aus Drakkarheim sind in der Stadt. Drakkarheim hat nach den Überfällen Hilfe geschickt."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Reich und geschäftig. Während des Fests laut, betrunken, voller Fremder. Darunter Misstrauen gegen alles, was nach Skalde aussieht."
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Das Stadttor von Björnsvig",
       "parent": "Björnsvig",
-      "lore": "Hier gibt’s: Eddy, die betrunkene Torwache\nKapitel: 1"
+      "description": "",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Eddy, die betrunkene Torwache"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Kneipe Zum Bodenlosen Fass",
       "parent": "Björnsvig",
-      "lore": "Hier entscheidet sich, wer beim Bierfest antreten darf.\nVorlesen: Rauch, Gelächter und ein Lied, das dreimal von vorne anfängt, weil keiner den zweiten Vers kann. Hinter dem Tresen steht eine Wirtin mit verschränkten Armen und mustert euch, als hätte sie schon bessere Brauer rausgeworfen.\nStimmung: Laut, trinkfest, schadenfroh.\nHier gibt’s: Die Stammgäste, deren Urteil zählt · Bier, das besser ist als eures · Teilnahme am Wettbewerb\nHinweise: Wer sich mit den Gästen gut stellt, erfährt von der Schaumbartknospe.\nGefahren: Eine Schlägerei, wenn der Abend kippt\nKapitel: 1"
+      "description": "Hier entscheidet sich, wer beim Bierfest antreten darf.\n\nRauch, Gelächter und ein Lied, das dreimal von vorne anfängt, weil keiner den zweiten Vers kann. Hinter dem Tresen steht eine Wirtin mit verschränkten Armen und mustert euch, als hätte sie schon bessere Brauer rausgeworfen.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Die Stammgäste, deren Urteil zählt · Bier, das besser ist als eures · Teilnahme am Wettbewerb"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Wer sich mit den Gästen gut stellt, erfährt von der Schaumbartknospe."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Laut, trinkfest, schadenfroh."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Eine Schlägerei, wenn der Abend kippt"
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Das Bauernfeld vor der Stadt",
       "parent": "Björnsvig",
-      "lore": "Die Stadt ist voll. Wer keinen Platz bekommt, lagert auf den Feldern vor den Mauern.\nGefahren: Attentäter in der Nacht\nKapitel: 1"
+      "description": "Die Stadt ist voll. Wer keinen Platz bekommt, lagert auf den Feldern vor den Mauern.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Gefahren",
+          "text": "Attentäter in der Nacht"
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Der Festplatz",
       "parent": "Björnsvig",
-      "lore": "Hier stehen die Brauer mit ihren Fässern, hier eröffnet der Jarl das Fest, und hier empfängt er die Sieger.\nStimmung: Erst Feier, dann Blutbad.\nKapitel: 1 · Schauplatz des Blutfests"
+      "description": "Hier stehen die Brauer mit ihren Fässern, hier eröffnet der Jarl das Fest, und hier empfängt er die Sieger.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Erst Feier, dann Blutbad."
+        },
+        {
+          "title": "Kapitel",
+          "text": "1 · Schauplatz des Blutfests"
+        }
+      ]
     },
     {
       "name": "Das Langhaus von Björnsvig",
       "parent": "Björnsvig",
-      "lore": "Halle des Jarls. In der Nacht des Blutfests der letzte Ort, der standhält.\nKapitel: 1"
+      "description": "Halle des Jarls. In der Nacht des Blutfests der letzte Ort, der standhält.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Das Verlies von Björnsvig",
       "parent": "Björnsvig",
-      "lore": "Vorlesen: Die Zelle ist kalt und dunkel. Durch den Gang dringen noch immer Schreie, Metall, Schritte. Gegenüber, auf einem Tisch außer Reichweite, liegen eure Sachen.\nHier gibt’s: Eure Ausrüstung auf dem Tisch gegenüber\nKapitel: 1"
+      "description": "Die Zelle ist kalt und dunkel. Durch den Gang dringen noch immer Schreie, Metall, Schritte. Gegenüber, auf einem Tisch außer Reichweite, liegen eure Sachen.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Eure Ausrüstung auf dem Tisch gegenüber"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Drakkarheim",
       "parent": "Skaldingen",
-      "lore": "Hauptstadt der Hamarlinge, in die Klippe gebaut. Minen, Schmieden und Werften, von denen die Schiffe durch Schächte im Fels ins Meer gelassen werden.\nVorlesen (Kapitel 1, nach dem Angriff): Schon von weitem hängt Rauch über den Klippen, und selbst die Tiere scheinen diesen Ort zu meiden. Je näher ihr kommt, desto stiller wird es. Kein Hämmern, kein Rufen. Nur das Knistern von verbranntem Holz und ein Seil, das im Wind gegen leere Kräne schlägt.\nStimmung: Hier haben sich Menschen gegenseitig abgeschlachtet. Es fühlt sich falsch an.\nHier gibt’s: Werften und Kranschächte · Langhaus des Jarls · Dorfbrunnen · Waldrand am Rand der Stadt\nHinweise: Türen sind von innen eingeschlagen. · Manche Leichen sind nicht nur getötet, sondern angefressen. · Alle Schiffe in den Schächten sind zerstört, ein Kran ist leer.\nGefahren: Die Zurückgelassenen · Der letzte Krieger\nKapitel: 1"
+      "description": "Hauptstadt der Hamarlinge, in die Klippe gebaut. Minen, Schmieden und Werften, von denen die Schiffe durch Schächte im Fels ins Meer gelassen werden.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Werften und Kranschächte · Langhaus des Jarls · Dorfbrunnen · Waldrand am Rand der Stadt"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Türen sind von innen eingeschlagen."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Manche Leichen sind nicht nur getötet, sondern angefressen."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Alle Schiffe in den Schächten sind zerstört, ein Kran ist leer."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Vorlesen (Kapitel 1, nach dem Angriff)",
+          "text": "Schon von weitem hängt Rauch über den Klippen, und selbst die Tiere scheinen diesen Ort zu meiden. Je näher ihr kommt, desto stiller wird es. Kein Hämmern, kein Rufen. Nur das Knistern von verbranntem Holz und ein Seil, das im Wind gegen leere Kräne schlägt."
+        },
+        {
+          "title": "Stimmung",
+          "text": "Hier haben sich Menschen gegenseitig abgeschlachtet. Es fühlt sich falsch an."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Die Zurückgelassenen · Der letzte Krieger"
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Der Brunnen von Drakkarheim",
       "parent": "Drakkarheim",
-      "lore": "Vorlesen: Das Wasser ist dunkel, fast schwarz, und riecht süßlich-faul.\nSL: Pilzsud. Wer davon trank, wurde zur Bestie oder verlor den Verstand. So hat sich Drakkarheim selbst zerfleischt.\nKapitel: 1"
+      "description": "Das Wasser ist dunkel, fast schwarz, und riecht süßlich-faul.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Pilzsud. Wer davon trank, wurde zur Bestie oder verlor den Verstand. So hat sich Drakkarheim selbst zerfleischt."
+        },
+        {
+          "title": "Kapitel",
+          "text": "1"
+        }
+      ]
     },
     {
       "name": "Die heilige Stätte der Varðir",
       "parent": "Skaldingen",
-      "lore": "[Offen: Was ist sie?]"
+      "description": "[Offen: Was ist sie?]",
+      "player_knowledge": [],
+      "gm_knowledge": []
     },
     {
       "name": "Yggdrasil° · Tvíborg",
-      "lore": "Das Königreich Yggdrasil, die reiche Bruderinsel. Riesengroß. Zwei Brüder, Bjarki und Ulfr, entdeckten die Insel, gründeten jeweils eine Stadt und vereinten sie später zur Hauptstadt Tvíborg. Tvíborg ist berühmt für seine Festung, für Feste, Bankette, Kriege, Freudenhäuser und Geld. Hier leben die begnadetsten Gelehrten und Alchemisten der Welt.\n\nDie Stadt ist zweigeteilt: unten am Strand die Hafenstadt unter König Bjarki, oben auf den Klippen die Klippenstadt unter König Ulfr. Dazwischen liegt eine tiefe Schlucht mit einer Zugbrücke.\n\nStatus: Kapitel 2 · Die Klippenstadt fällt in einer einzigen Nacht. Die Hafenstadt ist unberührt, aber eingeschlossen."
+      "description": "Das Königreich Yggdrasil, die reiche Bruderinsel. Riesengroß. Zwei Brüder, Bjarki und Ulfr, entdeckten die Insel, gründeten jeweils eine Stadt und vereinten sie später zur Hauptstadt Tvíborg. Tvíborg ist berühmt für seine Festung, für Feste, Bankette, Kriege, Freudenhäuser und Geld. Hier leben die begnadetsten Gelehrten und Alchemisten der Welt.\n\nDie Stadt ist zweigeteilt: unten am Strand die Hafenstadt unter König Bjarki, oben auf den Klippen die Klippenstadt unter König Ulfr. Dazwischen liegt eine tiefe Schlucht mit einer Zugbrücke.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "Kapitel 2 · Die Klippenstadt fällt in einer einzigen Nacht. Die Hafenstadt ist unberührt, aber eingeschlossen."
+        }
+      ]
     },
     {
       "name": "Die Hafenstadt",
       "parent": "Yggdrasil° · Tvíborg",
-      "lore": "Vorlesen: Tvíborg hält den Atem an. Prachtvolle Langhäuser mit vergoldeten Drachenköpfen, aber die Fensterläden sind zu. Auf dem Markt steht eine Schlange vor einem einzigen Getreidewagen. Im Hafen liegt eine schwere Kette quer über der Einfahrt. Und über allem ragen die Klippen auf, von denen manchmal ein süßlicher Geruch herabweht.\nStimmung: Unberührt, aber belagert. Rationierung, Paranoia. Zum ersten Mal seit der Gründung sind alle Feste abgesagt.\nHier gibt’s: Markt mit rationiertem Getreide · Bärenhalle · Taverne Halbes Horn · Grimurs Schmiede · Der gesperrte Hafen\nHinweise: Abgesagte Festbanner hängen noch an den Häusern. · Die Hafenkette lässt sich nur auf Bjarkis Befehl senken.\nGefahren: Ein eingeschleuster Wirt · Pilzhandel in den Gassen\nGerüchte & Infos: siehe Kapitel 2, „Was die Leute erzählen“"
+      "description": "Tvíborg hält den Atem an. Prachtvolle Langhäuser mit vergoldeten Drachenköpfen, aber die Fensterläden sind zu. Auf dem Markt steht eine Schlange vor einem einzigen Getreidewagen. Im Hafen liegt eine schwere Kette quer über der Einfahrt. Und über allem ragen die Klippen auf, von denen manchmal ein süßlicher Geruch herabweht.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Markt mit rationiertem Getreide · Bärenhalle · Taverne Halbes Horn · Grimurs Schmiede · Der gesperrte Hafen"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Abgesagte Festbanner hängen noch an den Häusern."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Die Hafenkette lässt sich nur auf Bjarkis Befehl senken."
+        },
+        {
+          "title": "Gerücht",
+          "text": "siehe Kapitel 2, „Was die Leute erzählen“"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Unberührt, aber belagert. Rationierung, Paranoia. Zum ersten Mal seit der Gründung sind alle Feste abgesagt."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Ein eingeschleuster Wirt · Pilzhandel in den Gassen"
+        }
+      ]
     },
     {
       "name": "Das Riff & der Wrackstrand",
       "parent": "Die Hafenstadt",
-      "lore": "Vorlesen: Das Kreischen von Holz auf Fels ist das Letzte, was ihr vom Boot hört. Das Riff hat euren Rumpf aufgerissen. Salzwasser, Kälte, dann Sand unter den Händen. Um euch treiben Planken und Fässer, und nicht nur eure: Halb im Sand liegen die Rippen kleiner Fluchtboote. Vor euch, keine hundert Schritt entfernt, die Mauern einer prachtvollen Stadt. Kein Rauch, kein Lärm. Nur hoch über ihr, oben auf den Klippen, brennt etwas.\nStimmung: Kalt, nass, ausgeliefert.\nHier gibt’s: Wrackteile: Seil, eine Axt, ein Fass Pökelfisch · Der Weg zum Haupttor\nHinweise: Die Fluchtboote kommen aus der Klippenstadt. · In einem liegt eine Leiche mit einer Wulst im Nacken, die sich bewegt.\nGefahren: Riff, Brandung und Kälte · SL-Option: Jeder Spieler verliert einen Gegenstand\nSL: Bjarki hat die Hafeneinfahrt mit einer Kette gesperrt. Darum landen alle am Strand, und das Riff davor zerreißt die Boote."
+      "description": "Das Kreischen von Holz auf Fels ist das Letzte, was ihr vom Boot hört. Das Riff hat euren Rumpf aufgerissen. Salzwasser, Kälte, dann Sand unter den Händen. Um euch treiben Planken und Fässer, und nicht nur eure: Halb im Sand liegen die Rippen kleiner Fluchtboote. Vor euch, keine hundert Schritt entfernt, die Mauern einer prachtvollen Stadt. Kein Rauch, kein Lärm. Nur hoch über ihr, oben auf den Klippen, brennt etwas.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Wrackteile: Seil, eine Axt, ein Fass Pökelfisch · Der Weg zum Haupttor"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Die Fluchtboote kommen aus der Klippenstadt."
+        },
+        {
+          "title": "Hinweis",
+          "text": "In einem liegt eine Leiche mit einer Wulst im Nacken, die sich bewegt."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Kalt, nass, ausgeliefert."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Riff, Brandung und Kälte · SL-Option: Jeder Spieler verliert einen Gegenstand"
+        },
+        {
+          "title": "SL",
+          "text": "Bjarki hat die Hafeneinfahrt mit einer Kette gesperrt. Darum landen alle am Strand, und das Riff davor zerreißt die Boote."
+        }
+      ]
     },
     {
       "name": "Das Haupttor",
       "parent": "Die Hafenstadt",
-      "lore": "Vorlesen: Ein Tor aus schwarzem Holz, beschlagen mit Eisen. Über der Mauer zeigen Armbrüste auf euch. Dazu ein Gesicht, das nicht so aussieht, als hätte es heute schon gelächelt.\nStimmung: Misstrauen. Jeder Fremde könnte einer von oben sein.\nHier gibt’s: Wachstube mit Feuerkorb · Wehrgang mit Blick auf Strand und Klippen\nHinweise: Steckbrief am Tor: Eyvind Wachsfinger, Verräter, Belohnung in Silber. · Nachts sieht man oben auf den Klippen Feuer brennen. Man hört Schreie. Aber man sieht nie Menschen.\nGefahren: Armbrüste, falls das Palaver kippt"
+      "description": "Ein Tor aus schwarzem Holz, beschlagen mit Eisen. Über der Mauer zeigen Armbrüste auf euch. Dazu ein Gesicht, das nicht so aussieht, als hätte es heute schon gelächelt.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Wachstube mit Feuerkorb · Wehrgang mit Blick auf Strand und Klippen"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Steckbrief am Tor: Eyvind Wachsfinger, Verräter, Belohnung in Silber."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Nachts sieht man oben auf den Klippen Feuer brennen. Man hört Schreie. Aber man sieht nie Menschen."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Misstrauen. Jeder Fremde könnte einer von oben sein."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Armbrüste, falls das Palaver kippt"
+        }
+      ]
     },
     {
       "name": "Das Wachhaus°",
       "parent": "Die Hafenstadt",
-      "lore": "Sitz der Stadtwache hinter dem Haupttor. Hier laufen die Berichte von Sigruns Spitzeln zusammen.\nVorlesen: Ein schmaler Raum, ein Tisch, darauf Wachstafeln in sauberen Stapeln. Eine Frau sitzt dahinter und schreibt weiter, als ihr hereingeführt werdet. Erst als sie fertig ist, sieht sie auf.\nStimmung: Ruhe, die nervöser macht als Geschrei.\nHier gibt’s: Wachstafeln mit Berichten · Karte der Stadt mit Kreidezeichen · Kerkerzellen im Keller\nHinweise: Auf der Karte sind drei Stellen markiert, an denen Pilzknollen verkauft wurden. Das Halbe Horn ist nicht markiert."
+      "description": "Sitz der Stadtwache hinter dem Haupttor. Hier laufen die Berichte von Sigruns Spitzeln zusammen.\n\nEin schmaler Raum, ein Tisch, darauf Wachstafeln in sauberen Stapeln. Eine Frau sitzt dahinter und schreibt weiter, als ihr hereingeführt werdet. Erst als sie fertig ist, sieht sie auf.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Wachstafeln mit Berichten · Karte der Stadt mit Kreidezeichen · Kerkerzellen im Keller"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Auf der Karte sind drei Stellen markiert, an denen Pilzknollen verkauft wurden. Das Halbe Horn ist nicht markiert."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Ruhe, die nervöser macht als Geschrei."
+        }
+      ]
     },
     {
       "name": "Die Bärenhalle",
       "parent": "Die Hafenstadt",
-      "lore": "Bjarkis Königshof.\nVorlesen: Die Halle riecht nach kaltem Rauch. Die langen Tafeln, an denen sonst hundert Gäste zechen, sind zu Barrikaden umgekippt. Ganz hinten, im Halbdunkel, ein leerer Thron mit Bärenfellen.\nStimmung: Ein Festsaal, der zur Festung wurde.\nHier gibt’s: Thronsaal · Schatzkammer (verschlossen)\nHinweise: Hallvards Hand zuckt zum Schlüsselbund, sobald jemand den Pilz erwähnt.\nGefahren: Ein falsches Wort, und man landet im Kerker\nSL: In der Schatzkammer lagert ein beschlagnahmter Pilzvorrat."
+      "description": "Bjarkis Königshof.\n\nDie Halle riecht nach kaltem Rauch. Die langen Tafeln, an denen sonst hundert Gäste zechen, sind zu Barrikaden umgekippt. Ganz hinten, im Halbdunkel, ein leerer Thron mit Bärenfellen.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Thronsaal · Schatzkammer (verschlossen)"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Hallvards Hand zuckt zum Schlüsselbund, sobald jemand den Pilz erwähnt."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Ein Festsaal, der zur Festung wurde."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Ein falsches Wort, und man landet im Kerker"
+        },
+        {
+          "title": "SL",
+          "text": "In der Schatzkammer lagert ein beschlagnahmter Pilzvorrat."
+        }
+      ]
     },
     {
       "name": "Taverne Halbes Horn",
       "parent": "Die Hafenstadt",
-      "lore": "Vorlesen: Warm, laut, zu voll. Flüchtlinge auf jeder Bank, unter den Tischen schlafen Kinder. Hinter dem Tresen eine Frau mit Unterarmen wie Ankertaue, die gleichzeitig Bier zapft und einen Streit schlichtet.\nStimmung: Galgenhumor. Der Lichtblick des Kapitels.\nHier gibt’s: Verdünntes Bier, Eintopf aus irgendwas · Schlafplätze auf dem Dachboden (teuer) · Kellertür mit neuem Schloss · Überlebende aus der Senke\nHinweise: Tove weicht aus, sobald es um den Keller geht.\nGefahren: Schlägereien zwischen Flüchtlingen und Bürgern\nSL: Unter den Fässern im Keller liegt eine Falltür: der Schmugglergang."
+      "description": "Warm, laut, zu voll. Flüchtlinge auf jeder Bank, unter den Tischen schlafen Kinder. Hinter dem Tresen eine Frau mit Unterarmen wie Ankertaue, die gleichzeitig Bier zapft und einen Streit schlichtet.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Verdünntes Bier, Eintopf aus irgendwas · Schlafplätze auf dem Dachboden (teuer) · Kellertür mit neuem Schloss · Überlebende aus der Senke"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Tove weicht aus, sobald es um den Keller geht."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Galgenhumor. Der Lichtblick des Kapitels."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Schlägereien zwischen Flüchtlingen und Bürgern"
+        },
+        {
+          "title": "SL",
+          "text": "Unter den Fässern im Keller liegt eine Falltür: der Schmugglergang."
+        }
+      ]
     },
     {
       "name": "Grimurs Schmiede",
       "parent": "Die Hafenstadt",
-      "lore": "Vorlesen: Das Hämmern hört ihr drei Gassen weit. Funken, Hitze, ein Berg von Speerspitzen auf dem Boden. Der Schmied blickt nicht auf, als ihr eintretet.\nStimmung: Arbeit statt Gedanken.\nHier gibt’s: Ersatz für verlorene Ausrüstung · Reparaturen · Speere für die Brückenwache\nHinweise: Grimur hat die Ketten der Zugbrücke geschmiedet und kennt ihr schwaches Glied."
+      "description": "Das Hämmern hört ihr drei Gassen weit. Funken, Hitze, ein Berg von Speerspitzen auf dem Boden. Der Schmied blickt nicht auf, als ihr eintretet.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Ersatz für verlorene Ausrüstung · Reparaturen · Speere für die Brückenwache"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Grimur hat die Ketten der Zugbrücke geschmiedet und kennt ihr schwaches Glied."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Arbeit statt Gedanken."
+        }
+      ]
     },
     {
       "name": "Der Hafen",
       "parent": "Die Hafenstadt",
-      "lore": "Die Einfahrt ist mit einer schweren Kette gesperrt. Die Schiffe der Hafenstadt liegen fest.\nHinweise: Die Kette senkt sich nur auf Bjarkis Befehl.\nSL: Bjarki fürchtet Fluchtboote voller Wirte."
+      "description": "Die Einfahrt ist mit einer schweren Kette gesperrt. Die Schiffe der Hafenstadt liegen fest.",
+      "player_knowledge": [
+        {
+          "title": "Hinweis",
+          "text": "Die Kette senkt sich nur auf Bjarkis Befehl."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Bjarki fürchtet Fluchtboote voller Wirte."
+        }
+      ]
     },
     {
       "name": "Die Zugbrücke",
       "parent": "Yggdrasil° · Tvíborg",
-      "lore": "Vorlesen: Die Brücke ist hochgezogen, eine Wand aus Eichenbohlen über einer Schlucht, deren Grund ihr nicht seht. Drüben wächst die Klippenstadt die Felswand hinauf, Rauch steigt auf. Wenn der Wind dreht, hört ihr ganz leise ein Geräusch wie Fingernägel auf Holz.\nStimmung: Das Ende der Welt, zehn Schritt breit.\nHier gibt’s: Wachposten mit Spähloch · Winden und Ketten\nHinweise: Durchs Spähloch: Gestalten, die einen Herzschlag zögern, bevor sie sich bewegen. · Kratzspuren an den Bohlen, auf Kopfhöhe.\nGefahren: Ein Sturm auf die Brücke"
+      "description": "Die Brücke ist hochgezogen, eine Wand aus Eichenbohlen über einer Schlucht, deren Grund ihr nicht seht. Drüben wächst die Klippenstadt die Felswand hinauf, Rauch steigt auf. Wenn der Wind dreht, hört ihr ganz leise ein Geräusch wie Fingernägel auf Holz.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Wachposten mit Spähloch · Winden und Ketten"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Durchs Spähloch: Gestalten, die einen Herzschlag zögern, bevor sie sich bewegen."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Kratzspuren an den Bohlen, auf Kopfhöhe."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Das Ende der Welt, zehn Schritt breit."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Ein Sturm auf die Brücke"
+        }
+      ]
     },
     {
       "name": "Der Schmugglergang",
       "parent": "Yggdrasil° · Tvíborg",
-      "lore": "Vorlesen: Hinter Toves Fässern eine Falltür. Darunter ein Gang, der steil in den Fels hinaufführt, die Stufen grob herausgehauen, so eng, dass die Schultern an beiden Seiten streifen. Es tropft. Es riecht nach Salz, dann nach Moder, und ganz oben süßlich.\nStimmung: Enge. Dunkelheit. Kein Weg zurück, wenn etwas entgegenkommt.\nHier gibt’s: Kerben in der Wand: Schmuggler zählten ihre Stufen\nHinweise: Ein zurückgelassener Sack mit getrockneten Pilzen. So kam der Pilz in die Stadt.\nGefahren: Einsturzgefahr · Ein Wirt im Gang"
+      "description": "Hinter Toves Fässern eine Falltür. Darunter ein Gang, der steil in den Fels hinaufführt, die Stufen grob herausgehauen, so eng, dass die Schultern an beiden Seiten streifen. Es tropft. Es riecht nach Salz, dann nach Moder, und ganz oben süßlich.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Kerben in der Wand: Schmuggler zählten ihre Stufen"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Ein zurückgelassener Sack mit getrockneten Pilzen. So kam der Pilz in die Stadt."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Enge. Dunkelheit. Kein Weg zurück, wenn etwas entgegenkommt."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Einsturzgefahr · Ein Wirt im Gang"
+        }
+      ]
     },
     {
       "name": "Der Wolfspass",
       "parent": "Yggdrasil° · Tvíborg",
-      "lore": "Vorlesen: Der alte Pfad windet sich hinter der Hafenstadt in die Berge und verschwindet nach zwanzig Schritt im Dornengestrüpp. Seit Jahrzehnten hat ihn niemand gebraucht. Etwas hat ihn trotzdem benutzt. Die Spuren sind groß.\nStimmung: Wildnis. Niemand hört dich schreien.\nHier gibt’s: Verfallene Wegschreine aus der Gründerzeit\nHinweise: Der Pfad kommt nahe der Wolfshalle heraus.\nGefahren: Wölfe, ein Bär · Dornen, Absturz · Kostet zwei Tage"
+      "description": "Der alte Pfad windet sich hinter der Hafenstadt in die Berge und verschwindet nach zwanzig Schritt im Dornengestrüpp. Seit Jahrzehnten hat ihn niemand gebraucht. Etwas hat ihn trotzdem benutzt. Die Spuren sind groß.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Verfallene Wegschreine aus der Gründerzeit"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Der Pfad kommt nahe der Wolfshalle heraus."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Wildnis. Niemand hört dich schreien."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Wölfe, ein Bär · Dornen, Absturz · Kostet zwei Tage"
+        }
+      ]
     },
     {
       "name": "Klippenstadt",
       "parent": "Yggdrasil° · Tvíborg",
-      "lore": ""
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": []
     },
     {
       "name": "Taverne Krähennest",
       "parent": "Klippenstadt",
-      "lore": "Verlassene Taverne in der Klippenstadt. Hier endet der Schmugglergang.\nVorlesen: Ihr stemmt eine Falltür auf und steigt in eine Schankstube, in der die Zeit stehengeblieben ist. Halbvolle Krüge auf den Tischen, umgeworfene Stühle. An der Wand ein Handabdruck in getrocknetem Blut, auf Kopfhöhe. Darunter ein zweiter, viel tiefer, als wäre jemand auf allen vieren weitergekrochen.\nStimmung: Stille. Zu viel Stille.\nHier gibt’s: Ausgang des Schmugglergangs · Vorräte, die niemand angerührt hat\nHinweise: Auf dem Tresen eine leere Gabenkiste mit Pilzresten.\nGefahren: Wirte in der Nähe, angezogen von Geräuschen"
+      "description": "Verlassene Taverne in der Klippenstadt. Hier endet der Schmugglergang.\n\nIhr stemmt eine Falltür auf und steigt in eine Schankstube, in der die Zeit stehengeblieben ist. Halbvolle Krüge auf den Tischen, umgeworfene Stühle. An der Wand ein Handabdruck in getrocknetem Blut, auf Kopfhöhe. Darunter ein zweiter, viel tiefer, als wäre jemand auf allen vieren weitergekrochen.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Ausgang des Schmugglergangs · Vorräte, die niemand angerührt hat"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Auf dem Tresen eine leere Gabenkiste mit Pilzresten."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Stille. Zu viel Stille."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Wirte in der Nähe, angezogen von Geräuschen"
+        }
+      ]
     },
     {
       "name": "Die Senke",
       "parent": "Klippenstadt",
-      "lore": "Das Armenviertel am Fuß der Klippen, direkt unter der Zugbrücke. Beide Hälften nutzten es jahrzehntelang als Hinterhof. Jetzt gehört es zur Klippenstadt. Hier begann der Aufstand.\nVorlesen: Hier hat es angefangen. Die Gassen sind voller Pilzgeflecht, weiß wie Schimmel, das aus allen Ritzen wächst. Auf einer Kiste liegt ein Haufen Pilze, als hätte jemand Brot verteilt.\nStimmung: Der Ort, an dem die Ärmsten sich einmal stark fühlten.\nHier gibt’s: Gabenstände des Alchemisten · Kreidezeichen an den Wänden: WIR SIND STARK · Das Weberhaus\nGefahren: Wirte in Rudeln · Versuchung: überall liegen Pilze herum"
+      "description": "Das Armenviertel am Fuß der Klippen, direkt unter der Zugbrücke. Beide Hälften nutzten es jahrzehntelang als Hinterhof. Jetzt gehört es zur Klippenstadt. Hier begann der Aufstand.\n\nHier hat es angefangen. Die Gassen sind voller Pilzgeflecht, weiß wie Schimmel, das aus allen Ritzen wächst. Auf einer Kiste liegt ein Haufen Pilze, als hätte jemand Brot verteilt.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Gabenstände des Alchemisten · Kreidezeichen an den Wänden: WIR SIND STARK · Das Weberhaus"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Der Ort, an dem die Ärmsten sich einmal stark fühlten."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Wirte in Rudeln · Versuchung: überall liegen Pilze herum"
+        }
+      ]
     },
     {
       "name": "Das Weberhaus",
       "parent": "Klippenstadt",
-      "lore": "Ein Handwerkshaus in der Senke. Hjördis hat sich hier mit vier Überlebenden verbarrikadiert.\nVorlesen: Die Fenster sind mit Webrahmen vernagelt, die Tür mit einem Tisch verkeilt. Durch einen Spalt seht ihr ein Auge, das euch mustert.\nHinweise: Hjördis kennt den Hintereingang zur Wolfshalle über die Weberkammer."
+      "description": "Ein Handwerkshaus in der Senke. Hjördis hat sich hier mit vier Überlebenden verbarrikadiert.\n\nDie Fenster sind mit Webrahmen vernagelt, die Tür mit einem Tisch verkeilt. Durch einen Spalt seht ihr ein Auge, das euch mustert.",
+      "player_knowledge": [
+        {
+          "title": "Hinweis",
+          "text": "Hjördis kennt den Hintereingang zur Wolfshalle über die Weberkammer."
+        }
+      ],
+      "gm_knowledge": []
     },
     {
       "name": "Der Leichenacker",
       "parent": "Klippenstadt",
-      "lore": "Felsplateau mit unbegrabenen Toten.\nVorlesen: Auf einem Felsplateau liegen die Toten der letzten Tage in Reihen, niemand hat sie begraben. Zwischen ihnen hockt ein Mann, ganz still. Dann zuckt sein Nacken. Etwas Langes, Glänzendes schiebt sich hinter seinem Ohr hervor, kriecht über den Stein und verschwindet im Ohr einer Leiche.\nStimmung: Ekel und Erkenntnis.\nHier gibt’s: Reihen unbegrabener Toter\nHinweise: Mehrere Leichenschädel sind ausgehöhlt. · Der verlassene Mann beginnt zu schreien und ist nicht mehr zu beruhigen.\nGefahren: Weitere Wirte, angezogen vom Leichengeruch"
+      "description": "Felsplateau mit unbegrabenen Toten.\n\nAuf einem Felsplateau liegen die Toten der letzten Tage in Reihen, niemand hat sie begraben. Zwischen ihnen hockt ein Mann, ganz still. Dann zuckt sein Nacken. Etwas Langes, Glänzendes schiebt sich hinter seinem Ohr hervor, kriecht über den Stein und verschwindet im Ohr einer Leiche.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Reihen unbegrabener Toter"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Mehrere Leichenschädel sind ausgehöhlt."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Der verlassene Mann beginnt zu schreien und ist nicht mehr zu beruhigen."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Ekel und Erkenntnis."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Weitere Wirte, angezogen vom Leichengeruch"
+        }
+      ]
     },
     {
       "name": "Die Wolfshalle",
       "parent": "Klippenstadt",
-      "lore": "Ulfrs Palast ganz oben auf der Klippe.\nVorlesen: Der Thronsaal ist ein Schlachtfeld. Auf dem Thron, die Krone schief auf dem Kopf, kauert ein Mann. Er ist zu groß, seine Schultern zu breit, seine Finger zu lang. Als er euch sieht, öffnet er den Mund, und für einen Augenblick klingt seine Stimme wie die eines Königs: „Lauft.“\nStimmung: Tragödie.\nHier gibt’s: Thronsaal · Labor des Alchemisten im Keller · Hintereingang über die Weberkammer\nHinweise: Gläser voller Tausendfüßler · Notizen zur Dosierung des Pilzes · Seekarte mit Kurs nach Ulmar · Liste mit Namen der Gelehrten Tvíborgs, einige durchgestrichen\nGefahren: Ulfr · Seine Leibgarde, alles Wirte"
+      "description": "Ulfrs Palast ganz oben auf der Klippe.\n\nDer Thronsaal ist ein Schlachtfeld. Auf dem Thron, die Krone schief auf dem Kopf, kauert ein Mann. Er ist zu groß, seine Schultern zu breit, seine Finger zu lang. Als er euch sieht, öffnet er den Mund, und für einen Augenblick klingt seine Stimme wie die eines Königs: „Lauft.“",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Thronsaal · Labor des Alchemisten im Keller · Hintereingang über die Weberkammer"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Gläser voller Tausendfüßler"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Notizen zur Dosierung des Pilzes"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Seekarte mit Kurs nach Ulmar"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Liste mit Namen der Gelehrten Tvíborgs, einige durchgestrichen"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Tragödie."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Ulfr · Seine Leibgarde, alles Wirte"
+        }
+      ]
     },
     {
       "name": "Der Klippenhafen",
       "parent": "Klippenstadt",
-      "lore": "Eine Seehöhle unter der Klippenstadt, gebaut von den Hamarlingen.\nVorlesen: Unter der Klippenstadt öffnet sich eine Seehöhle. Das Meer rauscht in der Dunkelheit. An mächtigen Kränen hängen Schiffe, bereit, durch einen Schacht im Fels hinab ins Wasser gelassen zu werden. Ein Kran ist leer. An seinem Seil hängen frisch gerissene Fasern.\nStimmung: Ein Ausweg, und ein Anfang.\nHier gibt’s: Ulfrs Schiffe an den Kränen · Lagerräume im Fels\nHinweise: Von hier floh der Alchemist. · Die Kräne haben Hamarlinge gebaut.\nGefahren: Wirte in den Lagerräumen · Ein Kran, der unter Last nachgibt"
+      "description": "Eine Seehöhle unter der Klippenstadt, gebaut von den Hamarlingen.\n\nUnter der Klippenstadt öffnet sich eine Seehöhle. Das Meer rauscht in der Dunkelheit. An mächtigen Kränen hängen Schiffe, bereit, durch einen Schacht im Fels hinab ins Wasser gelassen zu werden. Ein Kran ist leer. An seinem Seil hängen frisch gerissene Fasern.",
+      "player_knowledge": [
+        {
+          "title": "Hier gibt’s",
+          "text": "Ulfrs Schiffe an den Kränen · Lagerräume im Fels"
+        },
+        {
+          "title": "Hinweis",
+          "text": "Von hier floh der Alchemist."
+        },
+        {
+          "title": "Hinweis",
+          "text": "Die Kräne haben Hamarlinge gebaut."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Stimmung",
+          "text": "Ein Ausweg, und ein Anfang."
+        },
+        {
+          "title": "Gefahren",
+          "text": "Wirte in den Lagerräumen · Ein Kran, der unter Last nachgibt"
+        }
+      ]
     },
     {
       "name": "Ulmar",
-      "lore": "Die Insel der Kunst und des Wissens. Entdeckt von einem Paar: sie eine talentierte Schmiedin, er ein talentierter Schneider. Von hier stammen die schönsten und wertvollsten Ausrüstungen und Artefakte der Welt.\nSL: Ziel des Alchemisten nach Tvíborg. Er entführt hier Handwerker.\nKapitel: 3 (Entwurf)"
+      "description": "Die Insel der Kunst und des Wissens. Entdeckt von einem Paar: sie eine talentierte Schmiedin, er ein talentierter Schneider. Von hier stammen die schönsten und wertvollsten Ausrüstungen und Artefakte der Welt.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Ziel des Alchemisten nach Tvíborg. Er entführt hier Handwerker."
+        },
+        {
+          "title": "Kapitel",
+          "text": "3 (Entwurf)"
+        }
+      ]
     },
     {
       "name": "Die Nebelinseln",
-      "lore": "Eine Inselgruppe, ewig in Nebel gehüllt.\n\nAuf Skaldingen heißen sie Helheim, nach dem Reich der Toten.\n\nWas man erzählt: Hier ruhen die Toten. Die Seelen derer, die ohne Ruhe starben, verfallen dem Wahnsinn und enden hier. Nachts hört man Schreie und sieht Feuer, doch nie einen Menschen.\n\nDie Krieger Helheims: Blutrünstige Stämme, die den Pilz essen. Stark, wild und, wie man sagt, so dumm wie stark. Sie überfallen immer wieder die Küsten.\n\nSL: Auf den Inseln leben neben den Kriegern auch vereinzelt normale Menschen. Hier wächst der Pilz, und hier baut der Alchemist seine Festung, mitten unter den Bestien."
+      "description": "Eine Inselgruppe, ewig in Nebel gehüllt.\n\nAuf Skaldingen heißen sie Helheim, nach dem Reich der Toten.\n\nWas man erzählt: Hier ruhen die Toten. Die Seelen derer, die ohne Ruhe starben, verfallen dem Wahnsinn und enden hier. Nachts hört man Schreie und sieht Feuer, doch nie einen Menschen.\n\nDie Krieger Helheims: Blutrünstige Stämme, die den Pilz essen. Stark, wild und, wie man sagt, so dumm wie stark. Sie überfallen immer wieder die Küsten.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Auf den Inseln leben neben den Kriegern auch vereinzelt normale Menschen. Hier wächst der Pilz, und hier baut der Alchemist seine Festung, mitten unter den Bestien."
+        }
+      ]
     },
     {
       "name": "Die Festung im Nebel°",
       "parent": "Die Nebelinseln",
-      "lore": "Basis des Alchemisten. Hierhin bringt er die Entführten aus Tvíborg und Ulmar.\nSL: Die Bestien hier tragen seine Tausendfüßler. Darum greifen sie ihn nicht an. Die Krieger Helheims will er hier ausbilden und zu seinem Heer machen."
+      "description": "Basis des Alchemisten. Hierhin bringt er die Entführten aus Tvíborg und Ulmar.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Die Bestien hier tragen seine Tausendfüßler. Darum greifen sie ihn nicht an. Die Krieger Helheims will er hier ausbilden und zu seinem Heer machen."
+        }
+      ]
     }
   ],
   "npcs": [
     {
       "name": "Der Alchemist (Svafnir)",
       "profession": "Antagonist · Alchemist vom Volk der Skalden",
-      "description": "Masken: „der Druide“ in Björnsvig (Kapitel 1) · „der Heiler“ in Tvíborg (Kapitel 2)\nKurz: Kalter, brillanter Alchemist, der den Pilz beherrschen will.\nAussehen: [Offen: Wie haben die Spieler ihn in Kapitel 1 erlebt?]\nAuftreten: Ein ruhiger Mann. Man hört ihn nie schreien, sieht ihn nie lachen oder weinen. In seiner Nähe spürt man nichts, nur eine unheimliche, fast beruhigende Ruhe. Nur einmal bricht sie: Als Jarl Rotbart stirbt, schreit er, und die Leibgardin schwört, sie habe ihn lachen sehen.\nEigenschaften: kalt · geduldig · brillant\nMotivation: Macht und Stärke, ohne selbst zur Bestie zu werden.\nSo spielst du ihn: Leise, langsam, gelangweilt. Spricht mit den Helden wie mit einem kleinen Hindernis. In Kapitel 2 taucht er nicht selbst auf, sondern wirkt über Notizen, Gläser, Wirte und die Erinnerungen anderer.\nGeheimnis (SL): Sein Zwilling Sölvi ist im Pilztraum gefangen, und er ist nicht still.\nStatus: K1 · Richtet das Blutfest an, flieht auf einer Bestie nach Drakkarheim, vergiftet die Brunnen, segelt nach Yggdrasil. · K2 · Bringt die Klippenstadt zu Fall, flieht nach Ulmar.\nAuftritte: K1 Festplatz, Verlies, Björnsvig, Drakkarheim · K2 Wolfshalle (nur Spuren, Flucht an Tag 3)",
+      "description": "[Offen: Wie haben die Spieler ihn in Kapitel 1 erlebt?]",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Masken",
+          "text": "„der Druide“ in Björnsvig (Kapitel 1) · „der Heiler“ in Tvíborg (Kapitel 2)"
+        },
+        {
+          "title": "Kurz",
+          "text": "Kalter, brillanter Alchemist, der den Pilz beherrschen will."
+        },
+        {
+          "title": "Auftreten",
+          "text": "Ein ruhiger Mann. Man hört ihn nie schreien, sieht ihn nie lachen oder weinen. In seiner Nähe spürt man nichts, nur eine unheimliche, fast beruhigende Ruhe. Nur einmal bricht sie: Als Jarl Rotbart stirbt, schreit er, und die Leibgardin schwört, sie habe ihn lachen sehen."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "kalt · geduldig · brillant"
+        },
+        {
+          "title": "Motivation",
+          "text": "Macht und Stärke, ohne selbst zur Bestie zu werden."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Leise, langsam, gelangweilt. Spricht mit den Helden wie mit einem kleinen Hindernis. In Kapitel 2 taucht er nicht selbst auf, sondern wirkt über Notizen, Gläser, Wirte und die Erinnerungen anderer."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Sein Zwilling Sölvi ist im Pilztraum gefangen, und er ist nicht still."
+        },
+        {
+          "title": "Status",
+          "text": "K1 · Richtet das Blutfest an, flieht auf einer Bestie nach Drakkarheim, vergiftet die Brunnen, segelt nach Yggdrasil. · K2 · Bringt die Klippenstadt zu Fall, flieht nach Ulmar."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Festplatz, Verlies, Björnsvig, Drakkarheim · K2 Wolfshalle (nur Spuren, Flucht an Tag 3)"
+        }
+      ],
       "phrases": [
         {
           "trigger": "Im Verlies",
@@ -213,14 +854,57 @@
     {
       "name": "Sölvi, der Träumer",
       "profession": "Zwilling des Alchemisten · gefangen in der Traumwelt",
-      "description": "Kurz: Ein Gerücht unter Süchtigen: Im Rausch schreit einer, der dasselbe Gesicht hat wie der Alchemist.\nGeheimnis (SL): Er hat ein Schwert im Kopf und lebt. Sein Körper muss irgendwo liegen. [Offen: wo?]\nAuftritte: K2 nur als Hinweis (Ylvas Flüstern, Ulfrs Worte)",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Ein Gerücht unter Süchtigen: Im Rausch schreit einer, der dasselbe Gesicht hat wie der Alchemist."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Er hat ein Schwert im Kopf und lebt. Sein Körper muss irgendwo liegen. [Offen: wo?]"
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 nur als Hinweis (Ylvas Flüstern, Ulfrs Worte)"
+        }
+      ],
       "phrases": [],
       "location": null
     },
     {
       "name": "Jarl Thorgrim° von Skaldeby",
       "profession": "Jarl der Skalden · Auftraggeber",
-      "description": "Kurz: Ein alter Seewolf, dem man den Bruder ermordet hat. Er will Krieg, bis die Helden ihm widersprechen.\nEigenschaften: stolz · trauernd · aufbrausend · am Ende einsichtig\nMotivation: Rache für seinen Bruder. Und tief drinnen: kein Krieg gegen die eigenen Brüder und Schwestern.\nWeiß: Sein Bruder reiste als Händler regelmäßig nach Björnsvig. Zurück kamen nur sein Kopf und eine Botschaft, die nach mehr Blut verlangt.\nReaktionen:\n  - Wenn die Helden dem Krieg widersprechen → Aufruhr im Langhaus. Dann gibt der Jarl ihnen recht, denn ihm kommt das alles auch seltsam vor.\n  - Wenn die Helden sich als Boten anbieten → Er schickt sie verkleidet als Bierhändler nach Björnsvig und gibt ihnen seinen Ring.\nAuftritte: K1 Langhaus von Skaldeby",
+      "description": "",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Sein Bruder reiste als Händler regelmäßig nach Björnsvig. Zurück kamen nur sein Kopf und eine Botschaft, die nach mehr Blut verlangt."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Ein alter Seewolf, dem man den Bruder ermordet hat. Er will Krieg, bis die Helden ihm widersprechen."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "stolz · trauernd · aufbrausend · am Ende einsichtig"
+        },
+        {
+          "title": "Motivation",
+          "text": "Rache für seinen Bruder. Und tief drinnen: kein Krieg gegen die eigenen Brüder und Schwestern."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Helden dem Krieg widersprechen → Aufruhr im Langhaus. Dann gibt der Jarl ihnen recht, denn ihm kommt das alles auch seltsam vor.\n  - Wenn die Helden sich als Boten anbieten → Er schickt sie verkleidet als Bierhändler nach Björnsvig und gibt ihnen seinen Ring."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Langhaus von Skaldeby"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -232,14 +916,49 @@
     {
       "name": "Der Bruder des Jarls",
       "profession": "Händler, ermordet vor Kapitelbeginn",
-      "description": "[Name offen]\nSL: Getötet von Wirten des Alchemisten, damit die Skalden glauben, Björnsvig habe angefangen.",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "",
+          "text": "[Name offen]"
+        },
+        {
+          "title": "SL",
+          "text": "Getötet von Wirten des Alchemisten, damit die Skalden glauben, Björnsvig habe angefangen."
+        }
+      ],
       "phrases": [],
       "location": null
     },
     {
       "name": "Eddy",
       "profession": "Torwache von Björnsvig",
-      "description": "Aussehen: Lehnt schwer an seinem Schwert, sein Atem riecht nach Bier, doch seine Augen sind wach.\nEigenschaften: betrunken · gut gelaunt · menschenkundig\nSo spielst du ihn: Mustert die Helden nicht wie Händler, sondern wie jemand, der schon viele Gesichter gesehen hat. Bleibt an einem Gesicht hängen, grinst schief, dann trinkt er gierig von ihrem Bier.\nWeiß: Wer am Fest teilnehmen will, muss sich im Bodenlosen Fass beweisen. · Bei einem sympathischen Gespräch: das Geheimnis der Schaumbartknospe.\nAuftritte: K1 Stadttor von Björnsvig",
+      "description": "Lehnt schwer an seinem Schwert, sein Atem riecht nach Bier, doch seine Augen sind wach.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Wer am Fest teilnehmen will, muss sich im Bodenlosen Fass beweisen."
+        },
+        {
+          "title": "",
+          "text": "Bei einem sympathischen Gespräch: das Geheimnis der Schaumbartknospe."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "betrunken · gut gelaunt · menschenkundig"
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Mustert die Helden nicht wie Händler, sondern wie jemand, der schon viele Gesichter gesehen hat. Bleibt an einem Gesicht hängen, grinst schief, dann trinkt er gierig von ihrem Bier."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Stadttor von Björnsvig"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -259,28 +978,150 @@
     {
       "name": "Die Wirtin vom Bodenlosen Fass",
       "profession": "Wirtin, entscheidet über die Teilnahme am Wettbewerb",
-      "description": "[Name offen]\nEigenschaften: streng · vergnügungssüchtig · gerecht\nMotivation: Zu gutem Bier gehört gute Stimmung. Sie will unterhalten werden.\nReaktionen:\n  - Wenn die Helden singen, tanzen oder die Leute unterhalten → Sie dürfen ausschenken und sich den Gästen präsentieren.\n  - Wenn die Helden sie langweilen → Kein Ausschank.\nAuftritte: K1 Zum Bodenlosen Fass",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "",
+          "text": "[Name offen]"
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "streng · vergnügungssüchtig · gerecht"
+        },
+        {
+          "title": "Motivation",
+          "text": "Zu gutem Bier gehört gute Stimmung. Sie will unterhalten werden."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Helden singen, tanzen oder die Leute unterhalten → Sie dürfen ausschenken und sich den Gästen präsentieren.\n  - Wenn die Helden sie langweilen → Kein Ausschank."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Zum Bodenlosen Fass"
+        }
+      ],
       "phrases": [],
       "location": "Kneipe Zum Bodenlosen Fass"
     },
     {
       "name": "Jarl Rotbart Gelbrtson",
       "profession": "Jarl der Björnsvikinger",
-      "description": "Kurz: Groß, laut, ein Mann, der lacht, bevor er nachdenkt. Und dann doch nachdenkt.\nEigenschaften: stolz · jähzornig · klüger, als er wirkt\nMotivation: Rache für seine Dörfer. Bis die Helden ihn zweifeln lassen.\nWeiß: Seine Dörfer wurden von Kriegern in Skalden-Farben überfallen, ohne Vorwarnung und ohne Gnade, auch Frauen und Kinder. · Der Angriff auf die Helden in der Nacht ging nicht von ihm aus.\nReaktionen:\n  - Wenn die Helden den Ring zeigen und um Frieden bitten → Er hört sie an.\n  - Wenn die Helden von seltsamen Kriegern und dem ermordeten Bruder erzählen → Er lacht laut. „Ihr habt angefangen!“ Dann wird er nachdenklich, trinkt ihr Bier und ruft auf die Sieger und die Brüder und Schwestern aus Skaldeby. Leise sagt er: „Wir sollten reden. Der Angriff letzte Nacht kam nicht von mir.“\nStatus: K1 · Stirbt am vergifteten Siegerbier.\nAuftritte: K1 Festplatz",
+      "description": "",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Seine Dörfer wurden von Kriegern in Skalden-Farben überfallen, ohne Vorwarnung und ohne Gnade, auch Frauen und Kinder."
+        },
+        {
+          "title": "",
+          "text": "Der Angriff auf die Helden in der Nacht ging nicht von ihm aus."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Groß, laut, ein Mann, der lacht, bevor er nachdenkt. Und dann doch nachdenkt."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "stolz · jähzornig · klüger, als er wirkt"
+        },
+        {
+          "title": "Motivation",
+          "text": "Rache für seine Dörfer. Bis die Helden ihn zweifeln lassen."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Helden den Ring zeigen und um Frieden bitten → Er hört sie an.\n  - Wenn die Helden von seltsamen Kriegern und dem ermordeten Bruder erzählen → Er lacht laut. „Ihr habt angefangen!“ Dann wird er nachdenklich, trinkt ihr Bier und ruft auf die Sieger und die Brüder und Schwestern aus Skaldeby. Leise sagt er: „Wir sollten reden. Der Angriff letzte Nacht kam nicht von mir.“"
+        },
+        {
+          "title": "Status",
+          "text": "K1 · Stirbt am vergifteten Siegerbier."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Festplatz"
+        }
+      ],
       "phrases": [],
       "location": "Der Festplatz"
     },
     {
       "name": "Jira Rotbartdóttir",
       "profession": "Tochter von Jarl Rotbart · nach seinem Tod Jarl von Björnsvig",
-      "description": "Kurz: Kriegerin, die in der Nacht des Blutfests das Langhaus hält, während die Stadt brennt.\nEigenschaften: standhaft · stolz · misstrauisch gegenüber den Skalden\nMotivation: Ihre Stadt halten und den Mörder ihres Vaters finden.\nSL: Sie folgte dem Druiden ins Langhaus, stellte ihn zur Rede und wurde im Kampf verletzt. So ließ er die Maske fallen.\nReaktionen:\n  - Wenn die Helden ihr beistehen → Am Morgen tritt sie vor ihr Volk und bestätigt, dass die Skalden nicht die Feinde sind. Die Helden bekommen Pferde und Vorräte.\nStatus: K1 · Überlebt, verletzt. Neue Jarlin von Björnsvig.\nAuftritte: K1 Langhaus von Björnsvig",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Kriegerin, die in der Nacht des Blutfests das Langhaus hält, während die Stadt brennt."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "standhaft · stolz · misstrauisch gegenüber den Skalden"
+        },
+        {
+          "title": "Motivation",
+          "text": "Ihre Stadt halten und den Mörder ihres Vaters finden."
+        },
+        {
+          "title": "SL",
+          "text": "Sie folgte dem Druiden ins Langhaus, stellte ihn zur Rede und wurde im Kampf verletzt. So ließ er die Maske fallen."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Helden ihr beistehen → Am Morgen tritt sie vor ihr Volk und bestätigt, dass die Skalden nicht die Feinde sind. Die Helden bekommen Pferde und Vorräte."
+        },
+        {
+          "title": "Status",
+          "text": "K1 · Überlebt, verletzt. Neue Jarlin von Björnsvig."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Langhaus von Björnsvig"
+        }
+      ],
       "phrases": [],
       "location": "Das Langhaus von Björnsvig"
     },
     {
       "name": "Die Leibgardin",
       "profession": "Jiras Leibgardin",
-      "description": "[Name offen]\nKurz: Schwer verwundet, schleppt sie sich ins Verlies und befreit die Helden.\nWeiß: Der Druide kam als Freund, nicht als Feind. Die Ernten blühten, die Heilkräuter wirkten stärker. Als der Jarl fiel, schrie der Druide, und sie glaubt, ihn lachen gesehen zu haben. · Jira stellte ihn im Langhaus, er verletzte sie und befahl den Angriff. · Die Krieger aus Drakkarheim fielen und standen wieder auf.\nStatus: K1 · Stirbt vor der Zelle, nachdem sie den Schlüssel übergeben hat.\nAuftritte: K1 Verlies",
+      "description": "",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Der Druide kam als Freund, nicht als Feind. Die Ernten blühten, die Heilkräuter wirkten stärker. Als der Jarl fiel, schrie der Druide, und sie glaubt, ihn lachen gesehen zu haben."
+        },
+        {
+          "title": "",
+          "text": "Jira stellte ihn im Langhaus, er verletzte sie und befahl den Angriff."
+        },
+        {
+          "title": "",
+          "text": "Die Krieger aus Drakkarheim fielen und standen wieder auf."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "",
+          "text": "[Name offen]"
+        },
+        {
+          "title": "Kurz",
+          "text": "Schwer verwundet, schleppt sie sich ins Verlies und befreit die Helden."
+        },
+        {
+          "title": "Status",
+          "text": "K1 · Stirbt vor der Zelle, nachdem sie den Schlüssel übergeben hat."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Verlies"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -292,21 +1133,76 @@
     {
       "name": "Stimmen auf dem Markt von Björnsvig",
       "profession": "",
-      "description": "Drei optionale Gespräche. Jedes gibt ein Stück der Wahrheit.\nDer alte Händler: Vor einigen Monden kam ein neuer Berater zum Jarl, ruhig, klug, gebildet. Seitdem sind die Ernten besser. Kurz nach den letzten Raubzügen begannen die Angriffe. Sie waren zu gezielt, zu grausam, es ging nicht um Beute, sondern um Angst. Viele sagen, die Skalden hätten sich verändert. Er glaubt es nicht.\nDer Bauer: Er hat die Angreifer gesehen, mit Skalden-Abzeichen und Skalden-Farben. Sie töteten ohne Zögern. Doch ihre Bewegungen stimmten nicht. „Wie Hüllen.“\nDer Krieger aus Drakkarheim: Drakkarheim hat Hilfe geschickt, nachdem die Angriffe begannen. Doch manche seiner Brüder schlafen kaum noch, stehen nachts einfach da und sprechen nicht. Einer lief schwer verletzt weiter, als wäre nichts gewesen. „Vielleicht bilde ich mir das nur ein.“ Seine Augen sagen etwas anderes.",
+      "description": "",
+      "player_knowledge": [
+        {
+          "title": "Der alte Händler",
+          "text": "Vor einigen Monden kam ein neuer Berater zum Jarl, ruhig, klug, gebildet. Seitdem sind die Ernten besser. Kurz nach den letzten Raubzügen begannen die Angriffe. Sie waren zu gezielt, zu grausam, es ging nicht um Beute, sondern um Angst. Viele sagen, die Skalden hätten sich verändert. Er glaubt es nicht."
+        },
+        {
+          "title": "Der Bauer",
+          "text": "Er hat die Angreifer gesehen, mit Skalden-Abzeichen und Skalden-Farben. Sie töteten ohne Zögern. Doch ihre Bewegungen stimmten nicht. „Wie Hüllen.“"
+        },
+        {
+          "title": "Der Krieger aus Drakkarheim",
+          "text": "Drakkarheim hat Hilfe geschickt, nachdem die Angriffe begannen. Doch manche seiner Brüder schlafen kaum noch, stehen nachts einfach da und sprechen nicht. Einer lief schwer verletzt weiter, als wäre nichts gewesen. „Vielleicht bilde ich mir das nur ein.“ Seine Augen sagen etwas anderes."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "",
+          "text": "Drei optionale Gespräche. Jedes gibt ein Stück der Wahrheit."
+        }
+      ],
       "phrases": [],
       "location": "Björnsvig"
     },
     {
       "name": "Jarl Reiner von Drakkarheim",
       "profession": "Jarl der Hamarlinge",
-      "description": "Status: K1 · Gefallen, als Drakkarheim sich selbst zerfleischte.\nSL · Vorschlag: Er ist „der letzte Krieger“, den der Alchemist den Helden entgegenschickt. Ein Jarl als Wirt, schwer gepanzert, von unzähligen Wunden gezeichnet.",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "K1 · Gefallen, als Drakkarheim sich selbst zerfleischte."
+        },
+        {
+          "title": "SL · Vorschlag",
+          "text": "Er ist „der letzte Krieger“, den der Alchemist den Helden entgegenschickt. Ein Jarl als Wirt, schwer gepanzert, von unzähligen Wunden gezeichnet."
+        }
+      ],
       "phrases": [],
       "location": "Drakkarheim"
     },
     {
       "name": "Astrid Reinersdóttir",
       "profession": "Tochter von Jarl Reiner",
-      "description": "Kurz: Schwer verletzt am Waldrand von Drakkarheim, ihr rechter Arm fehlt. Sie lebt gerade lange genug, um zu erzählen.\nEigenschaften: klar · gebrochen · zornig\nWeiß (Pflichtdialog): siehe Kapitel 1, Szene „Die Worte der Tochter“.\nStatus: K1 · Stirbt, nachdem die Helden den letzten Krieger besiegt haben.\nAuftritte: K1 Drakkarheim, Waldrand",
+      "description": "",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "siehe Kapitel 1, Szene „Die Worte der Tochter“."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Schwer verletzt am Waldrand von Drakkarheim, ihr rechter Arm fehlt. Sie lebt gerade lange genug, um zu erzählen."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "klar · gebrochen · zornig"
+        },
+        {
+          "title": "Status",
+          "text": "K1 · Stirbt, nachdem die Helden den letzten Krieger besiegt haben."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Drakkarheim, Waldrand"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -318,35 +1214,139 @@
     {
       "name": "Der dreibeinige Grizzly (Gegner)",
       "profession": "",
-      "description": "Kurz: Ein bekannter Bär der Gegend, dem ein Bein fehlt. Wirt eines Tausendfüßlers.\nAussehen: Blutunterlaufene Augen, Blut läuft ihm aus dem Maul, er atmet schwer. Im Kampf fällt auf: Sein Hals ist fast durchtrennt. Er müsste tot sein.\nErkennen: Probe auf Naturkunde, um ihn als den Dreibeinigen zu erkennen.\nStirbt erst: wenn der Kopf ab ist.\nSpielwerte: [Nach How to be a Hero eintragen]",
+      "description": "Blutunterlaufene Augen, Blut läuft ihm aus dem Maul, er atmet schwer. Im Kampf fällt auf: Sein Hals ist fast durchtrennt. Er müsste tot sein.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Ein bekannter Bär der Gegend, dem ein Bein fehlt. Wirt eines Tausendfüßlers."
+        },
+        {
+          "title": "Erkennen",
+          "text": "Probe auf Naturkunde, um ihn als den Dreibeinigen zu erkennen."
+        },
+        {
+          "title": "Stirbt erst",
+          "text": "wenn der Kopf ab ist."
+        },
+        {
+          "title": "Spielwerte",
+          "text": "[Nach How to be a Hero eintragen]"
+        }
+      ],
       "phrases": [],
       "location": "Der Rastplatz am Waldrand"
     },
     {
       "name": "Krieger aus Helheim (Gegner)",
       "profession": "",
-      "description": "Kurz: Banditen von den Nebelinseln, seltsam ruhig, viel zu weit im Inland. Wirte.\nStirbt erst: wenn der Kopf ab ist.\nSpielwerte: [Nach How to be a Hero eintragen]",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Banditen von den Nebelinseln, seltsam ruhig, viel zu weit im Inland. Wirte."
+        },
+        {
+          "title": "Stirbt erst",
+          "text": "wenn der Kopf ab ist."
+        },
+        {
+          "title": "Spielwerte",
+          "text": "[Nach How to be a Hero eintragen]"
+        }
+      ],
       "phrases": [],
       "location": "Die Straße nach Björnsvig"
     },
     {
       "name": "Die Attentäter (Gegner)",
       "profession": "",
-      "description": "Kurz: Krieger in alten, abgetragenen Rüstungen der Björnsvikinger. Kämpfen stumpf, ohne auf Schmerz zu reagieren. Wirte.\nStirbt erst: wenn der Kopf ab ist.",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Krieger in alten, abgetragenen Rüstungen der Björnsvikinger. Kämpfen stumpf, ohne auf Schmerz zu reagieren. Wirte."
+        },
+        {
+          "title": "Stirbt erst",
+          "text": "wenn der Kopf ab ist."
+        }
+      ],
       "phrases": [],
       "location": "Das Bauernfeld vor der Stadt"
     },
     {
       "name": "Die Zurückgelassenen (Gegner)",
       "profession": "",
-      "description": "Kurz: Die Bewohner von Drakkarheim, die vom Brunnen tranken. Taumelnd, mit verdrehten Gliedern und leerem Blick, schwerfällig, aber unnatürlich stark.",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Die Bewohner von Drakkarheim, die vom Brunnen tranken. Taumelnd, mit verdrehten Gliedern und leerem Blick, schwerfällig, aber unnatürlich stark."
+        }
+      ],
       "phrases": [],
       "location": "Drakkarheim"
     },
     {
       "name": "Sigrun Hallsdóttir",
       "profession": "Hauptfrau der Stadtwache der Hafenstadt · Arbeitsname",
-      "description": "Kurz: Ruhig, kontrolliert, mit Spitzeln in der ganzen Stadt. Ihr entgeht wenig.\nAussehen: Mitte vierzig, Narbe übers Kinn, Kettenhemd, leise Stimme.\nEigenschaften: sehr ruhig · aufmerksam · pflichtbewusst · trocken · erschöpft\nMotivation: Nichts Gefährliches kommt in ihre Stadt.\nSo spielst du sie: Kurze Sätze, leise. Lässt Schweigen wirken. Lacht nie. Weiß oft mehr, als sie sagt, und lässt die Spieler das spüren.\nGeheimnis (SL): Ihr Bruder Arni diente in Ulfrs Garde und ist oben ein Wirt. Sie hofft, dass er über einen geheimen Weg zurückkommt. Darum will sie den Schmugglergang finden, bevor Bjarki ihn zumauern lässt.\nWeiß: Es gibt einen Schwarzmarkt mit Pilzen in der Hafenstadt. · Die Knollen kommen von oben, also muss es einen Geheimgang geben. · Der Steckbrief gilt Eyvind Wachsfinger. · Von ihren Leuten am Tor: Die Spieler sind Skalden.\nAuftrag an die Spieler: Dem Pilz-Schwarzmarkt auf die Schliche kommen und den Gang der Schmuggler finden.\nReaktionen:\n  - Wenn die Spieler sagen, sie sind Skalden → „Skalden. Man hört, ihr schlachtet jetzt sogar Gäste auf Festen ab.“ Sie wartet, bis die Spieler sich erklären. Überzeugen ist erschwert.\n  - Wenn die Spieler lügen → „Dann sag mir, wie euer Jarl heißt.“ Probe auf Lügen. Ihre Spitzel wissen es ohnehin.\n  - Wenn die Spieler vom Blutfest und vom Alchemisten erzählen → Sie wird still. „Einer, der Menschen zu Tieren macht.“ Dann gibt sie ihnen den Auftrag.\n  - Wenn die Spieler drohen → Sie schreibt weiter. „Ihr seid in meiner Stadt. Überlegt, wie lange ihr hier noch essen wollt.“\n  - Wenn die Spieler nach dem König fragen → „Der König empfängt nicht mal seinen Truchsess ohne Schwert in der Hand.“\n  - Wenn die Spieler den Gang finden → Sie geht als Erste hinab. Allein.\n  - Wenn die Spieler Nachricht von Arni bringen → Sie wird ihre wichtigste Verbündete in der Stadt, egal wie die Nachricht lautet.\nAuftritte: K2 Wachhaus, Haupttor, Hafenstadt",
+      "description": "Mitte vierzig, Narbe übers Kinn, Kettenhemd, leise Stimme.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Es gibt einen Schwarzmarkt mit Pilzen in der Hafenstadt."
+        },
+        {
+          "title": "",
+          "text": "Die Knollen kommen von oben, also muss es einen Geheimgang geben."
+        },
+        {
+          "title": "",
+          "text": "Der Steckbrief gilt Eyvind Wachsfinger."
+        },
+        {
+          "title": "",
+          "text": "Von ihren Leuten am Tor: Die Spieler sind Skalden."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Ruhig, kontrolliert, mit Spitzeln in der ganzen Stadt. Ihr entgeht wenig."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "sehr ruhig · aufmerksam · pflichtbewusst · trocken · erschöpft"
+        },
+        {
+          "title": "Motivation",
+          "text": "Nichts Gefährliches kommt in ihre Stadt."
+        },
+        {
+          "title": "So spielst du sie",
+          "text": "Kurze Sätze, leise. Lässt Schweigen wirken. Lacht nie. Weiß oft mehr, als sie sagt, und lässt die Spieler das spüren."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Ihr Bruder Arni diente in Ulfrs Garde und ist oben ein Wirt. Sie hofft, dass er über einen geheimen Weg zurückkommt. Darum will sie den Schmugglergang finden, bevor Bjarki ihn zumauern lässt."
+        },
+        {
+          "title": "Auftrag an die Spieler",
+          "text": "Dem Pilz-Schwarzmarkt auf die Schliche kommen und den Gang der Schmuggler finden."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler sagen, sie sind Skalden → „Skalden. Man hört, ihr schlachtet jetzt sogar Gäste auf Festen ab.“ Sie wartet, bis die Spieler sich erklären. Überzeugen ist erschwert.\n  - Wenn die Spieler lügen → „Dann sag mir, wie euer Jarl heißt.“ Probe auf Lügen. Ihre Spitzel wissen es ohnehin.\n  - Wenn die Spieler vom Blutfest und vom Alchemisten erzählen → Sie wird still. „Einer, der Menschen zu Tieren macht.“ Dann gibt sie ihnen den Auftrag.\n  - Wenn die Spieler drohen → Sie schreibt weiter. „Ihr seid in meiner Stadt. Überlegt, wie lange ihr hier noch essen wollt.“\n  - Wenn die Spieler nach dem König fragen → „Der König empfängt nicht mal seinen Truchsess ohne Schwert in der Hand.“\n  - Wenn die Spieler den Gang finden → Sie geht als Erste hinab. Allein.\n  - Wenn die Spieler Nachricht von Arni bringen → Sie wird ihre wichtigste Verbündete in der Stadt, egal wie die Nachricht lautet."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Wachhaus, Haupttor, Hafenstadt"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -362,7 +1362,43 @@
     {
       "name": "Kalle",
       "profession": "Junger Torwächter",
-      "description": "Aussehen: Neunzehn, viel zu großer Helm, hält sich an seinem Speer fest.\nEigenschaften: nervös · geschwätzig · gutmütig\nMotivation: Will tapfer wirken. Hat Todesangst.\nSo spielst du ihn: Redet zu schnell, beendet Sätze nicht, schaut nach jedem Wort zu den anderen Wachen.\nGeheimnis (SL): In seiner Tasche steckt eine Pilzknolle, von einem Flüchtling gekauft. „Für den Notfall.“\nWeiß: „Oben, die … die bellen nachts. Aber nicht wie Hunde.“ · Das Gerücht über Schritte in Toves Keller.\nReaktionen:\n  - Wenn die Spieler freundlich sind → Er wird zur Infoquelle und taucht später in der Taverne auf.\n  - Wenn die Spieler ihn unter Druck setzen → Er klappt zusammen und erzählt alles, inklusive Pilz in der Tasche. Damit hat Sigrun ihre erste Spur zum Schwarzmarkt.\n  - Wenn die Spieler ihn vor dem Pilz warnen → Er wirft ihn weg. Oder doch nicht? Würfel es aus.\nAuftritte: K2 Haupttor, Halbes Horn",
+      "description": "Neunzehn, viel zu großer Helm, hält sich an seinem Speer fest.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "„Oben, die … die bellen nachts. Aber nicht wie Hunde.“"
+        },
+        {
+          "title": "",
+          "text": "Das Gerücht über Schritte in Toves Keller."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "nervös · geschwätzig · gutmütig"
+        },
+        {
+          "title": "Motivation",
+          "text": "Will tapfer wirken. Hat Todesangst."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Redet zu schnell, beendet Sätze nicht, schaut nach jedem Wort zu den anderen Wachen."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "In seiner Tasche steckt eine Pilzknolle, von einem Flüchtling gekauft. „Für den Notfall.“"
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler freundlich sind → Er wird zur Infoquelle und taucht später in der Taverne auf.\n  - Wenn die Spieler ihn unter Druck setzen → Er klappt zusammen und erzählt alles, inklusive Pilz in der Tasche. Damit hat Sigrun ihre erste Spur zum Schwarzmarkt.\n  - Wenn die Spieler ihn vor dem Pilz warnen → Er wirft ihn weg. Oder doch nicht? Würfel es aus."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Haupttor, Halbes Horn"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -378,7 +1414,47 @@
     {
       "name": "Hallvard Silberzunge",
       "profession": "Truchsess von König Bjarki",
-      "description": "Aussehen: Schmal, gepflegter Bart mit Silberperlen. Das einzige saubere Gewand in der Stadt.\nEigenschaften: höflich · berechnend · loyal · hochmütig\nMotivation: Den König schützen, vor allem vor sich selbst.\nSo spielst du ihn: Lächelt immer. Wählt jedes Wort. Nennt die Spieler „meine geschätzten Gäste“, was nach Beleidigung klingt.\nGeheimnis (SL): Er weiß, dass Bjarki einen beschlagnahmten Pilzvorrat in der Schatzkammer hat und darüber nachdenkt. Er hat Angst davor.\nWeiß: Alles über den Hof. · Dass Eyvind den Alchemisten an Ulfrs Hof gebracht hat.\nWie man sich beweist: 1) Augenzeugen: vom Blutfest berichten und das eigene Scheitern zugeben, eine Stolzprobe. 2) Der Eingeschleuste: den Wirt in der Hafenstadt diskret finden. 3) Die Brücke: Grimur bestätigt, dass die Spieler bei der Verteidigung helfen.\nReaktionen:\n  - Wenn die Spieler prahlen → „Natürlich. Darum seid ihr auch schwimmend angereist.“\n  - Wenn die Spieler ehrlich zugeben, dass sie gestrandet sind → „Ehrlichkeit. Wie ungewöhnlich. Setzt euch.“ Er nennt die drei Wege.\n  - Wenn die Spieler nach dem Pilz fragen → Er weicht aus. Seine Hand zuckt zum Schlüsselbund.\n  - Wenn die Spieler den eingeschleusten Wirt finden → Audienz beim König, noch am selben Abend.\nAuftritte: K2 Bärenhalle",
+      "description": "Schmal, gepflegter Bart mit Silberperlen. Das einzige saubere Gewand in der Stadt.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Alles über den Hof."
+        },
+        {
+          "title": "",
+          "text": "Dass Eyvind den Alchemisten an Ulfrs Hof gebracht hat."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "höflich · berechnend · loyal · hochmütig"
+        },
+        {
+          "title": "Motivation",
+          "text": "Den König schützen, vor allem vor sich selbst."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Lächelt immer. Wählt jedes Wort. Nennt die Spieler „meine geschätzten Gäste“, was nach Beleidigung klingt."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Er weiß, dass Bjarki einen beschlagnahmten Pilzvorrat in der Schatzkammer hat und darüber nachdenkt. Er hat Angst davor."
+        },
+        {
+          "title": "Wie man sich beweist",
+          "text": "1) Augenzeugen: vom Blutfest berichten und das eigene Scheitern zugeben, eine Stolzprobe. 2) Der Eingeschleuste: den Wirt in der Hafenstadt diskret finden. 3) Die Brücke: Grimur bestätigt, dass die Spieler bei der Verteidigung helfen."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler prahlen → „Natürlich. Darum seid ihr auch schwimmend angereist.“\n  - Wenn die Spieler ehrlich zugeben, dass sie gestrandet sind → „Ehrlichkeit. Wie ungewöhnlich. Setzt euch.“ Er nennt die drei Wege.\n  - Wenn die Spieler nach dem Pilz fragen → Er weicht aus. Seine Hand zuckt zum Schlüsselbund.\n  - Wenn die Spieler den eingeschleusten Wirt finden → Audienz beim König, noch am selben Abend."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Bärenhalle"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -394,7 +1470,47 @@
     {
       "name": "König Bjarki",
       "profession": "Gründer und Herrscher der Hafenstadt",
-      "description": "Kurz: Einer der beiden Gründerbrüder. Hat sich in der Bärenhalle eingeschlossen.\nAussehen: Bärenhaft, ungekämmt, schläft in der Rüstung.\nEigenschaften: stolz · paranoid · liebt seinen Bruder · verzweifelt\nMotivation: Halten. Um jeden Preis.\nSo spielst du ihn: Lange Pausen, dann plötzliches Brüllen. Nennt Ulfr nie beim Namen, sagt nur „er“. Tritt erst auf, wenn die Spieler sich bewiesen haben.\nGeheimnis (SL): Der Pilzvorrat in der Schatzkammer. Den Hafen hat er gesperrt, weil er Fluchtboote voller Wirte fürchtet.\nWeiß: Die Geschichte der Gründung. · Wie die Stadt gebaut ist.\nReaktionen:\n  - Wenn die Spieler Nachricht über Ulfr bringen → „Bringt ihn mir. Lebend. Was auch immer er jetzt ist.“\n  - Wenn die Spieler den Pilzvorrat erwähnen → Erst Wut. Dann, sehr leise, Tränen.\n  - Wenn die Spieler an der Brücke helfen → Ausrüstung und das Versprechen, die Hafenkette für sie zu senken.\nAuftritte: K2 Bärenhalle, Zugbrücke (Tag 6)",
+      "description": "Bärenhaft, ungekämmt, schläft in der Rüstung.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Die Geschichte der Gründung."
+        },
+        {
+          "title": "",
+          "text": "Wie die Stadt gebaut ist."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Einer der beiden Gründerbrüder. Hat sich in der Bärenhalle eingeschlossen."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "stolz · paranoid · liebt seinen Bruder · verzweifelt"
+        },
+        {
+          "title": "Motivation",
+          "text": "Halten. Um jeden Preis."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Lange Pausen, dann plötzliches Brüllen. Nennt Ulfr nie beim Namen, sagt nur „er“. Tritt erst auf, wenn die Spieler sich bewiesen haben."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Der Pilzvorrat in der Schatzkammer. Den Hafen hat er gesperrt, weil er Fluchtboote voller Wirte fürchtet."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler Nachricht über Ulfr bringen → „Bringt ihn mir. Lebend. Was auch immer er jetzt ist.“\n  - Wenn die Spieler den Pilzvorrat erwähnen → Erst Wut. Dann, sehr leise, Tränen.\n  - Wenn die Spieler an der Brücke helfen → Ausrüstung und das Versprechen, die Hafenkette für sie zu senken."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Bärenhalle, Zugbrücke (Tag 6)"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -406,7 +1522,43 @@
     {
       "name": "Tove",
       "profession": "Wirtin des Halben Horns",
-      "description": "Aussehen: Breit, laut, rote Zöpfe, Unterarme wie Ankertaue.\nEigenschaften: herzlich · geschäftstüchtig · schlagfertig · verschwiegen\nMotivation: Ihre Gäste durchbringen. Und die Kasse.\nSo spielst du sie: Laut. Nennt alle „Schätzchen“. Wird eiskalt, sobald es um den Keller geht.\nGeheimnis (SL): Der Schmugglergang beginnt in ihrem Keller. Sie hat jahrelang daran mitverdient, auch an Eyvinds Lieferungen. Sie ahnt, dass so der Pilz in die Stadt kam, und dass er immer noch kommt.\nWeiß: Wer in der Stadt was weiß. · Wo Eyvind sich versteckt.\nReaktionen:\n  - Wenn die Spieler nach dem Keller fragen → „Da sind Fässer, Schätzchen. Willst du Fässer sehen?“ Probe auf Menschenkenntnis: sie lügt.\n  - Wenn die Spieler in der Schänke helfen → Freie Kost, ein Schlafplatz und ein Tipp: „Frag nicht mich. Frag den Wachsfinger.“\n  - Wenn die Spieler drohen → Die halbe Taverne steht auf.\n  - Wenn die Spieler sagen, dass Sigrun sie schickt → Tove wird blass. „Die Ruhige. Natürlich.“\nAuftritte: K2 Halbes Horn",
+      "description": "Breit, laut, rote Zöpfe, Unterarme wie Ankertaue.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Wer in der Stadt was weiß."
+        },
+        {
+          "title": "",
+          "text": "Wo Eyvind sich versteckt."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "herzlich · geschäftstüchtig · schlagfertig · verschwiegen"
+        },
+        {
+          "title": "Motivation",
+          "text": "Ihre Gäste durchbringen. Und die Kasse."
+        },
+        {
+          "title": "So spielst du sie",
+          "text": "Laut. Nennt alle „Schätzchen“. Wird eiskalt, sobald es um den Keller geht."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Der Schmugglergang beginnt in ihrem Keller. Sie hat jahrelang daran mitverdient, auch an Eyvinds Lieferungen. Sie ahnt, dass so der Pilz in die Stadt kam, und dass er immer noch kommt."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler nach dem Keller fragen → „Da sind Fässer, Schätzchen. Willst du Fässer sehen?“ Probe auf Menschenkenntnis: sie lügt.\n  - Wenn die Spieler in der Schänke helfen → Freie Kost, ein Schlafplatz und ein Tipp: „Frag nicht mich. Frag den Wachsfinger.“\n  - Wenn die Spieler drohen → Die halbe Taverne steht auf.\n  - Wenn die Spieler sagen, dass Sigrun sie schickt → Tove wird blass. „Die Ruhige. Natürlich.“"
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Halbes Horn"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -418,7 +1570,43 @@
     {
       "name": "Ylva",
       "profession": "Wäscherin, Überlebende aus der Senke",
-      "description": "Aussehen: Dünn, rote Hände, sitzt immer mit dem Rücken zur Wand.\nEigenschaften: verängstigt · aufmerksam · schuldbewusst\nMotivation: Vergessen.\nSo spielst du sie: Flüstert. Reibt die Hände, als würden sie nie sauber.\nGeheimnis (SL): Sie hat selbst vom Pilz genommen und sehnt sich danach.\nWeiß: Der Alchemist kam als Heiler und verteilte die Pilze umsonst. · Ein Mann mit wachsbleichen Fingern half ihm. Das war Eyvind.\nReaktionen:\n  - Wenn die Spieler den Pilz erwähnen → Ihre Augen leuchten kurz auf. Unheimlich.\n  - Wenn die Spieler versprechen, sie rauszubringen → Sie erzählt alles, was sie über den Heiler weiß.\nAuftritte: K2 Halbes Horn",
+      "description": "Dünn, rote Hände, sitzt immer mit dem Rücken zur Wand.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Der Alchemist kam als Heiler und verteilte die Pilze umsonst."
+        },
+        {
+          "title": "",
+          "text": "Ein Mann mit wachsbleichen Fingern half ihm. Das war Eyvind."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "verängstigt · aufmerksam · schuldbewusst"
+        },
+        {
+          "title": "Motivation",
+          "text": "Vergessen."
+        },
+        {
+          "title": "So spielst du sie",
+          "text": "Flüstert. Reibt die Hände, als würden sie nie sauber."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Sie hat selbst vom Pilz genommen und sehnt sich danach."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler den Pilz erwähnen → Ihre Augen leuchten kurz auf. Unheimlich.\n  - Wenn die Spieler versprechen, sie rauszubringen → Sie erzählt alles, was sie über den Heiler weiß."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Halbes Horn"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -430,7 +1618,43 @@
     {
       "name": "Bersi Einhand",
       "profession": "Alter Soldat",
-      "description": "Aussehen: Grauer Bart, ein Arm, ein Krug, der nie leer wird.\nEigenschaften: verbittert · trinkfest · grob ehrlich\nMotivation: Nicht nüchtern werden.\nSo spielst du ihn: Brummt. Erzählt nur gegen Bier. Starrt dabei auf seinen Stumpf.\nGeheimnis (SL): Der Wirt, der ihm den Arm abriss, war sein eigener Hauptmann.\nWeiß: „Die Augen. Die Augen waren noch Menschen. Der eine hat geweint, während er mir den Arm abgerissen hat.“ · Er hat eine Wulst im Nacken eines Wirts gesehen.\nReaktionen:\n  - Wenn die Spieler ihm ein Bier geben → Er erzählt vom Kampf.\n  - Wenn die Spieler ihm ein zweites Bier geben → Seine Taktik: „Sie zögern. Einen Herzschlag. Dann musst du da sein.“\nAuftritte: K2 Halbes Horn",
+      "description": "Grauer Bart, ein Arm, ein Krug, der nie leer wird.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "„Die Augen. Die Augen waren noch Menschen. Der eine hat geweint, während er mir den Arm abgerissen hat.“"
+        },
+        {
+          "title": "",
+          "text": "Er hat eine Wulst im Nacken eines Wirts gesehen."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "verbittert · trinkfest · grob ehrlich"
+        },
+        {
+          "title": "Motivation",
+          "text": "Nicht nüchtern werden."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Brummt. Erzählt nur gegen Bier. Starrt dabei auf seinen Stumpf."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Der Wirt, der ihm den Arm abriss, war sein eigener Hauptmann."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler ihm ein Bier geben → Er erzählt vom Kampf.\n  - Wenn die Spieler ihm ein zweites Bier geben → Seine Taktik: „Sie zögern. Einen Herzschlag. Dann musst du da sein.“"
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Halbes Horn"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -442,7 +1666,43 @@
     {
       "name": "Grimur Rußbart",
       "profession": "Schmied der Hafenstadt",
-      "description": "Aussehen: Gebeugt, Lederschürze, Bart voller Brandlöcher. Lernte bei den Hamarlingen in Drakkarheim.\nEigenschaften: brummig · ehrlich · stolz auf sein Handwerk · trauert still\nMotivation: Speerspitzen für die Brücke, bis die Hände bluten. Arbeit hält die Gedanken fern.\nSo spielst du ihn: Antwortet mit Hammerschlägen. Ein Satz pro Minute, aber jeder sitzt.\nGeheimnis (SL): Sein Lehrling Torvi ging über die Brücke, um seine Mutter zu holen, kurz bevor sie hochgezogen wurde. Er kam nie zurück.\nWeiß: Er hat die Brückenketten geschmiedet und kennt das eine Glied, das er nie ersetzt hat. · Er weiß, wie man die Kräne im Klippenhafen bedient.\nReaktionen:\n  - Wenn die Spieler mit anpacken → Rabatt und das Wissen über die Ketten.\n  - Wenn die Spieler Torvi finden und Nachricht oder ein Andenken bringen → Er schmiedet ihnen ein Meisterstück.\n  - Wenn die Spieler unverschämt feilschen → „Raus. Komm wieder, wenn du weißt, was Arbeit ist.“\n  - Wenn die Spieler Skalden sind → „Eure Nachbarn in Drakkarheim sind die einzigen, die was können.“ Er mag sie ein bisschen.\nAuftritte: K2 Grimurs Schmiede, Zugbrücke",
+      "description": "Gebeugt, Lederschürze, Bart voller Brandlöcher. Lernte bei den Hamarlingen in Drakkarheim.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Er hat die Brückenketten geschmiedet und kennt das eine Glied, das er nie ersetzt hat."
+        },
+        {
+          "title": "",
+          "text": "Er weiß, wie man die Kräne im Klippenhafen bedient."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "brummig · ehrlich · stolz auf sein Handwerk · trauert still"
+        },
+        {
+          "title": "Motivation",
+          "text": "Speerspitzen für die Brücke, bis die Hände bluten. Arbeit hält die Gedanken fern."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Antwortet mit Hammerschlägen. Ein Satz pro Minute, aber jeder sitzt."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Sein Lehrling Torvi ging über die Brücke, um seine Mutter zu holen, kurz bevor sie hochgezogen wurde. Er kam nie zurück."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler mit anpacken → Rabatt und das Wissen über die Ketten.\n  - Wenn die Spieler Torvi finden und Nachricht oder ein Andenken bringen → Er schmiedet ihnen ein Meisterstück.\n  - Wenn die Spieler unverschämt feilschen → „Raus. Komm wieder, wenn du weißt, was Arbeit ist.“\n  - Wenn die Spieler Skalden sind → „Eure Nachbarn in Drakkarheim sind die einzigen, die was können.“ Er mag sie ein bisschen."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Grimurs Schmiede, Zugbrücke"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -454,7 +1714,55 @@
     {
       "name": "Eyvind Wachsfinger",
       "profession": "Informant, verratener Gehilfe des Alchemisten",
-      "description": "Aussehen: Hager, nervös. Finger bleich und glatt wie Kerzenwachs, verätzt von alchemistischen Mitteln.\nEigenschaften: feige · gerissen · schuldbeladen · überlebensgierig\nMotivation: Runter von dieser Insel. Lebend.\nSo spielst du ihn: Flüstert, schaut über die Schulter, rechtfertigt sich ungefragt.\nGeheimnis (SL): Er hat den Alchemisten an Ulfrs Hof gebracht und die Pilze durch den Schmugglergang geliefert. Der Alchemist ließ ihn fallen. Jetzt jagen ihn Bjarkis Wachen.\nWeiß: Den Schmugglergang vom Halben Horn ins Krähennest. · „Er hat Gläser. Gläser voller Beine.“ · Den Weg zum Klippenhafen. · Wer den Schwarzmarkt heute beliefert.\nSo finden die Spieler ihn: Steckbrief am Haupttor · Ylva erwähnt den Mann mit den Wachsfingern · Tove: „Frag den Wachsfinger.“ · Er findet sie: Er hört von gestrandeten Skalden und will mit ihnen aufs Schiff · Jagd durch die Gassen (Tag 4)\nReaktionen:\n  - Wenn die Spieler drohen, ihn auszuliefern → Er verrät alles. Aber er merkt sich den Verrat.\n  - Wenn die Spieler ihn fair behandeln → Er bleibt loyal, solange es sich lohnt.\n  - Wenn es gefährlich wird → Er lässt die Spieler im Stich. Einmal. Danach schämt er sich.\nAuftritte: K2 Halbes Horn, Schmugglergang, Klippenhafen",
+      "description": "Hager, nervös. Finger bleich und glatt wie Kerzenwachs, verätzt von alchemistischen Mitteln.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Den Schmugglergang vom Halben Horn ins Krähennest."
+        },
+        {
+          "title": "",
+          "text": "„Er hat Gläser. Gläser voller Beine.“"
+        },
+        {
+          "title": "",
+          "text": "Den Weg zum Klippenhafen."
+        },
+        {
+          "title": "",
+          "text": "Wer den Schwarzmarkt heute beliefert."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "feige · gerissen · schuldbeladen · überlebensgierig"
+        },
+        {
+          "title": "Motivation",
+          "text": "Runter von dieser Insel. Lebend."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Flüstert, schaut über die Schulter, rechtfertigt sich ungefragt."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Er hat den Alchemisten an Ulfrs Hof gebracht und die Pilze durch den Schmugglergang geliefert. Der Alchemist ließ ihn fallen. Jetzt jagen ihn Bjarkis Wachen."
+        },
+        {
+          "title": "So finden die Spieler ihn",
+          "text": "Steckbrief am Haupttor · Ylva erwähnt den Mann mit den Wachsfingern · Tove: „Frag den Wachsfinger.“ · Er findet sie: Er hört von gestrandeten Skalden und will mit ihnen aufs Schiff · Jagd durch die Gassen (Tag 4)"
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler drohen, ihn auszuliefern → Er verrät alles. Aber er merkt sich den Verrat.\n  - Wenn die Spieler ihn fair behandeln → Er bleibt loyal, solange es sich lohnt.\n  - Wenn es gefährlich wird → Er lässt die Spieler im Stich. Einmal. Danach schämt er sich."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Halbes Horn, Schmugglergang, Klippenhafen"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -466,14 +1774,73 @@
     {
       "name": "Ketill Krummnase°",
       "profession": "Schwarzhändler",
-      "description": "Kurz: Verkauft Pilzknollen unter der Hand gegen Silber.\nAussehen: Krumme Nase, schnelle Hände, immer drei Mäntel übereinander.\nEigenschaften: gierig · freundlich · feige\nMotivation: Silber, solange es noch etwas wert ist.\nGeheimnis (SL): Seine Ware holt er nachts durch Toves Keller. Wer sie ihm reicht, ist ein Wirt. Der Alchemist will, dass der Pilz auch die Hafenstadt erreicht.\nReaktionen:\n  - Wenn die Spieler kaufen wollen → Er nennt einen Treffpunkt nach Mitternacht hinter dem Halben Horn.\n  - Wenn die Spieler ihn stellen → Er verrät Tove sofort.\nAuftritte: K2 Hafenstadt, Halbes Horn",
+      "description": "Krumme Nase, schnelle Hände, immer drei Mäntel übereinander.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Kurz",
+          "text": "Verkauft Pilzknollen unter der Hand gegen Silber."
+        },
+        {
+          "title": "Eigenschaften",
+          "text": "gierig · freundlich · feige"
+        },
+        {
+          "title": "Motivation",
+          "text": "Silber, solange es noch etwas wert ist."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Seine Ware holt er nachts durch Toves Keller. Wer sie ihm reicht, ist ein Wirt. Der Alchemist will, dass der Pilz auch die Hafenstadt erreicht."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler kaufen wollen → Er nennt einen Treffpunkt nach Mitternacht hinter dem Halben Horn.\n  - Wenn die Spieler ihn stellen → Er verrät Tove sofort."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Hafenstadt, Halbes Horn"
+        }
+      ],
       "phrases": [],
       "location": "Die Hafenstadt"
     },
     {
       "name": "Hjördis die Weberin",
       "profession": "Überlebende der Klippenstadt",
-      "description": "Aussehen: Grauer Zopf, ein Webschiffchen als Waffe, hat seit Tagen nicht geschlafen.\nEigenschaften: zäh · praktisch · beschützend\nMotivation: Ihre vier Leute lebend nach unten bringen.\nSo spielst du sie: Spricht durch die verbarrikadierte Tür. Öffnet erst, wenn sie Augen sieht, die zu den Worten passen.\nGeheimnis (SL): Einer ihrer Leute hat eine frische Wulst hinterm Ohr. Sie verschweigt es.\nWeiß: Sie hat die Wandteppiche im Thronsaal gewebt und kennt einen Hintereingang über die Weberkammer.\nReaktionen:\n  - Wenn die Spieler versprechen, sie rauszubringen → Sie zeigt ihnen den Hintereingang zum Palast.\n  - Wenn die Spieler die Wulst bei einem ihrer Leute entdecken → Moment der Wahrheit. Hier kann das Herauslocken zum ersten Mal schiefgehen.\n  - Wenn die Spieler eine Mannschaft brauchen → Ihre Leute können ein Schiff segeln.\nAuftritte: K2 Weberhaus, Klippenhafen",
+      "description": "Grauer Zopf, ein Webschiffchen als Waffe, hat seit Tagen nicht geschlafen.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Sie hat die Wandteppiche im Thronsaal gewebt und kennt einen Hintereingang über die Weberkammer."
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "zäh · praktisch · beschützend"
+        },
+        {
+          "title": "Motivation",
+          "text": "Ihre vier Leute lebend nach unten bringen."
+        },
+        {
+          "title": "So spielst du sie",
+          "text": "Spricht durch die verbarrikadierte Tür. Öffnet erst, wenn sie Augen sieht, die zu den Worten passen."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Einer ihrer Leute hat eine frische Wulst hinterm Ohr. Sie verschweigt es."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler versprechen, sie rauszubringen → Sie zeigt ihnen den Hintereingang zum Palast.\n  - Wenn die Spieler die Wulst bei einem ihrer Leute entdecken → Moment der Wahrheit. Hier kann das Herauslocken zum ersten Mal schiefgehen.\n  - Wenn die Spieler eine Mannschaft brauchen → Ihre Leute können ein Schiff segeln."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Weberhaus, Klippenhafen"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -485,7 +1852,43 @@
     {
       "name": "König Ulfr",
       "profession": "Gründer und Herrscher der Klippenstadt · Wirt",
-      "description": "Aussehen: Einst Bjarkis Spiegelbild. Jetzt zu groß, zu lange Finger, die Krone schief. Eine Wulst hinter dem rechten Ohr.\nEigenschaften: würdevoll · verzweifelt · gefährlich\nMotivation: Was von ihm übrig ist, will, dass ihn jemand aufhält.\nSo spielst du ihn: Wechsel zwischen tierischem Knurren und einzelnen klaren Worten. Seine Hände tun etwas anderes als seine Augen.\nGeheimnis (SL): Er ist bei vollem Bewusstsein, eingesperrt im eigenen Kopf.\nWeiß: Der Alchemist floh nach Ulmar und nahm Gefangene mit. · „Im Traum schreit einer. Er hat dasselbe Gesicht wie er.“\nReaktionen:\n  - Wenn die Spieler ihn töten → Er stirbt mit einem Blick der Erleichterung. Infos gibt es nur noch aus dem Labor.\n  - Wenn die Spieler ihn K.o. schlagen und den Tausendfüßler herauslocken → Ein paar klare Atemzüge: Er erzählt vom Traum, von Ulmar und den Gefangenen. Dann kippt er in Wahnsinn. Die Spieler müssen ihn erlösen.\n  - Wenn die Weltuhr Tag 10 erreicht → Nur noch Bestie. Keine Worte mehr.\nAuftritte: K2 Wolfshalle (Finale)",
+      "description": "Einst Bjarkis Spiegelbild. Jetzt zu groß, zu lange Finger, die Krone schief. Eine Wulst hinter dem rechten Ohr.",
+      "player_knowledge": [
+        {
+          "title": "",
+          "text": "Der Alchemist floh nach Ulmar und nahm Gefangene mit."
+        },
+        {
+          "title": "",
+          "text": "„Im Traum schreit einer. Er hat dasselbe Gesicht wie er.“"
+        }
+      ],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "würdevoll · verzweifelt · gefährlich"
+        },
+        {
+          "title": "Motivation",
+          "text": "Was von ihm übrig ist, will, dass ihn jemand aufhält."
+        },
+        {
+          "title": "So spielst du ihn",
+          "text": "Wechsel zwischen tierischem Knurren und einzelnen klaren Worten. Seine Hände tun etwas anderes als seine Augen."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Er ist bei vollem Bewusstsein, eingesperrt im eigenen Kopf."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn die Spieler ihn töten → Er stirbt mit einem Blick der Erleichterung. Infos gibt es nur noch aus dem Labor.\n  - Wenn die Spieler ihn K.o. schlagen und den Tausendfüßler herauslocken → Ein paar klare Atemzüge: Er erzählt vom Traum, von Ulmar und den Gefangenen. Dann kippt er in Wahnsinn. Die Spieler müssen ihn erlösen.\n  - Wenn die Weltuhr Tag 10 erreicht → Nur noch Bestie. Keine Worte mehr."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Wolfshalle (Finale)"
+        }
+      ],
       "phrases": [
         {
           "trigger": "",
@@ -501,28 +1904,92 @@
     {
       "name": "Arni Hallsson",
       "profession": "Sigruns Bruder, ehemals in Ulfrs Garde · Wirt",
-      "description": "Erkennbar: Trägt einen Schild mit dem Familienzeichen der Hallsdóttirs.\nAuftritte: K2 Senke (Ereignis „Arnis Schild“)",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Erkennbar",
+          "text": "Trägt einen Schild mit dem Familienzeichen der Hallsdóttirs."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Senke (Ereignis „Arnis Schild“)"
+        }
+      ],
       "phrases": [],
       "location": "Die Senke"
     },
     {
       "name": "Torvi",
       "profession": "Grimurs Lehrling · Wirt",
-      "description": "Erkennbar: Trägt noch die Lederschürze aus Grimurs Schmiede.\nAuftritte: K2 Senke",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Erkennbar",
+          "text": "Trägt noch die Lederschürze aus Grimurs Schmiede."
+        },
+        {
+          "title": "Auftritte",
+          "text": "K2 Senke"
+        }
+      ],
       "phrases": [],
       "location": "Die Senke"
     },
     {
       "name": "Die Wirte (Gegnertyp)",
       "profession": "",
-      "description": "Aussehen: Wulst hinter dem Ohr oder im Nacken, die sich bewegt. Pilzgeflecht unter den Fingernägeln. Augen, die nicht zu den Bewegungen passen.\nEigenschaften: bei Bewusstsein · stumm · rasend\nMotivation: Keine eigene. Sie gehorchen dem Alchemisten.\nSo spielst du sie: Gib ihnen Zeichen: eine Hand, die zögert, ein Blick, der zu lange auf einer Waffe ruht.\nGeheimnis (SL): Sie wissen, was mit ihnen passiert, und können es nicht sagen.\nReaktionen:\n  - Wenn ein Kampf beginnt → Sie zögern einen Herzschlag, bevor sie angreifen.\n  - Wenn eine Leiche nah am Kopf eines Wirts liegt → Der Tausendfüßler kann den Wirt verlassen. Der Wirt wird wahnsinnig.\nSpielwerte: [Nach How to be a Hero eintragen]",
+      "description": "Wulst hinter dem Ohr oder im Nacken, die sich bewegt. Pilzgeflecht unter den Fingernägeln. Augen, die nicht zu den Bewegungen passen.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "bei Bewusstsein · stumm · rasend"
+        },
+        {
+          "title": "Motivation",
+          "text": "Keine eigene. Sie gehorchen dem Alchemisten."
+        },
+        {
+          "title": "So spielst du sie",
+          "text": "Gib ihnen Zeichen: eine Hand, die zögert, ein Blick, der zu lange auf einer Waffe ruht."
+        },
+        {
+          "title": "Geheimnis (SL)",
+          "text": "Sie wissen, was mit ihnen passiert, und können es nicht sagen."
+        },
+        {
+          "title": "Reaktionen",
+          "text": "- Wenn ein Kampf beginnt → Sie zögern einen Herzschlag, bevor sie angreifen.\n  - Wenn eine Leiche nah am Kopf eines Wirts liegt → Der Tausendfüßler kann den Wirt verlassen. Der Wirt wird wahnsinnig."
+        },
+        {
+          "title": "Spielwerte",
+          "text": "[Nach How to be a Hero eintragen]"
+        }
+      ],
       "phrases": [],
       "location": null
     },
     {
       "name": "Die Bestien (Gegnertyp)",
       "profession": "",
-      "description": "Aussehen: Menschen mit Fell, Klauen und reißenden Zähnen.\nEigenschaften: schnell · stark · ohne Verstand\nSpielwerte: [Nach How to be a Hero eintragen]\nAuftritte: K1 Björnsvig, Drakkarheim · K2 Klippenstadt, Wolfspass",
+      "description": "Menschen mit Fell, Klauen und reißenden Zähnen.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Eigenschaften",
+          "text": "schnell · stark · ohne Verstand"
+        },
+        {
+          "title": "Spielwerte",
+          "text": "[Nach How to be a Hero eintragen]"
+        },
+        {
+          "title": "Auftritte",
+          "text": "K1 Björnsvig, Drakkarheim · K2 Klippenstadt, Wolfspass"
+        }
+      ],
       "phrases": [],
       "location": null
     },
@@ -530,6 +1997,8 @@
       "name": "Die Schmiedin",
       "profession": "Gründerin von Ulmar · [Name, lebt sie noch?]",
       "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "phrases": [],
       "location": "Ulmar"
     },
@@ -537,6 +2006,8 @@
       "name": "Der Schneider",
       "profession": "Gründer von Ulmar · [Name, lebt er noch?]",
       "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "phrases": [],
       "location": "Ulmar"
     }
@@ -545,8 +2016,16 @@
     {
       "name": "Krieg im Winter",
       "kind": "main",
-      "text": "Der Bruder des Jarls ist tot, Soldaten verschwinden, und alle Welt hält die Skalden für Mörder. Findet in Björnsvig heraus, wer die Jarltümer gegeneinander hetzt.",
-      "goal": "Status: erledigt",
+      "number": 1,
+      "goal": "",
+      "description": "Der Bruder des Jarls ist tot, Soldaten verschwinden, und alle Welt hält die Skalden für Mörder. Findet in Björnsvig heraus, wer die Jarltümer gegeneinander hetzt.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "erledigt"
+        }
+      ],
       "checklist": [
         "Am Thing teilnehmen",
         "Nach Björnsvig reisen",
@@ -560,8 +2039,20 @@
     {
       "name": "Bierhändler aus Skaldeby",
       "kind": "side",
-      "text": "Skalden sind in Björnsvig nicht willkommen. Kommt als Bierhändler hinein und gewinnt das Bierfest.",
-      "goal": "Belohnung: Audienz beim Jarl und ein Wunsch\nStatus: erledigt",
+      "number": null,
+      "goal": "",
+      "description": "Skalden sind in Björnsvig nicht willkommen. Kommt als Bierhändler hinein und gewinnt das Bierfest.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Belohnung",
+          "text": "Audienz beim Jarl und ein Wunsch"
+        },
+        {
+          "title": "Status",
+          "text": "erledigt"
+        }
+      ],
       "checklist": [
         "Am Tor vorbeikommen",
         "Die Stammgäste im Bodenlosen Fass überzeugen",
@@ -574,8 +2065,20 @@
     {
       "name": "Die Stadt halten",
       "kind": "side",
-      "text": "Jira hält das Langhaus allein. Steht ihr bei.",
-      "goal": "Belohnung: Jiras Vertrauen, Pferde und Vorräte\nStatus: erledigt",
+      "number": null,
+      "goal": "",
+      "description": "Jira hält das Langhaus allein. Steht ihr bei.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Belohnung",
+          "text": "Jiras Vertrauen, Pferde und Vorräte"
+        },
+        {
+          "title": "Status",
+          "text": "erledigt"
+        }
+      ],
       "checklist": [
         "Aus dem Verlies fliehen",
         "Zum Langhaus durchkämpfen",
@@ -588,8 +2091,16 @@
     {
       "name": "Dem Druiden nach",
       "kind": "main",
-      "text": "Der Druide ist kein Druide, sondern Alchemist. Er ist mit einem Schiff aus Drakkarheim nach Yggdrasil geflohen. Folgt ihm.",
-      "goal": "Status: erledigt → weiter in Kapitel 2",
+      "number": 2,
+      "goal": "",
+      "description": "Der Druide ist kein Druide, sondern Alchemist. Er ist mit einem Schiff aus Drakkarheim nach Yggdrasil geflohen. Folgt ihm.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "erledigt → weiter in Kapitel 2"
+        }
+      ],
       "checklist": [
         "Ihm nach Drakkarheim folgen",
         "Astrid anhören",
@@ -603,8 +2114,40 @@
     {
       "name": "Dem Alchemisten auf der Spur",
       "kind": "main",
-      "text": "Der Alchemist ist nach Tvíborg geflohen. Findet heraus, was er hier will und wohin er weiterzieht.",
-      "goal": "In der Wolfshalle erfahren die Spieler, dass der Alchemist mit Gefangenen nach Ulmar floh.\nOrt: Wolfshalle · auch: Klippenhafen\nBelohnung: Seekarte nach Ulmar, Liste der Gelehrten und Ulfrs Wissen über den Traum.\nScheitert, wenn: Die Spieler kommen zu spät. Dann gibt es nur noch Notizen im Labor, keine Worte von Ulfr.\nZeit-Hinweis: An Tag 3 flieht der Alchemist, ab Tag 10 ist Ulfr ganz Bestie.\nVorher: Kapitel 1 · Dem Druiden nach\nStatus: aktiv",
+      "number": 3,
+      "goal": "",
+      "description": "Der Alchemist ist nach Tvíborg geflohen. Findet heraus, was er hier will und wohin er weiterzieht.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Ort",
+          "text": "Wolfshalle · auch: Klippenhafen"
+        },
+        {
+          "title": "SL-Ziel",
+          "text": "In der Wolfshalle erfahren die Spieler, dass der Alchemist mit Gefangenen nach Ulmar floh."
+        },
+        {
+          "title": "Belohnung",
+          "text": "Seekarte nach Ulmar, Liste der Gelehrten und Ulfrs Wissen über den Traum."
+        },
+        {
+          "title": "Scheitert, wenn",
+          "text": "Die Spieler kommen zu spät. Dann gibt es nur noch Notizen im Labor, keine Worte von Ulfr."
+        },
+        {
+          "title": "Zeit-Hinweis",
+          "text": "An Tag 3 flieht der Alchemist, ab Tag 10 ist Ulfr ganz Bestie."
+        },
+        {
+          "title": "Vorher",
+          "text": "Kapitel 1 · Dem Druiden nach"
+        },
+        {
+          "title": "Status",
+          "text": "aktiv"
+        }
+      ],
       "checklist": [
         "In Tvíborg ankommen",
         "Einen Weg in die Klippenstadt finden",
@@ -618,8 +2161,28 @@
     {
       "name": "Fort von Tvíborg",
       "kind": "main",
-      "text": "Euer Boot ist zerschellt. Ihr braucht ein Schiff und eine Mannschaft.",
-      "goal": "Zwei Wege: Bjarki senkt die Hafenkette, oder die Spieler holen ein Schiff aus dem Klippenhafen.\nOrt: Hafen · auch: Klippenhafen\nBelohnung: Freie Fahrt nach Ulmar.\nStatus: aktiv",
+      "number": 4,
+      "goal": "",
+      "description": "Euer Boot ist zerschellt. Ihr braucht ein Schiff und eine Mannschaft.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Ort",
+          "text": "Hafen · auch: Klippenhafen"
+        },
+        {
+          "title": "SL-Ziel",
+          "text": "Zwei Wege: Bjarki senkt die Hafenkette, oder die Spieler holen ein Schiff aus dem Klippenhafen."
+        },
+        {
+          "title": "Belohnung",
+          "text": "Freie Fahrt nach Ulmar."
+        },
+        {
+          "title": "Status",
+          "text": "aktiv"
+        }
+      ],
       "checklist": [
         "Herausfinden, warum der Hafen gesperrt ist",
         "Bjarki zum Senken der Kette bewegen oder ein Schiff im Klippenhafen finden",
@@ -637,8 +2200,32 @@
     {
       "name": "Der Schwarzmarkt",
       "kind": "side",
-      "text": "In der Stadt werden Pilze verkauft. Die Hauptfrau will wissen, woher, und vermutet einen Geheimgang der Schmuggler.",
-      "goal": "Die Spur führt über Ketill und Tove zur Falltür im Keller des Halben Horns.\nOrt: Hafenstadt · auch: Halbes Horn\nBelohnung: Sigruns Vertrauen, freier Zugang zur Stadt und der Weg in die Klippenstadt.\nScheitert, wenn: Der eingeschleuste Wirt zuschlägt, bevor der Gang gefunden ist.\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "In der Stadt werden Pilze verkauft. Die Hauptfrau will wissen, woher, und vermutet einen Geheimgang der Schmuggler.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Ort",
+          "text": "Hafenstadt · auch: Halbes Horn"
+        },
+        {
+          "title": "SL-Ziel",
+          "text": "Die Spur führt über Ketill und Tove zur Falltür im Keller des Halben Horns."
+        },
+        {
+          "title": "Belohnung",
+          "text": "Sigruns Vertrauen, freier Zugang zur Stadt und der Weg in die Klippenstadt."
+        },
+        {
+          "title": "Scheitert, wenn",
+          "text": "Der eingeschleuste Wirt zuschlägt, bevor der Gang gefunden ist."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Einen Käufer oder Händler finden",
         "Ketill folgen oder Tove zum Reden bringen",
@@ -657,8 +2244,28 @@
     {
       "name": "Sich beweisen",
       "kind": "side",
-      "text": "Der König empfängt niemanden. Sein Truchsess verlangt, dass ihr euch beweist.",
-      "goal": "Einer der drei Wege führt zur Audienz.\nBelohnung: Ausrüstung, Bjarkis Hilfe und das Versprechen, die Hafenkette zu senken.\nScheitert, wenn: Bjarki kippt selbst (Tag 8).\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Der König empfängt niemanden. Sein Truchsess verlangt, dass ihr euch beweist.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL-Ziel",
+          "text": "Einer der drei Wege führt zur Audienz."
+        },
+        {
+          "title": "Belohnung",
+          "text": "Ausrüstung, Bjarkis Hilfe und das Versprechen, die Hafenkette zu senken."
+        },
+        {
+          "title": "Scheitert, wenn",
+          "text": "Bjarki kippt selbst (Tag 8)."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Hallvard dazu bringen, euch anzuhören",
         "Einen der drei Wege gehen",
@@ -671,8 +2278,32 @@
     {
       "name": "Der Wachsfinger",
       "kind": "side",
-      "text": "Ein Verräter namens Eyvind wird gesucht. Er soll mehr wissen als alle anderen.",
-      "goal": "Eyvind finden, bevor Bjarkis Wachen es tun.\nOrt: Halbes Horn · auch: Schmugglergang\nBelohnung: Der Schmugglergang und Wissen über die Tausendfüßler.\nScheitert, wenn: Eyvind gehängt wird.\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Ein Verräter namens Eyvind wird gesucht. Er soll mehr wissen als alle anderen.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Ort",
+          "text": "Halbes Horn · auch: Schmugglergang"
+        },
+        {
+          "title": "SL-Ziel",
+          "text": "Eyvind finden, bevor Bjarkis Wachen es tun."
+        },
+        {
+          "title": "Belohnung",
+          "text": "Der Schmugglergang und Wissen über die Tausendfüßler."
+        },
+        {
+          "title": "Scheitert, wenn",
+          "text": "Eyvind gehängt wird."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Eine Fährte zu ihm finden",
         "Ihn vor den Wachen retten",
@@ -685,8 +2316,20 @@
     {
       "name": "Sigruns Bruder",
       "kind": "side",
-      "text": "Die Hauptfrau hat einen Bruder in der Klippenstadt. Findet heraus, was mit ihm geschehen ist.",
-      "goal": "Belohnung: Sigrun wird eure wichtigste Verbündete.\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Die Hauptfrau hat einen Bruder in der Klippenstadt. Findet heraus, was mit ihm geschehen ist.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Belohnung",
+          "text": "Sigrun wird eure wichtigste Verbündete."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Von Arni erfahren",
         "Arni in der Klippenstadt finden",
@@ -699,8 +2342,24 @@
     {
       "name": "Grimurs Lehrling",
       "kind": "side",
-      "text": "Grimurs Lehrling Torvi ging über die Brücke und kam nie zurück.",
-      "goal": "Ort: Senke · auch: Grimurs Schmiede\nBelohnung: Grimurs Meisterstück.\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Grimurs Lehrling Torvi ging über die Brücke und kam nie zurück.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Ort",
+          "text": "Senke · auch: Grimurs Schmiede"
+        },
+        {
+          "title": "Belohnung",
+          "text": "Grimurs Meisterstück."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Von Torvi erfahren",
         "Torvi in der Klippenstadt finden",
@@ -713,8 +2372,28 @@
     {
       "name": "Die Brücke halten",
       "kind": "side",
-      "text": "Die Brücke hält nicht ewig. Grimur weiß, wo ihre Schwachstelle liegt.",
-      "goal": "Verhindern, dass die Brücke fällt, oder sie gezielt kappen.\nBelohnung: Der Weg über die Brücke bleibt offen.\nScheitert, wenn: Die Brücke stürzt in die Schlucht (Tag 6).\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Die Brücke hält nicht ewig. Grimur weiß, wo ihre Schwachstelle liegt.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL-Ziel",
+          "text": "Verhindern, dass die Brücke fällt, oder sie gezielt kappen."
+        },
+        {
+          "title": "Belohnung",
+          "text": "Der Weg über die Brücke bleibt offen."
+        },
+        {
+          "title": "Scheitert, wenn",
+          "text": "Die Brücke stürzt in die Schlucht (Tag 6)."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Grimurs Wissen über das schwache Glied bekommen",
         "Bei der Verteidigung helfen"
@@ -726,8 +2405,24 @@
     {
       "name": "Bringt ihn mir lebend",
       "kind": "side",
-      "text": "Bjarki will seinen Bruder zurück. Lebend, was auch immer er jetzt ist.",
-      "goal": "Belohnung: [Offen: Was gibt Bjarki, wenn sie es schaffen?]\nScheitert, wenn: Befreit vom Tausendfüßler wird Ulfr wahnsinnig. Ein echtes Gelingen gibt es vielleicht nicht.\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Bjarki will seinen Bruder zurück. Lebend, was auch immer er jetzt ist.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Belohnung",
+          "text": "[Offen: Was gibt Bjarki, wenn sie es schaffen?]"
+        },
+        {
+          "title": "Scheitert, wenn",
+          "text": "Befreit vom Tausendfüßler wird Ulfr wahnsinnig. Ein echtes Gelingen gibt es vielleicht nicht."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Ulfr in der Wolfshalle finden",
         "Ihn K.o. schlagen statt töten",
@@ -740,8 +2435,20 @@
     {
       "name": "Hjördis’ Leute",
       "kind": "side",
-      "text": "Im Weberhaus verstecken sich Überlebende. Bringt sie in Sicherheit.",
-      "goal": "Belohnung: Der Hintereingang zur Wolfshalle und eine Mannschaft fürs Schiff.\nStatus: offen",
+      "number": null,
+      "goal": "",
+      "description": "Im Weberhaus verstecken sich Überlebende. Bringt sie in Sicherheit.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Belohnung",
+          "text": "Der Hintereingang zur Wolfshalle und eine Mannschaft fürs Schiff."
+        },
+        {
+          "title": "Status",
+          "text": "offen"
+        }
+      ],
       "checklist": [
         "Hjördis’ Vertrauen gewinnen",
         "Die Wulst bei einem ihrer Leute bemerken",
@@ -755,132 +2462,694 @@
   "events": [
     {
       "name": "Der dreibeinige Grizzly",
-      "text": "Typ: Begegnung\nWas passiert: Ein Bär mit fast durchtrenntem Hals frisst Leichen mit Skalden-Abzeichen.\nFolgen: Erster Hinweis auf Wesen, die nicht sterben.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Begegnung"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ein Bär mit fast durchtrenntem Hals frisst Leichen mit Skalden-Abzeichen."
+        },
+        {
+          "title": "Folgen",
+          "text": "Erster Hinweis auf Wesen, die nicht sterben."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Der Rastplatz am Waldrand"
     },
     {
       "name": "Der Kopf des Bruders",
-      "text": "Typ: Hintergrund\nWas passiert: Der Bruder des Jarls kommt nur als Kopf mit Botschaft zurück.\nFolgen: Der Jarl ruft zum Krieg.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Hintergrund"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Der Bruder des Jarls kommt nur als Kopf mit Botschaft zurück."
+        },
+        {
+          "title": "Folgen",
+          "text": "Der Jarl ruft zum Krieg."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Skaldeby"
     },
     {
       "name": "Aufruhr im Thing",
-      "text": "Typ: Wendepunkt\nWas passiert: Die Helden widersprechen dem Jarl.\nFolgen: Er schickt sie als Bierhändler nach Björnsvig.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Wendepunkt"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Die Helden widersprechen dem Jarl."
+        },
+        {
+          "title": "Folgen",
+          "text": "Er schickt sie als Bierhändler nach Björnsvig."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Das Langhaus von Skaldeby"
     },
     {
       "name": "Banditen aus Helheim",
-      "text": "Typ: Begegnung\nWas passiert: Krieger aus Helheim, viel zu weit im Inland, sterben erst ohne Kopf.\nFolgen: Zweiter Hinweis.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Begegnung"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Krieger aus Helheim, viel zu weit im Inland, sterben erst ohne Kopf."
+        },
+        {
+          "title": "Folgen",
+          "text": "Zweiter Hinweis."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Die Straße nach Björnsvig"
     },
     {
       "name": "Die Nacht auf dem Feld",
-      "text": "Typ: Gefahr\nWas passiert: Attentäter in alten Björnsvikinger-Rüstungen.\nFolgen: Die Helden glauben, Björnsvig wolle sie tot sehen.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Gefahr"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Attentäter in alten Björnsvikinger-Rüstungen."
+        },
+        {
+          "title": "Folgen",
+          "text": "Die Helden glauben, Björnsvig wolle sie tot sehen."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Das Bauernfeld vor der Stadt"
     },
     {
       "name": "Das vergiftete Siegerbier",
-      "text": "Typ: Wendepunkt\nWas passiert: Jarl Rotbart stirbt an ihrem Bier, Rauch, die Helden voller Blut.\nFolgen: Sie werden als Mörder verhaftet.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Wendepunkt"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Jarl Rotbart stirbt an ihrem Bier, Rauch, die Helden voller Blut."
+        },
+        {
+          "title": "Folgen",
+          "text": "Sie werden als Mörder verhaftet."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Der Festplatz"
     },
     {
       "name": "Die Maske fällt",
-      "text": "Typ: Wendepunkt\nWas passiert: Der Druide verletzt Jira und befiehlt den Angriff.\nFolgen: Björnsvig brennt.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Wendepunkt"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Der Druide verletzt Jira und befiehlt den Angriff."
+        },
+        {
+          "title": "Folgen",
+          "text": "Björnsvig brennt."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Björnsvig"
     },
     {
       "name": "Ritt auf der Bestie",
-      "text": "Typ: Wendepunkt\nWas passiert: Der Druide flieht auf einer Bestie nach Drakkarheim.\nFolgen: Die Helden folgen.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Wendepunkt"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Der Druide flieht auf einer Bestie nach Drakkarheim."
+        },
+        {
+          "title": "Folgen",
+          "text": "Die Helden folgen."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Björnsvig"
     },
     {
       "name": "Die Brunnen von Drakkarheim",
-      "text": "Typ: Wendepunkt\nWas passiert: Pilzsud im Brunnen, die Stadt zerfleischt sich.\nFolgen: Jarl Reiner und Astrid sterben, die Schiffe sind zerstört.\nStatus: ausgelöst",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Typ",
+          "text": "Wendepunkt"
+        },
+        {
+          "title": "Was passiert",
+          "text": "Pilzsud im Brunnen, die Stadt zerfleischt sich."
+        },
+        {
+          "title": "Folgen",
+          "text": "Jarl Reiner und Astrid sterben, die Schiffe sind zerstört."
+        },
+        {
+          "title": "Status",
+          "text": "ausgelöst"
+        }
+      ],
       "location": "Der Brunnen von Drakkarheim"
     },
     {
       "name": "Der Eingeschleuste",
-      "text": "Gefahr · Tag 2\nEinsetzen, wenn: die Spieler in der Hafenstadt unterwegs sind.\nWas passiert: Ein Wirt hat es durch den Schmugglergang in die Hafenstadt geschafft. Er versteckt sich zwischen den Flüchtlingen. Noch hat er niemanden angegriffen.\nFolgen: Finden die Spieler ihn diskret, bekommen sie die Audienz bei Bjarki. Sonst bricht Panik aus, und Bjarki lässt alle Flüchtlinge einsperren.\nOrte: Hafenstadt, Schmugglergang · Figuren: Hallvard, Sigrun, Wirte · Quests: Sich beweisen, Der Schwarzmarkt",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Gefahr · Tag 2"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler in der Hafenstadt unterwegs sind."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ein Wirt hat es durch den Schmugglergang in die Hafenstadt geschafft. Er versteckt sich zwischen den Flüchtlingen. Noch hat er niemanden angegriffen."
+        },
+        {
+          "title": "Folgen",
+          "text": "Finden die Spieler ihn diskret, bekommen sie die Audienz bei Bjarki. Sonst bricht Panik aus, und Bjarki lässt alle Flüchtlinge einsperren."
+        },
+        {
+          "title": "Orte",
+          "text": "Hafenstadt, Schmugglergang · Figuren: Hallvard, Sigrun, Wirte · Quests: Sich beweisen, Der Schwarzmarkt"
+        }
+      ],
       "location": "Die Hafenstadt"
     },
     {
       "name": "Kratzen an der Brücke",
-      "text": "Atmosphäre · Tag 2\nVorlesen: Mitten in der Nacht hört ihr es. Kein Klopfen, kein Rammen. Ein Kratzen, geduldig und gleichmäßig, als hätte jemand alle Zeit der Welt.\nEinsetzen, wenn: die Spieler nachts an der Brücke sind oder in der Nähe schlafen.\nWas passiert: Die Wirte testen die Ketten der Zugbrücke.\nFolgen: Die Wachen werden nervöser. Die Brücke hält nicht ewig.\nOrte: Zugbrücke · Quests: Die Brücke halten",
+      "description": "Mitten in der Nacht hört ihr es. Kein Klopfen, kein Rammen. Ein Kratzen, geduldig und gleichmäßig, als hätte jemand alle Zeit der Welt.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Atmosphäre · Tag 2"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler nachts an der Brücke sind oder in der Nähe schlafen."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Die Wirte testen die Ketten der Zugbrücke."
+        },
+        {
+          "title": "Folgen",
+          "text": "Die Wachen werden nervöser. Die Brücke hält nicht ewig."
+        },
+        {
+          "title": "Orte",
+          "text": "Zugbrücke · Quests: Die Brücke halten"
+        }
+      ],
       "location": "Die Zugbrücke"
     },
     {
       "name": "Ein Schiff ohne Laternen",
-      "text": "Wendepunkt · Tag 3\nEinsetzen, wenn: in der Nacht von Tag 3.\nWas passiert: Der Alchemist lässt im Klippenhafen ein Schiff zu Wasser und segelt nach Ulmar. Wer am Haupttor Ausschau hält, sieht ein Schiff ohne Licht unter den Klippen hervorgleiten.\nFolgen: Ab jetzt ist er weg. Sind die Spieler schon in der Wolfshalle, gibt es eine Verfolgung zum Klippenhafen. Er entkommt knapp.\nOrte: Klippenhafen, Haupttor · Figuren: Alchemist · Quests: Dem Alchemisten auf der Spur",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Wendepunkt · Tag 3"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "in der Nacht von Tag 3."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Der Alchemist lässt im Klippenhafen ein Schiff zu Wasser und segelt nach Ulmar. Wer am Haupttor Ausschau hält, sieht ein Schiff ohne Licht unter den Klippen hervorgleiten."
+        },
+        {
+          "title": "Folgen",
+          "text": "Ab jetzt ist er weg. Sind die Spieler schon in der Wolfshalle, gibt es eine Verfolgung zum Klippenhafen. Er entkommt knapp."
+        },
+        {
+          "title": "Orte",
+          "text": "Klippenhafen, Haupttor · Figuren: Alchemist · Quests: Dem Alchemisten auf der Spur"
+        }
+      ],
       "location": "Der Klippenhafen"
     },
     {
       "name": "Jagd auf den Wachsfinger",
-      "text": "Begegnung · Tag 4\nEinsetzen, wenn: die Spieler in den Gassen unterwegs sind.\nWas passiert: Bjarkis Wachen haben Eyvinds Versteck gefunden und jagen ihn durch die Gassen. Er rennt den Spielern direkt in die Arme.\nFolgen: Retten die Spieler ihn, haben sie einen dankbaren Informanten. Sonst wird er an Tag 5 gehängt.\nOrte: Hafenstadt · Figuren: Eyvind · Quests: Der Wachsfinger",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · Tag 4"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler in den Gassen unterwegs sind."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Bjarkis Wachen haben Eyvinds Versteck gefunden und jagen ihn durch die Gassen. Er rennt den Spielern direkt in die Arme."
+        },
+        {
+          "title": "Folgen",
+          "text": "Retten die Spieler ihn, haben sie einen dankbaren Informanten. Sonst wird er an Tag 5 gehängt."
+        },
+        {
+          "title": "Orte",
+          "text": "Hafenstadt · Figuren: Eyvind · Quests: Der Wachsfinger"
+        }
+      ],
       "location": "Die Hafenstadt"
     },
     {
       "name": "Der Sturm auf die Brücke",
-      "text": "Wendepunkt · Tag 6\nEinsetzen, wenn: am Morgen von Tag 6.\nWas passiert: Großangriff der Wirte auf die Zugbrücke. Bjarki befiehlt, die Ketten zu kappen.\nFolgen: Ohne Eingreifen stürzt die Brücke in die Schlucht. Mit Grimurs Wissen über das schwache Glied lässt sie sich halten oder gezielt kappen.\nOrte: Zugbrücke · Figuren: Bjarki, Grimur, Wirte · Quests: Die Brücke halten",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Wendepunkt · Tag 6"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "am Morgen von Tag 6."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Großangriff der Wirte auf die Zugbrücke. Bjarki befiehlt, die Ketten zu kappen."
+        },
+        {
+          "title": "Folgen",
+          "text": "Ohne Eingreifen stürzt die Brücke in die Schlucht. Mit Grimurs Wissen über das schwache Glied lässt sie sich halten oder gezielt kappen."
+        },
+        {
+          "title": "Orte",
+          "text": "Zugbrücke · Figuren: Bjarki, Grimur, Wirte · Quests: Die Brücke halten"
+        }
+      ],
       "location": "Die Zugbrücke"
     },
     {
       "name": "Die Sünde des Guten",
-      "text": "Wendepunkt · Tag 8\nEinsetzen, wenn: die Lage in der Hafenstadt verzweifelt ist.\nWas passiert: Bjarki öffnet heimlich seinen beschlagnahmten Pilzvorrat für die eigene Garde.\nFolgen: Auch die Hafenstadt beginnt zu kippen. Hallvard sucht Verbündete, vielleicht die Spieler.\nOrte: Bärenhalle · Figuren: Bjarki, Hallvard · Quests: Sich beweisen",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Wendepunkt · Tag 8"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Lage in der Hafenstadt verzweifelt ist."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Bjarki öffnet heimlich seinen beschlagnahmten Pilzvorrat für die eigene Garde."
+        },
+        {
+          "title": "Folgen",
+          "text": "Auch die Hafenstadt beginnt zu kippen. Hallvard sucht Verbündete, vielleicht die Spieler."
+        },
+        {
+          "title": "Orte",
+          "text": "Bärenhalle · Figuren: Bjarki, Hallvard · Quests: Sich beweisen"
+        }
+      ],
       "location": "Die Bärenhalle"
     },
     {
       "name": "Nur noch Bestie",
-      "text": "Wendepunkt · Tag 10\nEinsetzen, wenn: die Spieler die Wolfshalle bis Tag 10 nicht erreicht haben.\nWas passiert: Ulfr ist ganz verwandelt.\nFolgen: Infos über Ulmar gibt es nur noch aus dem Labor.\nOrte: Wolfshalle · Figuren: Ulfr · Quests: Dem Alchemisten auf der Spur, Bringt ihn mir lebend",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Wendepunkt · Tag 10"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler die Wolfshalle bis Tag 10 nicht erreicht haben."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ulfr ist ganz verwandelt."
+        },
+        {
+          "title": "Folgen",
+          "text": "Infos über Ulmar gibt es nur noch aus dem Labor."
+        },
+        {
+          "title": "Orte",
+          "text": "Wolfshalle · Figuren: Ulfr · Quests: Dem Alchemisten auf der Spur, Bringt ihn mir lebend"
+        }
+      ],
       "location": "Die Wolfshalle"
     },
     {
       "name": "Flüchtlinge am Tor",
-      "text": "Begegnung · frei\nEinsetzen, wenn: die Spieler am Haupttor sind oder kurz danach.\nWas passiert: Eine Familie aus der Klippenstadt ist mit einem Fluchtboot gestrandet und fleht um Einlass. Die Wache verweigert ihn. Einer von ihnen trägt seinen Schal ungewöhnlich hoch.\nFolgen: Lassen die Spieler sie rein, ist einer ein frischer Wirt. Bleiben sie draußen, hören alle in der Nacht die Schreie.\nOrte: Haupttor, Wrackstrand · Figuren: Kalle",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler am Haupttor sind oder kurz danach."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Eine Familie aus der Klippenstadt ist mit einem Fluchtboot gestrandet und fleht um Einlass. Die Wache verweigert ihn. Einer von ihnen trägt seinen Schal ungewöhnlich hoch."
+        },
+        {
+          "title": "Folgen",
+          "text": "Lassen die Spieler sie rein, ist einer ein frischer Wirt. Bleiben sie draußen, hören alle in der Nacht die Schreie."
+        },
+        {
+          "title": "Orte",
+          "text": "Haupttor, Wrackstrand · Figuren: Kalle"
+        }
+      ],
       "location": "Das Haupttor"
     },
     {
       "name": "Kalles Versuchung",
-      "text": "Versuchung · frei\nEinsetzen, wenn: Kalle mit den Spielern Wache hält oder in Gefahr gerät.\nWas passiert: Kalle holt die Pilzknolle aus der Tasche. Seine Hände zittern.\nFolgen: Halten die Spieler ihn ab, haben sie einen Freund fürs Leben. Wenn nicht, sehen sie zum ersten Mal den Rausch aus der Nähe.\nOrte: Haupttor · Figuren: Kalle",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Versuchung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "Kalle mit den Spielern Wache hält oder in Gefahr gerät."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Kalle holt die Pilzknolle aus der Tasche. Seine Hände zittern."
+        },
+        {
+          "title": "Folgen",
+          "text": "Halten die Spieler ihn ab, haben sie einen Freund fürs Leben. Wenn nicht, sehen sie zum ersten Mal den Rausch aus der Nähe."
+        },
+        {
+          "title": "Orte",
+          "text": "Haupttor · Figuren: Kalle"
+        }
+      ],
       "location": "Das Haupttor"
     },
     {
       "name": "Der Schatten",
-      "text": "Begegnung · frei\nEinsetzen, wenn: die Spieler sich in der Hafenstadt sicher fühlen.\nWas passiert: Dieselbe unscheinbare Gestalt taucht an drei verschiedenen Orten hinter ihnen auf. Es ist einer von Sigruns Spitzeln.\nFolgen: Stellen die Spieler ihn, weiß Sigrun, dass sie aufmerksam sind, und rückt mit mehr Wissen heraus.\nOrte: Hafenstadt · Figuren: Sigrun · Quests: Der Schwarzmarkt",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler sich in der Hafenstadt sicher fühlen."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Dieselbe unscheinbare Gestalt taucht an drei verschiedenen Orten hinter ihnen auf. Es ist einer von Sigruns Spitzeln."
+        },
+        {
+          "title": "Folgen",
+          "text": "Stellen die Spieler ihn, weiß Sigrun, dass sie aufmerksam sind, und rückt mit mehr Wissen heraus."
+        },
+        {
+          "title": "Orte",
+          "text": "Hafenstadt · Figuren: Sigrun · Quests: Der Schwarzmarkt"
+        }
+      ],
       "location": "Die Hafenstadt"
     },
     {
       "name": "Knolle gegen Silber",
-      "text": "Begegnung · frei\nEinsetzen, wenn: die Spieler dem Schwarzmarkt nachgehen.\nWas passiert: Nach Mitternacht hinter dem Halben Horn: Ketill verkauft Knollen an zitternde Flüchtlinge. Die Ware hat er eben aus dem Keller geholt.\nFolgen: Folgen die Spieler ihm, führt die Spur direkt zur Falltür.\nOrte: Halbes Horn · Figuren: Ketill°, Tove · Quests: Der Schwarzmarkt",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Spieler dem Schwarzmarkt nachgehen."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Nach Mitternacht hinter dem Halben Horn: Ketill verkauft Knollen an zitternde Flüchtlinge. Die Ware hat er eben aus dem Keller geholt."
+        },
+        {
+          "title": "Folgen",
+          "text": "Folgen die Spieler ihm, führt die Spur direkt zur Falltür."
+        },
+        {
+          "title": "Orte",
+          "text": "Halbes Horn · Figuren: Ketill°, Tove · Quests: Der Schwarzmarkt"
+        }
+      ],
       "location": "Taverne Halbes Horn"
     },
     {
       "name": "Das Flüstern",
-      "text": "Atmosphäre · frei\nEinsetzen, wenn: nachts im Halben Horn.\nWas passiert: Ylva murmelt im Schlaf: „Er hat dasselbe Gesicht. Er schreit, und keiner hört ihn.“ Am Morgen weiß sie nichts davon.\nFolgen: Erster Hinweis auf den Träumer.\nOrte: Halbes Horn · Figuren: Ylva",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Atmosphäre · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "nachts im Halben Horn."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ylva murmelt im Schlaf: „Er hat dasselbe Gesicht. Er schreit, und keiner hört ihn.“ Am Morgen weiß sie nichts davon."
+        },
+        {
+          "title": "Folgen",
+          "text": "Erster Hinweis auf den Träumer."
+        },
+        {
+          "title": "Orte",
+          "text": "Halbes Horn · Figuren: Ylva"
+        }
+      ],
       "location": "Taverne Halbes Horn"
     },
     {
       "name": "Schlägerei im Halben Horn",
-      "text": "Begegnung · frei\nEinsetzen, wenn: die Stimmung einen Lichtblick braucht oder die Spieler Toves Vertrauen gewinnen sollen.\nWas passiert: Ein Bürger beschimpft die Flüchtlinge als Pilzfresser. Krüge fliegen.\nFolgen: Schaffen die Spieler Ordnung, öffnet Tove sich ihnen und verweist auf den Wachsfinger.\nOrte: Halbes Horn · Figuren: Tove, Bersi · Quests: Der Wachsfinger",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "die Stimmung einen Lichtblick braucht oder die Spieler Toves Vertrauen gewinnen sollen."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ein Bürger beschimpft die Flüchtlinge als Pilzfresser. Krüge fliegen."
+        },
+        {
+          "title": "Folgen",
+          "text": "Schaffen die Spieler Ordnung, öffnet Tove sich ihnen und verweist auf den Wachsfinger."
+        },
+        {
+          "title": "Orte",
+          "text": "Halbes Horn · Figuren: Tove, Bersi · Quests: Der Wachsfinger"
+        }
+      ],
       "location": "Taverne Halbes Horn"
     },
     {
       "name": "Arnis Schild",
-      "text": "Begegnung · frei\nEinsetzen, wenn: beim ersten großen Kampf in der Klippenstadt.\nWas passiert: Unter den Wirten kämpft einer mit einem Schild, das Sigruns Familienzeichen trägt.\nFolgen: Töten, K.o. schlagen oder fliehen? Was die Spieler Sigrun später erzählen, entscheidet über ihre Freundschaft.\nOrte: Senke · Figuren: Arni, Sigrun · Quests: Sigruns Bruder",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "beim ersten großen Kampf in der Klippenstadt."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Unter den Wirten kämpft einer mit einem Schild, das Sigruns Familienzeichen trägt."
+        },
+        {
+          "title": "Folgen",
+          "text": "Töten, K.o. schlagen oder fliehen? Was die Spieler Sigrun später erzählen, entscheidet über ihre Freundschaft."
+        },
+        {
+          "title": "Orte",
+          "text": "Senke · Figuren: Arni, Sigrun · Quests: Sigruns Bruder"
+        }
+      ],
       "location": "Die Senke"
     },
     {
       "name": "Pilz am Wegesrand",
-      "text": "Versuchung · frei\nEinsetzen, wenn: ein Spieler verletzt oder erschöpft ist.\nWas passiert: Frische Pilze, weiß und prall, zwischen den Pflastersteinen. Sie riechen süßlich nach Kraft.\nFolgen: Wer nimmt, erlebt den Rausch: Stärke und der Blick von außen auf sich selbst. Und den Wunsch nach mehr.\nOrte: Senke",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Versuchung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "ein Spieler verletzt oder erschöpft ist."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Frische Pilze, weiß und prall, zwischen den Pflastersteinen. Sie riechen süßlich nach Kraft."
+        },
+        {
+          "title": "Folgen",
+          "text": "Wer nimmt, erlebt den Rausch: Stärke und der Blick von außen auf sich selbst. Und den Wunsch nach mehr."
+        },
+        {
+          "title": "Orte",
+          "text": "Senke"
+        }
+      ],
       "location": "Die Senke"
     },
     {
       "name": "Einsturz im Gang",
-      "text": "Gefahr · frei\nEinsetzen, wenn: auf halbem Weg durch den Schmugglergang.\nWas passiert: Ein Stützbalken bricht, Geröll rutscht nach. Hinter den Spielern ist der Rückweg verschüttet.\nFolgen: Zurück zur Hafenstadt geht es nur noch über die Brücke oder den Wolfspass.\nOrte: Schmugglergang · Figuren: Eyvind",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Gefahr · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "auf halbem Weg durch den Schmugglergang."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ein Stützbalken bricht, Geröll rutscht nach. Hinter den Spielern ist der Rückweg verschüttet."
+        },
+        {
+          "title": "Folgen",
+          "text": "Zurück zur Hafenstadt geht es nur noch über die Brücke oder den Wolfspass."
+        },
+        {
+          "title": "Orte",
+          "text": "Schmugglergang · Figuren: Eyvind"
+        }
+      ],
       "location": "Der Schmugglergang"
     },
     {
       "name": "Der Bär am Pass",
-      "text": "Begegnung · frei\nEinsetzen, wenn: auf dem Wolfspass, in der ersten Nacht.\nWas passiert: Ein ausgehungerter Bär, angelockt vom Geruch der Wirte, die den Pass ebenfalls nutzen.\nFolgen: Kampf oder Umweg. Der Umweg kostet einen halben Tag.\nOrte: Wolfspass",
+      "description": "",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Art",
+          "text": "Begegnung · frei"
+        },
+        {
+          "title": "Einsetzen, wenn",
+          "text": "auf dem Wolfspass, in der ersten Nacht."
+        },
+        {
+          "title": "Was passiert",
+          "text": "Ein ausgehungerter Bär, angelockt vom Geruch der Wirte, die den Pass ebenfalls nutzen."
+        },
+        {
+          "title": "Folgen",
+          "text": "Kampf oder Umweg. Der Umweg kostet einen halben Tag."
+        },
+        {
+          "title": "Orte",
+          "text": "Wolfspass"
+        }
+      ],
       "location": "Der Wolfspass"
     }
   ],
@@ -888,7 +3157,14 @@
     {
       "name": "Alchemie",
       "category": "Lore & Mächte",
-      "text": "Der einzige Weg, in dieser Welt zu „zaubern“. Alchemisten mischen, destillieren und züchten. Die Zwillinge Svafnir und Sölvi waren Meister darin.\n\nSL: Die Grenzen der Alchemie sind noch nicht festgelegt (siehe Offene Fragen).",
+      "description": "Der einzige Weg, in dieser Welt zu „zaubern“. Alchemisten mischen, destillieren und züchten. Die Zwillinge Svafnir und Sölvi waren Meister darin.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Die Grenzen der Alchemie sind noch nicht festgelegt (siehe Offene Fragen)."
+        }
+      ],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -897,7 +3173,9 @@
     {
       "name": "Der Pilz",
       "category": "Lore & Mächte",
-      "text": "Wächst auf den Nebelinseln. Weiß, prall, riecht süßlich nach Kraft. Wer ihn isst, bekommt unmenschliche Stärke. Er macht süchtig und verändert den Charakter für immer.\n\nSL · Die drei Stufen\n\nRausch\n  Wirkung: Stärke, Hochgefühl. Man sieht sich selbst wie von außen, behält aber die Kontrolle. Macht süchtig.\n\nTausendfüßler\n  Wirkung: Mit einem Tausendfüßler im Nacken gehorcht der Körper dem Alchemisten. Der Wirt ist wach, merkt alles, kann nichts sagen und nichts tun.\n\nBestie\n  Wirkung: Überdosis. Fell, Klauen, reißende Zähne. Kein Weg zurück.\n\nHelheim und der Pilz: Die Krieger Helheims essen den Pilz seit jeher in kleinen Mengen. Darum gelten sie als stärker, schneller und härter als andere, und als ebenso dumm wie wild. Auf Skaldingen kennt man das nur aus Geschichten.\n\nPilzsud: Ausgekocht und in Wasser gelöst, wirkt der Pilz auf alle, die davon trinken. So vergiftet der Alchemist in Drakkarheim die Brunnen.\n\nSL · Spielregeln für How to be a Hero: Bonus im Rausch, Suchtprobe und Schwelle zur Bestie noch festlegen.",
+      "description": "Wächst auf den Nebelinseln. Weiß, prall, riecht süßlich nach Kraft. Wer ihn isst, bekommt unmenschliche Stärke. Er macht süchtig und verändert den Charakter für immer.\n\nRausch\n  Wirkung: Stärke, Hochgefühl. Man sieht sich selbst wie von außen, behält aber die Kontrolle. Macht süchtig.\n\nTausendfüßler\n  Wirkung: Mit einem Tausendfüßler im Nacken gehorcht der Körper dem Alchemisten. Der Wirt ist wach, merkt alles, kann nichts sagen und nichts tun.\n\nBestie\n  Wirkung: Überdosis. Fell, Klauen, reißende Zähne. Kein Weg zurück.\n\nHelheim und der Pilz: Die Krieger Helheims essen den Pilz seit jeher in kleinen Mengen. Darum gelten sie als stärker, schneller und härter als andere, und als ebenso dumm wie wild. Auf Skaldingen kennt man das nur aus Geschichten.\n\nPilzsud: Ausgekocht und in Wasser gelöst, wirkt der Pilz auf alle, die davon trinken. So vergiftet der Alchemist in Drakkarheim die Brunnen.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -906,7 +3184,9 @@
     {
       "name": "Der Tausendfüßler",
       "category": "Lore & Mächte",
-      "text": "Was man erzählt: Auf Skaldingen spricht man von Kriegern, die nicht sterben wollen. In Yggdrasil flüstert man, etwas bewege sich im Nacken der Bestien.\n\nSL:\nHerkunft: Eine Erfindung des Alchemisten, mit dem Pilz gezüchtet und präpariert. Gehorcht ihm.\nIm lebenden Wirt: Gezügelt. Er frisst nicht, sondern gibt ein Sekret ab, das den Wirt steuert.\nNähe zu totem Hirn: Die Instinkte brechen durch. Er verlässt den Wirt und frisst das Hirn der Leiche.\nKopf ab: Solange das Hirn des Wirts lebt, hält der Tausendfüßler den Körper in Gang. Wirte kämpfen darum mit Wunden weiter, die jeden anderen töten würden, und spüren keinen Schmerz. Erst wenn der Kopf ab ist oder der Schädel gespalten, ist es vorbei.\nAuch Tiere: Der Tausendfüßler nistet sich auch in Tieren ein. Ein Tier als Wirt frisst Aas und Leichen.\nHerauslocken: Wirt fixieren, am besten K.o. schlagen, eine Leiche nah an den Kopf legen, warten.\nDer Preis: Der befreite Wirt wird wahnsinnig, ist nicht zu beruhigen und muss am Ende erlöst werden.",
+      "description": "Was man erzählt: Auf Skaldingen spricht man von Kriegern, die nicht sterben wollen. In Yggdrasil flüstert man, etwas bewege sich im Nacken der Bestien.\n\nHerkunft: Eine Erfindung des Alchemisten, mit dem Pilz gezüchtet und präpariert. Gehorcht ihm.\nIm lebenden Wirt: Gezügelt. Er frisst nicht, sondern gibt ein Sekret ab, das den Wirt steuert.\nNähe zu totem Hirn: Die Instinkte brechen durch. Er verlässt den Wirt und frisst das Hirn der Leiche.\nKopf ab: Solange das Hirn des Wirts lebt, hält der Tausendfüßler den Körper in Gang. Wirte kämpfen darum mit Wunden weiter, die jeden anderen töten würden, und spüren keinen Schmerz. Erst wenn der Kopf ab ist oder der Schädel gespalten, ist es vorbei.\nAuch Tiere: Der Tausendfüßler nistet sich auch in Tieren ein. Ein Tier als Wirt frisst Aas und Leichen.\nHerauslocken: Wirt fixieren, am besten K.o. schlagen, eine Leiche nah an den Kopf legen, warten.\nDer Preis: Der befreite Wirt wird wahnsinnig, ist nicht zu beruhigen und muss am Ende erlöst werden.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -915,7 +3195,9 @@
     {
       "name": "Wirte",
       "category": "Lore & Mächte",
-      "text": "So nennt man in Tvíborg die Menschen mit einem Tausendfüßler im Kopf. Erkennbar an einer Wulst hinter dem Ohr oder im Nacken, Pilzgeflecht unter den Fingernägeln und Augen, die nicht zu ihren Bewegungen passen. Vor einem Angriff zögern sie einen Herzschlag lang.",
+      "description": "So nennt man in Tvíborg die Menschen mit einem Tausendfüßler im Kopf. Erkennbar an einer Wulst hinter dem Ohr oder im Nacken, Pilzgeflecht unter den Fingernägeln und Augen, die nicht zu ihren Bewegungen passen. Vor einem Angriff zögern sie einen Herzschlag lang.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -924,7 +3206,9 @@
     {
       "name": "Bestien",
       "category": "Lore & Mächte",
-      "text": "Menschen, die zu viel vom Pilz genommen haben. Menschenartig, mit Fell, Klauen und reißenden Zähnen. Sie sind schneller und stärker als jeder Krieger. Der Alchemist reitet eine von ihnen.",
+      "description": "Menschen, die zu viel vom Pilz genommen haben. Menschenartig, mit Fell, Klauen und reißenden Zähnen. Sie sind schneller und stärker als jeder Krieger. Der Alchemist reitet eine von ihnen.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -933,7 +3217,14 @@
     {
       "name": "Die Traumwelt",
       "category": "Lore & Mächte",
-      "text": "Ein Ort, in den der Pilz Menschen holt. Süchtige berichten im Rausch von einem Mann, der schreit und dasselbe Gesicht hat wie der Alchemist.\n\nSL: Dort ist Sölvi gefangen. Was die Traumwelt ist und was dort geschieht, wird noch ausgearbeitet.",
+      "description": "Ein Ort, in den der Pilz Menschen holt. Süchtige berichten im Rausch von einem Mann, der schreit und dasselbe Gesicht hat wie der Alchemist.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "SL",
+          "text": "Dort ist Sölvi gefangen. Was die Traumwelt ist und was dort geschieht, wird noch ausgearbeitet."
+        }
+      ],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -942,7 +3233,9 @@
     {
       "name": "Das Bierfest von Björnsvig",
       "category": "Lore & Mächte",
-      "text": "Findet jedes Jahr in Björnsvig statt. Vertreter aller Inseln und Jarltümer kommen zusammen und messen ihr Bier gegeneinander. Mitmachen darf nur, wer vorher in der Kneipe Zum Bodenlosen Fass die Stammgäste überzeugt. Der Sieger erhält eine Audienz beim Jarl von Björnsvig und darf sich etwas von ihm wünschen. Das größte Treffen der bekannten Welt.",
+      "description": "Findet jedes Jahr in Björnsvig statt. Vertreter aller Inseln und Jarltümer kommen zusammen und messen ihr Bier gegeneinander. Mitmachen darf nur, wer vorher in der Kneipe Zum Bodenlosen Fass die Stammgäste überzeugt. Der Sieger erhält eine Audienz beim Jarl von Björnsvig und darf sich etwas von ihm wünschen. Das größte Treffen der bekannten Welt.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -951,7 +3244,9 @@
     {
       "name": "Das Thing",
       "category": "Lore & Mächte",
-      "text": "Die Versammlung freier Leute, auf der Recht gesprochen und Entscheidungen getroffen werden. Die Skalden halten ihr Thing im Langhaus ihres Jarls in Skaldeby ab.",
+      "description": "Die Versammlung freier Leute, auf der Recht gesprochen und Entscheidungen getroffen werden. Die Skalden halten ihr Thing im Langhaus ihres Jarls in Skaldeby ab.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -960,7 +3255,18 @@
     {
       "name": "Die Skalden",
       "category": "Volk",
-      "text": "Volk der Spieler\nDas Küstenvolk, genannt die Beschützer der Insel. Rau, stolz und mehr auf See als an Land. Ihre Schiffe bauen sie nicht selbst, die kommen von den Hamarlingen.\nStatus: Kapitel 1 · Gerät in Verruf. Skalden-Soldaten verschwinden, und Krieger in Skalden-Farben überfallen Dörfer der Björnsvikinger.\nSL: Der Alchemist stammt aus diesem Volk und hat Skalden mit Tausendfüßlern zu Mördern gemacht.",
+      "description": "Volk der Spieler\nDas Küstenvolk, genannt die Beschützer der Insel. Rau, stolz und mehr auf See als an Land. Ihre Schiffe bauen sie nicht selbst, die kommen von den Hamarlingen.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "Kapitel 1 · Gerät in Verruf. Skalden-Soldaten verschwinden, und Krieger in Skalden-Farben überfallen Dörfer der Björnsvikinger."
+        },
+        {
+          "title": "SL",
+          "text": "Der Alchemist stammt aus diesem Volk und hat Skalden mit Tausendfüßlern zu Mördern gemacht."
+        }
+      ],
       "locations": [
         "Skaldingen"
       ],
@@ -971,7 +3277,14 @@
     {
       "name": "Die Björnsvikinger",
       "category": "Volk",
-      "text": "Das Feldvolk im Herzen der Insel. Reich durch fruchtbaren Boden. Wer auf Skaldingen handeln will, kommt an ihnen nicht vorbei. Ihr Jarl ist Rotbart Gelbrtson.\nStatus: Kapitel 1 · Jarl Rotbart stirbt beim Bierfest, Björnsvig versinkt im Chaos. Seine Tochter Jira hält die Stadt.",
+      "description": "Das Feldvolk im Herzen der Insel. Reich durch fruchtbaren Boden. Wer auf Skaldingen handeln will, kommt an ihnen nicht vorbei. Ihr Jarl ist Rotbart Gelbrtson.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "Kapitel 1 · Jarl Rotbart stirbt beim Bierfest, Björnsvig versinkt im Chaos. Seine Tochter Jira hält die Stadt."
+        }
+      ],
       "locations": [
         "Skaldingen"
       ],
@@ -982,7 +3295,9 @@
     {
       "name": "Die Varðir",
       "category": "Volk",
-      "text": "Das Bergvolk, ihr Name bedeutet die Wächter. Traditionell, verschlossen, leben für sich. Sie verteidigen die heilige Stätte.",
+      "description": "Das Bergvolk, ihr Name bedeutet die Wächter. Traditionell, verschlossen, leben für sich. Sie verteidigen die heilige Stätte.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [
         "Skaldingen"
       ],
@@ -993,7 +3308,14 @@
     {
       "name": "Die Hamarlinge",
       "category": "Volk",
-      "text": "Das Klippenvolk. Hamarr heißt in der alten Sprache zugleich Fels und Hammer. Sie leben oberhalb der Klippen an erzreichen Bergen und sind das reichste Volk Skaldingens. Bekannt für Erze, Schmiedekunst und Schiffsbau: Ihre Schiffe werden durch die Klippe hindurch zu Wasser gelassen. Ihre Kräne und Werften sind über Skaldingen hinaus begehrt. Ihre Hauptstadt ist Drakkarheim, ihr Jarl ist Reiner.\nStatus: Kapitel 1 · Drakkarheim fällt. Der Alchemist vergiftet die Brunnen, Jarl Reiner und seine Tochter Astrid sterben.",
+      "description": "Das Klippenvolk. Hamarr heißt in der alten Sprache zugleich Fels und Hammer. Sie leben oberhalb der Klippen an erzreichen Bergen und sind das reichste Volk Skaldingens. Bekannt für Erze, Schmiedekunst und Schiffsbau: Ihre Schiffe werden durch die Klippe hindurch zu Wasser gelassen. Ihre Kräne und Werften sind über Skaldingen hinaus begehrt. Ihre Hauptstadt ist Drakkarheim, ihr Jarl ist Reiner.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Status",
+          "text": "Kapitel 1 · Drakkarheim fällt. Der Alchemist vergiftet die Brunnen, Jarl Reiner und seine Tochter Astrid sterben."
+        }
+      ],
       "locations": [
         "Skaldingen"
       ],
@@ -1004,7 +3326,9 @@
     {
       "name": "Die Jarltümer",
       "category": "Lore & Mächte",
-      "text": "Skaldingen hat keinen König. Jedes Volk bildet ein Jarltum mit einem Jarl in seiner Hauptstadt. Untereinander streiten sie oft, meist um Land und meist im ehrenhaften Zweikampf. Ein Tod im Zweikampf ist voller Ehre und trotzdem jedes Mal eine Tragödie, denn man tötet Brüder und Schwestern. Krieg gegeneinander haben die Jarltümer nie geführt.\n\nNach außen halten sie zusammen: Erst vor wenigen Monden zogen sie gemeinsam auf Raubzug in den Süden und verteidigten sich Seite an Seite gegen die Krieger Helheims.",
+      "description": "Skaldingen hat keinen König. Jedes Volk bildet ein Jarltum mit einem Jarl in seiner Hauptstadt. Untereinander streiten sie oft, meist um Land und meist im ehrenhaften Zweikampf. Ein Tod im Zweikampf ist voller Ehre und trotzdem jedes Mal eine Tragödie, denn man tötet Brüder und Schwestern. Krieg gegeneinander haben die Jarltümer nie geführt.\n\nNach außen halten sie zusammen: Erst vor wenigen Monden zogen sie gemeinsam auf Raubzug in den Süden und verteidigten sich Seite an Seite gegen die Krieger Helheims.",
+      "player_knowledge": [],
+      "gm_knowledge": [],
       "locations": [
         "Skaldingen"
       ],
@@ -1015,7 +3339,22 @@
     {
       "name": "Ring des Jarls von Skaldeby",
       "category": "Gegenstand",
-      "text": "Beschreibung: Siegelring mit dem Wappen der Skalden.\nFundort: Langhaus von Skaldeby\nBesitzer: die Helden\nSL: Zeichen, dass die Helden als Boten kommen.",
+      "description": "Siegelring mit dem Wappen der Skalden.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Fundort",
+          "text": "Langhaus von Skaldeby"
+        },
+        {
+          "title": "Besitzer",
+          "text": "die Helden"
+        },
+        {
+          "title": "SL",
+          "text": "Zeichen, dass die Helden als Boten kommen."
+        }
+      ],
       "locations": [
         "Das Langhaus von Skaldeby"
       ],
@@ -1026,7 +3365,22 @@
     {
       "name": "Alte Skalden-Abzeichen",
       "category": "Gegenstand",
-      "text": "Beschreibung: Abzeichen von den Leichen am Rastplatz, abgewetzt, aus dem letzten Raubzug.\nFundort: Rastplatz am Waldrand\nBesitzer: die Helden\nSL: Beweis: Es sind die verschwundenen Soldaten.",
+      "description": "Abzeichen von den Leichen am Rastplatz, abgewetzt, aus dem letzten Raubzug.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Fundort",
+          "text": "Rastplatz am Waldrand"
+        },
+        {
+          "title": "Besitzer",
+          "text": "die Helden"
+        },
+        {
+          "title": "SL",
+          "text": "Beweis: Es sind die verschwundenen Soldaten."
+        }
+      ],
       "locations": [
         "Der Rastplatz am Waldrand"
       ],
@@ -1037,7 +3391,22 @@
     {
       "name": "Schaumbartknospe",
       "category": "Gegenstand",
-      "text": "Beschreibung: Sieht aus wie der Bart eines alten Mannes. Roh ins fertige Bier gegeben, rundet sie den Geschmack ab.\nWert: Geheimtipp der Brauer\nFundort: Björnsvig\nSL: Macht aus dem scheußlichen Bier der Helden ein Siegerbier.",
+      "description": "Sieht aus wie der Bart eines alten Mannes. Roh ins fertige Bier gegeben, rundet sie den Geschmack ab.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "Geheimtipp der Brauer"
+        },
+        {
+          "title": "Fundort",
+          "text": "Björnsvig"
+        },
+        {
+          "title": "SL",
+          "text": "Macht aus dem scheußlichen Bier der Helden ein Siegerbier."
+        }
+      ],
       "locations": [
         "Björnsvig"
       ],
@@ -1048,7 +3417,18 @@
     {
       "name": "Das Bier der Helden",
       "category": "Gegenstand",
-      "text": "Beschreibung: Stark, haut jeden um, schmeckt scheußlich.\nBesitzer: die Helden\nSL: Mit Schaumbartknospe gewinnt es. Der Druide vergiftet es bei der Audienz.",
+      "description": "Stark, haut jeden um, schmeckt scheußlich.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Besitzer",
+          "text": "die Helden"
+        },
+        {
+          "title": "SL",
+          "text": "Mit Schaumbartknospe gewinnt es. Der Druide vergiftet es bei der Audienz."
+        }
+      ],
       "locations": [],
       "npcs": [],
       "quests": [],
@@ -1057,7 +3437,18 @@
     {
       "name": "Schlüssel zum Verlies",
       "category": "Gegenstand",
-      "text": "Beschreibung: Von der sterbenden Leibgardin.\nFundort: Verlies von Björnsvig\nBesitzer: die Helden",
+      "description": "Von der sterbenden Leibgardin.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Fundort",
+          "text": "Verlies von Björnsvig"
+        },
+        {
+          "title": "Besitzer",
+          "text": "die Helden"
+        }
+      ],
       "locations": [
         "Das Verlies von Björnsvig"
       ],
@@ -1068,7 +3459,26 @@
     {
       "name": "Seekarte nach Ulmar",
       "category": "Gegenstand",
-      "text": "Beschreibung: Pergament, mit Wachs gegen Feuchtigkeit getränkt. Ein Kurs ist eingezeichnet.\nWert: [eintragen]\nFundort: Wolfshalle, Labor\nBesitzer: liegt im Labor\nSL: Am Rand Notizen des Alchemisten über eine Schmiede auf Ulmar.",
+      "description": "Pergament, mit Wachs gegen Feuchtigkeit getränkt. Ein Kurs ist eingezeichnet.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "[eintragen]"
+        },
+        {
+          "title": "Fundort",
+          "text": "Wolfshalle, Labor"
+        },
+        {
+          "title": "Besitzer",
+          "text": "liegt im Labor"
+        },
+        {
+          "title": "SL",
+          "text": "Am Rand Notizen des Alchemisten über eine Schmiede auf Ulmar."
+        }
+      ],
       "locations": [
         "Die Wolfshalle"
       ],
@@ -1079,7 +3489,22 @@
     {
       "name": "Liste der Gelehrten°",
       "category": "Gegenstand",
-      "text": "Beschreibung: Namen von Gelehrten und Alchemisten Tvíborgs, einige durchgestrichen.\nFundort: Wolfshalle, Labor\nBesitzer: liegt im Labor\nSL: Die Durchgestrichenen sind an Bord seines Schiffs. Beweis für die Entführungen.",
+      "description": "Namen von Gelehrten und Alchemisten Tvíborgs, einige durchgestrichen.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Fundort",
+          "text": "Wolfshalle, Labor"
+        },
+        {
+          "title": "Besitzer",
+          "text": "liegt im Labor"
+        },
+        {
+          "title": "SL",
+          "text": "Die Durchgestrichenen sind an Bord seines Schiffs. Beweis für die Entführungen."
+        }
+      ],
       "locations": [
         "Die Wolfshalle"
       ],
@@ -1090,7 +3515,26 @@
     {
       "name": "Notizen zur Dosierung",
       "category": "Gegenstand",
-      "text": "Beschreibung: Aufzeichnungen über Rausch, Tausendfüßler und Bestie.\nWert: für Alchemisten unbezahlbar\nFundort: Wolfshalle, Labor\nBesitzer: liegt im Labor\nSL: Grundlage für die Pilz-Regeln.",
+      "description": "Aufzeichnungen über Rausch, Tausendfüßler und Bestie.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "für Alchemisten unbezahlbar"
+        },
+        {
+          "title": "Fundort",
+          "text": "Wolfshalle, Labor"
+        },
+        {
+          "title": "Besitzer",
+          "text": "liegt im Labor"
+        },
+        {
+          "title": "SL",
+          "text": "Grundlage für die Pilz-Regeln."
+        }
+      ],
       "locations": [
         "Die Wolfshalle"
       ],
@@ -1101,7 +3545,18 @@
     {
       "name": "Gläser voller Tausendfüßler",
       "category": "Gegenstand",
-      "text": "Beschreibung: Dutzende Gläser, darin bewegt sich etwas.\nFundort: Wolfshalle, Labor\nSL: Zerstören, mitnehmen oder liegen lassen?",
+      "description": "Dutzende Gläser, darin bewegt sich etwas.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Fundort",
+          "text": "Wolfshalle, Labor"
+        },
+        {
+          "title": "SL",
+          "text": "Zerstören, mitnehmen oder liegen lassen?"
+        }
+      ],
       "locations": [
         "Die Wolfshalle"
       ],
@@ -1112,7 +3567,26 @@
     {
       "name": "Kalles Pilzknolle",
       "category": "Gegenstand",
-      "text": "Beschreibung: Eine getrocknete Knolle, von einem Flüchtling gekauft. „Für den Notfall.“\nWert: unter Flüchtlingen ein kleines Vermögen\nFundort: Haupttor\nBesitzer: Kalle\nSL: Wer sie nimmt, erlebt den Rausch.",
+      "description": "Eine getrocknete Knolle, von einem Flüchtling gekauft. „Für den Notfall.“",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "unter Flüchtlingen ein kleines Vermögen"
+        },
+        {
+          "title": "Fundort",
+          "text": "Haupttor"
+        },
+        {
+          "title": "Besitzer",
+          "text": "Kalle"
+        },
+        {
+          "title": "SL",
+          "text": "Wer sie nimmt, erlebt den Rausch."
+        }
+      ],
       "locations": [
         "Das Haupttor"
       ],
@@ -1125,7 +3599,26 @@
     {
       "name": "Arnis Schild",
       "category": "Gegenstand",
-      "text": "Beschreibung: Rundschild mit dem Familienzeichen der Hallsdóttirs.\nWert: für Sigrun unbezahlbar\nFundort: Senke\nBesitzer: Arni\nSL: Wer es Sigrun bringt, bringt ihr die Wahrheit.",
+      "description": "Rundschild mit dem Familienzeichen der Hallsdóttirs.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "für Sigrun unbezahlbar"
+        },
+        {
+          "title": "Fundort",
+          "text": "Senke"
+        },
+        {
+          "title": "Besitzer",
+          "text": "Arni"
+        },
+        {
+          "title": "SL",
+          "text": "Wer es Sigrun bringt, bringt ihr die Wahrheit."
+        }
+      ],
       "locations": [
         "Die Senke"
       ],
@@ -1138,7 +3631,22 @@
     {
       "name": "Grimurs Meisterstück",
       "category": "Gegenstand",
-      "text": "Beschreibung: Eine Waffe aus Grimurs Schmiede, die er nur für Freunde schmiedet.\nWert: unbezahlbar\nFundort: Grimurs Schmiede\nSL: Belohnung der Quest „Grimurs Lehrling“.",
+      "description": "Eine Waffe aus Grimurs Schmiede, die er nur für Freunde schmiedet.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "unbezahlbar"
+        },
+        {
+          "title": "Fundort",
+          "text": "Grimurs Schmiede"
+        },
+        {
+          "title": "SL",
+          "text": "Belohnung der Quest „Grimurs Lehrling“."
+        }
+      ],
       "locations": [
         "Grimurs Schmiede"
       ],
@@ -1149,7 +3657,18 @@
     {
       "name": "Steckbrief: Eyvind Wachsfinger",
       "category": "Gegenstand",
-      "text": "Beschreibung: „Verräter. Belohnung in Silber.“\nFundort: Haupttor\nSL: Erste Fährte zu Eyvind.",
+      "description": "„Verräter. Belohnung in Silber.“",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Fundort",
+          "text": "Haupttor"
+        },
+        {
+          "title": "SL",
+          "text": "Erste Fährte zu Eyvind."
+        }
+      ],
       "locations": [
         "Das Haupttor"
       ],
@@ -1160,7 +3679,22 @@
     {
       "name": "Fass Pökelfisch",
       "category": "Gegenstand",
-      "text": "Beschreibung: Treibgut vom Wrackstrand.\nWert: in der belagerten Stadt mehr wert als Gold\nFundort: Wrackstrand\nSL: Damit lässt sich jede Wache bestechen.",
+      "description": "Treibgut vom Wrackstrand.",
+      "player_knowledge": [],
+      "gm_knowledge": [
+        {
+          "title": "Wert",
+          "text": "in der belagerten Stadt mehr wert als Gold"
+        },
+        {
+          "title": "Fundort",
+          "text": "Wrackstrand"
+        },
+        {
+          "title": "SL",
+          "text": "Damit lässt sich jede Wache bestechen."
+        }
+      ],
       "locations": [
         "Das Riff & der Wrackstrand"
       ],

@@ -11,19 +11,39 @@
         </button>
       }
     </div>
+    @if (draft().kind === 'main') {
+      <div class="field">
+        <label for="quest-number">Nummer der Hauptquest</label>
+        <input
+          id="quest-number"
+          class="input input--number"
+          type="number"
+          min="1"
+          [ngModel]="draft().number"
+          (ngModelChange)="set('number', $event ? +$event : null)"
+        />
+      </div>
+    }
     <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
   </div>
 
   <div class="panel">
     <div class="field">
-      <label for="quest-text">Text</label>
-      <textarea id="quest-text" class="input" rows="6" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
-    </div>
-    <div class="field">
       <label for="quest-goal">Ziel</label>
+      <span class="soft">Sehen die Spieler zusammen mit Beschreibung und Checkliste, sobald du die Quest teilst.</span>
       <textarea id="quest-goal" class="input" rows="3" [ngModel]="draft().goal" (ngModelChange)="set('goal', $event)"></textarea>
     </div>
   </div>
+
+  <app-entry-texts-editor
+    inputId="quest-description"
+    [description]="draft().description"
+    [playerKnowledge]="draft().player_knowledge"
+    [gmKnowledge]="draft().gm_knowledge"
+    (descriptionChange)="set('description', $event)"
+    (playerKnowledgeChange)="set('player_knowledge', $event)"
+    (gmKnowledgeChange)="set('gm_knowledge', $event)"
+  />
 
   <div class="panel">
     <h2 class="subtitle">Checkliste</h2>

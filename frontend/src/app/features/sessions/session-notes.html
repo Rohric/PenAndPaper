@@ -1,0 +1,40 @@
+<div class="board">
+  <section class="stack">
+    <div class="row row--between">
+      <h3 class="section-title"><app-icon name="note" /> Meine Notizen</h3>
+      <button type="button" class="btn btn--small btn--primary" (click)="open.emit(null)"><app-icon name="plus" [size]="16" /> Notiz</button>
+    </div>
+    <div class="tiles">
+      @for (note of own(); track note.id) {
+        <button type="button" class="tile note" (click)="open.emit(note.id)">
+          <span class="tile__title">{{ note.title }}</span>
+          @if (note.text) {
+            <span class="soft clamp">{{ note.text }}</span>
+          }
+        </button>
+      } @empty {
+        <p class="soft">Noch keine eigene Notiz.</p>
+      }
+    </div>
+  </section>
+
+  <section class="stack">
+    <h3 class="section-title"><app-icon name="group" /> Gruppenblock</h3>
+    <div class="tiles">
+      @for (note of group(); track note.id) {
+        <button type="button" class="tile note note--group" (click)="open.emit(note.id)">
+          <span class="kicker">von {{ note.author }}</span>
+          <span class="tile__title">{{ note.title }}</span>
+          @if (note.text) {
+            <span class="soft clamp">{{ note.text }}</span>
+          }
+          @if (note.comments.length) {
+            <span class="chip">{{ note.comments.length }} {{ note.comments.length === 1 ? 'Kommentar' : 'Kommentare' }}</span>
+          }
+        </button>
+      } @empty {
+        <p class="soft">Der Gruppenblock ist noch leer.</p>
+      }
+    </div>
+  </section>
+</div>

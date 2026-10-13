@@ -1,0 +1,106 @@
+<!-- A quest as a tile: look it up, mark it as done, share it with the players. -->
+<ng-template #questTile let-quest>
+  <article class="tile" [class.tile--done]="is('quest', quest.id, 'done')">
+    <button type="button" class="tile__body" (click)="lookUp('quests', quest.id)">
+      <span class="kicker">
+        {{ quest.kicker }}{{ is('quest', quest.id, 'revealed') ? ' · geteilt' : '' }}{{ is('quest', quest.id, 'done') ? ' · erledigt' : '' }}
+      </span>
+      <span class="tile__title">{{ quest.name }}</span>
+      @if (quest.text) {
+        <span class="soft clamp">{{ quest.text }}</span>
+      }
+    </button>
+    <div class="row">
+      <button type="button" class="btn btn--small" [attr.aria-pressed]="is('quest', quest.id, 'done')" (click)="store.toggle('quest', quest.id, 'done')">
+        <app-icon name="check" [size]="16" /> Erledigt
+      </button>
+      <button type="button" class="btn btn--small" [attr.aria-pressed]="is('quest', quest.id, 'revealed')" (click)="store.toggle('quest', quest.id, 'revealed')">
+        <app-icon name="eye" [size]="16" /> {{ is('quest', quest.id, 'revealed') ? 'Geteilt' : 'Teilen' }}
+      </button>
+    </div>
+  </article>
+</ng-template>
+
+<!-- An event as a tile; "whole" shows all of its text instead of the beginning. -->
+<ng-template #eventTile let-event let-whole="whole">
+  <article class="tile">
+    <button type="button" class="tile__body" (click)="lookUp('events', event.id)">
+      <span class="kicker">{{ event.kicker }}</span>
+      <span class="tile__title">{{ event.name }}</span>
+      @if (event.text) {
+        <span class="soft" [class.clamp]="!whole" [class.prose]="whole">{{ event.text }}</span>
+      }
+    </button>
+    <div class="row">
+      <button type="button" class="btn btn--small" (click)="store.toggle('event', event.id, 'done')">
+        <app-icon name="check" [size]="16" /> Erledigt
+      </button>
+    </div>
+  </article>
+</ng-template>
+
+@if (scene(); as shown) {
+  <app-scene-view [scene]="shown" [editable]="false" [showEvents]="false">
+    <div class="row">
+      <button type="button" class="pill" [attr.aria-pressed]="is('scene', shown.id, 'done')" (click)="store.toggle('scene', shown.id, 'done')">
+        <app-icon name="check" [size]="16" /> Gespielt
+      </button>
+      <button type="button" class="pill" [attr.aria-pressed]="is('scene', shown.id, 'pinned')" (click)="store.toggle('scene', shown.id, 'pinned')">
+        <app-icon name="pin" [size]="16" /> Stecknadel
+      </button>
+      <button type="button" class="btn btn--small btn--primary" (click)="fight.emit(shown)">
+        <app-icon name="sword" [size]="16" /> Kampf in dieser Szene
+      </button>
+    </div>
+  </app-scene-view>
+
+  @if (hasSceneEvents()) {
+    <section class="stack">
+      <h3 class="section-title"><app-icon name="flag" /> Ereignisse dieser Szene</h3>
+      <div class="tiles tiles--wide">
+        @for (event of sceneEvents(); track event.id) {
+          <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: true }" />
+        } @empty {
+          <p class="soft">Alle Ereignisse dieser Szene sind erledigt. Sie stehen im Archiv.</p>
+        }
+      </div>
+    </section>
+  }
+} @else {
+  <div class="empty">
+    <p>Wähle links eine Szene.</p>
+  </div>
+}
+
+<section class="stack">
+  <h3 class="section-title"><app-icon name="quest" /> Hauptquests</h3>
+  <div class="tiles">
+    @for (quest of mainQuests(); track quest.id) {
+      <ng-container *ngTemplateOutlet="questTile; context: { $implicit: quest }" />
+    } @empty {
+      <p class="soft">Diese Welt hat noch keine Hauptquest.</p>
+    }
+  </div>
+</section>
+
+<section class="stack">
+  <h3 class="section-title"><app-icon name="quest" /> Offene Nebenquests</h3>
+  <div class="tiles">
+    @for (quest of sideQuests(); track quest.id) {
+      <ng-container *ngTemplateOutlet="questTile; context: { $implicit: quest }" />
+    } @empty {
+      <p class="soft">Keine offene Nebenquest in diesem Kapitel.</p>
+    }
+  </div>
+</section>
+
+<section class="stack">
+  <h3 class="section-title"><app-icon name="flag" /> Weitere offene Ereignisse</h3>
+  <div class="tiles">
+    @for (event of otherEvents(); track event.id) {
+      <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: false }" />
+    } @empty {
+      <p class="soft">Kein weiteres offenes Ereignis in diesem Kapitel.</p>
+    }
+  </div>
+</section>

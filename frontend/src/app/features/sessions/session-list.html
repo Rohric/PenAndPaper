@@ -1,0 +1,57 @@
+<section class="stack">
+  <header class="row row--between">
+    <div>
+      <span class="kicker">Spielleiter</span>
+      <h1 class="title">Runden</h1>
+    </div>
+    <app-tutorial-button topic="sessions" />
+  </header>
+
+  @if (error()) {
+    <p class="notice notice--error" role="alert">{{ error() }}</p>
+  }
+
+  <div class="cards">
+    @for (session of sessions(); track session.id) {
+      <a class="card" [routerLink]="['/gm/sessions', session.id]">
+        <span class="kicker">{{ session.world_name }} · seit {{ session.date }}</span>
+        <span class="card__title">{{ session.name }}</span>
+        <span class="soft">{{ session.characters.length }} Charaktere</span>
+        @if (session.finished) {
+          <span class="chip">beendet</span>
+        }
+      </a>
+    }
+  </div>
+
+  @if (!sessions().length) {
+    <div class="empty">
+      <p>Noch keine Runde. Starte unten deine erste.</p>
+    </div>
+  }
+
+  <form class="panel" (ngSubmit)="create()">
+    <h2 class="subtitle">Neue Runde starten</h2>
+    <div class="grid-fields">
+      <div class="field">
+        <label for="session-name">Name</label>
+        <input id="session-name" class="input" name="name" placeholder="z. B. Donnerstagsgruppe" [(ngModel)]="name" />
+      </div>
+      <div class="field">
+        <label for="session-date">Datum</label>
+        <input id="session-date" class="input" name="date" type="date" [(ngModel)]="date" />
+      </div>
+      <div class="field">
+        <label for="session-world">Welt</label>
+        <app-id-select inputId="session-world" emptyLabel="Welt wählen" [options]="worldOptions()" [value]="world()" (valueChange)="world.set($event)" />
+      </div>
+    </div>
+    <div class="field">
+      <span class="label">Charaktere der Spieler</span>
+      <app-link-picker label="Charaktere" emptyText="Noch kein Charakter gewählt." [options]="characterOptions()" [selected]="chosen()" (selectedChange)="chosen.set($event)" />
+    </div>
+    <div class="row">
+      <button type="submit" class="btn btn--primary" [disabled]="!name().trim() || world() === null">Runde starten</button>
+    </div>
+  </form>
+</section>

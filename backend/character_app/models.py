@@ -22,7 +22,9 @@ class BaseCharacter(models.Model):
     gender = models.CharField(max_length=100, blank=True)
     profession = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
+    # The life points right now, and the most the character can have.
     life_points = models.PositiveIntegerField(default=START_LIFE_POINTS)
+    max_life_points = models.PositiveIntegerField(default=START_LIFE_POINTS)
     # Two budgets: base points from character creation, bonus points from leveling.
     skill_points_total = models.PositiveIntegerField(default=START_SKILL_POINTS)
     bonus_points_total = models.PositiveIntegerField(default=0)
@@ -46,6 +48,11 @@ class Npc(BaseCharacter):
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="npcs")
     phrases = models.JSONField(default=list, blank=True)
+    # Players see name and description once a session revealed the NPC.
+    # Each knowledge piece: title, text. A session reveals the pieces for players one by one.
+    player_knowledge = models.JSONField(default=list, blank=True)
+    # Only the game master reads these pieces.
+    gm_knowledge = models.JSONField(default=list, blank=True)
 
     class Meta:
         ordering = ["name"]

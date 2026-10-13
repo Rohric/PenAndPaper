@@ -1,0 +1,64 @@
+// The three talents side by side; they wrap below each other on narrow screens.
+.talents {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.talent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.talent__head,
+.skill {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.talent__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.talent__value,
+.skill__value {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.talent__value {
+  font-size: 20px;
+}
+
+.skill__note {
+  font-size: 13px;
+}
+
+// Skills and talents a player can tap to roll a check.
+.talent__head--roll,
+.skill--roll {
+  min-height: var(--touch);
+  padding: 4px 8px;
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.talent__head--roll:hover,
+.skill--roll:hover {
+  border-color: var(--accent);
+}

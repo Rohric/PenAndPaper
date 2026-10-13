@@ -1,0 +1,61 @@
+<article class="tile" [class.tile--open]="expanded()">
+  <button type="button" class="tile__head" [attr.aria-expanded]="expanded()" (click)="expanded.set(!expanded())">
+    <span class="tile__title">{{ character().name }}</span>
+    <span class="soft">{{ character().player }}</span>
+    @if (unread()) {
+      <span class="chip chip--accent">{{ unread() }} neu</span>
+    }
+    <app-icon [name]="expanded() ? 'down' : 'right'" />
+  </button>
+
+  <div class="life" [attr.aria-label]="'Lebenspunkte ' + character().life_points + ' von ' + character().max_life_points">
+    <app-icon name="heart" [size]="16" />
+    <div class="life__bar"><div class="life__fill" [class.life__fill--low]="percent() <= 25" [style.width.%]="percent()"></div></div>
+    <strong>{{ character().life_points }} / {{ character().max_life_points }}</strong>
+  </div>
+
+  @if (expanded()) {
+    <div class="row">
+      @for (step of steps; track step) {
+        <button
+          type="button"
+          class="btn btn--small"
+          [attr.aria-label]="'Lebenspunkte ' + (step > 0 ? 'plus ' : 'minus ') + (step > 0 ? step : -step)"
+          (click)="changeLife(step)"
+        >
+          {{ step > 0 ? '+' + step : step }}
+        </button>
+      }
+    </div>
+
+    @for (talent of talents(); track talent.label) {
+      <div class="values">
+        <div class="values__head">
+          <span>{{ talent.label }}</span>
+          <span>{{ talent.value }} <span class="soft">· GBP {{ talent.inspiration }}</span></span>
+        </div>
+        @for (skill of talent.skills; track skill.name) {
+          <div class="values__row">
+            <span>{{ skill.name }}</span>
+            <span>{{ skill.value }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (weapons().length) {
+      <div class="values">
+        <div class="values__head"><span>Waffen</span></div>
+        @for (weapon of weapons(); track weapon) {
+          <div class="values__row"><span>{{ weapon }}</span></div>
+        }
+      </div>
+    }
+
+    <div class="row">
+      <button type="button" class="btn btn--small" (click)="open.emit('sheet')"><app-icon name="sheet" [size]="16" /> Bogen</button>
+      <button type="button" class="btn btn--small" (click)="open.emit('messages')"><app-icon name="mail" [size]="16" /> Nachricht</button>
+      <button type="button" class="btn btn--small" (click)="open.emit('item')"><app-icon name="gift" [size]="16" /> Gegenstand</button>
+    </div>
+  }
+</article>

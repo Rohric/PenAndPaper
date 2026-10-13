@@ -1,0 +1,57 @@
+@if (writable()) {
+  <div class="panel">
+    <div class="field">
+      <label for="note-title">Titel</label>
+      <input id="note-title" class="input input--title" [ngModel]="title()" (ngModelChange)="title.set($event)" />
+    </div>
+    <div class="field">
+      <label for="note-text">Text</label>
+      <textarea id="note-text" class="input" rows="10" [ngModel]="text()" (ngModelChange)="text.set($event)"></textarea>
+    </div>
+    @if (note(); as own) {
+      <div class="row">
+        <button type="button" class="btn btn--primary" [disabled]="!dirty() || !title().trim()" (click)="store(own.shared)">Speichern</button>
+        <button type="button" class="btn" [disabled]="!title().trim()" (click)="store(!own.shared)">
+          {{ own.shared ? 'Zurück zu meinen Notizen' : 'In den Gruppenblock legen' }}
+        </button>
+        <button type="button" class="btn btn--danger" (click)="drop(own)">Löschen</button>
+      </div>
+      <p class="soft">{{ own.shared ? 'Diese Notiz liegt im Gruppenblock, alle in der Runde sehen sie.' : 'Diese Notiz siehst nur du.' }}</p>
+    } @else {
+      <div class="row">
+        <button type="button" class="btn btn--primary" [disabled]="!title().trim()" (click)="store(false)">Für mich speichern</button>
+        <button type="button" class="btn" [disabled]="!title().trim()" (click)="store(true)">In den Gruppenblock</button>
+      </div>
+    }
+  </div>
+} @else {
+  @if (note(); as shown) {
+    <article class="panel">
+      <span class="kicker">von {{ shown.author }}</span>
+      <h3 class="subtitle">{{ shown.title }}</h3>
+      @if (shown.text) {
+        <p class="prose">{{ shown.text }}</p>
+      }
+    </article>
+  }
+}
+
+@if (note(); as shown) {
+  @if (shown.shared) {
+    <div class="panel">
+      <h3 class="section-title">Kommentare</h3>
+      @for (entry of shown.comments; track entry.id) {
+        <div class="knowledge">
+          <span class="kicker">{{ entry.author }}</span>
+          <p class="prose">{{ entry.text }}</p>
+        </div>
+      } @empty {
+        <p class="soft">Noch kein Kommentar.</p>
+      }
+      <form class="list-row" (ngSubmit)="send(shown.id)">
+        <input class="input" name="reply" aria-label="Kommentar" placeholder="Kommentar schreiben" [ngModel]="reply()" (ngModelChange)="reply.set($event)" />
+        <button type="submit" class="btn btn--small btn--primary" [disabled]="!reply().trim()">Senden</button>
+      </form>
+    </div>
+  }
+}

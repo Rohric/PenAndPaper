@@ -18,6 +18,10 @@ export class SceneThread {
   readonly scenes = input.required<Scene[]>();
   /** Id of the opened scene. */
   readonly selected = input<number | null>(null);
+  /** Whether scenes can be added and moved; a session only reads the thread. */
+  readonly editable = input(true);
+  /** Ids of the scenes a session has played. */
+  readonly done = input<number[]>([]);
   readonly open = output<number>();
   readonly add = output<{ name: string; optional: boolean }>();
   /** Asks to move a scene of the thread up (-1) or down (1). */

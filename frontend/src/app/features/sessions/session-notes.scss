@@ -1,0 +1,16 @@
+// Own notes and the notepad of the group side by side; below each other on narrow screens.
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+// A note looks like a slip of paper: a coloured edge on top.
+.note {
+  border-top: 4px solid var(--accent);
+}
+
+.note--group {
+  border-top-color: var(--info);
+}

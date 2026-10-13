@@ -161,6 +161,10 @@ a.card:hover,
 
 // Controls
 .btn {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
   min-height: var(--touch);
   padding: 8px 16px;
   border: 1px solid var(--line-2);
@@ -188,12 +192,21 @@ a.card:hover,
   font-size: 14px;
 }
 
+// A button that is switched on, for example the view that is open.
+.btn[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .btn:disabled {
   opacity: 0.4;
   cursor: default;
 }
 
 .pill {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
   min-height: var(--touch);
   padding: 8px 16px;
   border: 1px solid var(--line-2);
@@ -338,12 +351,119 @@ textarea.input {
   font-family: var(--font-body);
 }
 
+// One piece of knowledge about an entry; what only the game master knows is set apart.
+.knowledge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.knowledge--gm {
+  border-style: dashed;
+  border-color: var(--line-2);
+  background: var(--surface-2);
+}
+
 .plain-list {
   display: flex;
   flex-direction: column;
   gap: 4px;
   margin: 0;
   padding-left: 20px;
+}
+
+// Tiles: small cards in a grid that fills the width, as many per row as fit.
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 12px;
+  align-items: start;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+
+// A chip inside a tile keeps its own width.
+.tile > .chip {
+  align-self: flex-start;
+}
+
+.tile--open {
+  border-color: var(--line-2);
+}
+
+// Something that is done but still shown, like a finished main quest.
+.tile--done {
+  border-style: dashed;
+}
+
+.tile--done .tile__title {
+  color: var(--soft);
+  text-decoration: line-through;
+}
+
+// Wider tiles for texts that are read in full.
+.tiles--wide {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+// The part of a tile that opens what the tile stands for.
+.tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+// A tile that is a button as a whole, like a note on the board.
+button.tile {
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.tile:hover {
+  border-color: var(--accent);
+}
+
+.tile__body:hover .tile__title {
+  color: var(--accent);
+}
+
+.tile__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+// A small heading with a symbol in front, above a group of tiles.
+.section-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
 // Tabs: the parts of a world and of a chapter.
@@ -357,6 +477,7 @@ textarea.input {
 .tabs__tab {
   flex: 0 0 auto;
   display: inline-flex;
+  gap: 6px;
   align-items: center;
   min-height: var(--touch);
   padding: 8px 16px;
@@ -364,6 +485,14 @@ textarea.input {
   color: var(--soft);
   font-weight: 600;
   text-decoration: none;
+}
+
+// A tab can also be a button, when it does not change the address.
+button.tabs__tab {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
 }
 
 .tabs__tab.is-active {

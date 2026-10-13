@@ -1,0 +1,107 @@
+<article class="panel">
+  <header class="row row--between">
+    <div>
+      <span class="kicker">{{ character().player ? 'Charakter von ' + character().player : 'Charakter' }}</span>
+      <h2 class="subtitle">{{ character().name }}</h2>
+      @if (character().profession) {
+        <p class="soft">{{ character().profession }}</p>
+      }
+    </div>
+    <ng-content />
+  </header>
+
+  <div class="row">
+    <span class="chip chip--accent">Lebenspunkte {{ character().life_points }} von {{ character().max_life_points }}</span>
+    @if (facts()) {
+      <span class="chip">{{ facts() }}</span>
+    }
+    <span class="chip" [class.chip--danger]="baseLeft() < 0">Grundpunkte übrig: {{ baseLeft() }}</span>
+    <span class="chip" [class.chip--danger]="bonusLeft() < 0">Bonuspunkte übrig: {{ bonusLeft() }}</span>
+  </div>
+
+  @if (character().description) {
+    <div class="field">
+      <span class="label">Beschreibung</span>
+      <p class="prose">{{ character().description }}</p>
+    </div>
+  }
+  @if (character().backstory) {
+    <div class="field">
+      <span class="label">Hintergrundgeschichte</span>
+      <p class="prose">{{ character().backstory }}</p>
+    </div>
+  }
+
+  <div class="talents">
+    @for (talent of talents(); track talent.label) {
+      <section class="talent">
+        @if (rollable()) {
+          <button type="button" class="talent__head talent__head--roll" (click)="roll.emit({ label: talent.label, value: talent.value })">
+            <span class="talent__name">{{ talent.label }}</span>
+            <span class="talent__value">{{ talent.value }}</span>
+          </button>
+        } @else {
+          <div class="talent__head">
+            <span class="talent__name">{{ talent.label }}</span>
+            <span class="talent__value">{{ talent.value }}</span>
+          </div>
+        }
+        <span class="soft">Geistesblitzpunkte: {{ talent.inspiration }}</span>
+        @for (skill of talent.skills; track skill.name) {
+          @if (rollable()) {
+            <button type="button" class="skill skill--roll" (click)="roll.emit({ label: skill.name, value: valueOf(skill) })">
+              <span>{{ skill.name }}</span>
+              <span class="skill__value">{{ valueOf(skill) }}</span>
+            </button>
+          } @else {
+            <div class="skill">
+              <span>{{ skill.name }}</span>
+              <span class="skill__value">{{ valueOf(skill) }}</span>
+            </div>
+          }
+          @if (skill.description) {
+            <span class="soft skill__note">{{ skill.description }}</span>
+          }
+        } @empty {
+          <span class="soft">Noch keine Fähigkeit.</span>
+        }
+      </section>
+    }
+  </div>
+
+  @if (character().inventory.length) {
+    <div class="field">
+      <span class="label">Inventar und Waffen</span>
+      <ul class="plain-list">
+        @for (item of character().inventory; track $index) {
+          <li>
+            {{ item.quantity }}× {{ item.name }}
+            @if (damage(item)) {
+              <span class="chip chip--info">{{ damage(item) }}</span>
+            }
+            @if (item.description) {
+              <span class="soft">{{ item.description }}</span>
+            }
+          </li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (character().special_abilities.length) {
+    <div class="field">
+      <span class="label">Besondere Fähigkeiten</span>
+      @for (ability of character().special_abilities; track $index) {
+        <div class="knowledge">
+          <span class="kicker">{{ ability.name }}</span>
+          @if (ability.roll_condition) {
+            <span class="soft">{{ ability.roll_condition }}</span>
+          }
+          @if (ability.description) {
+            <p class="prose">{{ ability.description }}</p>
+          }
+        </div>
+      }
+    </div>
+  }
+</article>

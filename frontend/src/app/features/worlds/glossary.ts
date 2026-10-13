@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 import { readError } from '../../core/api-error';
-import { EntryKind, EntryRef, QUEST_KINDS } from '../../core/models';
+import { EntryKind, EntryRef, questLabel } from '../../core/models';
 import { MasterDetail } from '../../shared/master-detail';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { EntryView } from './entry-view';
@@ -139,7 +139,7 @@ export class Glossary {
       case 'world-npcs':
         return this.store.npcs().map((n) => flat(n.npc, n.name, n.profession));
       case 'quests':
-        return this.store.quests().map((q) => flat(q.id, q.name, QUEST_KINDS.find((k) => k.id === q.kind)?.label));
+        return this.store.quests().map((q) => flat(q.id, q.name, questLabel(q)));
       case 'events':
         return this.store.events().map((e) => flat(e.id, e.name));
       case 'trivia':

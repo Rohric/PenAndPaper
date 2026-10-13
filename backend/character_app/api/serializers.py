@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 
-from character_app.models import START_SKILL_POINTS, BaseCharacter, Npc, PlayerCharacter
+from character_app.models import START_LIFE_POINTS, START_SKILL_POINTS, BaseCharacter, Npc, PlayerCharacter
 from character_app.utils import (
     MAX_DAMAGE_DICE,
     MAX_SKILL_POINTS,
@@ -10,16 +10,17 @@ from character_app.utils import (
     bonus_points_left,
     talent_summary,
 )
+from core.knowledge import clean_knowledge
 
 MAX_AMOUNT = 9999
 # What every character has, in the order the API returns it.
 CHARACTER_FIELDS = [
     "id", "name", "age", "gender", "profession", "description",
-    "life_points", "skill_points_total", "bonus_points_total",
+    "life_points", "max_life_points", "skill_points_total", "bonus_points_total",
     "skills", "inventory", "special_abilities", "talents", "points_left",
 ]
 # What only the game master changes on a player character.
-LEVEL_FIELDS = ["life_points", "skill_points_total", "bonus_points_total"]
+LEVEL_FIELDS = ["life_points", "max_life_points", "skill_points_total", "bonus_points_total"]
 # What only the player changes on a player character.
 PLAYER_FIELDS = [
     "name", "age", "gender", "profession", "description",
@@ -140,15 +141,30 @@ class CharacterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Die Grundpunkte der Fähigkeiten übersteigen das Budget.")
         if bonus_points_left(skills, self._current(data, "bonus_points_total", 0)) < 0:
             raise serializers.ValidationError("Die Bonuspunkte der Fähigkeiten übersteigen das Budget.")
+        return self._within_maximum(data)
+
+    def _within_maximum(self, data):
+        """Keep the life points at or below the maximum whenever one of the two changes."""
+        if "life_points" in data or "max_life_points" in data:
+            maximum = self._current(data, "max_life_points", START_LIFE_POINTS)
+            data["life_points"] = min(self._current(data, "life_points", maximum), maximum)
         return data
 
 
 class NpcSerializer(CharacterSerializer):
-    """Serialize an NPC with the phrases it might say."""
+    """Serialize an NPC with the phrases it might say and the knowledge about it."""
 
     class Meta:
         model = Npc
-        fields = CHARACTER_FIELDS + ["phrases"]
+        fields = CHARACTER_FIELDS + ["phrases", "player_knowledge", "gm_knowledge"]
+
+    def validate_player_knowledge(self, pieces):
+        """Check the knowledge pieces players can learn."""
+        return clean_knowledge(pieces)
+
+    def validate_gm_knowledge(self, pieces):
+        """Check the knowledge pieces only the game master reads."""
+        return clean_knowledge(pieces)
 
     def validate_phrases(self, phrases):
         """Check every phrase and drop the ones without text."""

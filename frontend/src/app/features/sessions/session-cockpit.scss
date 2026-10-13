@@ -1,0 +1,67 @@
+// Desktop only. The page between two bars that stay in view: tools on top, pins and the last roll below.
+.cockpit {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: calc(100vh - 96px);
+}
+
+.bar {
+  position: sticky;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.bar--top {
+  top: 8px;
+}
+
+// Pushed to the bottom of the page when the story is short.
+.bar--bottom {
+  bottom: 8px;
+  margin-top: auto;
+}
+
+.bar__title {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+// The thread of the story beside the scene. Breakpoints: laptop (default), large screen.
+.story {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.story__thread {
+  position: sticky;
+  top: 96px;
+  max-height: calc(100vh - 200px);
+  padding-right: 4px;
+  overflow-y: auto;
+}
+
+.story__main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+@media (min-width: 1600px) {
+  .story {
+    grid-template-columns: 320px minmax(0, 1fr);
+    gap: 28px;
+  }
+}

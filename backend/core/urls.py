@@ -8,4 +8,6 @@ urlpatterns = [
     path("api/auth/", include("auth_app.api.urls")),
     path("api/", include("character_app.api.urls")),
     path("api/", include("world.world_app.api.urls")),
+    path("api/", include("session_app.api.urls")),
+    path("api/", include("battle_app.api.urls")),
 ]

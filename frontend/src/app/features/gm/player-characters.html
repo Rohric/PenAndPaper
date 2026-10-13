@@ -1,0 +1,63 @@
+<section class="stack">
+  <header class="row row--between">
+    <div>
+      <span class="kicker">Spielleiter</span>
+      <h1 class="title">Figuren der Spieler</h1>
+    </div>
+    <app-tutorial-button topic="gm-characters" />
+  </header>
+
+  @if (error()) {
+    <p class="notice notice--error" role="alert">{{ error() }}</p>
+  }
+
+  <app-master-detail [list]="listTpl" [detail]="detailTpl" [open]="!!selected()" (back)="selectedId.set(null)" />
+</section>
+
+<ng-template #listTpl>
+  @for (character of characters(); track character.id) {
+    <button type="button" class="card" [class.is-active]="character.id === selectedId()" (click)="selectedId.set(character.id)">
+      <span class="card__title">{{ character.name }}</span>
+      <span class="soft">Spieler: {{ character.player }}</span>
+    </button>
+  } @empty {
+    <div class="empty">
+      <p>Noch kein Spieler hat einen Charakter angelegt.</p>
+    </div>
+  }
+</ng-template>
+
+<ng-template #detailTpl>
+  @if (selected(); as shown) {
+    <div class="panel">
+      <h2 class="subtitle">Leveln</h2>
+      <p class="soft">Nur du änderst diese Werte. Die Punkte verteilt der Spieler selbst.</p>
+      <div class="grid-fields">
+        <div class="field">
+          <label for="level-base">Budget Grundpunkte</label>
+          <input id="level-base" class="input" type="number" min="0" [ngModel]="level().skill_points_total" (ngModelChange)="set('skill_points_total', $event)" />
+        </div>
+        <div class="field">
+          <label for="level-bonus">Budget Bonuspunkte</label>
+          <input id="level-bonus" class="input" type="number" min="0" [ngModel]="level().bonus_points_total" (ngModelChange)="set('bonus_points_total', $event)" />
+        </div>
+        <div class="field">
+          <label for="level-life">Lebenspunkte</label>
+          <input id="level-life" class="input" type="number" min="0" [ngModel]="level().life_points" (ngModelChange)="set('life_points', $event)" />
+        </div>
+        <div class="field">
+          <label for="level-life-max">Lebenspunkte maximal</label>
+          <input id="level-life-max" class="input" type="number" min="0" [ngModel]="level().max_life_points" (ngModelChange)="set('max_life_points', $event)" />
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" class="btn btn--primary" [disabled]="!dirty() || busy()" (click)="save()">Speichern</button>
+      </div>
+    </div>
+    <app-character-sheet [character]="shown" />
+  } @else {
+    <div class="empty">
+      <p>Wähle links einen Charakter.</p>
+    </div>
+  }
+</ng-template>

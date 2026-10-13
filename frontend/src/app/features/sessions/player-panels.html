@@ -1,0 +1,66 @@
+@if (shows().group) {
+  <div class="panel">
+    <h3 class="subtitle">Gruppe</h3>
+    @for (member of view().group; track member.id) {
+      <div class="row row--between">
+        <span><strong>{{ member.name }}</strong> <span class="soft">({{ member.player }})</span></span>
+        <span class="chip chip--accent">Lebenspunkte {{ member.life_points }} von {{ member.max_life_points }}</span>
+      </div>
+    } @empty {
+      <p class="soft">Noch niemand in der Gruppe.</p>
+    }
+  </div>
+}
+
+@if (shows().quests) {
+  <div class="panel">
+    <h3 class="subtitle">Quests</h3>
+    @for (quest of quests(); track quest.id) {
+      <article class="knowledge">
+        <span class="kicker">{{ quest.main ? 'Hauptquest' + (quest.number ? ' ' + quest.number : '') : 'Nebenquest' }}{{ quest.done ? ' · erledigt' : '' }}</span>
+        <strong>{{ quest.name }}</strong>
+        @if (quest.giver) {
+          <span class="soft">Auftraggeber: {{ quest.giver }}</span>
+        }
+        @if (quest.description) {
+          <p class="prose">{{ quest.description }}</p>
+        }
+        @if (quest.goal) {
+          <p class="prose"><span class="soft">Ziel:</span> {{ quest.goal }}</p>
+        }
+        @if (quest.checklist.length) {
+          <ul class="plain-list">
+            @for (step of quest.checklist; track $index) {
+              <li>{{ step.done ? '☑' : '☐' }} {{ step.text }}</li>
+            }
+          </ul>
+        }
+        @for (piece of quest.knowledge; track $index) {
+          <p class="prose">{{ piece.title ? piece.title + ': ' : '' }}{{ piece.text }}</p>
+        }
+      </article>
+    } @empty {
+      <p class="soft">Noch keine Quest geteilt.</p>
+    }
+  </div>
+}
+
+@if (shows().glossary) {
+  <div class="panel">
+    <h3 class="subtitle">Glossar</h3>
+    @for (entry of view().glossary; track entry.kind + entry.id) {
+      <article class="knowledge">
+        <span class="kicker">{{ entry.category || labels[entry.kind] }}</span>
+        <strong>{{ entry.name }}</strong>
+        @if (entry.description) {
+          <p class="prose">{{ entry.description }}</p>
+        }
+        @for (piece of entry.knowledge; track $index) {
+          <p class="prose">{{ piece.title ? piece.title + ': ' : '' }}{{ piece.text }}</p>
+        }
+      </article>
+    } @empty {
+      <p class="soft">Noch nichts im Glossar.</p>
+    }
+  </div>
+}

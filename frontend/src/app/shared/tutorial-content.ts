@@ -50,6 +50,11 @@ export const TUTORIALS: Tutorial[] = [
         text: 'Jeder Eintrag öffnet sich zum Lesen. Mit „Bearbeiten“ kommst du ins Formular, „Speichern“ bringt dich zurück.\n\nKlickst du auf einen verknüpften Namen, öffnet sich der Eintrag rechts in einer Seitenleiste. So verlierst du deinen Platz nicht.',
       },
       {
+        title: 'Spielen',
+        text: 'Als Spieler baust du unter „Meine Charaktere“ deine Figuren und spielst unter „Meine Runden“ mit. Als Spielleiter startest du unter „Runden“ eine Runde mit einer Welt und den Charakteren der Spieler.',
+        more: 'sessions',
+      },
+      {
         title: 'Hilfe auf jeder Seite',
         text: 'Auf jeder Seite gibt es einen Knopf „? Hilfe“. Er öffnet das Tutorial für genau den Bereich, in dem du gerade bist.\n\nDieses Tutorial findest du jederzeit im Hauptmenü unter „Hilfe“.',
       },
@@ -155,7 +160,11 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Werte und Waffen',
-        text: 'Jede Figur hat Fähigkeiten mit Grund- und Bonuspunkten, die Werte rechnet die App nach den Regeln aus. Im Inventar wird ein Gegenstand zur Waffe, sobald er Schadenswürfel hat.',
+        text: 'Jede Figur hat Fähigkeiten mit Grund- und Bonuspunkten, die Werte rechnet die App nach den Regeln aus. Im Inventar wird ein Gegenstand zur Waffe, sobald er Schadenswürfel hat.\n\nBesondere Fähigkeiten sind alles, was über die normalen Fähigkeiten hinausgeht: ein Name, eine Beschreibung und die Bedingung, wann darauf gewürfelt wird.',
+      },
+      {
+        title: 'Was Spieler sehen',
+        text: 'Jeder Eintrag der Welt hat drei Arten Text. Die Beschreibung sehen die Spieler, sobald du den Eintrag in einer Runde freigibst. „Wissen für Spieler“ gibst du in der Runde Stück für Stück frei. „Wissen nur für dich“ sehen sie nie.\n\nDas gilt genauso für Orte, Quests, Ereignisse und Wissen.',
       },
       {
         title: 'Beispielsätze',
@@ -164,6 +173,122 @@ export const TUTORIALS: Tutorial[] = [
       {
         title: 'Wo eine Figur vorkommt',
         text: 'An der Figur siehst du ihre Quests, die Szenen, in denen sie auftritt, und das Wissen, das zu ihr gehört.',
+      },
+    ],
+  },
+  {
+    id: 'my-characters',
+    title: 'Meine Charaktere',
+    steps: [
+      {
+        title: 'Charakter anlegen',
+        text: 'Unter „Meine Charaktere“ baust du die Figuren, die du spielst. Gib einen Namen ein und leg den Charakter an, danach füllst du ihn im Formular.',
+      },
+      {
+        title: 'Punkte verteilen',
+        text: 'Du hast 400 Grundpunkte für deine Fähigkeiten, höchstens 100 pro Fähigkeit. Jede Fähigkeit gehört zu Handeln, Wissen oder Soziales. Die Werte rechnet die App aus: Der Begabungswert ist ein Zehntel aller Punkte der Begabung und zählt bei jeder ihrer Fähigkeiten dazu.',
+      },
+      {
+        title: 'Was nur der Spielleiter ändert',
+        text: 'Die Budgets für Grund- und Bonuspunkte und deine Lebenspunkte setzt der Spielleiter. Bonuspunkte bekommst du beim Leveln, meist am Ende eines Kapitels, und verteilst sie dann selbst.',
+      },
+      {
+        title: 'Der Bogen',
+        text: 'Ein Charakter öffnet sich als Bogen zum Lesen: Begabungen, Fähigkeiten mit ihrem Wert, Inventar, Waffen und besondere Fähigkeiten. Mit „Bearbeiten“ kommst du ins Formular.',
+      },
+    ],
+  },
+  {
+    id: 'gm-characters',
+    title: 'Figuren der Spieler',
+    steps: [
+      {
+        title: 'Alle Charaktere',
+        text: 'Hier siehst du die Charaktere aller Spieler mit dem Namen des Kontos. Die Figuren deiner Welt (NSC) stehen nicht hier, sondern im Glossar der Welt.',
+      },
+      {
+        title: 'Lesen und leveln',
+        text: 'Du liest den ganzen Bogen, schreibst aber nicht im Charakter der Spieler. Unter „Leveln“ änderst du, was nur dir gehört: das Budget der Grundpunkte, das Budget der Bonuspunkte und die Lebenspunkte.',
+      },
+    ],
+  },
+  {
+    id: 'sessions',
+    title: 'Runden',
+    steps: [
+      {
+        title: 'Was eine Runde ist',
+        text: 'Eine Runde ist eine Gruppe, die eine deiner Welten spielt, über mehrere Abende. Du gibst ihr einen Namen und ein Datum, wählst die Welt und die Charaktere der Spieler.\n\nDie Welt selbst bleibt beim Spielen unverändert. Was die Runde erlebt, wird bei der Runde gespeichert. So können mehrere Gruppen dieselbe Welt spielen.',
+      },
+      {
+        title: 'Das Cockpit',
+        text: 'Oben liegt die Leiste mit den Werkzeugen: Kapitel wählen, Spieleransicht, Kampf, Notizen, Archiv und Kapitel abschließen.\n\nDarunter steht die Gruppe als Reihe von Kacheln, dann links der rote Faden und rechts die gewählte Szene mit ihren Ereignissen, darunter die Hauptquests, die offenen Nebenquests und die übrigen Ereignisse. Unten bleiben die Stecknadeln und der letzte Wurf stehen.',
+      },
+      {
+        title: 'Das Seitenfenster',
+        text: 'Fast alles öffnet sich rechts in einem Fenster, ohne dass du die Seite verlässt: ein Eintrag der Welt, der Bogen eines Charakters, die geheimen Nachrichten, ein Gegenstand zum Übergeben, eine Notiz, das Archiv und die Liste der Würfe.\n\nEs ist immer nur ein Fenster offen. Mit „Schließen“ oder der Esc-Taste ist es wieder weg.',
+      },
+      {
+        title: 'Abhaken und Stecknadeln',
+        text: 'Szenen markierst du als gespielt, sie bleiben im Faden stehen. Erledigte Nebenquests und Ereignisse verschwinden aus dem Cockpit und stehen im Archiv. Von dort holst du sie mit „Zurückholen“ wieder.\n\nHauptquests bleiben immer stehen, in der Reihenfolge ihrer Nummer, auch wenn sie erledigt sind oder zu einem anderen Kapitel gehören.\n\nMit der Stecknadel heftest du an, was du schnell wiederfinden willst. Die Stecknadeln stehen in der Leiste unten.',
+      },
+      {
+        title: 'Was die Spieler sehen',
+        text: 'Öffne einen Eintrag und gib ihn für die Spieler frei. Dann sehen sie seinen Namen und seine Beschreibung in ihrem Glossar. Jedes Stück „Wissen für Spieler“ hakst du einzeln an, sobald sie es herausfinden.\n\nEine Quest teilst du genauso. Die Spieler sehen dann Beschreibung, Ziel, Checkliste und Auftraggeber. „Wissen nur für dich“ sehen sie nie.',
+      },
+      {
+        title: 'Spieleransicht',
+        text: 'Mit „Spieleransicht“ schaust du dir an, was die Spieler gerade sehen: ihre Quests, ihr Glossar und die Gruppe. So prüfst du, ob du nichts zu viel freigegeben hast.',
+      },
+      {
+        title: 'Die Gruppe',
+        text: 'Jeder Charakter ist eine Kachel zum Auf- und Zuklappen. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters. Aufgeklappt änderst du die Lebenspunkte, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Wissens-Einträge der Kategorie „Gegenstand“.',
+      },
+      {
+        title: 'Notizen und Würfe',
+        text: 'Der Knopf „Notizen“ zeigt eine Tafel: links deine eigenen Notizen, rechts der Gruppenblock der Spieler. Ein Klick öffnet eine Notiz im Seitenfenster, dort schreibst und kommentierst du. Der Knopf zeigt an, wenn im Gruppenblock etwas Neues steht.\n\nWürfelt ein Spieler in der App, erscheint der Wurf unten in der Leiste. „Alle Würfe“ zeigt die letzten 30, nach einem Neustart des Servers ist die Liste leer.',
+      },
+      {
+        title: 'Kampf',
+        text: 'Nur du startest einen Kampf. „Kampf“ oben in der Leiste nimmt alle Charaktere der Runde. „Kampf in dieser Szene“ an der Szene nimmt zusätzlich alle Figuren der Szene mit. Läuft schon ein Kampf, kommen sie dazu.\n\nErst würfelst du die Initiative (1W10 plus Handeln), dann ist jeder der Reihe nach dran. Spieler würfeln ihren Angriff auf ihrer eigenen Seite, du kannst es auch für sie tun. Ihre Lebenspunkte sehen sie, die der Gegner nicht.',
+      },
+      {
+        title: 'Wurf, Parade, Zug abschließen',
+        text: 'Ein gewürfelter Angriff bleibt zuerst offen. Trifft er normal, entscheidet das Ziel, ob es pariert: ein Spieler auf seiner Seite, für alle anderen du. Kritische Treffer lassen sich nicht parieren.\n\nDanach entscheidest du: „Zug abschließen“ zieht den Schaden ab, überträgt ihn sofort auf den Charakter, schreibt alles in den Verlauf und gibt an den Nächsten weiter. „Wurf verwerfen“ lässt alles, wie es war, zum Beispiel wenn neu gewürfelt wird.\n\nLebenspunkte kannst du jederzeit von Hand setzen. Die letzte Auswahl jedes Teilnehmers (Ziel, Fähigkeit, Waffe) merkt sich der Browser.',
+      },
+      {
+        title: 'Kapitel abschließen',
+        text: 'Am Ende eines Kapitels gibst du den Charakteren Bonuspunkte. Im Seitenfenster steht jeder Charakter mit den üblichen 10 Punkten, du kannst jedem eine eigene Zahl geben.\n\nDie Spieler verteilen die Punkte selbst auf ihre Fähigkeiten, und die Runde rückt ins nächste Kapitel.',
+      },
+    ],
+  },
+  {
+    id: 'my-sessions',
+    title: 'Meine Runden',
+    steps: [
+      {
+        title: 'In einer Runde spielen',
+        text: 'Der Spielleiter nimmt einen deiner Charaktere in eine Runde auf. Sie erscheint dann unter „Meine Runden“. Ein Charakter spielt immer nur in einer Runde.',
+      },
+      {
+        title: 'Charakter und Würfeln',
+        text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf.',
+      },
+      {
+        title: 'Quests und Glossar',
+        text: 'Hier steht nur, was der Spielleiter mit euch geteilt hat. Das Glossar wächst, während ihr spielt: Orte, Figuren und Wissen kommen dazu, sobald ihr sie entdeckt.',
+      },
+      {
+        title: 'Notizen',
+        text: 'Die Notizen sind eine Tafel mit Karten: deine eigenen und der Gruppenblock. Ein Klick öffnet eine Notiz zum Schreiben und Kommentieren.\n\nEigene Notizen siehst nur du. Legst du eine in den Gruppenblock, sehen sie alle in der Runde und können Kommentare dazuschreiben. Du kannst sie jederzeit zurückholen.',
+      },
+      {
+        title: 'Nachrichten',
+        text: 'Der Spielleiter kann dir geheime Nachrichten schicken, die sonst niemand sieht. Du kannst ihm antworten.',
+      },
+      {
+        title: 'Kampf',
+        text: 'Startet der Spielleiter einen Kampf, zeigt der Reiter „Kampf“ die Reihenfolge, wer dran ist und was passiert ist. Von deiner Gruppe siehst du die Lebenspunkte, von Gegnern nicht.\n\nBist du dran, wählst du Ziel, Fähigkeit und Waffe und würfelst den Angriff. Wirst du getroffen, entscheidest du, ob du parierst. Das geht einmal pro Runde. Deine letzte Auswahl bleibt gemerkt.\n\nEin Wurf zählt erst, wenn der Spielleiter den Zug abschließt.',
       },
     ],
   },

@@ -13,14 +13,18 @@ export interface NavItem {
 }
 
 const MODES: { id: Mode; label: string; home: string }[] = [
-  { id: 'player', label: 'Spieler', home: '/player' },
+  { id: 'player', label: 'Spieler', home: '/player/characters' },
   { id: 'gm', label: 'Spielleiter', home: '/gm' },
 ];
 
 const NAV: Record<Mode, NavItem[]> = {
-  player: [{ label: 'Meine Charaktere', path: '/player' }],
+  player: [
+    { label: 'Meine Charaktere', path: '/player/characters' },
+    { label: 'Meine Runden', path: '/player/sessions' },
+  ],
   gm: [
     { label: 'Welten', path: '/gm/worlds' },
+    { label: 'Runden', path: '/gm/sessions' },
     { label: 'Figuren', path: '/gm/characters' },
   ],
 };

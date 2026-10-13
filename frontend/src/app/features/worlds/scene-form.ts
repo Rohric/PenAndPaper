@@ -24,7 +24,7 @@ export class SceneForm extends EntryEditor<Scene> {
     this.store
       .scenesOf(this.entry().chapter)
       .filter((scene) => scene.id !== this.entry().id)
-      .map((scene) => ({ id: scene.id, label: scene.name })),
+      .map((scene) => ({ id: scene.id, label: scene.name, hint: scene.optional ? 'optionale Szene' : 'am roten Faden' })),
   );
 
   /** Create a new entry in the glossary from the typed name and link it to the scene. */

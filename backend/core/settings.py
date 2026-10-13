@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     "auth_app",
     "character_app",
     "world.world_app",
+    "session_app",
+    "battle_app",
 ]
 
 MIDDLEWARE = [

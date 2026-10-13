@@ -1,16 +1,16 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
-import { Npc, WorldNpc } from '../../core/models';
+import { AnyCharacter, Npc, WorldNpc } from '../../core/models';
 import { IdSelect } from '../../shared/id-select';
-import { NpcEditor } from '../npcs/npc-editor';
-import { NpcService } from '../npcs/npc.service';
+import { CharacterEditor } from '../characters/character-editor';
+import { CharacterService } from '../characters/character.service';
 import { WorldStore } from './world-store';
 
 /** Edit an NPC of the world: where it can be met, and the character itself. */
 @Component({
   selector: 'app-world-npc-editor',
-  imports: [NpcEditor, IdSelect],
+  imports: [CharacterEditor, IdSelect],
   template: `
     <div class="stack">
       <div class="panel">
@@ -31,14 +31,14 @@ import { WorldStore } from './world-store';
       </div>
 
       @if (npc(); as loaded) {
-        <app-npc-editor [npc]="loaded" (saved)="onSaved($event)" (deleted)="onDeleted()" />
+        <app-character-editor kind="npc" [character]="loaded" (saved)="onSaved($event)" (deleted)="onDeleted()" />
       }
     </div>
   `,
 })
 export class WorldNpcEditor {
   protected readonly store = inject(WorldStore);
-  private readonly npcService = inject(NpcService);
+  private readonly characters = inject(CharacterService);
 
   readonly link = input.required<WorldNpc>();
   /** Fired after the character was saved. */
@@ -54,7 +54,7 @@ export class WorldNpcEditor {
     // Load the character whenever another NPC is opened.
     effect(() => {
       this.npc.set(null);
-      this.npcService.get(this.npcId()).subscribe({ next: (npc) => this.npc.set(npc), error: (e: unknown) => this.error.set(readError(e)) });
+      this.characters.get<Npc>('npcs', this.npcId()).subscribe({ next: (npc) => this.npc.set(npc), error: (e: unknown) => this.error.set(readError(e)) });
     });
   }
 
@@ -64,7 +64,8 @@ export class WorldNpcEditor {
   }
 
   /** Keep the list of the world in step with the saved character. */
-  protected onSaved(npc: Npc): void {
+  protected onSaved(saved: AnyCharacter): void {
+    const npc = saved as Npc;
     this.npc.set(npc);
     this.store.patchLocal('world-npcs', this.link().id, { name: npc.name, profession: npc.profession });
     this.saved.emit();
