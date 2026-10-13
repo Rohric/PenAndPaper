@@ -245,6 +245,14 @@ export const TUTORIALS: Tutorial[] = [
         text: 'Eine Runde ist eine Gruppe, die eine deiner Welten spielt, über mehrere Abende. Du gibst ihr einen Namen und ein Datum, wählst die Welt und die Charaktere der Spieler.\n\nDie Welt selbst bleibt beim Spielen unverändert. Was die Runde erlebt, wird bei der Runde gespeichert. So können mehrere Gruppen dieselbe Welt spielen.',
       },
       {
+        title: 'Ein Charakter, ein Abenteuer',
+        text: 'Ein Charakter spielt immer nur in einem laufenden Abenteuer. Beendest du die Runde, ist er wieder frei und kann in ein neues Abenteuer. Fähigkeiten, Inventar und Punkte behält er so, wie die Runde sie hinterlassen hat. Notizen, Chat und Würfe bleiben als Archiv bei der beendeten Runde.\n\nIm Cockpit nimmst du mit „Gruppe bearbeiten“ freie Charaktere auch in eine laufende Runde auf oder nimmst Mitglieder heraus. Herausgenommene Charaktere sind wieder frei. Unter „Figuren der Spieler“ siehst du, wer frei ist und wer in welchem Abenteuer spielt.',
+      },
+      {
+        title: 'Spieler mit dem Handy',
+        text: '„QR-Code für Spieler“ oben in der Rundenübersicht zeigt einen Code, der ein Handy direkt zur Anmeldung bringt. Derselbe Code steht auf der Anmeldeseite, wenn sie an einem großen Bildschirm offen ist.\n\nDamit das klappt, starte das Frontend mit „npm run start:lan“ statt „npm start“. Die Handys müssen im selben WLAN sein wie dein Rechner. Der Code wird bei jedem Start neu erzeugt, mit der Adresse, die dein Rechner gerade hat.',
+      },
+      {
         title: 'Das Cockpit',
         text: 'Oben liegt die Leiste mit den Werkzeugen: Kapitel wählen, Spieleransicht, Glossar, Würfeln, Kampf, Notizen, Archiv, Kapitel abschließen und die Suche über die ganze Welt.\n\nDarunter steht die Gruppe als Reihe von Kacheln, dann links der rote Faden und rechts die gewählte Szene mit ihren Ereignissen und Dialogen, darunter die Hauptquests. „Nebenquests“ und „Freie Ereignisse“ stehen immer darunter, sind aber zugeklappt: Ein Klick auf die Überschrift öffnet sie. Unten bleiben die Stecknadeln und der letzte Wurf stehen.',
       },

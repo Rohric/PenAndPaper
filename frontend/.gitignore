@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 
+# The QR code to the login page; it is drawn anew with every "npm run start:lan".
+/public/login-qr.svg
+
 # Node
 /node_modules
 npm-debug.log

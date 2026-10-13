@@ -40,9 +40,9 @@ def session_for_member(user, session_id):
 
 
 def characters_in_other_sessions(characters, session=None):
-    """Return the given characters that already play in another running session."""
-    running = Session.objects.filter(finished=False).exclude(pk=getattr(session, "pk", None))
-    return [character for character in characters if running.filter(characters=character).exists()]
+    """Return the given characters that already play in another running session; a finished one frees them."""
+    others = Session.objects.filter(finished=False).exclude(pk=getattr(session, "pk", None))
+    return [character for character in characters if others.filter(characters=character).exists()]
 
 
 @transaction.atomic

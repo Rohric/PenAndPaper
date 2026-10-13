@@ -28,6 +28,7 @@ import { RollPanel } from './roll-panel';
 import { SessionArchive } from './session-archive';
 import { SessionEntryActions } from './session-entry-actions';
 import { SessionGroup } from './session-group';
+import { SessionMembers } from './session-members';
 import { SessionNotes } from './session-notes';
 import { SessionRolls } from './session-rolls';
 import { SessionStore } from './session-store';
@@ -45,7 +46,8 @@ type Panel =
   | { kind: 'archive' }
   | { kind: 'rolls' }
   | { kind: 'roll' }
-  | { kind: 'level' };
+  | { kind: 'level' }
+  | { kind: 'members' };
 
 /** What fills the page between the two bars. */
 type View = 'story' | 'quests' | 'notes' | 'players' | 'glossary';
@@ -59,6 +61,7 @@ const PANEL_TITLES: Record<Panel['kind'], string> = {
   rolls: 'Letzte Würfe',
   roll: 'Würfeln',
   level: 'Kapitel abschließen',
+  members: 'Gruppe bearbeiten',
 };
 
 /** How the kinds of a session are called among the entries of a world. */
@@ -83,7 +86,7 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
   imports: [
     RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
     ChapterCloseForm, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
-    SessionGroup, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch,
+    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch,
   ],
   providers: [WorldStore, SessionStore],
   templateUrl: './session-cockpit.html',

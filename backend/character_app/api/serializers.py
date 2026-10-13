@@ -20,6 +20,7 @@ CHARACTER_FIELDS = [
     "skills", "inventory", "special_abilities", "talents", "points_left",
     "symbol", "image", "shows_image", "created_at", "updated_at",
 ]
+ADVENTURE_FIELDS = ["backstory", "player", "adventure"]
 # What only the game master changes on a player character.
 LEVEL_FIELDS = ["life_points", "max_life_points", "skill_points_total", "bonus_points_total"]
 # What only the player changes on a player character.
@@ -195,11 +196,17 @@ class PlayerCharacterSerializer(CharacterSerializer):
     """Serialize a player character for its player; budgets and life points belong to the game master."""
 
     player = serializers.CharField(source="owner.username", read_only=True)
+    adventure = serializers.SerializerMethodField()
 
     class Meta:
         model = PlayerCharacter
-        fields = CHARACTER_FIELDS + ["backstory", "player"]
+        fields = CHARACTER_FIELDS + ADVENTURE_FIELDS
         read_only_fields = LEVEL_FIELDS
+
+    def get_adventure(self, character):
+        """Return the running adventure the character plays in, or None while it is free."""
+        session = next((session for session in character.sessions.all() if not session.finished), None)
+        return {"id": session.pk, "name": session.name, "finished": session.finished} if session else None
 
 
 class PlayerCharacterLevelSerializer(PlayerCharacterSerializer):

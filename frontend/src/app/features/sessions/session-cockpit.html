@@ -78,7 +78,12 @@
       }
       @default {
         <section class="stack">
-          <h2 class="section-title kind--npcs"><app-icon name="group" /> Gruppe</h2>
+          <div class="row row--between">
+            <h2 class="section-title kind--npcs"><app-icon name="group" /> Gruppe</h2>
+            <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'members' })">
+              <app-icon name="edit" [size]="16" /> Gruppe bearbeiten
+            </button>
+          </div>
           <app-session-group (open)="openPanel($event)" />
         </section>
 
@@ -172,6 +177,9 @@
           [rolls]="store.rolls()"
           (roll)="store.roll($event)"
         />
+      }
+      @case ('members') {
+        <app-session-members />
       }
       @case ('level') {
         <app-chapter-close-form [characters]="store.characters()" (close)="closeChapter($event)" />

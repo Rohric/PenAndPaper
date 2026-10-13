@@ -4,13 +4,17 @@ import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { AuthService } from '../../core/auth.service';
+import { LoginQr } from '../../shared/login-qr';
 
 type AuthMode = 'login' | 'register';
 
-/** Login and registration share this page; the route decides which one it is. */
+/**
+ * Login and registration share this page; the route decides which one it is.
+ * On a large screen it also shows the QR code that brings a phone to this page.
+ */
 @Component({
   selector: 'app-auth-page',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, LoginQr],
   templateUrl: './auth-page.html',
   styleUrl: './auth-page.scss',
 })

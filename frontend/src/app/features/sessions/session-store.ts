@@ -32,6 +32,8 @@ export class SessionStore {
   readonly entries = signal<SessionEntry[]>([]);
   /** The characters of the group with their whole sheet. */
   readonly characters = signal<PlayerCharacter[]>([]);
+  /** Every character of every player, for the game master to pick from. */
+  readonly everyone = signal<PlayerCharacter[]>([]);
   readonly notes = signal<Note[]>([]);
   readonly rolls = signal<Roll[]>([]);
   /** The roll the game master made last. */
@@ -186,6 +188,7 @@ export class SessionStore {
     this.notes.set(data.notes);
     this.rolls.set(data.rolls);
     this.messages.set(data.messages);
+    this.everyone.set(data.characters);
     this.characters.set(data.characters.filter((character) => session.characters.includes(character.id)));
     this.error.set('');
   }

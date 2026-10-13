@@ -67,11 +67,12 @@ class SessionSerializer(serializers.ModelSerializer):
         return world
 
     def validate_characters(self, characters):
-        """Reject characters that already play in another running session."""
-        taken = characters_in_other_sessions(characters, self.instance)
+        """Reject new characters that already play in another adventure; those already in the group stay."""
+        members = self.instance.characters.all() if self.instance else []
+        taken = characters_in_other_sessions([c for c in characters if c not in members], self.instance)
         if taken:
             names = ", ".join(character.name for character in taken)
-            raise serializers.ValidationError(f"Schon in einer anderen laufenden Runde: {names}.")
+            raise serializers.ValidationError(f"Spielt schon in einem anderen laufenden Abenteuer: {names}.")
         return characters
 
     def validate(self, data):

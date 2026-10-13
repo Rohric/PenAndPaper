@@ -25,6 +25,9 @@
           <span class="soft">{{ character.profession }}</span>
         }
         <span class="soft">Lebenspunkte {{ character.life_points }}</span>
+        <span class="chip" [class.chip--accent]="!!character.adventure">
+          {{ character.adventure ? 'spielt in: ' + character.adventure.name : 'frei' }}
+        </span>
       </a>
     }
   </div>

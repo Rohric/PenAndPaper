@@ -15,16 +15,52 @@
 </section>
 
 <ng-template #listTpl>
-  @for (character of characters(); track character.id) {
-    <button type="button" class="card" [class.is-active]="character.id === selectedId()" (click)="selectedId.set(character.id)">
-      <span class="card__title">{{ character.name }}</span>
-      <span class="soft">Spieler: {{ character.player }}</span>
-    </button>
-  } @empty {
-    <div class="empty">
-      <p>Noch kein Spieler hat einen Charakter angelegt.</p>
+  <div class="stack">
+    <input class="input" aria-label="Charaktere suchen" placeholder="Name oder Spieler suchen" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+    <div class="row" role="group" aria-label="Filter">
+      <button type="button" class="pill" [attr.aria-pressed]="filter() === 'all'" (click)="filter.set('all')">Alle</button>
+      <button type="button" class="pill" [attr.aria-pressed]="filter() === 'free'" (click)="filter.set('free')">Frei</button>
+      @for (adventure of adventures(); track adventure.id) {
+        <button type="button" class="pill" [attr.aria-pressed]="filter() === '' + adventure.id" (click)="filter.set('' + adventure.id)">
+          {{ adventure.name }}
+        </button>
+      }
     </div>
-  }
+    <div class="row" role="group" aria-label="Sortierung">
+      @for (sort of sorts; track sort.id) {
+        <button type="button" class="pill" [attr.aria-pressed]="sortBy() === sort.id" (click)="sortBy.set(sort.id)">{{ sort.label }}</button>
+      }
+    </div>
+
+    <h3 class="section-title">Frei · {{ free().length }}</h3>
+    @for (character of free(); track character.id) {
+      <button type="button" class="card" [class.is-active]="character.id === selectedId()" (click)="selectedId.set(character.id)">
+        <span class="card__title">{{ character.name }}</span>
+        <span class="soft">Spieler: {{ character.player }}</span>
+      </button>
+    } @empty {
+      <p class="soft">Kein freier Charakter.</p>
+    }
+
+    <h3 class="section-title">Im Abenteuer · {{ playing().length }}</h3>
+    @for (character of playing(); track character.id) {
+      <button type="button" class="card" [class.is-active]="character.id === selectedId()" (click)="selectedId.set(character.id)">
+        <span class="card__title">{{ character.name }}</span>
+        <span class="soft">Spieler: {{ character.player }}</span>
+        <a class="chip chip--accent" [routerLink]="['/gm/sessions', character.adventure?.id]" (click)="$event.stopPropagation()">
+          {{ character.adventure?.name }}
+        </a>
+      </button>
+    } @empty {
+      <p class="soft">Kein Charakter im Abenteuer.</p>
+    }
+
+    @if (!characters().length) {
+      <div class="empty">
+        <p>Noch kein Spieler hat einen Charakter angelegt.</p>
+      </div>
+    }
+  </div>
 </ng-template>
 
 <ng-template #detailTpl>

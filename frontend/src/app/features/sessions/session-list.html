@@ -4,7 +4,12 @@
       <span class="kicker">Spielleiter</span>
       <h1 class="title">Runden</h1>
     </div>
-    <app-tutorial-button topic="sessions" />
+    <div class="row">
+      <button type="button" class="btn" [attr.aria-pressed]="qrOpen()" (click)="qrOpen.set(true)">
+        <app-icon name="expand" /> QR-Code für Spieler
+      </button>
+      <app-tutorial-button topic="sessions" />
+    </div>
   </header>
 
   @if (error()) {
@@ -55,3 +60,11 @@
     </div>
   </form>
 </section>
+
+@if (qrOpen()) {
+  <app-side-panel title="Mit dem Handy dabei" (closed)="qrOpen.set(false)">
+    <div class="panel">
+      <app-login-qr />
+    </div>
+  </app-side-panel>
+}

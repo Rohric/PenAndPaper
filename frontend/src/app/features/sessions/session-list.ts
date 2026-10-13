@@ -7,8 +7,11 @@ import { readError } from '../../core/api-error';
 import { ApiService } from '../../core/api.service';
 import { Option, PlayerCharacter, World } from '../../core/models';
 import { Session } from '../../core/session-models';
+import { Icon } from '../../shared/icon';
 import { IdSelect } from '../../shared/id-select';
 import { LinkPicker } from '../../shared/link-picker';
+import { LoginQr } from '../../shared/login-qr';
+import { SidePanel } from '../../shared/side-panel';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterService } from '../characters/character.service';
 import { SessionService } from './session.service';
@@ -16,7 +19,7 @@ import { SessionService } from './session.service';
 /** The sessions of the game master, with the form that starts a new one. */
 @Component({
   selector: 'app-session-list',
-  imports: [FormsModule, RouterLink, IdSelect, LinkPicker, TutorialButton],
+  imports: [FormsModule, RouterLink, Icon, IdSelect, LinkPicker, LoginQr, SidePanel, TutorialButton],
   templateUrl: './session-list.html',
 })
 export class SessionList {
@@ -27,6 +30,8 @@ export class SessionList {
   protected readonly worlds = signal<World[]>([]);
   protected readonly characters = signal<PlayerCharacter[]>([]);
   protected readonly error = signal('');
+  /** Whether the window with the QR code for the phones of the players is open. */
+  protected readonly qrOpen = signal(false);
 
   protected readonly name = signal('');
   protected readonly date = signal(new Date().toISOString().slice(0, 10));
@@ -35,7 +40,7 @@ export class SessionList {
 
   protected readonly worldOptions = computed<Option[]>(() => this.worlds().map((w) => ({ id: w.id, label: w.name })));
   protected readonly characterOptions = computed<Option[]>(() =>
-    this.characters().map((c) => ({ id: c.id, label: c.name, hint: `Spieler: ${c.player}` })),
+    this.characters().filter((c) => !c.adventure).map((c) => ({ id: c.id, label: c.name, hint: `Spieler: ${c.player}` })),
   );
 
   constructor() {

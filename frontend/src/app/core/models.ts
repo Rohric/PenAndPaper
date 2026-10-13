@@ -315,6 +315,8 @@ export interface Npc extends Character {
 export interface PlayerCharacter extends Character {
   backstory: string;
   player: string;
+  /** The running adventure the character plays in; null while it is free, also after a finished one. */
+  adventure: { id: number; name: string; finished: boolean } | null;
 }
 
 /** Either kind of character, for the parts of the app that handle both. */
