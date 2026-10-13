@@ -1,8 +1,8 @@
-"""Serializers for NPCs, including the checks for their skill and inventory lists."""
+"""Serializers for NPCs and player characters, including the checks for their lists."""
 
 from rest_framework import serializers
 
-from character_app.models import START_SKILL_POINTS, BaseCharacter, Npc
+from character_app.models import START_SKILL_POINTS, BaseCharacter, Npc, PlayerCharacter
 from character_app.utils import (
     MAX_DAMAGE_DICE,
     MAX_SKILL_POINTS,
@@ -12,6 +12,19 @@ from character_app.utils import (
 )
 
 MAX_AMOUNT = 9999
+# What every character has, in the order the API returns it.
+CHARACTER_FIELDS = [
+    "id", "name", "age", "gender", "profession", "description",
+    "life_points", "skill_points_total", "bonus_points_total",
+    "skills", "inventory", "special_abilities", "talents", "points_left",
+]
+# What only the game master changes on a player character.
+LEVEL_FIELDS = ["life_points", "skill_points_total", "bonus_points_total"]
+# What only the player changes on a player character.
+PLAYER_FIELDS = [
+    "name", "age", "gender", "profession", "description",
+    "skills", "inventory", "special_abilities", "backstory",
+]
 
 
 def _as_list(value):
@@ -78,29 +91,30 @@ def _clean_phrase(phrase):
     return {"trigger": _clean_text(entry, "trigger"), "text": _clean_text(entry, "text")}
 
 
-class NpcSerializer(serializers.ModelSerializer):
-    """Serialize an NPC, check its lists against the rules and add the calculated values."""
+def _clean_ability(entry):
+    """Return one special ability with every field checked and filled."""
+    return {
+        "name": _clean_name(entry),
+        "description": _clean_text(entry, "description"),
+        "roll_condition": _clean_text(entry, "roll_condition"),
+    }
+
+
+class CharacterSerializer(serializers.ModelSerializer):
+    """Base for both kinds of characters: check the lists against the rules and add the calculated values."""
 
     talents = serializers.SerializerMethodField()
     points_left = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Npc
-        fields = [
-            "id", "name", "age", "gender", "profession", "description",
-            "life_points", "skill_points_total", "bonus_points_total",
-            "skills", "inventory", "phrases", "talents", "points_left",
-        ]
-
-    def get_talents(self, npc):
+    def get_talents(self, character):
         """Return talent value and inspiration points for each talent."""
-        return talent_summary(npc.skills)
+        return talent_summary(character.skills)
 
-    def get_points_left(self, npc):
+    def get_points_left(self, character):
         """Return the unspent points of both budgets."""
         return {
-            "base": base_points_left(npc.skills, npc.skill_points_total),
-            "bonus": bonus_points_left(npc.skills, npc.bonus_points_total),
+            "base": base_points_left(character.skills, character.skill_points_total),
+            "bonus": bonus_points_left(character.skills, character.bonus_points_total),
         }
 
     def validate_skills(self, skills):
@@ -111,9 +125,9 @@ class NpcSerializer(serializers.ModelSerializer):
         """Check and complete every inventory entry."""
         return [_clean_item(entry) for entry in _as_list(items)]
 
-    def validate_phrases(self, phrases):
-        """Check every phrase and drop the ones without text."""
-        return [phrase for phrase in map(_clean_phrase, _as_list(phrases)) if phrase["text"]]
+    def validate_special_abilities(self, abilities):
+        """Check and complete every special ability."""
+        return [_clean_ability(entry) for entry in _as_list(abilities)]
 
     def _current(self, data, field, default):
         """Return the new value of a field, or the stored one on a partial update."""
@@ -127,3 +141,33 @@ class NpcSerializer(serializers.ModelSerializer):
         if bonus_points_left(skills, self._current(data, "bonus_points_total", 0)) < 0:
             raise serializers.ValidationError("Die Bonuspunkte der Fähigkeiten übersteigen das Budget.")
         return data
+
+
+class NpcSerializer(CharacterSerializer):
+    """Serialize an NPC with the phrases it might say."""
+
+    class Meta:
+        model = Npc
+        fields = CHARACTER_FIELDS + ["phrases"]
+
+    def validate_phrases(self, phrases):
+        """Check every phrase and drop the ones without text."""
+        return [phrase for phrase in map(_clean_phrase, _as_list(phrases)) if phrase["text"]]
+
+
+class PlayerCharacterSerializer(CharacterSerializer):
+    """Serialize a player character for its player; budgets and life points belong to the game master."""
+
+    player = serializers.CharField(source="owner.username", read_only=True)
+
+    class Meta:
+        model = PlayerCharacter
+        fields = CHARACTER_FIELDS + ["backstory", "player"]
+        read_only_fields = LEVEL_FIELDS
+
+
+class PlayerCharacterLevelSerializer(PlayerCharacterSerializer):
+    """Serialize a player character for the game master, who reads it all and may only level it."""
+
+    class Meta(PlayerCharacterSerializer.Meta):
+        read_only_fields = PLAYER_FIELDS

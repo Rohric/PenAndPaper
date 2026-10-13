@@ -1,4 +1,4 @@
-"""Models for characters: a shared template and the NPCs a game master writes."""
+"""Models for characters: a shared template, the NPCs of a game master and the characters of the players."""
 
 from django.conf import settings
 from django.db import models
@@ -30,6 +30,8 @@ class BaseCharacter(models.Model):
     skills = models.JSONField(default=list, blank=True)
     # Each item: name, quantity, damage_dice, damage_bonus, description.
     inventory = models.JSONField(default=list, blank=True)
+    # Each special ability: name, description, roll_condition.
+    special_abilities = models.JSONField(default=list, blank=True)
 
     class Meta:
         abstract = True
@@ -44,6 +46,16 @@ class Npc(BaseCharacter):
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="npcs")
     phrases = models.JSONField(default=list, blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
+
+class PlayerCharacter(BaseCharacter):
+    """Store a character a player creates and plays."""
+
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="player_characters")
+    backstory = models.TextField(blank=True)
 
     class Meta:
         ordering = ["name"]

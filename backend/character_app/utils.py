@@ -4,7 +4,7 @@ The rules follow the official wiki. Leveling with bonus points is a house rule:
 wherever the rules say "points", base points and bonus points count together.
 """
 
-from character_app.models import BaseCharacter, Npc
+from character_app.models import BaseCharacter, Npc, PlayerCharacter
 
 MAX_SKILL_POINTS = 100
 MAX_DAMAGE_DICE = 10
@@ -61,3 +61,8 @@ def talent_summary(skills):
 def npcs_for_user(user):
     """Return the NPCs the given game master owns."""
     return Npc.objects.filter(owner=user)
+
+
+def player_characters_for_user(user):
+    """Return the characters the given player owns."""
+    return PlayerCharacter.objects.filter(owner=user)

@@ -2,12 +2,12 @@
 
 from django.contrib import admin
 
-from .models import Npc
+from .models import Npc, PlayerCharacter
 
 
-@admin.register(Npc)
-class NpcAdmin(admin.ModelAdmin):
-    """Show NPCs with their owner."""
+@admin.register(Npc, PlayerCharacter)
+class CharacterAdmin(admin.ModelAdmin):
+    """Show NPCs and player characters with their owner."""
 
     list_display = ["name", "profession", "owner"]
     search_fields = ["name"]
