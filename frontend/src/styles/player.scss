@@ -17,6 +17,9 @@
   --tutorial-titles: none;
   --tutorial-item: center;
   --symbol: 54px;
+  // Nothing sticks on top of a player page.
+  --stick-top: 0px;
+  --stick-height: 100vh;
 }
 
 @media (min-width: 400px) {

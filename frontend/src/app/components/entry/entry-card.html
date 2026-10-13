@@ -1,9 +1,9 @@
-@if (face(); as shown) {
-  @if (size() === 'tag') {
-    <button type="button" [class]="'chip chip--link kind--' + shown.tone" [style.--kind]="shown.colour || null" (click)="open()">
-      {{ shown.name }}
-    </button>
-  } @else {
+@if (size() === 'tag') {
+  <button type="button" [class]="'chip chip--link kind--' + (tone() || face()?.tone || ref().kind)" [style.--kind]="face()?.colour || null" (click)="open()">
+    {{ label() || face()?.name }}
+  </button>
+} @else {
+  @if (face(); as shown) {
     <article
       [class]="'entry kind--' + shown.tone"
       [class.entry--card]="size() === 'card'"

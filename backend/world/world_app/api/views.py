@@ -81,6 +81,9 @@ class WorldChildList(generics.ListCreateAPIView):
 
     permission_classes = GAME_MASTER_ONLY
     related_name = None
+    # Relations the serializer reads for every entry; loading them at once saves one query per entry.
+    select = []
+    prefetch = []
 
     @cached_property
     def world(self):
@@ -88,8 +91,9 @@ class WorldChildList(generics.ListCreateAPIView):
         return world_for_user(self.request.user, self.kwargs["world_id"])
 
     def get_queryset(self):
-        """Return the entries of the world."""
-        return getattr(self.world, self.related_name).all()
+        """Return the entries of the world together with the relations their serializer reads."""
+        entries = getattr(self.world, self.related_name)
+        return entries.select_related(*self.select).prefetch_related(*self.prefetch)
 
     def get_serializer_context(self):
         """Pass the world to the serializer so it can check links."""
@@ -116,6 +120,7 @@ class LocationList(WorldChildList):
 
     serializer_class = LocationSerializer
     related_name = "locations"
+    prefetch = ["chapters"]
 
 
 class LocationDetail(WorldChildDetail):
@@ -130,6 +135,8 @@ class WorldNpcList(WorldChildList):
 
     serializer_class = WorldNpcSerializer
     related_name = "world_npcs"
+    select = ["npc"]
+    prefetch = ["npc__chapters"]
 
 
 class WorldNpcDetail(WorldChildDetail):
@@ -148,6 +155,7 @@ class QuestList(WorldChildList):
 
     serializer_class = QuestSerializer
     related_name = "quests"
+    prefetch = ["npcs", "chapters"]
 
 
 class QuestDetail(WorldChildDetail):
@@ -162,6 +170,7 @@ class EventList(WorldChildList):
 
     serializer_class = EventSerializer
     related_name = "events"
+    prefetch = ["chapters"]
 
 
 class EventDetail(WorldChildDetail):
@@ -176,6 +185,7 @@ class TriviaList(WorldChildList):
 
     serializer_class = TriviaSerializer
     related_name = "trivia"
+    prefetch = ["locations", "npcs", "quests", "events", "chapters"]
 
 
 class TriviaDetail(WorldChildDetail):
@@ -190,6 +200,7 @@ class ChapterList(WorldChildList):
 
     serializer_class = ChapterSerializer
     related_name = "chapters"
+    prefetch = ["locations", "npcs", "quests", "events", "trivia"]
 
 
 class ChapterDetail(WorldChildDetail):

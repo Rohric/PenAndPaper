@@ -39,7 +39,7 @@ Die Runde hat fünf Seiten in der Hauptreihe (Runde, Charakter, Quests, Chat, un
 
 - **oben:** Welt und Kapitel, Name der Runde.
 - **Hauptreihe:** Menü, Runde (Zahl: Neues), Charakter, Quests (Zahl: neue), Chat (Zahl: ungelesen), Kampf (Punkt, wenn man etwas tun muss).
-- **Obere Reihe (Seite Runde):** Gesehen, Würfe, Glossar, Notizen, Gruppe. Auf Glossar, Notizen und Gruppe bleiben die drei Schalter stehen. Die Hilfe zur Seite liegt im Menü („Hilfe").
+- **Obere Reihe (Seite Runde):** Gesehen, Würfe, Glossar, Notizen, Gruppe. Auf Glossar, Notizen und Gruppe bleiben die drei Schalter stehen. Am Ende jeder Reihe steht „Hilfe".
 
 Obere Reihe der Seite Runde:
 
@@ -47,6 +47,7 @@ Obere Reihe der Seite Runde:
 | --- | --- | --- |
 | Gesehen | Alles gesehen | räumt die Liste „Neu" auf; ausgegraut, wenn nichts neu ist |
 | Würfe | Letzte Würfe | Popup mit den letzten Würfen der Gruppe |
+| Glossar, Notizen, Gruppe | die Seiten der Runde | wechselt zur Seite; „Runde" in der Hauptreihe führt zurück |
 | Hilfe | Hilfe zur Runde | Tutorial |
 
 ## Zustände

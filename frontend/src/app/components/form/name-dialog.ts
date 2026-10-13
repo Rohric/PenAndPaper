@@ -5,7 +5,7 @@ import { Dialog } from '../window/dialog';
 
 /**
  * The dialog that starts something new from its name: a world, a chapter, an entry of the glossary.
- * Everything else about the new thing is written afterwards, in its own form.
+ * Everything else about the new thing is written afterwards, in its own form. A page can put one more choice below the name.
  */
 @Component({
   selector: 'app-name-dialog',
@@ -16,6 +16,7 @@ import { Dialog } from '../window/dialog';
         <label for="name-dialog-name">{{ label() }}</label>
         <input #field id="name-dialog-name" class="input" name="name" autocomplete="off" [(ngModel)]="name" />
       </form>
+      <ng-content />
       @if (hint()) {
         <p class="soft">{{ hint() }}</p>
       }

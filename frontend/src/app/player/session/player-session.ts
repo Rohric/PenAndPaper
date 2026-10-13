@@ -160,25 +160,28 @@ export class PlayerSession {
     return items;
   });
   /** The tutorial that explains the open page. */
-  private readonly topic = computed(() => [this.page() === 'character' || this.page() === 'roll' || this.page() === 'battle' ? 'rules' : 'my-sessions']);
+  private readonly topic = computed(() => [this.page() === 'battle' ? 'rules#initiative' : this.page() === 'character' || this.page() === 'roll' ? 'rules#check' : 'my-sessions']);
   /** The side pages of the round as switches in the row above the main row. */
   private readonly roundPages = computed<Tool[]>(() =>
     ROUND_PAGES.map((item) => ({ id: item.id, word: item.label, icon: item.icon, pressed: this.page() === item.id, click: () => this.open(item.id) })),
   );
-  /** The row of the open page above the main row. The help for every page is in the menu on the left. */
+  /** The row of the open page above the main row; the help of the page stands at its end. */
   private readonly pageTools = computed<Tool[]>(() => {
+    const help = (topic: string, step: number | string = 0) => this.tools.help(topic, step);
     switch (this.page()) {
       case 'round':
         return [
           { id: 'seen', word: 'Gesehen', icon: 'check', disabled: !this.feed().length, click: () => this.markSeen() },
           { id: 'rolls', word: 'Würfe', icon: 'dice', popup: this.rollsPop(), popupTitle: 'Letzte Würfe' },
           ...this.roundPages(),
+          help('my-sessions'),
         ];
       case 'notes':
-        return [{ id: 'note-new', word: 'Neu', icon: 'plus', click: () => this.noteId.set(null) }, ...this.roundPages()];
+        return [{ id: 'note-new', word: 'Neu', icon: 'plus', click: () => this.noteId.set(null) }, ...this.roundPages(), help('my-sessions', 6)];
       case 'glossary':
+        return [...this.roundPages(), help('my-sessions', 5)];
       case 'group':
-        return this.roundPages();
+        return [...this.roundPages(), help('my-sessions')];
       case 'character':
       case 'roll':
         return [
@@ -186,6 +189,7 @@ export class PlayerSession {
           { id: 'roll', word: 'Würfeln', icon: 'dice', pressed: this.page() === 'roll', click: () => this.page.set('roll') },
           { id: 'edit', word: 'Bearbeiten', icon: 'edit', disabled: !this.character(), click: () => this.startEdit('profile') },
           { id: 'spark', word: 'Blitz', icon: 'flag', count: this.sparksLeft(), popup: this.sparkPop(), popupTitle: 'Geistesblitz' },
+          help('rules', 'check'),
         ];
       case 'quests':
         return [
@@ -193,11 +197,13 @@ export class PlayerSession {
           { id: 'status-running', word: 'Laufend', icon: 'flag', pressed: this.questStatus() === 'running', click: () => this.questStatus.set('running') },
           { id: 'status-open', word: 'Offen', icon: 'pin', pressed: this.questStatus() === 'open', click: () => this.questStatus.set('open') },
           { id: 'status-done', word: 'Beendet', icon: 'check', pressed: this.questStatus() === 'done', click: () => this.questStatus.set('done') },
+          help('my-sessions', 4),
         ];
       case 'chat':
         return [
           { id: 'channel-group', word: 'Gruppe', icon: 'group', count: this.chatUnread(), pressed: this.channel() === 'group', click: () => this.open('chat', 'group') },
           { id: 'channel-gm', word: 'Spielleiter', icon: 'mail', count: this.unread(), pressed: this.channel() === 'gm', click: () => this.open('chat', 'gm') },
+          help('my-sessions', 7),
         ];
       default:
         return [];

@@ -264,12 +264,16 @@ export class SessionCockpit {
     }));
     return fighting ? [...tabs, { id: 'battle', label: 'Kampf', icon: 'sword', active: true, click: () => undefined }] : tabs;
   });
-  /** Where the game master is: the sessions, the world and this session. */
-  private readonly crumbs = computed<Crumb[]>(() => [
-    { label: 'Runden', path: '/gm/sessions' },
-    { label: this.store.session()?.world_name ?? 'Welt' },
-    { label: this.store.session()?.name ?? 'Runde' },
-  ]);
+  /** Where the game master is: the sessions, this session, its world and the chapter that is played. */
+  private readonly crumbs = computed<Crumb[]>(() => {
+    const session = this.store.session();
+    const chapter = this.world.chapters().find((other) => other.id === this.chapterId());
+    const path: Crumb[] = [{ label: 'Runden', path: '/gm/sessions' }, { label: session?.name ?? 'Runde' }, { label: session?.world_name ?? 'Welt' }];
+    if (chapter) {
+      path.push({ label: `Kapitel ${chapter.number}` });
+    }
+    return [...path, ...this.placeCrumb()];
+  });
   /** The parts of the glossary as links on top, while the glossary is open. */
   private readonly viewLinks = computed<NavItem[]>(() =>
     this.view() === 'glossary' && this.battleId() === null
@@ -279,6 +283,15 @@ export class SessionCockpit {
       : [],
   );
   private readonly extras = computed(() => [this.chapterPick(), this.searchBox()].filter((extra): extra is TemplateRef<unknown> => !!extra));
+
+  /** The last step of the path: the fight while one runs, the scene while the story is open. */
+  private placeCrumb(): Crumb[] {
+    if (this.battleId() !== null) {
+      return [{ label: 'Kampf' }];
+    }
+    const scene = this.scene();
+    return this.view() === 'story' && scene ? [{ label: scene.name }] : [];
+  }
 
   /** The symbols that are there in every view. */
   private readonly alwaysTools = computed<Tool[]>(() => [

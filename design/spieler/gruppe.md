@@ -15,7 +15,7 @@ Je Charakter der Runde eine Karte: Portrait, Name, Beruf, „gespielt von …", 
 
 ## Leisten in dieser Ansicht
 
-Erreichbar in der Runde: Schalter „Gruppe" in der oberen Reihe der Symbolleiste. Obere Reihe: Glossar, Notizen, Gruppe. Die Hilfe zur Seite liegt im Menü („Hilfe").
+Erreichbar in der Runde: Schalter „Gruppe" in der oberen Reihe der Symbolleiste. Obere Reihe: Glossar, Notizen, Gruppe, Hilfe.
 
 ## Zustände
 

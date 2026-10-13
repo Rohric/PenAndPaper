@@ -17,20 +17,10 @@
       @case ('overview') {
         <div class="page">
           @if (editingOverview()) {
-            <div class="stack">
-              <div class="row">
-                <button type="button" class="btn btn--small" (click)="editingOverview.set(false)"><app-icon name="eye" [size]="16" /> Lesen</button>
-              </div>
-              <app-chapter-editor [entry]="current" (saved)="editingOverview.set(false)" (closed)="leave()" />
-            </div>
+            <app-chapter-editor [entry]="current" (saved)="editingOverview.set(false)" (closed)="leave()" />
           } @else {
             <article class="panel">
-              <header class="row row--between">
-                <h3 class="subtitle">Überblick</h3>
-                <button type="button" class="btn btn--small" (click)="editingOverview.set(true)">
-                  <app-icon name="edit" [size]="16" /> Bearbeiten
-                </button>
-              </header>
+              <h3 class="subtitle">Überblick</h3>
               @if (current.to_read) {
                 <div class="read-aloud">
                   <span class="kicker">Vorlesen</span>
@@ -40,10 +30,11 @@
               @if (current.description) {
                 <p class="prose">{{ current.description }}</p>
               } @else {
-                <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ schreibst du, worum es geht.</p>
+                <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ unten in der Leiste schreibst du, worum es geht.</p>
               }
               <app-link-row label="Orte dieses Kapitels" [items]="places()" />
               <app-link-row label="Figuren dieses Kapitels" [items]="npcs()" />
+              <app-link-row label="Gegenstände und Wissen dieses Kapitels" [items]="knowledge()" />
             </article>
           }
         </div>
@@ -57,8 +48,17 @@
   </div>
 }
 
+@if (creating()) {
+  <app-name-dialog title="Neue Szene" label="Name der Szene" hint="Die Szene öffnet sich danach zum Schreiben." [error]="error()" (create)="addScene({ name: $event, optional: optional() })" (closed)="creating.set(false)">
+    <label class="row">
+      <input type="checkbox" [checked]="optional()" (change)="optional.set($any($event.target).checked)" />
+      Optionale Szene (steht nicht am roten Faden)
+    </label>
+  </app-name-dialog>
+}
+
 <ng-template #threadTpl>
-  <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" (open)="select($event)" (add)="addScene($event)" (move)="moveScene($event)" />
+  <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" (open)="select($event)" />
 </ng-template>
 
 <ng-template #sceneTpl>
@@ -66,11 +66,11 @@
     @if (editing()) {
       <app-scene-form [entry]="shown" (saved)="stopEditing()" (closed)="closeScene()" />
     } @else {
-      <app-scene-view [scene]="shown" (edit)="editing.set(true)" />
+      <app-scene-view [scene]="shown" [editable]="false" />
     }
   } @else {
     <div class="empty">
-      <p>Wähle links eine Szene oder leg eine neue an.</p>
+      <p>Wähle links eine Szene oder leg mit „Neu“ unten in der Leiste eine an.</p>
     </div>
   }
 </ng-template>

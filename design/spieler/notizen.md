@@ -28,6 +28,7 @@ Erreichbar in der Runde: Schalter „Notizen" in der oberen Reihe der Symbolleis
 | Wort | Klick |
 | --- | --- |
 | Neu | öffnet eine leere Notiz im Seitenfenster |
+| Glossar, Notizen, Gruppe | wechselt zwischen den Seiten der Runde |
 | Hilfe | Tutorial „Meine Runden" an der Stelle „Notizen" |
 
 ## Zustände

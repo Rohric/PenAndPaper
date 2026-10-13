@@ -19,27 +19,11 @@
           <span class="chip chip--accent">als Nächstes</span>
         }
       </button>
-      @if (editable() && scene.id === selected()) {
-        <div class="item__move">
-          <button type="button" class="btn btn--small" aria-label="Szene nach oben schieben" [disabled]="$first" (click)="move.emit({ id: scene.id, by: -1 })">
-            ↑
-          </button>
-          <button type="button" class="btn btn--small" aria-label="Szene nach unten schieben" [disabled]="$last" (click)="move.emit({ id: scene.id, by: 1 })">
-            ↓
-          </button>
-        </div>
-      }
     </li>
   } @empty {
     <li class="soft">Noch keine Szene am Faden.</li>
   }
 </ol>
-@if (editable()) {
-  <form class="list-row" (ngSubmit)="create(false)">
-    <input class="input" name="newOnThread" aria-label="Name der neuen Szene am Faden" placeholder="Neue Szene am Faden" [(ngModel)]="newOnThread" />
-    <button type="submit" class="btn btn--small btn--primary" [disabled]="!newOnThread().trim()">Anlegen</button>
-  </form>
-}
 
 <span class="kicker section">Optionale Szenen</span>
 <ul class="list">
@@ -67,9 +51,3 @@
     <li class="soft">Noch keine optionale Szene.</li>
   }
 </ul>
-@if (editable()) {
-  <form class="list-row" (ngSubmit)="create(true)">
-    <input class="input" name="newOptional" aria-label="Name der neuen optionalen Szene" placeholder="Neue optionale Szene" [(ngModel)]="newOptional" />
-    <button type="submit" class="btn btn--small btn--primary" [disabled]="!newOptional().trim()">Anlegen</button>
-  </form>
-}

@@ -21,7 +21,7 @@ Die Seite hat vier Abschnitte zum Auf- und Zuklappen: **Orte, Figuren, Wissen, G
 
 ## Leisten in dieser Ansicht
 
-Erreichbar in der Runde: Schalter „Glossar" in der oberen Reihe der Symbolleiste. Obere Reihe: Glossar, Notizen, Gruppe. Die Hilfe zur Seite liegt im Menü („Hilfe").
+Erreichbar in der Runde: Schalter „Glossar" in der oberen Reihe der Symbolleiste. Obere Reihe: Glossar, Notizen, Gruppe, Hilfe (Tutorial „Meine Runden", Stelle „Glossar").
 
 ## Zustände
 

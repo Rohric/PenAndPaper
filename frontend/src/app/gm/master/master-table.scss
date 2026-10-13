@@ -9,11 +9,11 @@
 .master__side,
 .master__people {
   position: sticky;
-  top: 96px;
+  top: calc(var(--stick-top, 0px) + var(--gap-3));
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: calc(100vh - 220px);
+  max-height: var(--stick-height, calc(100vh - 2 * var(--gap-4)));
   overflow-y: auto;
 }
 

@@ -37,6 +37,8 @@ Gilt unter der Klasse `area-player` am Rahmen. Gebaut wird ab 320 px.
 - Einzige Ausnahme: `prefers-reduced-motion` schaltet Bewegung ab.
 - Der Rahmen hängt am Bereich: `/gm` zeigt den Rahmen des Spielleiters, `/player` den der Spieler, egal wie breit das Fenster ist.
 
+**Was stehen bleibt:** Teile einer Seite, die beim Scrollen stehen bleiben (der Faden der Szenen, eine Liste neben dem Eintrag, die Notizen im Master), lesen `--stick-top` und `--stick-height` aus dem Bereich. So rutschen sie nicht unter die Kopfleiste und enden über der Symbolleiste. In einem Fenster ist `--stick-top` null.
+
 ## Bausteine
 
 - [Rahmen Spielleiter](../spielleiter/rahmen.md)

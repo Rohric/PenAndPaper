@@ -1,7 +1,7 @@
 // A bar that stays in view while the sections below scroll: name, the big save button, the points, the sections.
 .editbar {
   position: sticky;
-  top: 0;
+  top: var(--stick-top, 0px);
   z-index: 12;
   display: flex;
   flex-direction: column;

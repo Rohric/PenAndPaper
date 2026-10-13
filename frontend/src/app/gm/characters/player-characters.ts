@@ -21,7 +21,7 @@ const SORTS: { id: SortBy; word: string; icon: IconName }[] = [
 
 type LevelField = 'skill_points_total' | 'bonus_points_total' | 'life_points' | 'max_life_points';
 
-/** The characters of all players as the game master sees them: read the sheet, and level it. */
+/** The characters of all players as the game master sees them: read the sheet, and level it in a popup of the bar. */
 @Component({
   selector: 'app-player-characters',
   imports: [FormsModule, RouterLink, MasterDetail, CharacterSheet],
@@ -74,11 +74,17 @@ export class PlayerCharacters {
   });
 
   private readonly searchBox = viewChild<TemplateRef<unknown>>('searchBox');
+  private readonly levelPop = viewChild<TemplateRef<unknown>>('levelPop');
+  private readonly tools = inject(Tools);
   /** The filters as the links on top: all, the free ones, and one per adventure. */
   private readonly links = computed<NavItem[]>(() => [
     this.link('all', 'Alle'),
     this.link('free', 'Frei'),
     ...this.adventures().map((adventure) => this.link(String(adventure.id), adventure.name)),
+  ]);
+  /** Leveling the opened character, behind its own symbol. */
+  private readonly levelTool = computed<Tool[]>(() => [
+    { id: 'level', word: 'Leveln', title: 'Budgets und Lebenspunkte', icon: 'flag', disabled: !this.selected(), popup: this.levelPop(), popupTitle: `${this.selected()?.name ?? 'Charakter'} leveln` },
   ]);
   /** The order of the list as switches in the bar at the bottom. */
   private readonly sortTools = computed<Tool[]>(() =>
@@ -91,7 +97,8 @@ export class PlayerCharacters {
     nav.links.provide(this.links);
     nav.extras.provide(computed(() => [this.searchBox()].filter((extra): extra is TemplateRef<unknown> => !!extra)));
     nav.topic.provide(signal(['gm-characters']));
-    inject(Tools).provide('view', this.sortTools);
+    this.tools.provide('always', this.levelTool);
+    this.tools.provide('view', this.sortTools);
     this.service.list<PlayerCharacter>('gm/player-characters').subscribe({
       next: (characters) => this.characters.set(characters),
       error: (e: unknown) => this.error.set(readError(e)),
@@ -134,6 +141,7 @@ export class PlayerCharacters {
   private done(saved: PlayerCharacter): void {
     this.characters.update((characters) => characters.map((old) => (old.id === saved.id ? saved : old)));
     this.finish('');
+    this.tools.dismiss();
   }
 
   private finish(error: string): void {

@@ -10,6 +10,36 @@
   <input class="input" aria-label="Charaktere suchen" placeholder="Name oder Spieler suchen" [ngModel]="query()" (ngModelChange)="query.set($event)" />
 </ng-template>
 
+<ng-template #levelPop>
+  @if (selected(); as shown) {
+    <p class="soft">Nur du änderst diese Werte von {{ shown.name }}. Die Punkte verteilt der Spieler selbst.</p>
+    <div class="grid-fields">
+      <div class="field">
+        <label for="level-base">Budget Grundpunkte</label>
+        <input id="level-base" class="input" type="number" min="0" [ngModel]="level().skill_points_total" (ngModelChange)="set('skill_points_total', $event)" />
+      </div>
+      <div class="field">
+        <label for="level-bonus">Budget Bonuspunkte</label>
+        <input id="level-bonus" class="input" type="number" min="0" [ngModel]="level().bonus_points_total" (ngModelChange)="set('bonus_points_total', $event)" />
+      </div>
+      <div class="field">
+        <label for="level-life">Lebenspunkte</label>
+        <input id="level-life" class="input" type="number" min="0" [ngModel]="level().life_points" (ngModelChange)="set('life_points', $event)" />
+      </div>
+      <div class="field">
+        <label for="level-life-max">Lebenspunkte maximal</label>
+        <input id="level-life-max" class="input" type="number" min="0" [ngModel]="level().max_life_points" (ngModelChange)="set('max_life_points', $event)" />
+      </div>
+    </div>
+    @if (error()) {
+      <p class="notice notice--error" role="alert">{{ error() }}</p>
+    }
+    <div class="row">
+      <button type="button" class="btn btn--primary" [disabled]="!dirty() || busy()" (click)="save()">Speichern</button>
+    </div>
+  }
+</ng-template>
+
 <ng-template #listTpl>
   <div class="stack">
     <h3 class="section-title">Frei · {{ free().length }}</h3>
@@ -45,31 +75,6 @@
 
 <ng-template #detailTpl>
   @if (selected(); as shown) {
-    <div class="panel">
-      <h2 class="subtitle">Leveln</h2>
-      <p class="soft">Nur du änderst diese Werte. Die Punkte verteilt der Spieler selbst.</p>
-      <div class="grid-fields">
-        <div class="field">
-          <label for="level-base">Budget Grundpunkte</label>
-          <input id="level-base" class="input" type="number" min="0" [ngModel]="level().skill_points_total" (ngModelChange)="set('skill_points_total', $event)" />
-        </div>
-        <div class="field">
-          <label for="level-bonus">Budget Bonuspunkte</label>
-          <input id="level-bonus" class="input" type="number" min="0" [ngModel]="level().bonus_points_total" (ngModelChange)="set('bonus_points_total', $event)" />
-        </div>
-        <div class="field">
-          <label for="level-life">Lebenspunkte</label>
-          <input id="level-life" class="input" type="number" min="0" [ngModel]="level().life_points" (ngModelChange)="set('life_points', $event)" />
-        </div>
-        <div class="field">
-          <label for="level-life-max">Lebenspunkte maximal</label>
-          <input id="level-life-max" class="input" type="number" min="0" [ngModel]="level().max_life_points" (ngModelChange)="set('max_life_points', $event)" />
-        </div>
-      </div>
-      <div class="row">
-        <button type="button" class="btn btn--primary" [disabled]="!dirty() || busy()" (click)="save()">Speichern</button>
-      </div>
-    </div>
     <app-character-sheet [character]="shown" />
   } @else {
     <div class="empty">

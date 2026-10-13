@@ -28,9 +28,11 @@ Gebaut für den Desktop ab 1024 px.
 - **Oben** die [Kopfleiste](../bausteine/kopfleiste.md): Ort als Krümel, Links der Ansicht, Suche. Sie bleibt stehen.
 - **Unten** die [Symbolleiste](../bausteine/symbolleiste.md), auf jeder Seite. Sie bleibt stehen.
 - **Inhalt** scrollt zwischen Kopf und Symbolleiste. Er wird nicht breiter als 1680 px und steht dann mittig.
-- [Fenster](../bausteine/fenster.md) liegen über dem Inhalt: Popups über ihrem Symbol, das Seitenfenster rechts, der Dialog in der Mitte.
+- [Fenster](../bausteine/fenster.md) liegen über dem Inhalt: Popups und der Dialog in der Mitte, das Seitenfenster rechts.
 
 Jede Seite meldet beim Rahmen an: ihren Ort (Krümel), ihre Links der Ansicht, ihre Reiter für die Gruppe „hier" und ihre Symbole. Verlässt man die Seite, verschwinden sie.
+
+**Hilfe:** Auf den Seiten des Spielleiters gibt es keinen eigenen Hilfe-Knopf. Das Fragezeichen unten in der linken Leiste öffnet immer das Tutorial zur offenen Seite.
 
 ## Bausteine
 

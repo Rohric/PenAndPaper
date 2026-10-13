@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, input, linkedSignal, output, signa
 import { Router } from '@angular/router';
 
 import { EntryRef } from '../../core/models';
+import { SessionStore } from '../../core/session-store';
 import { WorldStore } from '../../core/world-store';
 import { EntryForm } from '../../gm/glossary/entry-form';
 import { Icon } from '../basic/icon';
@@ -10,7 +11,7 @@ import { WindowHistory } from '../window/window-history';
 import { WindowTab } from '../window/window-head';
 import { EntryView } from './entry-view';
 import { Eyes, entryAddress, viewOf } from './entry-views';
-import { LinkRow } from './link-row';
+import { EntryCard } from './entry-card';
 
 const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
 
@@ -21,7 +22,7 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
  */
 @Component({
   selector: 'app-entry-peek',
-  imports: [SideWindow, Icon, EntryView, EntryForm, LinkRow],
+  imports: [SideWindow, Icon, EntryView, EntryForm, EntryCard],
   template: `
     @if (store.peek(); as shown) {
       <app-side-window
@@ -42,8 +43,20 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
         } @else {
           @switch (tab()) {
             @case ('links') {
+              @if (session() && linkCount()) {
+                <div class="row">
+                  <button type="button" class="btn btn--small" (click)="layAll(shown)"><app-icon name="plus" [size]="16" /> Alles auf den Tisch</button>
+                </div>
+              }
               @for (group of view()?.links ?? []; track group.label) {
-                <app-link-row [label]="group.label" [items]="group.items" />
+                <div class="field">
+                  <span class="label">{{ group.label }}</span>
+                  <div class="stack">
+                    @for (item of group.items; track item.kind + item.id) {
+                      <app-entry-card [ref]="item" />
+                    }
+                  </div>
+                </div>
               } @empty {
                 <p class="soft">Dieser Eintrag ist noch mit nichts verknüpft.</p>
               }
@@ -74,6 +87,8 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
 export class EntryPeek {
   protected readonly store = inject(WorldStore);
   private readonly router = inject(Router);
+  /** There is a session only while a round is played. */
+  private readonly round = inject(SessionStore, { optional: true });
 
   /** Whether the entry can be edited here. A session switches that off: it never changes the world. */
   readonly editable = input(true);
@@ -95,7 +110,7 @@ export class EntryPeek {
     const shown = this.store.peek();
     return shown ? viewOf(this.store, shown, null) : null;
   });
-  private readonly linkCount = computed(() => (this.view()?.links ?? []).reduce((sum, group) => sum + group.items.length, 0));
+  protected readonly linkCount = computed(() => (this.view()?.links ?? []).reduce((sum, group) => sum + group.items.length, 0));
   protected readonly tabs = computed<WindowTab[]>(() => {
     const tabs: WindowTab[] = [{ id: 'read', label: 'Lesen' }, { id: 'links', label: 'Verbindungen', count: this.linkCount() }];
     return this.session() ? [...tabs, { id: 'round', label: 'Runde' }, { id: 'note', label: 'Notiz' }] : tabs;
@@ -111,6 +126,11 @@ export class EntryPeek {
   /** Close the window. */
   protected close(): void {
     this.store.peek.set(null);
+  }
+
+  /** Ask into which group of the table the entry and everything connected to it shall be laid. */
+  protected layAll(ref: EntryRef): void {
+    this.round?.tableWish.set({ kind: ref.kind, id: ref.id });
   }
 
   /** Close the window and go to the place where the entry lives. */

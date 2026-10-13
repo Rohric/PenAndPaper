@@ -3,12 +3,14 @@ import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { EntryLink } from '../../core/models';
-import { Icon, IconName } from '../../components/basic/icon';
+import { IconName } from '../../components/basic/icon';
 import { MasterDetail } from '../../components/basic/master-detail';
+import { NameDialog } from '../../components/form/name-dialog';
 import { Crumb, NavItem, NavService } from '../../global/frame/nav.service';
+import { Tool, Tools } from '../../global/tool-bar/tools.service';
 import { ChapterEditor } from './chapter-editor';
 import { ChapterLinks } from './chapter-links';
-import { npcLinks } from '../../components/entry/entry-views';
+import { isItem, npcLinks } from '../../components/entry/entry-views';
 import { LinkRow } from '../../components/entry/link-row';
 import { SceneForm } from './scene-form';
 import { SceneThread } from './scene-thread';
@@ -25,12 +27,12 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
 ];
 
 /**
- * One chapter: the thread of its scenes with the opened scene beside it,
- * its quests and events, and an overview of the chapter itself.
+ * One chapter: the thread of its scenes with the opened scene beside it, its quests and events, and an overview
+ * of the chapter itself. Its parts are links in the bar on top; creating, writing and moving are tools at the bottom.
  */
 @Component({
   selector: 'app-chapter-page',
-  imports: [RouterLink, Icon, MasterDetail, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
+  imports: [RouterLink, MasterDetail, NameDialog, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
   templateUrl: './chapter-page.html',
 })
 export class ChapterPage {
@@ -53,7 +55,26 @@ export class ChapterPage {
   );
   private readonly crumbs = computed<Crumb[]>(() => {
     const chapter = this.chapter();
-    return [{ label: 'Kapitel', path: this.chaptersLink() }, { label: chapter ? `${chapter.number} · ${chapter.name}` : 'unbekannt' }];
+    const here: Crumb[] = [{ label: 'Kapitel', path: this.chaptersLink() }, { label: chapter ? `${chapter.number} · ${chapter.name}` : 'unbekannt' }];
+    const scene = this.currentTab() === 'scenes' ? this.openScene() : null;
+    return scene ? [...here, { label: scene.name }] : here;
+  });
+  /** Whether the dialog for a new scene is open, and whether the new scene is optional. */
+  protected readonly creating = signal(false);
+  protected readonly optional = signal(false);
+  /** The place of the opened scene on the thread; -1 for an optional scene or none. */
+  private readonly place = computed(() => this.scenes().filter((scene) => !scene.optional).findIndex((scene) => scene.id === this.sceneId()));
+  private readonly threadLength = computed(() => this.scenes().filter((scene) => !scene.optional).length);
+  /** The tools of the open part of the chapter, for the bar at the bottom. */
+  private readonly pageTools = computed<Tool[]>(() => {
+    switch (this.currentTab()) {
+      case 'scenes':
+        return this.sceneTools();
+      case 'overview':
+        return [this.overviewTool()];
+      default:
+        return [];
+    }
   });
   protected readonly error = signal('');
   protected readonly editingOverview = signal(false);
@@ -65,19 +86,24 @@ export class ChapterPage {
     computation: (id) => id !== null && id === this.createdId,
   });
 
-  /** Places and NPCs of the chapter are collected from its scenes, never entered twice. */
+  /** Places, NPCs and knowledge of the chapter: everything that carries its tag. */
   protected readonly places = computed<EntryLink[]>(() => {
-    const ids = new Set(this.scenes().map((scene) => scene.location));
-    const places = this.store.locations().filter((place) => ids.has(place.id));
-    return places.map((place) => ({ kind: 'locations', id: place.id, label: place.name }));
+    const ids = this.chapter()?.locations ?? [];
+    return this.store.locations().filter((place) => ids.includes(place.id)).map((place) => ({ kind: 'locations', id: place.id, label: place.name }));
   });
-  protected readonly npcs = computed(() => npcLinks(this.store, this.scenes().flatMap((scene) => scene.npcs)));
+  protected readonly npcs = computed(() => npcLinks(this.store, this.chapter()?.npcs ?? []));
+  protected readonly knowledge = computed<EntryLink[]>(() => {
+    const ids = this.chapter()?.trivia ?? [];
+    const entries = this.store.trivia().filter((entry) => ids.includes(entry.id));
+    return entries.map((entry) => ({ kind: 'trivia', id: entry.id, label: entry.name, tone: isItem(entry) ? 'items' : undefined }));
+  });
 
   constructor() {
     const nav = inject(NavService);
     nav.crumbs.provide(this.crumbs);
     nav.links.provide(this.links);
     nav.topic.provide(computed(() => [this.currentTab() === 'scenes' ? 'scenes' : 'chapters']));
+    inject(Tools).provide('view', this.pageTools);
   }
 
   /** Address of the list of all chapters. */
@@ -132,7 +158,34 @@ export class ChapterPage {
     void this.router.navigate(this.chaptersLink());
   }
 
+  /** The tools of the scenes: a new scene, writing the opened one, and moving it on the thread. */
+  private sceneTools(): Tool[] {
+    const open = !!this.openScene();
+    const place = this.place();
+    const writing = this.editing();
+    return [
+      { id: 'scene-new', word: 'Neu', title: 'Neue Szene', icon: 'plus', click: () => this.creating.set(true) },
+      { id: 'scene-write', word: writing ? 'Fertig' : 'Schreiben', title: writing ? 'Zurück zum Lesen' : 'Szene schreiben', icon: writing ? 'check' : 'edit', pressed: writing, disabled: !open, click: () => (writing ? this.stopEditing() : this.editing.set(true)) },
+      { id: 'scene-up', word: 'Hoch', title: 'Szene im Faden nach oben schieben', icon: 'up', disabled: place <= 0, click: () => this.moveOpen(-1) },
+      { id: 'scene-down', word: 'Runter', title: 'Szene im Faden nach unten schieben', icon: 'down', disabled: place < 0 || place >= this.threadLength() - 1, click: () => this.moveOpen(1) },
+    ];
+  }
+
+  private overviewTool(): Tool {
+    const editing = this.editingOverview();
+    return { id: 'chapter-edit', word: editing ? 'Lesen' : 'Bearbeiten', title: editing ? 'Zurück zum Lesen' : 'Kapitel bearbeiten', icon: editing ? 'eye' : 'edit', pressed: editing, click: () => this.editingOverview.set(!editing) };
+  }
+
+  private moveOpen(by: number): void {
+    const id = this.sceneId();
+    if (id !== null) {
+      this.moveScene({ id, by });
+    }
+  }
+
   private sceneCreated(id: number): void {
+    this.creating.set(false);
+    this.optional.set(false);
     this.error.set('');
     this.createdId = id;
     this.select(id);

@@ -66,7 +66,7 @@ export class NavService {
   readonly links = new Slot<NavItem>();
   /** Small things a page puts into the bar on top, like its search or a choice. */
   readonly extras = new Slot<TemplateRef<unknown>>();
-  /** The tutorial that explains the open page; the last one reported counts. */
+  /** The tutorial that explains the open page, with a step when needed ("rules#check"); the last one reported counts. */
   readonly topic = new Slot<string>();
 
   /** Whether the rail of the game master is drawn out, with names beside the symbols. */
@@ -99,7 +99,8 @@ export class NavService {
   /** Open the tutorial of the open page, or the one that introduces the area. */
   help(): void {
     this.menuOpen.set(false);
-    this.tutorial.open(this.topic.items().at(-1) ?? (this.area() === 'gm' ? 'start' : 'start-player'));
+    const [id, step] = (this.topic.items().at(-1) ?? (this.area() === 'gm' ? 'start' : 'start-player')).split('#');
+    this.tutorial.open(id, /^\d+$/.test(step ?? '') ? Number(step) : (step ?? 0));
   }
 
   private gameMasterTabs(): NavItem[] {

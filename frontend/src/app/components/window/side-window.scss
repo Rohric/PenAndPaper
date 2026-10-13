@@ -1,5 +1,7 @@
 // The width comes from the area: a column on the desktop, the whole screen on the phone.
 .side {
+  // The window scrolls by itself: what sticks inside it sticks to its own top.
+  --stick-top: 0px;
   position: fixed;
   top: 0;
   right: 0;

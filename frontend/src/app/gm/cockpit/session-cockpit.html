@@ -55,7 +55,7 @@
       @default {
         <div class="story">
           <div class="story__thread">
-            <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" [editable]="false" [done]="playedScenes()" (open)="sceneId.set($event)" />
+            <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" [done]="playedScenes()" (open)="sceneId.set($event)" />
           </div>
           <div class="story__main">
             <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" />

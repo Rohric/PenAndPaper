@@ -30,7 +30,8 @@ Symbolleiste:
 | --- | --- | --- |
 | Neu | Neue Welt | Dialog: Name der Welt (nur in der Liste) |
 | Zuletzt | Zuletzt angelegt und bearbeitet | Popup mit zwei Listen (in einer Welt) |
-| Hilfe | Hilfe zu dieser Seite | Tutorial |
+
+Die Hilfe zur Seite öffnet das Fragezeichen unten in der linken Leiste.
 
 ## Zustände
 

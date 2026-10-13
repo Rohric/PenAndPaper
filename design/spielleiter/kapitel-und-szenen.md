@@ -31,18 +31,20 @@ Als Spielleiter will ich meine Geschichte Kapitel für Kapitel und Szene für Sz
 ## Leisten in dieser Ansicht
 
 - **links, hier:** die Reiter der Welt (siehe [Welten](welten.md)), „Kapitel" ist aktiv.
-- **oben:** Welt › Kapitel 2 › Szene; Links: Szenen, Quests, Ereignisse, Überblick.
+- **oben:** Welten › Welt › Kapitel › 2 · Name › Szene; Links: Szenen, Quests, Ereignisse, Überblick.
 
 Symbolleiste:
 
 | Wort | voller Name | Klick |
 | --- | --- | --- |
-| Neu | Neues Kapitel bzw. Neue Szene | legt an und öffnet zum Schreiben |
+| Neu | Neues Kapitel bzw. Neue Szene | Dialog: Name, bei einer Szene der Haken „Optionale Szene"; legt an und öffnet zum Schreiben |
 | Schreiben | Szene schreiben | wechselt die gewählte Szene ins Schreiben; im Schreiben heißt es „Fertig" |
 | Hoch, Runter | Szene im Faden verschieben | schaltet direkt |
-| Hinzufügen | Quest oder Ereignis ins Kapitel | Popup: auswählen oder neu anlegen (Ansichten Quests, Ereignisse) |
-| Bearbeiten | Kapitel bearbeiten | Formular im Überblick |
-| Hilfe | Hilfe zu dieser Seite | Tutorial |
+| Bearbeiten | Kapitel bearbeiten | Formular im Überblick; im Formular heißt es „Lesen" |
+
+Quests und Ereignisse nimmt man in den Ansichten „Quests" und „Ereignisse" über das Suchfeld über den Karten ins Kapitel auf (auswählen oder neu anlegen). Der Überblick zeigt Orte, Figuren, Gegenstände und Wissen, die den Tag des Kapitels tragen.
+
+Die Hilfe zur Seite öffnet das Fragezeichen unten in der linken Leiste.
 
 ## Zustände
 

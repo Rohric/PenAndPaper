@@ -4,6 +4,8 @@
 
 // The size comes from the area: a window in the middle on the desktop, the whole screen on the phone.
 .dialog {
+  // The window scrolls by itself: what sticks inside it sticks to its own top.
+  --stick-top: 0px;
   position: fixed;
   top: 50%;
   left: 50%;

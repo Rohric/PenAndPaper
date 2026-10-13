@@ -12,6 +12,9 @@
   // The names in the line of a fight have room on the desktop.
   --who-width: 132px;
   --who-font: 14px;
+  // Where parts of a page that stay in view stop: below the bar on top, above the bar of tools.
+  --stick-top: var(--bar);
+  --stick-height: calc(100vh - var(--bar) - var(--tool-bar) - 2 * var(--gap-3));
 }
 
 @media (min-width: 1280px) {

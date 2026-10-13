@@ -16,8 +16,8 @@
 
 .split__list {
   position: sticky;
-  top: var(--gap-4);
-  max-height: calc(100vh - var(--bar) * 2 - var(--gap-5));
+  top: calc(var(--stick-top, 0px) + var(--gap-3));
+  max-height: var(--stick-height, calc(100vh - 2 * var(--gap-4)));
   overflow-y: auto;
   padding-right: var(--gap-1);
 }

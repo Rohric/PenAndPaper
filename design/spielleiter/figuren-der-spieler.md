@@ -21,14 +21,16 @@ Der Spielleiter schreibt nicht im Charakter der Spieler. Die Figuren der Welt (N
 ## Leisten in dieser Ansicht
 
 - **links:** „Figuren" in der Gruppe „immer" aktiv; „hier" leer.
-- **oben:** „Figuren der Spieler".
+- **oben:** „Figuren der Spieler"; Links: die Filter „Alle", „Frei" und je Abenteuer einer; das Suchfeld für Name oder Spieler.
 
 Symbolleiste:
 
 | Wort | voller Name | Klick |
 | --- | --- | --- |
-| Leveln | Budgets und Lebenspunkte | Popup mit dem Formular für den gewählten Charakter |
-| Hilfe | Hilfe zu dieser Seite | Tutorial |
+| Leveln | Budgets und Lebenspunkte | Popup mit dem Formular für den gewählten Charakter; ausgegraut, solange keiner gewählt ist |
+| Name, Spieler, Geändert | Reihenfolge der Liste | schaltet, eines ist gedrückt |
+
+Die Hilfe zur Seite öffnet das Fragezeichen unten in der linken Leiste.
 
 ## Zustände
 

@@ -43,6 +43,10 @@ export class EntryCard {
   /** The entry of the world this card stands for. */
   readonly ref = input.required<EntryRef>();
   readonly size = input<'tag' | 'tile' | 'card'>('tile');
+  /** Other words for a tag than the name of the entry, like "Kap. 2 · Am Hafen". */
+  readonly label = input('');
+  /** Another colour for a tag than the one of the kind: an item is knowledge, but has its own colour. */
+  readonly tone = input('');
   /** More words behind the kind, like " · hängt an einer Szene". */
   readonly marks = input('');
   /** Show all of the text instead of how it begins. */

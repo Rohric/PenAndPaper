@@ -30,7 +30,7 @@ Dasselbe Glossar gibt es in einer Runde als Ansicht des Cockpits. Dort tragen di
 ## Leisten in dieser Ansicht
 
 - **links, hier:** die Reiter der Welt, der offene Bereich ist aktiv. In einer Runde: die Reiter der Runde, „Glossar" aktiv; die Bereiche stehen dann als Links in der Kopfleiste.
-- **oben:** Welt › Glossar › Bereich, Suche.
+- **oben:** Welten › Welt › Bereich › Eintrag (auf seiner ganzen Seite), Suche.
 
 Symbolleiste:
 
@@ -38,7 +38,8 @@ Symbolleiste:
 | --- | --- | --- |
 | Neu | Neuer Eintrag in diesem Bereich | Dialog: Name; danach öffnet das Seitenfenster im Formular (nicht in einer Runde) |
 | Zuletzt | Zuletzt angelegt und bearbeitet | Popup |
-| Hilfe | Hilfe zu diesem Bereich | Tutorial |
+
+Die Hilfe zur Seite öffnet das Fragezeichen unten in der linken Leiste.
 
 ## Zustände
 

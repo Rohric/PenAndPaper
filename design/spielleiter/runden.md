@@ -35,7 +35,7 @@ Rechts in der Symbolleiste: Stecknadeln je Art mit Zahl (Popup mit [Tags](../bau
 ## Leisten in dieser Ansicht
 
 - **links, hier:** in der Liste nichts; in einer Runde Story, Master, Quests, Glossar, Notizen, Spieleransicht (und Kampf).
-- **oben:** in der Liste „Runden"; in einer Runde Name der Runde › Welt, das Auswahlfeld für das Kapitel, Suche.
+- **oben:** in der Liste „Runden"; in einer Runde Runden › Name der Runde › Welt › Kapitel, am Ende die Szene (Story) oder „Kampf"; das Auswahlfeld für das Kapitel, Suche.
 
 Symbolleiste der Liste:
 
@@ -43,7 +43,8 @@ Symbolleiste der Liste:
 | --- | --- | --- |
 | Neu | Neue Runde | Dialog |
 | QR-Code | QR-Code für Spieler | Popup |
-| Hilfe | Hilfe zu Runden | Tutorial |
+
+Die Hilfe zur Seite öffnet das Fragezeichen unten in der linken Leiste.
 
 ## Zustände
 

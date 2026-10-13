@@ -15,8 +15,8 @@
 
 .story__thread {
   position: sticky;
-  top: var(--gap-4);
-  max-height: calc(100vh - 2 * var(--bar) - var(--gap-5));
+  top: calc(var(--stick-top, 0px) + var(--gap-3));
+  max-height: var(--stick-height, calc(100vh - 2 * var(--gap-4)));
   padding-right: var(--gap-1);
   overflow-y: auto;
 }
