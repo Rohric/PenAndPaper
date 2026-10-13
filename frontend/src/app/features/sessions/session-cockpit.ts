@@ -316,6 +316,7 @@ export class SessionCockpit {
         this.tools.dismiss();
       }
     });
+    effect(() => this.world.activeScene.set(this.sceneId()));
     this.tools.provide('always', this.alwaysTools);
     this.tools.provide('view', this.viewTools);
     this.tools.provide('right', this.rightTools);

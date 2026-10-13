@@ -33,7 +33,10 @@ interface Tag extends EntryLink {
         </span>
         @if (now().goal) {
           <span class="soft clamp"><strong>Ziel:</strong> {{ now().goal }}</span>
-        } @else if (summary()) {
+        }
+        @if (now().description) {
+          <span class="soft clamp">{{ now().description }}</span>
+        } @else if (!now().goal && summary()) {
           <span class="soft clamp">{{ summary() }}</span>
         }
       </button>

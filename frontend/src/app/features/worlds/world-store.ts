@@ -64,6 +64,8 @@ export class WorldStore {
   readonly error = signal('');
   /** The entry that is looked up in the side panel, without leaving the page. */
   readonly peek = signal<Peek | null>(null);
+  /** Set by a session: the scene that is open, so cards can add entries to it. */
+  readonly activeScene = signal<number | null>(null);
   /** Set by a session: how a scene is opened there, instead of going to its chapter page. */
   openScene: ((sceneId: number) => void) | null = null;
   /** Set by a session: what it has different about a quest. While the world is written, nothing. */
