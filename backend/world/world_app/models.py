@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 
 from character_app.models import Npc
+from core.models import BaseEntry
 
 
 class World(models.Model):
@@ -22,21 +23,15 @@ class World(models.Model):
         return self.name
 
 
-class Entry(models.Model):
+class Entry(BaseEntry):
     """Hold what every entry of a world shares: what players may see and what only the game master knows."""
 
-    name = models.CharField(max_length=200)
-    # Players see name and description once a session revealed the entry.
-    description = models.TextField(blank=True)
     # Each piece: title, text. A session reveals these pieces one by one.
     player_knowledge = models.JSONField(default=list, blank=True)
     # Each piece: title, text. Only the game master reads these.
     gm_knowledge = models.JSONField(default=list, blank=True)
     # Name of the symbol shown for the entry; empty means the usual symbol of its kind.
     symbol = models.CharField(max_length=40, blank=True)
-    # When it was written and when it was changed last; Django fills both.
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -122,19 +117,14 @@ class Trivia(Entry):
         verbose_name_plural = "trivia"
 
 
-class Chapter(models.Model):
+class Chapter(BaseEntry):
     """Store one chapter of a world's story; its scenes form the thread of the story."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="chapters")
     number = models.PositiveIntegerField()
-    name = models.CharField(max_length=200)
-    text = models.TextField(blank=True)
     to_read = models.TextField(blank=True)
     quests = models.ManyToManyField(Quest, blank=True, related_name="chapters")
     events = models.ManyToManyField(Event, blank=True, related_name="chapters")
-    # When it was written and when it was changed last; Django fills both.
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["number"]
@@ -147,7 +137,7 @@ class Chapter(models.Model):
         return f"Kapitel {self.number}: {self.name}"
 
 
-class Scene(models.Model):
+class Scene(BaseEntry):
     """Store one scene of a chapter: numbered on the thread of the story, or optional beside it."""
 
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name="scenes")
@@ -155,8 +145,6 @@ class Scene(models.Model):
     position = models.PositiveIntegerField(default=0)
     # An optional scene has no place on the thread and can be used wherever it fits.
     optional = models.BooleanField(default=False)
-    name = models.CharField(max_length=200)
-    text = models.TextField(blank=True)
     to_read = models.TextField(blank=True)
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="scenes")
     npcs = models.ManyToManyField(Npc, blank=True, related_name="scenes")
@@ -167,9 +155,6 @@ class Scene(models.Model):
     trivia = models.ManyToManyField(Trivia, blank=True, related_name="scenes")
     # Each dialogue: title, lines. Each line: npc (id of the speaking character, or None) and text.
     dialogues = models.JSONField(default=list, blank=True)
-    # When it was written and when it was changed last; Django fills both.
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["position", "id"]

@@ -16,12 +16,14 @@
   @if (view().quests.length) {
     <div class="stack">
       <input class="input" aria-label="Quests suchen" placeholder="Quests durchsuchen" [value]="query()" (input)="query.set($any($event.target).value)" />
-      <div class="row" role="group" aria-label="Status">
-        <button type="button" class="pill" [attr.aria-pressed]="status() === 'all'" (click)="status.set('all')">Alle · {{ view().quests.length }}</button>
-        @for (item of statusCounts(); track item.id) {
-          <button type="button" class="pill" [attr.aria-pressed]="status() === item.id" (click)="status.set(item.id)">{{ item.label }} · {{ item.count }}</button>
-        }
-      </div>
+      @if (statusPills()) {
+        <div class="row" role="group" aria-label="Status">
+          <button type="button" class="pill" [attr.aria-pressed]="status() === 'all'" (click)="status.set('all')">Alle · {{ view().quests.length }}</button>
+          @for (item of statusCounts(); track item.id) {
+            <button type="button" class="pill" [attr.aria-pressed]="status() === item.id" (click)="status.set(item.id)">{{ item.label }} · {{ item.count }}</button>
+          }
+        </div>
+      }
       <div class="row" role="group" aria-label="Sortierung und Tags">
         <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'main'" (click)="sortBy.set('main')">Haupt zuerst</button>
         <button type="button" class="pill" [attr.aria-pressed]="sortBy() === 'name'" (click)="sortBy.set('name')">A–Z</button>

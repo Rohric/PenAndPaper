@@ -111,14 +111,14 @@ export class PointsOverview {
   protected readonly lines = computed(() => {
     const { base, bonus } = this.budgets();
     const baseLeft = basePointsLeft(this.skills(), base);
-    const bonusLeft = this.leveling() ? creditLeft(this.skills(), bonus).free : bonusPointsLeft(this.skills(), bonus);
+    const bonusLeft = bonusPointsLeft(this.skills(), bonus, this.leveling());
     return [
       { label: 'Grundpunkte', left: baseLeft, percent: this.percent(base - baseLeft, base) },
       { label: 'Bonuspunkte', left: bonusLeft, percent: this.percent(bonus - bonusLeft, bonus) },
     ];
   });
   protected readonly talents = computed(() => {
-    const credit = this.leveling() ? creditLeft(this.skills(), this.budgets().bonus).credit : undefined;
+    const credit = this.leveling() ? creditLeft(this.skills()) : undefined;
     return TALENTS.map((talent) => ({
       id: talent.id,
       label: talent.label,

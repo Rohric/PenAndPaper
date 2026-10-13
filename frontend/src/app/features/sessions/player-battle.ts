@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, TemplateRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -10,6 +10,8 @@ import { Icon } from '../../shared/icon';
 import { BattleExchange } from './battle-exchange';
 import { ownKey, recall, remember } from './battle-memory';
 import { BattleTimeline, TimelineEntry } from './battle-timeline';
+import { Tool } from './cockpit-tools';
+import { PlayerTools } from '../player/player-tools';
 import { SessionService } from './session.service';
 
 /**
@@ -25,6 +27,7 @@ import { SessionService } from './session.service';
 })
 export class PlayerBattlePanel {
   private readonly api = inject(SessionService);
+  private readonly playerTools = inject(PlayerTools);
 
   readonly sessionId = input.required<number>();
   readonly battle = input<PlayerBattle | null>(null);
@@ -74,7 +77,21 @@ export class PlayerBattlePanel {
   );
   private readonly characterId = computed(() => this.character()?.id ?? null);
 
+  private readonly logPop = viewChild<TemplateRef<unknown>>('logPop');
+  /** The symbols of the bar while the fight runs; what does not fit the moment is greyed out. */
+  protected readonly tools = computed<Tool[]>(() => {
+    const free = this.myTurn() && !this.open();
+    return [
+      { id: 'fight-attack', word: 'Angriff', icon: 'sword', pressed: this.mode() === 'attack', disabled: !free, click: () => this.mode.set('attack') },
+      { id: 'fight-action', word: 'Aktion', icon: 'speech', pressed: this.mode() === 'action', disabled: !free, click: () => this.mode.set('action') },
+      { id: 'fight-close', word: 'Abschließen', title: 'Zug abschließen', icon: 'check', disabled: !this.canClose(), click: () => this.close() },
+      { id: 'fight-log', word: 'Verlauf', icon: 'book', popup: this.logPop(), popupTitle: 'Verlauf' },
+      this.playerTools.help('rules', 'initiative'),
+    ];
+  });
+
   constructor() {
+    this.playerTools.provide('view', this.tools);
     // Fill in what the own character picked the last time, once it is known which character plays.
     effect(() => this.recallChoice(this.characterId()));
   }

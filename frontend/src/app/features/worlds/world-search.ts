@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, viewChild } from '@angular/core';
 
 import { EntryKind, Option, isItem } from '../../core/models';
 import { LinkPicker } from '../../shared/link-picker';
@@ -35,6 +35,7 @@ const SPAN = 1_000_000;
 })
 export class WorldSearch {
   private readonly store = inject(WorldStore);
+  private readonly picker = viewChild(LinkPicker);
 
   protected readonly options = computed<Option[]>(() => [
     ...this.store.locations().map((place) => this.option('locations', place.id, place.name, allText(place))),
@@ -46,6 +47,11 @@ export class WorldSearch {
       tone: isItem(trivia) ? 'items' : 'trivia',
     })),
   ]);
+
+  /** Put the cursor into the search field. */
+  focus(): void {
+    this.picker()?.focus();
+  }
 
   /** Look the chosen entry up at the side. */
   protected open(value: number | null): void {

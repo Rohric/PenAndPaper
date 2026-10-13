@@ -31,7 +31,7 @@
         </div>
 
         <div class="skill__points">
-          <div class="stepper">
+          <div class="stepper stepper--base">
             <span class="stepper__label">
               Grund
               @if (row.fixed) {
@@ -51,8 +51,8 @@
             />
             <button type="button" class="btn stepper__btn" aria-label="Grundpunkte mehr" (click)="stepPoints(row.index, 1)">+</button>
           </div>
-          <div class="stepper" [class.stepper--credit]="row.note?.usable">
-            <span class="stepper__label">Dazu</span>
+          <div class="stepper stepper--bonus">
+            <span class="stepper__label">Bonuspunkte</span>
             <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte weniger" [disabled]="!row.skill.bonus_points" (click)="stepBonus(row.index, -1)">−</button>
             <input
               class="input input--number stepper__input"
@@ -64,19 +64,31 @@
               (ngModelChange)="setBonus(row.index, $event)"
             />
             <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte mehr" (click)="stepBonus(row.index, 1)">+</button>
+            @if (leveling()) {
+              <span class="soft skill__cost">+1 kostet {{ cost(row.skill) }} {{ cost(row.skill) === 1 ? 'Bonuspunkt' : 'Bonuspunkte' }}</span>
+            }
           </div>
+          @if (row.showCredit) {
+            <div class="stepper stepper--credit" [class.stepper--hot]="row.note?.usable">
+              <span class="stepper__label">Guthaben</span>
+              <button type="button" class="btn stepper__btn" aria-label="Guthaben weniger" [disabled]="!row.skill.credit_points" (click)="stepCredit(row.index, -1)">−</button>
+              <input
+                class="input input--number stepper__input"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                [attr.aria-label]="'Guthaben ' + row.skill.name"
+                [ngModel]="row.skill.credit_points ?? 0"
+                (ngModelChange)="setCredit(row.index, $event)"
+              />
+              <button type="button" class="btn stepper__btn" aria-label="Guthaben mehr" [disabled]="row.creditBlocked" (click)="stepCredit(row.index, 1)">+</button>
+              <span class="soft skill__cost">+1 kostet {{ creditPrice(row.skill) }} Guthaben</span>
+            </div>
+          }
         </div>
 
-        @if (leveling()) {
-          <span class="soft skill__cost">+1 kostet {{ cost(row.skill) }} {{ cost(row.skill) === 1 ? 'Bonuspunkt' : 'Bonuspunkte' }}</span>
-        }
         @if (row.note) {
           <p class="skill__message skill__message--credit">{{ row.note.text }}</p>
-          @if (row.note.usable) {
-            <button type="button" class="btn btn--small skill__spend" (click)="stepBonus(row.index, 1); $event.stopPropagation()">
-              <app-icon name="plus" [size]="14" /> Guthaben einsetzen: +1 Punkt
-            </button>
-          }
         }
         @for (problem of row.problems; track $index) {
           <p class="skill__message skill__message--error" role="alert">{{ problem.text }}</p>

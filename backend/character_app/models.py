@@ -3,11 +3,13 @@
 from django.conf import settings
 from django.db import models
 
+from core.models import BaseEntry
+
 START_LIFE_POINTS = 100
 START_SKILL_POINTS = 400
 
 
-class BaseCharacter(models.Model):
+class BaseCharacter(BaseEntry):
     """Hold the fields every character shares; it creates no table of its own."""
 
     class Talent(models.TextChoices):
@@ -17,18 +19,17 @@ class BaseCharacter(models.Model):
         KNOWLEDGE = "knowledge", "Wissen"
         SOCIAL = "social", "Soziales"
 
-    name = models.CharField(max_length=200)
     age = models.CharField(max_length=100, blank=True)
     gender = models.CharField(max_length=100, blank=True)
     profession = models.CharField(max_length=200, blank=True)
-    description = models.TextField(blank=True)
     # The life points right now, and the most the character can have.
     life_points = models.PositiveIntegerField(default=START_LIFE_POINTS)
     max_life_points = models.PositiveIntegerField(default=START_LIFE_POINTS)
     # Two budgets: base points from character creation, bonus points from leveling.
     skill_points_total = models.PositiveIntegerField(default=START_SKILL_POINTS)
     bonus_points_total = models.PositiveIntegerField(default=0)
-    # Each skill: id (fixed number), name, talent, points, bonus_points (points won by leveling), description.
+    # Each skill: id (fixed number), name, talent, points, bonus_points (points won by leveling),
+    # credit_points (points bought with the credit of its talent), description.
     skills = models.JSONField(default=list, blank=True)
     # Each item: name, quantity, damage_dice, damage_bonus, description. Optional: item (id of the
     # world item it comes from) and hidden (then only its owner and the game master see it).
@@ -40,9 +41,6 @@ class BaseCharacter(models.Model):
     # A picture of the character, and whether it is shown instead of the symbol.
     image = models.ImageField(upload_to="characters/", blank=True)
     shows_image = models.BooleanField(default=False)
-    # When it was written and when it was changed last; Django fills both.
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True

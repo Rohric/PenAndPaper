@@ -34,8 +34,8 @@ import { WorldStore } from './world-store';
           <a class="tile tile--link kind--chapters" [routerLink]="[chapter.id]">
             <span class="kicker">Kapitel {{ chapter.number }}</span>
             <span class="tile__title">{{ chapter.name }}</span>
-            @if (chapter.text) {
-              <span class="soft clamp">{{ chapter.text }}</span>
+            @if (chapter.description) {
+              <span class="soft clamp">{{ chapter.description }}</span>
             }
             <span class="row">
               @for (count of counts(chapter); track count) {

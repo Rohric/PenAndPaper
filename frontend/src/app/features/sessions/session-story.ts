@@ -96,17 +96,17 @@ export class SessionStory {
           { id: 'story-quests', word: 'Quests', icon: 'quest', tone: 'kind--quests', count: this.sceneQuests().length, popup: this.questList(), popupTitle: 'Quests dieser Szene', wide: true },
           { id: 'story-events', word: 'Ereignisse', icon: 'flag', tone: 'kind--events', count: this.sceneEvents().length, popup: this.eventList(), popupTitle: 'Ereignisse dieser Szene', wide: true },
           { id: 'story-knowledge', word: 'Wissen', icon: 'gift', tone: 'kind--trivia', count: this.knowledge().length, popup: this.knowledgeList(), popupTitle: 'Gegenstände und Wissen der Szene' },
-          { id: 'story-leads', word: 'Führt zu', icon: 'right', tone: 'kind--scenes', count: this.leads().length, popup: this.leadsList(), popupTitle: 'Führt zu' },
+          { id: 'story-leads', word: 'Weiter', title: 'Führt zu', icon: 'right', tone: 'kind--scenes', count: this.leads().length, popup: this.leadsList(), popupTitle: 'Führt zu' },
         ]
       : [];
     const world: Tool[] = [
-      { id: 'story-main', word: 'Hauptquests', icon: 'quest', tone: 'kind--quests', count: this.runningMain(), popup: this.mainList(), popupTitle: 'Hauptquests', wide: true },
-      { id: 'story-free', word: 'Freie Ereignisse', icon: 'flag', tone: 'kind--events', count: this.freeCount(), popup: this.freeList(), popupTitle: 'Freie Ereignisse', wide: true },
+      { id: 'story-main', word: 'Haupt', title: 'Hauptquests', icon: 'quest', tone: 'kind--quests', count: this.runningMain(), popup: this.mainList(), popupTitle: 'Hauptquests', wide: true },
+      { id: 'story-free', word: 'Freie', title: 'Freie Ereignisse', icon: 'flag', tone: 'kind--events', count: this.freeCount(), popup: this.freeList(), popupTitle: 'Freie Ereignisse', wide: true },
     ];
     const switches: Tool[] = scene
       ? [
           { id: 'story-played', word: 'Gespielt', icon: 'check', pressed: !!this.store.state('scene', scene.id)?.done, click: () => this.store.toggle('scene', scene.id, 'done') },
-          { id: 'story-pin', word: 'Stecknadel', icon: 'pin', pressed: !!this.store.state('scene', scene.id)?.pinned, click: () => this.store.toggle('scene', scene.id, 'pinned') },
+          { id: 'story-pin', word: 'Nadel', title: 'Stecknadel', icon: 'pin', pressed: !!this.store.state('scene', scene.id)?.pinned, click: () => this.store.toggle('scene', scene.id, 'pinned') },
           { id: 'story-fight', word: 'Kampf hier', icon: 'sword', click: () => this.fight.emit(scene) },
         ]
       : [];

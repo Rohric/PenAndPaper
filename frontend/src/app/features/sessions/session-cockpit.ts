@@ -16,6 +16,7 @@ import { Eyes, isItem } from '../worlds/entry-views';
 import { GLOSSARY_SECTIONS, GlossaryTiles, SectionId } from '../worlds/glossary-tiles';
 import { Carrier } from '../worlds/item-rows';
 import { SceneThread } from '../worlds/scene-thread';
+import { SceneView } from '../worlds/scene-view';
 import { WorldSearch } from '../worlds/world-search';
 import { WorldStore } from '../worlds/world-store';
 import { BattleView } from './battle-view';
@@ -54,7 +55,8 @@ type Panel =
   | { kind: 'roll' }
   | { kind: 'level' }
   | { kind: 'members' }
-  | { kind: 'chat' };
+  | { kind: 'chat' }
+  | { kind: 'scene'; sceneId: number };
 
 /** What fills the page between the two bars. */
 type View = 'story' | 'master' | 'quests' | 'glossary' | 'notes' | 'players';
@@ -92,6 +94,7 @@ const PANEL_TITLES: Record<Panel['kind'], string> = {
   level: 'Kapitel abschließen',
   members: 'Gruppe bearbeiten',
   chat: 'Chat der Gruppe',
+  scene: 'Szene',
 };
 
 /** How the kinds of a session are called among the entries of a world. */
@@ -115,11 +118,12 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
   imports: [
     RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
     ChapterCloseForm, ChatThread, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
-    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch, MasterTable, ToolBar,
+    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch, MasterTable, ToolBar, SceneView,
   ],
   providers: [WorldStore, SessionStore, CockpitTools],
   templateUrl: './session-cockpit.html',
   styleUrl: './session-cockpit.scss',
+  host: { '(document:keydown)': 'onKey($event)' },
 })
 export class SessionCockpit {
   protected readonly world = inject(WorldStore);
@@ -131,8 +135,11 @@ export class SessionCockpit {
   readonly sessionId = input.required<string>();
 
   protected readonly views = VIEWS;
+  private readonly search = viewChild<WorldSearch>('search');
   protected readonly ago = timeAgo;
   protected readonly view = signal<View>('story');
+  /** The entry whose connections the master mode shows. It has nothing to do with the scene of the story. */
+  protected readonly masterFocus = signal<EntryRef | null>(null);
   protected readonly panel = signal<Panel | null>(null);
   protected readonly sceneId = signal<number | null>(null);
   protected readonly battleId = signal<number | null>(null);
@@ -179,6 +186,10 @@ export class SessionCockpit {
     const panel = this.panel();
     const id = panel && 'characterId' in panel ? panel.characterId : null;
     return this.store.characters().find((character) => character.id === id) ?? null;
+  });
+  protected readonly panelScene = computed(() => {
+    const panel = this.panel();
+    return panel?.kind === 'scene' ? (this.world.scenes().find((scene) => scene.id === panel.sceneId) ?? null) : null;
   });
   protected readonly panelNote = computed(() => {
     const panel = this.panel();
@@ -251,7 +262,7 @@ export class SessionCockpit {
     { id: 'chat', word: 'Chat', icon: 'speech', count: this.chatUnread(), click: () => this.openPanel({ kind: 'chat' }) },
     { id: 'fight', word: 'Kampf', icon: 'sword', pressed: this.battleId() !== null, click: () => this.openBattle() },
     { id: 'archive', word: 'Archiv', icon: 'archive', click: () => this.openPanel({ kind: 'archive' }) },
-    { id: 'level', word: 'Kapitel abschließen', icon: 'flag', click: () => this.openPanel({ kind: 'level' }) },
+    { id: 'level', word: 'Kapitel', title: 'Kapitel abschließen', icon: 'flag', click: () => this.openPanel({ kind: 'level' }) },
   ]);
   /** The symbols on the right: one for every kind of pin that exists, and the last roll. */
   private readonly rightTools = computed<Tool[]>(() => {
@@ -260,7 +271,7 @@ export class SessionCockpit {
       count: this.pins().filter((pin) => pin.session === part.kind).length, data: part.kind, popup: this.pinPop(), popupTitle: `Stecknadeln · ${part.word}`,
     })).filter((tool) => tool.count);
     const roll = this.lastRoll();
-    return [...pins, { id: 'last-roll', word: 'Letzter Wurf', icon: 'dice', count: roll?.rolled ?? roll?.total ?? null, popup: this.rollPop(), popupTitle: 'Letzter Wurf' }];
+    return [...pins, { id: 'last-roll', word: 'Wurf', title: 'Letzter Wurf', icon: 'dice', count: roll?.rolled ?? roll?.total ?? null, popup: this.rollPop(), popupTitle: 'Letzter Wurf' }];
   });
   /** The symbols of the views the cockpit draws itself; the other views and the battle report their own. */
   private readonly viewTools = computed<Tool[]>(() => {
@@ -277,13 +288,13 @@ export class SessionCockpit {
         ];
       case 'notes':
         return [
-          { id: 'notes-new', word: 'Neue Notiz', icon: 'plus', click: () => this.openPanel({ kind: 'note', noteId: null }) },
-          { id: 'notes-group', word: 'Gruppenblock', icon: 'group', count: this.fresh(), popup: this.groupNotesPop(), popupTitle: 'Gruppenblock' },
+          { id: 'notes-new', word: 'Neu', title: 'Neue Notiz', icon: 'plus', click: () => this.openPanel({ kind: 'note', noteId: null }) },
+          { id: 'notes-group', word: 'Block', title: 'Gruppenblock', icon: 'group', count: this.fresh(), popup: this.groupNotesPop(), popupTitle: 'Gruppenblock' },
         ];
       case 'players':
         return [
-          { id: 'players-reload', word: 'Neu laden', icon: 'undo', click: () => this.loadPlayerView() },
-          { id: 'players-shared', word: 'Zuletzt geteilt', icon: 'eye', popup: this.sharedPop(), popupTitle: 'Zuletzt geteilt' },
+          { id: 'players-reload', word: 'Laden', title: 'Neu laden', icon: 'undo', click: () => this.loadPlayerView() },
+          { id: 'players-shared', word: 'Geteilt', title: 'Zuletzt geteilt', icon: 'eye', popup: this.sharedPop(), popupTitle: 'Zuletzt geteilt' },
         ];
       default:
         return [];
@@ -327,11 +338,27 @@ export class SessionCockpit {
       }
     });
     // Links to scenes stay in the cockpit instead of leading to the writing tool.
-    this.world.openScene = (sceneId) => this.sceneId.set(sceneId);
+    this.world.openScene = (sceneId) =>
+      this.view() === 'master' && this.battleId() === null ? this.masterFocus.set({ kind: 'scenes', id: sceneId }) : this.sceneId.set(sceneId);
     // Quests are shown as this session has them, without changing the world.
     this.world.questChanges = (questId) => this.store.state('quest', questId)?.changes ?? {};
     const timer = setInterval(() => this.store.refresh(), REFRESH_MS);
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
+  }
+
+  /** Keys: "/" jumps into the search, 1 to 6 switch the view. Nothing happens while the user types somewhere. */
+  protected onKey(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (event.ctrlKey || event.altKey || event.metaKey || target?.closest('input, textarea, select, [contenteditable]')) {
+      return;
+    }
+    const view = VIEWS[Number(event.key) - 1];
+    if (event.key === '/') {
+      event.preventDefault();
+      this.search()?.focus();
+    } else if (view) {
+      this.show(view.id);
+    }
   }
 
   /** Switch to a view; a battle that is open is left. */
@@ -351,6 +378,30 @@ export class SessionCockpit {
     if (panel.kind === 'messages' && this.store.unread(panel.characterId)) {
       this.store.markRead(panel.characterId);
     }
+  }
+
+  /** Show an entry to read in the master mode: a scene in a window, everything else in the window of the entries. */
+  protected look(ref: EntryRef): void {
+    if (ref.kind === 'scenes') {
+      this.openPanel({ kind: 'scene', sceneId: ref.id });
+    } else {
+      this.world.peek.set({ kind: ref.kind, id: ref.id });
+    }
+  }
+
+  /** Go to the place where an entry can be edited: the story, the quests or the glossary. */
+  protected toEntry(ref: EntryRef): void {
+    if (ref.kind === 'scenes') {
+      this.show('story');
+      this.sceneId.set(ref.id);
+      return;
+    }
+    const item = ref.kind === 'trivia' && this.world.trivia().some((trivia) => trivia.id === ref.id && isItem(trivia));
+    this.show(ref.kind === 'quests' ? 'quests' : 'glossary');
+    if (ref.kind !== 'quests') {
+      this.sectionId.set((item ? 'items' : ref.kind) as SectionId);
+    }
+    this.world.peek.set({ kind: ref.kind, id: ref.id });
   }
 
   /** The pins of one kind, for the popup behind its symbol. */

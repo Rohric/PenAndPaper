@@ -2,15 +2,15 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Skill, TALENTS, Talent } from '../../core/models';
-import { CreditLeft, SkillProblem, nextCost } from '../../core/house-rules';
+import { SkillProblem, nextCost, nextCreditCost, refund } from '../../core/house-rules';
 import { MAX_SKILL_VALUE, inspirationPoints, rawValue, skillValue, talentValue } from '../../core/rules';
 import { Icon } from '../../shared/icon';
 
 const MAX_BASE_POINTS = 100;
 
 /**
- * Edit the skills of a character, one card per talent. Every skill has its base points and its points
- * won by leveling, each with a minus and a plus, the value it is rolled against, and the messages of the
+ * Edit the skills of a character, one card per talent. Every skill has its base points, its bonus points
+ * and its credit, each counter with a minus and a plus and a colour of its own, the value it is rolled against, and the messages of the
  * rules directly below it. While the character plays in an adventure its base points are locked.
  */
 @Component({
@@ -27,8 +27,8 @@ export class SkillEditor {
   readonly locked = input(false);
   /** Whether bonus points cost by tiers; the cost of the next point is shown then. */
   readonly leveling = input(false);
-  /** The free bonus points and the credit of each talent; only a player character has them. */
-  readonly credit = input<CreditLeft | undefined>(undefined);
+  /** The open credit of each talent; only a player character has it. */
+  readonly credit = input<Record<Talent, number> | undefined>(undefined);
   readonly problems = input<SkillProblem[]>([]);
   readonly hints = input<{ index: number; text: string }[]>([]);
   readonly skillsChange = output<Skill[]>();
@@ -43,7 +43,7 @@ export class SkillEditor {
 
   /** Append an empty skill to a talent. */
   protected add(talent: Talent): void {
-    this.skillsChange.emit([...this.skills(), { name: '', talent, points: 0, bonus_points: 0, description: '' }]);
+    this.skillsChange.emit([...this.skills(), { name: '', talent, points: 0, bonus_points: 0, credit_points: 0, description: '' }]);
   }
 
   /** Change fields of one skill. */
@@ -59,6 +59,16 @@ export class SkillEditor {
   /** Set the points won by leveling. */
   protected setBonus(index: number, value: number | null): void {
     this.change(index, { bonus_points: Math.min(MAX_BASE_POINTS, this.whole(value)) });
+  }
+
+  /** Set the points bought with credit. */
+  protected setCredit(index: number, value: number | null): void {
+    this.change(index, { credit_points: Math.min(MAX_BASE_POINTS, this.whole(value)) });
+  }
+
+  /** Move the points bought with credit by a step. */
+  protected stepCredit(index: number, step: number): void {
+    this.setCredit(index, (this.skills()[index].credit_points ?? 0) + step);
   }
 
   /** Move the base points by a step. */
@@ -92,20 +102,25 @@ export class SkillEditor {
     return nextCost(skill);
   }
 
+  /** What the next point bought with credit costs. */
+  protected creditPrice(skill: Skill): number {
+    return nextCreditCost(skill);
+  }
+
   /** What the credit of the talent means for the skill the user tapped; empty when it has none. */
   private creditNote(skill: Skill, label: string): { text: string; usable: boolean } | null {
-    const credit = this.credit()?.credit[skill.talent] ?? 0;
-    if (!credit) {
+    const credit = this.credit()?.[skill.talent] ?? 0;
+    if (credit <= 0) {
       return null;
     }
     const own = `Du hast ${credit} ${credit === 1 ? 'Punkt' : 'Punkte'} Guthaben in ${label}.`;
     if (rawValue(skill, this.skills()) >= MAX_SKILL_VALUE) {
       return { text: `${own} „${skill.name || 'Die Fähigkeit'}“ ist bei ${MAX_SKILL_VALUE}. Setz das Guthaben bei einer anderen Fähigkeit in ${label} ein.`, usable: false };
     }
-    const missing = nextCost(skill) - credit - Math.max(0, this.credit()?.free ?? 0);
-    return missing > 0
-      ? { text: `${own} Für +1 hier fehlt dir ${missing} Bonuspunkt${missing === 1 ? '' : 'e'}.`, usable: false }
-      : { text: `${own} Hier kannst du ${credit === 1 ? 'ihn' : 'sie'} einsetzen.`, usable: true };
+    const price = nextCreditCost(skill);
+    return credit >= price
+      ? { text: `${own} Hier kannst du es einsetzen: +1 kostet ${price} Guthaben.`, usable: true }
+      : { text: `${own} Für +1 hier brauchst du ${price} Guthaben.`, usable: false };
   }
 
   private whole(value: number | null): number {
@@ -124,9 +139,11 @@ export class SkillEditor {
         problems: this.problems().filter((problem) => problem.index === index),
         hints: this.hints().filter((hint) => hint.index === index),
         note: this.active() === index ? this.creditNote(skill, label) : null,
+        showCredit: this.leveling() && (refund(skills, talent) > 0 || (skill.credit_points ?? 0) > 0),
+        creditBlocked: (this.credit()?.[talent] ?? 0) < nextCreditCost(skill) || rawValue(skill, skills) >= MAX_SKILL_VALUE,
       }))
       .filter((row) => row.skill.talent === talent);
-    const credit = this.credit()?.credit[talent] ?? 0;
+    const credit = this.credit()?.[talent] ?? 0;
     return { talent, label, rows, credit, value: talentValue(skills, talent), inspiration: inspirationPoints(skills, talent) };
   }
 }

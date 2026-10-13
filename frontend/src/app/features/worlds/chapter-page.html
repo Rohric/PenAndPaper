@@ -56,8 +56,8 @@
                   <p class="prose">{{ current.to_read }}</p>
                 </div>
               }
-              @if (current.text) {
-                <p class="prose">{{ current.text }}</p>
+              @if (current.description) {
+                <p class="prose">{{ current.description }}</p>
               } @else {
                 <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ schreibst du, worum es geht.</p>
               }

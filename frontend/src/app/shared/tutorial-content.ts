@@ -210,7 +210,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Was Spieler sehen',
-        text: 'Jeder Eintrag der Welt hat drei Arten Text. Die Beschreibung sehen die Spieler, sobald du den Eintrag in einer Runde freigibst. „Wissen für Spieler“ gibst du in der Runde Stück für Stück frei. „Wissen nur für dich“ sehen sie nie.\n\nDas gilt genauso für Orte, Quests, Ereignisse und Wissen.',
+        text: 'Jeder Eintrag der Welt hat drei Arten Text. Die Beschreibung sehen die Spieler, sobald du den Eintrag in einer Runde freigibst. „Wissen für Spieler“ gibst du in der Runde Stück für Stück frei. „Wissen nur für dich“ sehen sie nie.\n\nDas gilt genauso für Orte, Quests, Ereignisse und Wissen.\nMit dem Haken „Von Anfang an für Spieler sichtbar“ ist eine Figur in neuen Runden gleich aufgedeckt, mit Name und Beschreibung. Das gilt für jeden Eintrag der Welt, nicht für Runden, die schon laufen.',
       },
       {
         title: 'Beispielsätze',
@@ -229,22 +229,22 @@ export const TUTORIALS: Tutorial[] = [
     steps: [
       {
         title: 'Charakter anlegen',
-        text: 'Unter „Meine Charaktere“ baust du die Figuren, die du spielst. Gib einen Namen ein und leg den Charakter an, danach füllst du ihn im Editor.\n\nOben im Editor stehen immer dein Name und der Speicherknopf. Darunter wechselst du zwischen Steckbrief, Skillung, Inventar und Besonderem.',
+        text: 'Unter „Meine Charaktere“ baust du die Figuren, die du spielst. Gib einen Namen ein und leg den Charakter an, danach füllst du ihn im Editor.\n\nUnten wechselst du über die Symbole zwischen Profil, Skillung, Inventar und Extra. Der runde Speicherknopf unten rechts erscheint erst, wenn du etwas geändert hast. Bei Fehlern ist er rot und trägt die Zahl der Fehler. Nach dem Speichern steht oben kurz „Gespeichert“.',
         tip: 'Der Speicherknopf zeigt, wie es steht: „Speichern“, wenn du etwas geändert hast, „Gespeichert“, wenn alles gesichert ist, und „2 Fehler“, wenn die Regeln noch etwas verlangen.',
       },
       {
         title: 'Skillung Schritt für Schritt',
-        text: 'Du hast 400 Grundpunkte. Verteile sie in der Skillung auf Fähigkeiten. Jede Fähigkeit gehört zu Handeln, Wissen oder Soziales.\n\nJede Fähigkeit hat zwei Zähler mit Minus und Plus: „Grund“ für die Punkte aus der Erstellung und „Dazu“ für Punkte, die du später beim Leveln gewinnst. Die große Zahl rechts ist der Wert, mit dem gewürfelt wird.',
+        text: 'Du hast 400 Grundpunkte. Verteile sie in der Skillung auf Fähigkeiten. Jede Fähigkeit gehört zu Handeln, Wissen oder Soziales.\n\nJede Fähigkeit hat bis zu drei Zähler mit Minus und Plus, jeder mit seiner Farbe: „Grund“ für die Punkte der Erstellung, „Bonuspunkte“ für Punkte, die du beim Leveln gewinnst, und „Guthaben“, sobald deine Begabung welches hat. Der Wert, auf den gewürfelt wird, steht rechts neben dem Namen.',
         list: ['Mindestens 1 Punkt je Fähigkeit.', 'Höchstwert 100 mit dem Begabungswert.', 'Alle 400 Grundpunkte sollten verteilt werden.'],
         example: 'Holzfällen mit 50 Grundpunkten und Handeln 13 ergibt den Wert 63.',
       },
       {
-        title: 'Die Übersicht oben',
-        text: 'Unter dem Speicherknopf siehst du zwei Balken: wie viele Grund- und Bonuspunkte schon vergeben sind und wie viele übrig bleiben. Daneben stehen die Begabungswerte von Handeln, Wissen und Soziales.\n\nRot heißt: zu viel vergeben.',
+        title: 'Offene Punkte unten links',
+        text: 'Unten links am Bildschirm hängt ein kleines Feld mit farbigen Kreisen: offene Grundpunkte, freie Bonuspunkte und, wenn du welches hast, offenes Guthaben. Nur die Zahl steht darin. Ist ein Kreis blass, ist nichts mehr offen, ist er rot gefüllt, hast du zu viel vergeben.\n\nEin Tipp auf das Feld öffnet die ganze Übersicht mit den Begabungswerten von Handeln, Wissen und Soziales.',
       },
       {
         title: 'Meldungen der Regeln',
-        text: 'Wenn etwas gegen die Regeln geht, steht die Meldung direkt unter der Fähigkeit, zum Beispiel „Schwert hat Wert 104. Höchstwert ist 100: Verteile 4 Punkte in Handeln um.“\n\nSolange eine Meldung da ist, lässt sich nicht speichern. Ein Tipp auf „Fehler“ führt dich zur Skillung.',
+        text: 'Wenn etwas gegen die Regeln geht, steht die Meldung direkt unter der Fähigkeit, zum Beispiel „Schwert hat Wert 104. Höchstwert ist 100: Verteile 4 Punkte in Handeln um.“\n\nSolange eine Meldung da ist, ist der Speicherknopf rot. Ein Tipp darauf springt zu den Meldungen.',
         tip: 'Hinweise ohne Rot sperren nichts. Sie sagen dir zum Beispiel, dass eine Fähigkeit bei 100 gedeckelt ist.',
       },
       {
@@ -306,11 +306,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Das Cockpit',
-        text: 'Das Cockpit hat zwei Leisten. Oben stehen nur die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht, dazu Kapitel, Suche und Hilfe. Auf dem Schirm steht nur, was du gerade liest.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und Kapitel abschließen. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet über sich ein Popup. Es ist immer nur eines offen. Esc, ein Klick daneben oder ein zweiter Klick auf das Symbol schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt.',
+        text: 'Das Cockpit hat zwei Leisten. Oben stehen nur die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht, dazu Kapitel, Suche und Hilfe. Auf dem Schirm steht nur, was du gerade liest.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und Kapitel abschließen. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet über sich ein Popup. Es ist immer nur eines offen. Esc, ein Klick daneben oder ein zweiter Klick auf das Symbol schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt.\nTastenkürzel: „/“ springt in die Suche, die Ziffern 1 bis 6 wechseln die Ansicht.',
       },
       {
         title: 'Master-Modus: der Tisch',
-        text: 'Die Ansicht „Master“ ist dein Tisch. Oben steht schmal die offene Szene, „Vorlesen“ klappt den Text auf. Darunter liegt „Hier am Ort“: kleine Kacheln für alles, was zur Szene und ihrem Ort gehört, also Figuren, offene Quests und Ereignisse, Gegenstände und Wissen.\n\nUnter „Meine Gruppen“ liegt, was du selbst auf den Tisch gelegt hast, nach dem Namen der Gruppe sortiert. In der Leiste legt „Auf den Tisch“ einen Eintrag der Welt in eine Gruppe, „Gruppe anlegen“ macht eine neue, „Szene wechseln“ wählt eine andere Szene. Im Seitenfenster eines Eintrags gibt es dasselbe als Knopf „Auf den Tisch“. An jeder Kachel wählst du eine andere Gruppe oder nimmst sie „Vom Tisch“.\n\nGanz unten stehen die Charaktere der Gruppe. Was auf dem Tisch liegt, bleibt bei der Runde gespeichert und ist auch nach dem Neuladen noch da. Die Welt ändert sich dadurch nicht.',
+        text: 'Die Ansicht „Master“ ist dein Tisch. Sie hängt nicht an der Szene der Story und ist zum Ansehen und Benutzen da, nicht zum Bearbeiten.\n\nOben suchst du in allem. Wählst du eine Kachel, zeigt „Dazu gehört“ ihre Verbindungen: bei einer Szene Ort, Figuren, Quests, Ereignisse, Gegenstände, Wissen und wohin sie führt. Durch einen Klick auf eine Verbindung wanderst du weiter, „Zurück“ bringt dich zurück. „Alle auf den Tisch“ legt den Eintrag mit allem Verbundenen in eine Gruppe.\n\n„Mein Tisch“ zeigt, was du selbst in Gruppen gelegt hast. Darunter hat jede Art von Eintrag ihre Schublade mit einer Zahl, immer eine ist offen. Vier Schalter in der Leiste blenden Erledigtes, Ungeteiltes, nicht Angepinntes und andere Kapitel aus. Links stehen die Notizen, rechts die Charaktere der Gruppe als runde Knöpfe mit einem Popup.\n\nÄndern geht hier nicht: „Zum Eintrag“ bringt dich dorthin, wo du bearbeiten kannst.',
+      },
+      {
+        title: 'Notiz an einem Eintrag',
+        text: 'Zu jedem Eintrag kannst du eine Notiz schreiben, die nur du siehst. Du findest sie an jeder Kachel unter dem Symbol der Notiz und im Seitenfenster des Eintrags.\n\nDie Notiz gehört zu dieser Runde. Die Welt ändert sich nicht, und die Spieler sehen sie nie. Im Master-Modus stehen alle Einträge mit Notiz links in der Liste.',
       },
       {
         title: 'Das Seitenfenster',
@@ -354,7 +358,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Kampf',
-        text: 'Nur du startest einen Kampf. „Kampf“ unten in der Symbolleiste nimmt alle Charaktere der Runde. „Kampf hier“ in der Story nimmt zusätzlich alle Figuren der Szene mit. Läuft schon ein Kampf, kommen sie dazu.\n\nIm Kampf wechselt die Mitte der Symbolleiste: Teilnehmer, Verlauf, Nächster ist dran, Zug abschließen, Wurf verwerfen, Teilnehmer dazu und Kampf beenden. Was gerade nicht geht, ist ausgegraut. Der Schirm zeigt die Zeitleiste, den offenen Wurf und den Angriff.\n\nErst würfelst du die Initiative (1W10 plus Handeln), dann ist jeder der Reihe nach dran. Spieler würfeln ihren Angriff auf ihrer eigenen Seite, du kannst es auch für sie tun.',
+        text: 'Nur du startest einen Kampf. „Kampf“ unten in der Symbolleiste nimmt alle Charaktere der Runde. „Kampf hier“ in der Story nimmt zusätzlich alle Figuren der Szene mit. Läuft schon ein Kampf, kommen sie dazu.\n\nIm Kampf wechselt die Mitte der Symbolleiste: Teilnehmer, Verlauf, Nächster ist dran, Zug abschließen, Wurf verwerfen, Teilnehmer dazu und Kampf beenden. Was gerade nicht geht, ist ausgegraut. Der Schirm zeigt die Zeitleiste, den offenen Wurf und den Angriff.\n\nErst würfelst du die Initiative (1W10 plus Handeln), dann ist jeder der Reihe nach dran. Spieler würfeln ihren Angriff auf ihrer eigenen Seite, du kannst es auch für sie tun.\nDie kurzen Wörter in der Leiste heißen Initiative, Nächster, Abschließen, Verwerfen, Aufnehmen und Beenden. Beim Darüberfahren steht der volle Name da.',
       },
       {
         title: 'Zeitleiste und Zustände',
@@ -383,16 +387,16 @@ export const TUTORIALS: Tutorial[] = [
       {
         title: 'In einer Runde spielen',
         house: true,
-        text: 'Der Spielleiter nimmt einen deiner Charaktere in eine Runde auf, auch mitten im Spiel. Sie erscheint dann unter „Meine Runden“. Ein Charakter spielt immer nur in einer laufenden Runde. Ist sie beendet, ist er wieder frei, mit allem, was er in der Runde gewonnen hat.\n\nUnten steht eine Leiste mit fünf Symbolen: Runde, Charakter, Quests, Chat und Mehr.',
+        text: 'Der Spielleiter nimmt einen deiner Charaktere in eine Runde auf, auch mitten im Spiel. Sie erscheint dann unter „Meine Runden“. Ein Charakter spielt immer nur in einer laufenden Runde. Ist sie beendet, ist er wieder frei, mit allem, was er in der Runde gewonnen hat.\n\nUnten steht eine Leiste mit fünf Symbolen: Runde, Charakter, Quests, Chat und Mehr.\nDie Leiste unten hat zwei Reihen. Unten stehen die Hauptsymbole: Runde, Charakter, Quests, Chat, bei einem Kampf Kampf, und Mehr. Darüber stehen die Symbole der Seite, die gerade offen ist, zum Beispiel Bogen und Würfeln beim Charakter.',
       },
       {
         title: 'Die Runde: was ist neu?',
-        text: 'Der Reiter „Runde“ zeigt dein Leben, deine Geistesblitzpunkte und „Neu seit deinem letzten Blick“: neue Quests, neue Einträge im Glossar, Gegenstände, die du bekommen hast, geänderte Lebenspunkte, Notizen und Nachrichten.\n\nEin Tipp auf eine Meldung führt dich dorthin. „Alles gesehen“ räumt die Liste auf. Kurze Meldungen am unteren Rand sagen dir auch gleich, wenn etwas dazukommt.',
+        text: 'Der Reiter „Runde“ zeigt dein Leben, deine Geistesblitzpunkte und „Neu seit deinem letzten Blick“: neue Quests, neue Einträge im Glossar, Gegenstände, die du bekommen hast, geänderte Lebenspunkte, Notizen und Nachrichten.\n\nEin Tipp auf eine Meldung führt dich dorthin. „Alles gesehen“ räumt die Liste auf. Kurze Meldungen am unteren Rand sagen dir auch gleich, wenn etwas dazukommt.\nIn der Leiste über den Hauptsymbolen liegen „Gesehen“, das alles als gesehen markiert, und „Würfe“ mit den letzten Würfen der Gruppe. Kurze Meldungen über Neues erscheinen am oberen Rand des Bildschirms.',
         tip: 'Reißt die Verbindung ab, zeigt ein Hinweis oben den letzten Stand, und die App versucht es weiter.',
       },
       {
         title: 'Charakter und Würfeln',
-        text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf, die Gruppe auch.\n\nMit „Würfeln“ oben wechselst du zu deinen Werten als Knöpfen und zu freien Würfeln ohne Wert (W100 oder 1 bis 10 W10). Mit „Bearbeiten“ änderst du deinen Charakter, auch in der Runde.',
+        text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf, die Gruppe auch.\n\nMit „Würfeln“ oben wechselst du zu deinen Werten als Knöpfen und zu freien Würfeln ohne Wert (W100 oder 1 bis 10 W10). Mit „Bearbeiten“ änderst du deinen Charakter, auch in der Runde.\nIn der Leiste wechselst du zwischen „Bogen“ und „Würfeln“, öffnest mit „Bearbeiten“ den Editor und siehst unter „Blitz“ deine Geistesblitzpunkte.',
         more: 'rules#check',
       },
       {
@@ -406,19 +410,19 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Glossar',
-        text: 'Unter „Mehr“ findest du das Glossar. Es wächst, während ihr spielt: Orte, Figuren, Wissen und Gegenstände erscheinen, sobald der Spielleiter sie zeigt. Filter und Suche halten es kurz.\n\nUnter „Gegenstände“ steht auch die Ausrüstung der Gruppe mit „Getragen von“. Einen Gegenstand, den du in deinem Charakter als versteckt markierst, sehen nur du und der Spielleiter.',
+        text: 'Unter „Mehr“ findest du das Glossar. Es wächst, während ihr spielt: Orte, Figuren, Wissen und Gegenstände erscheinen, sobald der Spielleiter sie zeigt. Filter und Suche halten es kurz.\n\nUnter „Gegenstände“ steht auch die Ausrüstung der Gruppe mit „Getragen von“. Einen Gegenstand, den du in deinem Charakter als versteckt markierst, sehen nur du und der Spielleiter.\nDas Popup „Mehr“ in der Leiste unten führt dich hin.',
       },
       {
         title: 'Notizen',
-        text: 'Unter „Mehr“ liegen die Notizen als Karten: deine eigenen und der Gruppenblock. Oben legst du mit einem Titel eine schnelle Notiz an. Ein Tipp auf eine Karte öffnet sie, und was du änderst, speichert sich von selbst.\n\nEigene Notizen siehst nur du. Legst du eine in den Gruppenblock, sehen alle sie und können Kommentare schreiben.',
+        text: 'Unter „Mehr“ liegen die Notizen als Karten: deine eigenen und der Gruppenblock. Oben legst du mit einem Titel eine schnelle Notiz an. Ein Tipp auf eine Karte öffnet sie, und was du änderst, speichert sich von selbst.\n\nEigene Notizen siehst nur du. Legst du eine in den Gruppenblock, sehen alle sie und können Kommentare schreiben.\nIn der Leiste legt „Neu“ eine Notiz an. Das Popup „Mehr“ führt zu den Notizen.',
       },
       {
         title: 'Chat',
-        text: 'Im Reiter „Chat“ gibt es zwei Kanäle. „Gruppe“: alle in der Runde, auch der Spielleiter, lesen mit. „Spielleiter“: geheim, nur du und der Spielleiter. Neue Nachrichten zeigt eine Zahl an.',
+        text: 'Im Chat gibt es zwei Kanäle, die du in der Leiste über den Hauptsymbolen wählst. „Gruppe“: alle in der Runde, auch der Spielleiter, lesen mit. „Spielleiter“: geheim, nur du und der Spielleiter. Neue Nachrichten zeigt eine Zahl an.',
       },
       {
         title: 'Kampf',
-        text: 'Startet der Spielleiter einen Kampf, erscheint oben ein Band „Kampf läuft“, bei deinem Zug mit dem Hinweis „du bist dran“. Die Zeitleiste zeigt, wer in welcher Reihenfolge dran ist, wer aussetzt und wer kampfunfähig ist. Von deiner Gruppe siehst du die Lebenspunkte, von Gegnern nicht.\n\nBist du dran, greifst du an oder machst eine andere Aktion. Wirst du getroffen, entscheidest du, ob du parierst. Nichts zählt, bevor der Zug abgeschlossen ist: Deinen eigenen Zug schließt du mit „Zug abschließen“ selbst ab, alle anderen der Spielleiter.',
+        text: 'Startet der Spielleiter einen Kampf, erscheint in der Leiste unten das Symbol „Kampf“. Ein Punkt darauf sagt dir, dass etwas auf dich wartet, zum Beispiel „du bist dran“. Endet der Kampf, verschwindet das Symbol.\n\nDie Zeitleiste zeigt, wer in welcher Reihenfolge dran ist, wer aussetzt und wer kampfunfähig ist. In der Leiste über den Hauptsymbolen wählst du „Angriff“ oder „Aktion“, schließt mit „Abschließen“ deinen Zug ab und siehst im „Verlauf“, was passiert ist. Ist ein Symbol grau, geht es gerade nicht.',
         more: 'rules#initiative',
       },
     ],
@@ -501,7 +505,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Die Leiste unten',
-        text: 'In einer Runde führt dich die Leiste unten: „Runde“ zeigt, was neu ist, „Charakter“ deinen Bogen und das Würfeln, „Quests“ euer Questlog, „Chat“ die Gespräche, „Mehr“ Glossar, Notizen, Gruppe und Kampf.',
+        text: 'Die Leiste unten gibt es auf allen Seiten, nicht nur in der Runde. Außerhalb einer Runde führt sie zu deinen Charakteren, deinen Runden, zum Regelwerk und zu deinem Konto. Dort findest du auch die Hilfe zur App und das Abmelden.\n\nIn einer Runde führt sie dich so: „Runde“ zeigt, was neu ist, „Charakter“ deinen Bogen und das Würfeln, „Quests“ euer Questlog, „Chat“ die Gespräche. Bei einem Kampf kommt „Kampf“ dazu. „Mehr“ öffnet Glossar, Notizen und Gruppe. Über den Hauptsymbolen stehen die Symbole der offenen Seite.',
       },
       {
         title: 'Das Regelwerk',
@@ -732,8 +736,8 @@ export const TUTORIALS: Tutorial[] = [
       {
         house: true,
         title: 'Über 100: Guthaben',
-        text: 'Du kannst keine Fähigkeit über Wert 100 kaufen. Schiebt dein Begabungswert eine Fähigkeit später über 100, bleibt sie bei 100. Je 2 Punkte darüber ergeben 1 Punkt Guthaben, den du in einer Fähigkeit derselben Begabung einsetzen kannst.\n\nDas Guthaben siehst du als roten Tag an der Begabung. Tippst du eine Fähigkeit an, sagt dir die App, ob du das Guthaben dort einsetzen kannst.',
-        example: 'Schwert 87 plus Handeln 15 ergibt 102. Die 2 Punkte darüber geben 1 Punkt Guthaben in Handeln.',
+        text: 'Du kannst keine Fähigkeit über Wert 100 kaufen. Schiebt dein Begabungswert eine Fähigkeit später über 100, bleibt sie bei 100. Je 2 Punkte darüber ergeben 1 Punkt Guthaben in dieser Begabung.\n\nGuthaben ist ein eigener Topf seiner Begabung mit dem eigenen Zähler „Guthaben“ an jeder Fähigkeit. Es kostet nach derselben Staffel wie Bonuspunkte, lässt sich aber nicht mit ihnen zusammenlegen und gilt nur für Fähigkeiten derselben Begabung. Den Rest zeigt dir die App als roten Tag an der Begabung.',
+        example: 'Schwert 87 plus Handeln 15 ergibt 102, also 1 Punkt Guthaben in Handeln. Schleichen von 28 auf 29 kostet 1 Guthaben. Klettern von 43 auf 44 würde 2 Guthaben kosten, eine Stufe teurer.',
       },
       {
         house: true,

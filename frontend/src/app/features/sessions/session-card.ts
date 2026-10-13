@@ -1,9 +1,11 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 import { EntryRef, EntryTexts, Scene } from '../../core/models';
 import { QUEST_STATUSES, questStatus } from '../../core/session-models';
 import { EyeToggle } from '../../shared/eye-toggle';
 import { Icon, IconName } from '../../shared/icon';
+import { Popup } from '../../shared/popup';
 import { Portrait } from '../../shared/portrait';
 import { KIND_LABELS, isItem, summaryOf } from '../worlds/entry-views';
 import { WorldStore } from '../worlds/world-store';
@@ -35,7 +37,7 @@ const SCENE_LISTS: Partial<Record<EntryRef['kind'], keyof Pick<Scene, 'quests' |
  */
 @Component({
   selector: 'app-session-card',
-  imports: [Icon, Portrait, EyeToggle],
+  imports: [FormsModule, Icon, Popup, Portrait, EyeToggle],
   template: `
     @if (face(); as shown) {
       <article [class]="'card kind--' + shown.tone" [class.card--done]="!!state()?.done">
@@ -48,14 +50,17 @@ const SCENE_LISTS: Partial<Record<EntryRef['kind'], keyof Pick<Scene, 'quests' |
           @if (shown.text) {
             <p class="card__text">{{ shown.text }}</p>
           }
-          @if (kind() === 'quest' || canAdd()) {
+          @if (state()?.gm_note) {
+            <p class="card__note">Notiz: {{ state()?.gm_note }}</p>
+          }
+          @if (kind() === 'quest' || (canAdd() && !master())) {
             <div class="row card__row">
               @if (kind() === 'quest') {
                 <button type="button" class="chip chip--link" [attr.aria-pressed]="!!state()?.started" (click)="session.toggle('quest', ref().id, 'started')">
                   <app-icon name="flag" [size]="12" /> {{ state()?.started ? 'Angenommen' : 'Annehmen' }}
                 </button>
               }
-              @if (canAdd()) {
+              @if (canAdd() && !master()) {
                 <button type="button" class="chip chip--link" (click)="addToScene()">
                   <app-icon name="plus" [size]="12" /> Zur Szene
                 </button>
@@ -77,6 +82,27 @@ const SCENE_LISTS: Partial<Record<EntryRef['kind'], keyof Pick<Scene, 'quests' |
           >
             <app-icon name="pin" [size]="16" />
           </button>
+          <button
+            type="button"
+            class="card__btn"
+            [class.is-on]="!!state()?.gm_note"
+            aria-label="Notiz"
+            title="Notiz"
+            (click)="openNote($event)"
+          >
+            <app-icon name="note" [size]="16" />
+          </button>
+          <button
+            type="button"
+            class="card__btn"
+            [class.is-on]="!!state()?.on_table"
+            aria-label="Auf den Tisch"
+            title="Auf den Tisch"
+            [attr.aria-pressed]="!!state()?.on_table"
+            (click)="toTable()"
+          >
+            <app-icon name="plus" [size]="16" />
+          </button>
           @if (canFinish()) {
             <button
               type="button"
@@ -91,6 +117,13 @@ const SCENE_LISTS: Partial<Record<EntryRef['kind'], keyof Pick<Scene, 'quests' |
           }
         </div>
       </article>
+      @if (noteOpen()) {
+        <app-popup [title]="'Notiz zu ' + shown.name" side="auto" [anchor]="noteAnchor()" [size]="380" (closed)="closeNote()">
+          <textarea class="input" rows="5" aria-label="Notiz (nur für dich)" [ngModel]="draft()" (ngModelChange)="draft.set($event)"></textarea>
+          <p class="soft">Nur für dich und nur in dieser Runde.</p>
+          <div class="row"><button type="button" class="btn btn--small btn--primary" (click)="closeNote()">Fertig</button></div>
+        </app-popup>
+      }
     }
   `,
   styles: `
@@ -157,6 +190,15 @@ const SCENE_LISTS: Partial<Record<EntryRef['kind'], keyof Pick<Scene, 'quests' |
       line-clamp: 3;
     }
 
+    .card__note {
+      overflow: hidden;
+      margin: 0;
+      color: var(--accent);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .card__row {
       gap: 6px;
     }
@@ -189,6 +231,14 @@ export class SessionCard {
 
   /** The entry of the world this card stands for. */
   readonly ref = input.required<EntryRef>();
+  /** In the master mode a card is picked instead of looked up, and it can be laid on the table. */
+  readonly master = input(false);
+  readonly pick = output<EntryRef>();
+  readonly table = output<EntryRef>();
+
+  protected readonly noteOpen = signal(false);
+  protected readonly noteAnchor = signal<HTMLElement | null>(null);
+  protected readonly draft = signal('');
 
   protected readonly kind = computed(() => SESSION_KINDS[this.ref().kind]);
   protected readonly state = computed(() => {
@@ -212,9 +262,39 @@ export class SessionCard {
     return !!list && !!this.scene() && !this.scene()![list].includes(this.ref().id);
   });
 
-  /** Look the entry up in the window at the side. */
+  /** The plus: in the master mode the table decides the group, elsewhere the entry just lies on the table or leaves it. */
+  protected toTable(): void {
+    const kind = this.kind();
+    if (this.master()) {
+      this.table.emit(this.ref());
+    } else if (kind) {
+      this.session.toggle(kind, this.ref().id, 'on_table');
+    }
+  }
+
+  /** Open the note of the game master about this entry. */
+  protected openNote(event: MouseEvent): void {
+    this.noteAnchor.set(event.currentTarget as HTMLElement);
+    this.draft.set(this.state()?.gm_note ?? '');
+    this.noteOpen.set(true);
+  }
+
+  /** Close the note and save what was written. */
+  protected closeNote(): void {
+    const kind = this.kind();
+    if (kind && this.noteOpen() && this.draft() !== (this.state()?.gm_note ?? '')) {
+      this.session.setNote(kind, this.ref().id, this.draft());
+    }
+    this.noteOpen.set(false);
+  }
+
+  /** Look the entry up in the window at the side, or pick it in the master mode. */
   protected lookUp(): void {
     const { kind, id } = this.ref();
+    if (this.master()) {
+      this.pick.emit(this.ref());
+      return;
+    }
     if (kind === 'scenes' && this.world.openScene) {
       this.world.openScene(id);
     } else {
@@ -255,7 +335,7 @@ export class SessionCard {
         return pick(this.world.events(), 'flag', 'events', (event) => event.happening || summaryOf(event));
       case 'scenes': {
         const scene = this.world.scenes().find((entry) => entry.id === id);
-        return scene ? { name: scene.name, symbol: '', fallback: 'book', tone: 'scenes', text: scene.to_read || scene.text } : null;
+        return scene ? { name: scene.name, symbol: '', fallback: 'book', tone: 'scenes', text: scene.to_read || scene.description } : null;
       }
       case 'trivia': {
         const trivia = this.world.trivia().find((entry) => entry.id === id);

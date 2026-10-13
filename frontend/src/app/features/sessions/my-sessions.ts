@@ -3,13 +3,14 @@ import { RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { Session } from '../../core/session-models';
-import { TutorialButton } from '../../shared/tutorial-button';
+import { PlayerBar } from '../player/player-bar';
+import { PlayerTools } from '../player/player-tools';
 import { SessionService } from './session.service';
 
 /** The sessions in which a character of the player plays. */
 @Component({
   selector: 'app-my-sessions',
-  imports: [RouterLink, TutorialButton],
+  imports: [RouterLink, PlayerBar],
   template: `
     <section class="stack">
       <header class="row row--between">
@@ -17,7 +18,6 @@ import { SessionService } from './session.service';
           <span class="kicker">Spieler</span>
           <h1 class="title">Meine Runden</h1>
         </div>
-        <app-tutorial-button topic="my-sessions" />
       </header>
 
       @if (error()) {
@@ -42,6 +42,7 @@ import { SessionService } from './session.service';
         </div>
       }
     </section>
+    <app-player-bar />
   `,
 })
 export class MySessions {
@@ -49,6 +50,8 @@ export class MySessions {
   protected readonly error = signal('');
 
   constructor() {
+    const tools = inject(PlayerTools);
+    tools.provide('view', signal([tools.help('my-sessions')]));
     inject(SessionService).mine().subscribe({
       next: (sessions) => this.sessions.set(sessions),
       error: (e: unknown) => this.error.set(readError(e)),

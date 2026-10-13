@@ -30,7 +30,7 @@ import { EntryEditor } from './entry-editor';
       </div>
       <div class="field">
         <label for="chapter-text">Worum es in diesem Kapitel geht</label>
-        <textarea id="chapter-text" class="input" rows="14" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
+        <textarea id="chapter-text" class="input" rows="14" [ngModel]="draft().description" (ngModelChange)="set('description', $event)"></textarea>
       </div>
       <div class="field">
         <label for="chapter-read">Zum Vorlesen</label>

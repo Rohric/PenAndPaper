@@ -1,28 +1,24 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { Leavable } from '../../core/leave.guard';
 import { AnyCharacter, PlayerCharacter } from '../../core/models';
-import { Icon } from '../../shared/icon';
-import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterEditor, EditorSection } from '../characters/character-editor';
 import { CharacterSheet } from '../characters/character-sheet';
 import { CharacterService } from '../characters/character.service';
+import { Tool } from '../sessions/cockpit-tools';
+import { PlayerBar } from './player-bar';
+import { PlayerTools } from './player-tools';
 
 const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'];
 
 /** One character of the player: the sheet to read, and the form to write it. The pencils on the sheet open the form at their part. */
 @Component({
   selector: 'app-character-page',
-  imports: [RouterLink, Icon, TutorialButton, CharacterSheet, CharacterEditor],
+  imports: [CharacterSheet, CharacterEditor, PlayerBar],
   template: `
     <section class="stack">
-      <div class="row row--between">
-        <a class="btn btn--small" routerLink="/player/characters">Alle Charaktere</a>
-        <app-tutorial-button topic="my-characters" />
-      </div>
-
       @if (error()) {
         <p class="notice notice--error" role="alert">{{ error() }}</p>
       }
@@ -39,17 +35,11 @@ const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'
             (dirtyChange)="dirty.set($event)"
           />
         } @else {
-          @if (shown.adventure; as adventure) {
-            <a class="btn btn--primary" [routerLink]="['/player/sessions', adventure.id]">
-              <app-icon name="flag" /> Zur Runde: {{ adventure.name }}
-            </a>
-          }
-          <app-character-sheet [character]="shown" [editable]="true" (edit)="open($event)">
-            <button type="button" class="btn btn--small" (click)="open('profile')">Bearbeiten</button>
-          </app-character-sheet>
+          <app-character-sheet [character]="shown" [editable]="true" (edit)="open($event)" />
         }
       }
     </section>
+    <app-player-bar />
   `,
   styles: `
     .back {
@@ -60,6 +50,7 @@ const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'
 export class CharacterPage implements Leavable {
   private readonly service = inject(CharacterService);
   private readonly router = inject(Router);
+  private readonly playerTools = inject(PlayerTools);
 
   /** From the URL: /player/characters/:id?edit=1 or ?edit=skills */
   readonly id = input.required<string>();
@@ -70,8 +61,18 @@ export class CharacterPage implements Leavable {
   protected readonly section = signal<EditorSection>('profile');
   protected readonly dirty = signal(false);
   protected readonly error = signal('');
+  /** The symbols of the bar for the sheet: edit, go to the adventure, help. The form brings its own bar. */
+  private readonly tools = computed<Tool[]>(() => {
+    const adventure = this.character()?.adventure;
+    return [
+      { id: 'sheet-edit', word: 'Bearbeiten', icon: 'edit', click: () => this.open('profile') },
+      ...(adventure ? [{ id: 'sheet-adventure', word: 'Zur Runde', icon: 'flag' as const, title: `Zur Runde: ${adventure.name}`, click: () => void this.router.navigate(['/player/sessions', adventure.id]) }] : []),
+      this.playerTools.help('my-characters'),
+    ];
+  });
 
   constructor() {
+    this.playerTools.provide('view', this.tools);
     // Load the character whenever another one is opened; a fresh one opens as a form.
     effect(() => {
       const wish = this.edit();

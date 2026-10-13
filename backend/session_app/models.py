@@ -37,7 +37,7 @@ class SessionEntry(models.Model):
     """Store what a session did with one entry of the world.
 
     Whether it is done, started, shown to the players and how much of it, pinned, on the table of
-    the master mode, changed for this session, and what the group wrote down about it.
+    the master mode, changed for this session, what the group wrote down about it, and the note of the game master.
     """
 
     class Kind(models.TextChoices):
@@ -75,6 +75,8 @@ class SessionEntry(models.Model):
     # What the group itself adds to a quest: notes (text), tags (list of words), points (each: text, done)
     # and order (keys of all points in the order of the group: "g0" is a given point, "p0" one of its own).
     log = models.JSONField(default=dict, blank=True)
+    # What the game master noted about the entry in this session; the players never see it.
+    gm_note = models.TextField(blank=True)
 
     class Meta:
         constraints = [

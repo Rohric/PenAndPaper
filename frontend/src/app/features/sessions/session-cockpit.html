@@ -16,12 +16,12 @@
     </div>
     <nav class="row" aria-label="Ansichten der Runde">
       @for (item of views; track item.id) {
-        <button type="button" class="btn" [attr.aria-pressed]="view() === item.id && !battleId()" (click)="show(item.id)">
+        <button type="button" class="btn" [attr.title]="'Taste ' + ($index + 1)" [attr.aria-pressed]="view() === item.id && !battleId()" (click)="show(item.id)">
           <app-icon [class]="item.tone ?? ''" [name]="item.icon" /> {{ item.label }}
         </button>
       }
       @if (world.world()) {
-        <app-world-search />
+        <app-world-search #search />
       }
       <app-tutorial-button topic="sessions" />
     </nav>
@@ -58,7 +58,13 @@
         />
       }
       @case ('master') {
-        <app-master-table [(sceneId)]="sceneId" (open)="openPanel($event)" />
+        <app-master-table
+          [(focus)]="masterFocus"
+          (open)="openPanel($event)"
+          (note)="openPanel({ kind: 'note', noteId: $event })"
+          (look)="look($event)"
+          (jump)="toEntry($event)"
+        />
       }
       @default {
         <div class="story">
@@ -147,9 +153,9 @@
   </div>
 </ng-template>
 
-<app-entry-peek editLabel="In der Welt bearbeiten" [eyes]="eyes()" (eye)="onEye($event)" (step)="onStep($event)">
+<app-entry-peek editLabel="In der Welt bearbeiten" [editable]="view() !== 'master'" [jump]="view() === 'master'" (jumped)="toEntry($event)" [eyes]="eyes()" (eye)="onEye($event)" (step)="onStep($event)">
   @if (world.peek(); as looked) {
-    <app-session-entry-actions [entry]="looked" />
+    <app-session-entry-actions [entry]="looked" [readonly]="view() === 'master'" />
   }
 </app-entry-peek>
 
@@ -165,6 +171,11 @@
         @if (panelCharacter(); as character) {
           <p class="soft">Nur du und {{ character.name }} sehen diese Nachrichten.</p>
           <app-session-thread [messages]="thread()" [characterName]="character.name" [asGameMaster]="true" (send)="store.send(character.id, $event)" />
+        }
+      }
+      @case ('scene') {
+        @if (panelScene(); as shown) {
+          <app-scene-view [scene]="shown" [editable]="false" [showEvents]="false" />
         }
       }
       @case ('item') {

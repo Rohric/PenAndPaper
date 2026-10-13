@@ -303,7 +303,7 @@ export class LinkPicker {
   }
 
   /** A click anywhere in the field puts the cursor into it and shows the list. */
-  protected focus(): void {
+  focus(): void {
     this.box().nativeElement.focus();
     this.open.set(true);
   }

@@ -14,6 +14,10 @@ export interface Tool {
   /** The symbol is a switch and is on. */
   pressed?: boolean;
   disabled?: boolean;
+  /** The full name, shown as a tooltip and read out; the word under the symbol stays short. */
+  title?: string;
+  /** A small dot on the symbol: something here waits for the user. */
+  alert?: boolean;
   /** What a click does when it opens no popup. */
   click?: () => void;
   /** What a click opens above the symbol. */

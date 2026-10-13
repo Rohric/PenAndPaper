@@ -45,9 +45,11 @@ import { EntryItems } from './entry-items';
       <app-entry-texts-editor
         inputId="location-description"
         [description]="draft().description"
+        [visibleFromStart]="!!draft().visible_from_start"
         [playerKnowledge]="draft().player_knowledge"
         [gmKnowledge]="draft().gm_knowledge"
         (descriptionChange)="set('description', $event)"
+        (visibleFromStartChange)="set('visible_from_start', $event)"
         (playerKnowledgeChange)="set('player_knowledge', $event)"
         (gmKnowledgeChange)="set('gm_knowledge', $event)"
       />

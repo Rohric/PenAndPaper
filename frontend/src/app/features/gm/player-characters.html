@@ -11,10 +11,6 @@
     <p class="notice notice--error" role="alert">{{ error() }}</p>
   }
 
-  <app-master-detail [list]="listTpl" [detail]="detailTpl" [open]="!!selected()" (back)="selectedId.set(null)" />
-</section>
-
-<ng-template #listTpl>
   <div class="stack">
     <input class="input" aria-label="Charaktere suchen" placeholder="Name oder Spieler suchen" [ngModel]="query()" (ngModelChange)="query.set($event)" />
     <div class="row" role="group" aria-label="Filter">
@@ -32,6 +28,13 @@
       }
     </div>
 
+  </div>
+
+  <app-master-detail [list]="listTpl" [detail]="detailTpl" [open]="!!selected()" (back)="selectedId.set(null)" />
+</section>
+
+<ng-template #listTpl>
+  <div class="stack">
     <h3 class="section-title">Frei · {{ free().length }}</h3>
     @for (character of free(); track character.id) {
       <button type="button" class="card" [class.is-active]="character.id === selectedId()" (click)="selectedId.set(character.id)">

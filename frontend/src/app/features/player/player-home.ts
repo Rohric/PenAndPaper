@@ -9,11 +9,13 @@ import { basePointsLeft } from '../../core/rules';
 import { Portrait } from '../../shared/portrait';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterService } from '../characters/character.service';
+import { PlayerBar } from './player-bar';
+import { PlayerTools } from './player-tools';
 
 /** Start page of every account: the characters of the player, with a form to create one. */
 @Component({
   selector: 'app-player-home',
-  imports: [FormsModule, RouterLink, Portrait, TutorialButton],
+  imports: [FormsModule, RouterLink, Portrait, TutorialButton, PlayerBar],
   templateUrl: './player-home.html',
 })
 export class PlayerHome {
@@ -31,6 +33,8 @@ export class PlayerHome {
   protected readonly checked = signal(false);
 
   constructor() {
+    const tools = inject(PlayerTools);
+    tools.provide('view', signal([tools.help('my-characters')]));
     this.service.list<PlayerCharacter>('player-characters').subscribe({
       next: (characters) => this.characters.set(characters),
       error: (e: unknown) => this.error.set(readError(e)),

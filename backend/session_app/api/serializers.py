@@ -91,7 +91,7 @@ class SessionEntrySerializer(serializers.ModelSerializer):
         model = SessionEntry
         fields = [
             "id", "kind", "entry_id", "done", "started", "revealed", "shown", "pinned", "on_table", "table_group",
-            "steps", "known", "changes", "log",
+            "steps", "known", "changes", "log", "gm_note",
         ]
         read_only_fields = ["kind", "entry_id"]
 

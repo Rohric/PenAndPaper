@@ -20,6 +20,7 @@ from session_app.utils import (
     inspire,
     latest_rolls,
     player_view,
+    reveal_from_start,
     roll_check,
     roll_dice,
     session_for_game_master,
@@ -95,7 +96,7 @@ class SessionList(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         """Save the new session with the requesting user as game master."""
-        serializer.save(owner=self.request.user)
+        reveal_from_start(serializer.save(owner=self.request.user))
 
 
 class SessionDetail(generics.RetrieveUpdateDestroyAPIView):

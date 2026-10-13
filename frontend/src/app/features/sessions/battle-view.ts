@@ -133,12 +133,12 @@ export class BattleView {
       { id: 'battle-people', word: 'Teilnehmer', icon: 'group', tone: 'kind--npcs', count: this.combatants().length, popup: this.peoplePop(), popupTitle: 'Teilnehmer', wide: true },
       { id: 'battle-log', word: 'Verlauf', icon: 'book', popup: this.logPop(), popupTitle: 'Verlauf' },
       battle?.round === 0
-        ? { id: 'battle-start', word: 'Initiative würfeln', icon: 'dice', disabled: over || !this.combatants().length, click: () => this.step('start') }
-        : { id: 'battle-next', word: 'Nächster ist dran', icon: 'right', disabled: over || !!battle?.pending, click: () => this.step('next') },
-      { id: 'battle-close', word: 'Zug abschließen', icon: 'check', disabled: !exchange || exchange.stage === 'parry', click: () => this.step('close') },
-      { id: 'battle-discard', word: 'Wurf verwerfen', icon: 'undo', disabled: !exchange, click: () => this.step('discard') },
-      { id: 'battle-add', word: 'Teilnehmer dazu', icon: 'plus', disabled: over, popup: this.addPop(), popupTitle: 'Teilnehmer dazunehmen' },
-      { id: 'battle-finish', word: 'Kampf beenden', icon: 'flag', disabled: over, click: () => this.step('finish') },
+        ? { id: 'battle-start', word: 'Initiative', title: 'Initiative würfeln', icon: 'dice', disabled: over || !this.combatants().length, click: () => this.step('start') }
+        : { id: 'battle-next', word: 'Nächster', title: 'Nächster ist dran', icon: 'right', disabled: over || !!battle?.pending, click: () => this.step('next') },
+      { id: 'battle-close', word: 'Abschließen', title: 'Zug abschließen', icon: 'check', disabled: !exchange || exchange.stage === 'parry', click: () => this.step('close') },
+      { id: 'battle-discard', word: 'Verwerfen', title: 'Wurf verwerfen', icon: 'undo', disabled: !exchange, click: () => this.step('discard') },
+      { id: 'battle-add', word: 'Aufnehmen', title: 'Teilnehmer aufnehmen', icon: 'plus', disabled: over, popup: this.addPop(), popupTitle: 'Teilnehmer aufnehmen' },
+      { id: 'battle-finish', word: 'Beenden', title: 'Kampf beenden', icon: 'flag', disabled: over, click: () => this.step('finish') },
     ];
   });
 

@@ -152,7 +152,7 @@ class Command(BaseCommand):
         for entry in entries:
             chapter = Chapter.objects.create(
                 world=self.world, number=entry["number"], name=entry["name"],
-                text=entry.get("text", ""), to_read=entry.get("to_read", ""),
+                description=entry.get("description", entry.get("text", "")), to_read=entry.get("to_read", ""),
             )
             chapter.quests.set(pick_all(self.quests, entry.get("quests"), "Die Quest"))
             chapter.events.set(pick_all(self.events, entry.get("events"), "Das Ereignis"))
@@ -170,7 +170,7 @@ class Command(BaseCommand):
         """Create one scene with its place, characters, quests, events and knowledge."""
         scene = Scene.objects.create(
             chapter=chapter, position=position, optional=entry.get("optional", False), name=entry["name"],
-            text=entry.get("text", ""), to_read=entry.get("to_read", ""),
+            description=entry.get("description", entry.get("text", "")), to_read=entry.get("to_read", ""),
             location=pick(self.locations, entry.get("location"), "Der Ort"), dialogues=self._dialogues(entry),
         )
         scene.npcs.set(pick_all(self.npcs, entry.get("npcs"), "Die Figur"))

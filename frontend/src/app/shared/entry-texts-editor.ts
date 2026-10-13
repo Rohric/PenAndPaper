@@ -14,6 +14,13 @@ import { KnowledgeListEditor } from './knowledge-list-editor';
   template: `
     <div class="panel">
       <div class="field">
+        <label class="check">
+          <input type="checkbox" [checked]="visibleFromStart()" (change)="visibleFromStartChange.emit($any($event.target).checked)" />
+          Von Anfang an für Spieler sichtbar
+        </label>
+        <span class="soft">Gilt für neue Runden. In einer laufenden Runde schaltest du das Auge.</span>
+      </div>
+      <div class="field">
         <label [for]="inputId()">Beschreibung</label>
         <span class="soft">Sehen die Spieler, sobald du den Eintrag in einer Runde freigibst.</span>
         <textarea
@@ -50,6 +57,9 @@ export class EntryTextsEditor {
   /** Id of the description field, unique on the page. */
   readonly inputId = input('entry-description');
   readonly description = input.required<string>();
+  /** Whether a new session shows the entry to its players right away. */
+  readonly visibleFromStart = input(false);
+  readonly visibleFromStartChange = output<boolean>();
   readonly playerKnowledge = input.required<Knowledge[]>();
   readonly gmKnowledge = input.required<Knowledge[]>();
   readonly descriptionChange = output<string>();

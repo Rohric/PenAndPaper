@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 from battle_app.rules import FAILURE, check, roll_die
 from character_app.models import Npc
 from character_app.utils import use_inspiration
-from session_app.models import Session
+from session_app.models import Session, SessionEntry
 from world.world_app.models import Quest
 
 KEPT_ROLLS = 30
@@ -18,6 +18,27 @@ KEPT_ROLLS = 30
 CHAPTER_BONUS = 10
 # The latest rolls of every session. They live only in the memory of the server.
 ROLLS = defaultdict(lambda: deque(maxlen=KEPT_ROLLS))
+
+
+def _marked_entries(world):
+    """Return for each kind of entry the ones of a world that are marked as visible from the start."""
+    kinds = SessionEntry.Kind
+    return {
+        kinds.LOCATION: world.locations.filter(visible_from_start=True),
+        kinds.QUEST: world.quests.filter(visible_from_start=True),
+        kinds.EVENT: world.events.filter(visible_from_start=True),
+        kinds.TRIVIA: world.trivia.filter(visible_from_start=True),
+        kinds.NPC: Npc.objects.filter(world_link__world=world, visible_from_start=True),
+    }
+
+
+def reveal_from_start(session):
+    """Show the players of a new session every entry of its world that is marked as visible from the start."""
+    SessionEntry.objects.bulk_create(
+        SessionEntry(session=session, kind=kind, entry_id=entry.pk, revealed=True, shown=["description"])
+        for kind, entries in _marked_entries(session.world).items()
+        for entry in entries
+    )
 
 
 def sessions_for_game_master(user):

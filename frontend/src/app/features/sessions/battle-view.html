@@ -47,10 +47,10 @@
           @if (!battle()!.finished) {
             <div class="grid-fields">
               <div class="field">
-                <label for="battle-npc">Figur der Welt dazunehmen</label>
+                <label for="battle-npc">Figur der Welt aufnehmen</label>
                 <div class="list-row">
                   <app-id-select inputId="battle-npc" emptyLabel="Figur wählen" [options]="npcOptions()" [value]="newNpc()" (valueChange)="newNpc.set($event)" />
-                  <button type="button" class="btn btn--small" [disabled]="newNpc() === null" (click)="addNpc()">Dazu</button>
+                  <button type="button" class="btn btn--small" [disabled]="newNpc() === null" (click)="addNpc()">Aufnehmen</button>
                 </div>
               </div>
               <form class="field" (ngSubmit)="addFree()">
@@ -59,7 +59,7 @@
                   <input id="battle-free" class="input" name="name" placeholder="z. B. Wirt 2" [(ngModel)]="newName" />
                   <input class="input input--number" name="action" type="number" min="0" aria-label="Handeln-Wert" [(ngModel)]="newAction" />
                   <input class="input input--number" name="life" type="number" min="1" aria-label="Lebenspunkte" [(ngModel)]="newLife" />
-                  <button type="submit" class="btn btn--small" [disabled]="!newName().trim()">Dazu</button>
+                  <button type="submit" class="btn btn--small" [disabled]="!newName().trim()">Aufnehmen</button>
                 </div>
               </form>
             </div>

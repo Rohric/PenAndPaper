@@ -1,0 +1,194 @@
+<!-- The popups behind the symbols of the bar. -->
+<ng-template #addList>
+  <div class="field">
+    <label for="table-target">In die Gruppe</label>
+    <select id="table-target" class="input" [ngModel]="target()" (ngModelChange)="target.set($event)">
+      @for (name of groupNames(); track name) {
+        <option [value]="name">{{ label(name) }}</option>
+      }
+    </select>
+  </div>
+  <div class="field">
+    <label for="table-search">Suchen</label>
+    <input id="table-search" class="input" placeholder="Name eines Eintrags der Welt" [ngModel]="draftQuery()" (ngModelChange)="draftQuery.set($event)" />
+  </div>
+  <div class="field">
+    <label for="table-kind">Oder aus einer Liste wählen</label>
+    <select id="table-kind" class="input" [ngModel]="pickedKind()" (ngModelChange)="pickedKind.set($event)">
+      <option value="">Art wählen …</option>
+      @for (item of drawers; track item.id) {
+        <option [value]="item.id">{{ item.label }}</option>
+      }
+    </select>
+  </div>
+  <ul class="plain-list found">
+    @for (found of (pickedKind() ? choices() : results()); track found.ref.kind + found.ref.id) {
+      <li>
+        <button type="button" class="chip chip--link" (click)="lay(found.ref, target())">
+          <app-icon name="plus" [size]="12" /> {{ found.head?.name }} <span class="soft">· {{ found.head?.kicker }}</span>
+        </button>
+      </li>
+    } @empty {
+      <li class="soft">{{ draftQuery().trim() ? 'Nichts gefunden.' : 'Tippe einen Namen oder wähle eine Art.' }}</li>
+    }
+  </ul>
+</ng-template>
+
+<ng-template #newGroup>
+  <form class="list-row" (ngSubmit)="createGroup()">
+    <input class="input" name="group" aria-label="Name der Gruppe" placeholder="Name der neuen Gruppe" [ngModel]="draft()" (ngModelChange)="draft.set($event)" />
+    <button type="submit" class="btn btn--small" [disabled]="!draft().trim()"><app-icon name="plus" [size]="16" /> Anlegen</button>
+  </form>
+  <p class="soft">Eine Gruppe bleibt, sobald ein Eintrag darin liegt.</p>
+</ng-template>
+
+<div class="master">
+  <aside class="master__side">
+    <div class="row row--between">
+      <h2 class="section-title"><app-icon name="note" /> Notizen</h2>
+      <button type="button" class="btn btn--small" (click)="note.emit(null)"><app-icon name="plus" [size]="14" /> Neue</button>
+    </div>
+    @for (item of notes(); track item.id) {
+      <button type="button" class="line" (click)="note.emit(item.id)">
+        <span class="line__title">{{ item.title || 'Ohne Titel' }}</span>
+        @if (item.shared) {
+          <span class="chip">Gruppe</span>
+        }
+      </button>
+    } @empty {
+      <p class="soft">Noch keine Notiz.</p>
+    }
+
+    <h3 class="kicker">Einträge mit Notiz</h3>
+    @for (item of noted(); track item.ref.kind + item.ref.id) {
+      <button type="button" class="line line--stack" (click)="pick(item.ref)">
+        <span class="line__title">{{ item.name }}</span>
+        <span class="soft line__text">{{ item.text }}</span>
+      </button>
+    } @empty {
+      <p class="soft">An keinem Eintrag steht eine Notiz.</p>
+    }
+  </aside>
+
+  <section class="master__main">
+    <div class="field">
+      <input class="input" type="search" aria-label="Suche in allem" placeholder="Suche in allem" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+    </div>
+
+    @if (query().trim()) {
+      <h2 class="section-title"><app-icon name="search" /> Treffer</h2>
+      <div class="cards">
+        @for (ref of found(); track ref.kind + ref.id) {
+          <app-session-card [ref]="ref" [master]="true" (pick)="pick($event)" (table)="toggleTable($event)" />
+        } @empty {
+          <p class="soft">Nichts gefunden. Die Filter in der Leiste können Treffer ausblenden.</p>
+        }
+      </div>
+    } @else {
+      @if (head(); as shown) {
+        <div class="panel focus">
+          <div class="row row--between">
+            <div>
+              <span class="kicker">Dazu gehört · {{ shown.kicker }}</span>
+              <h2 class="subtitle">{{ shown.name }}</h2>
+            </div>
+            <div class="row">
+              @if (canGoBack()) {
+                <button type="button" class="btn btn--small" (click)="back()"><app-icon name="back" [size]="14" /> Zurück</button>
+              }
+              <button type="button" class="btn btn--small" (click)="look.emit(focus()!)"><app-icon name="eye" [size]="14" /> Ansehen</button>
+              <button type="button" class="btn btn--small" (click)="jump.emit(focus()!)"><app-icon name="expand" [size]="14" /> Zum Eintrag</button>
+              <button type="button" class="btn btn--small" (click)="layAll()"><app-icon name="plus" [size]="14" /> Alle auf den Tisch</button>
+              <button type="button" class="btn btn--small" aria-label="Schließen" (click)="clearFocus()"><app-icon name="close" [size]="14" /></button>
+            </div>
+          </div>
+          @if (shown.text) {
+            <p [class]="shown.readAloud ? 'read-aloud prose' : 'soft'">{{ shown.text }}</p>
+          }
+          @for (group of connections(); track group.label) {
+            <span class="kicker">{{ group.label }}</span>
+            <div class="cards">
+              @for (ref of group.refs; track ref.kind + ref.id) {
+                <app-session-card [ref]="ref" [master]="true" (pick)="pick($event)" (table)="toggleTable($event)" />
+              }
+            </div>
+          } @empty {
+            <p class="soft">Mit diesem Eintrag ist nichts verbunden.</p>
+          }
+        </div>
+      }
+
+      <h2 class="section-title"><app-icon name="flag" /> Mein Tisch</h2>
+      @for (group of groups(); track group.name) {
+        <div class="panel">
+          <span class="kicker">{{ label(group.name) }}</span>
+          <div class="cards">
+            @for (item of group.entries; track item.ref.kind + item.ref.id) {
+              <div class="placed">
+                <app-session-card [ref]="item.ref" [master]="true" (pick)="pick($event)" (table)="toggleTable($event)" />
+                <div class="row">
+                  <select class="input input--small" aria-label="Gruppe wechseln" [ngModel]="group.name" (ngModelChange)="move(item, $event)">
+                    @for (name of groupNames(); track name) {
+                      <option [value]="name">{{ label(name) }}</option>
+                    }
+                  </select>
+                  <button type="button" class="btn btn--small" (click)="take(item)"><app-icon name="close" [size]="14" /> Vom Tisch</button>
+                </div>
+              </div>
+            } @empty {
+              <p class="soft">Noch nichts in dieser Gruppe.</p>
+            }
+          </div>
+        </div>
+      } @empty {
+        <p class="soft">Der Tisch ist leer. Mit „Auf Tisch“ in der Leiste, dem Plus an einer Kachel oder „Alle auf den Tisch“ legst du Einträge dazu.</p>
+      }
+
+      <div class="drawers" role="group" aria-label="Schubladen">
+        @for (item of drawers; track item.id) {
+          <button type="button" class="drawer" [attr.aria-pressed]="drawer() === item.id" (click)="toggleDrawer(item.id)">
+            {{ item.label }} <span class="drawer__count">{{ counts()[item.id] }}</span>
+          </button>
+        }
+      </div>
+      @if (drawer()) {
+        <div class="cards">
+          @for (ref of shelf(); track ref.kind + ref.id) {
+            <app-session-card [ref]="ref" [master]="true" (pick)="pick($event)" (table)="toggleTable($event)" />
+          } @empty {
+            <p class="soft">In dieser Schublade liegt nichts, was die Filter durchlässt.</p>
+          }
+        </div>
+      }
+    }
+  </section>
+
+  <aside class="master__people" aria-label="Charaktere">
+    @for (character of characters(); track character.id) {
+      <button
+        type="button"
+        class="person"
+        [attr.aria-label]="character.name"
+        [attr.title]="character.name"
+        (click)="toggleCharacter(character.id, $event)"
+      >
+        <app-portrait [symbol]="character.symbol" fallback="sheet" [image]="character.shows_image ? character.image : null" [size]="44" />
+        <span class="person__life"><span class="person__fill" [style.width.%]="life(character.id)"></span></span>
+        @if (store.unread(character.id)) {
+          <span class="person__badge">{{ store.unread(character.id) }}</span>
+        }
+      </button>
+    }
+  </aside>
+</div>
+
+@if (openCharacter(); as character) {
+  <app-popup [title]="character.name" side="left" [anchor]="characterAnchor()" [size]="380" (closed)="characterId.set(null)">
+    <app-character-tile
+      [character]="character"
+      [unread]="store.unread(character.id)"
+      (life)="store.setLife(character.id, $event)"
+      (open)="open.emit({ kind: $event, characterId: character.id })"
+    />
+  </app-popup>
+}

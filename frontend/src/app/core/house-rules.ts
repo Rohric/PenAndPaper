@@ -5,7 +5,9 @@ import { MAX_SKILL_VALUE, basePointsLeft, rawValue, skillPoints, skillRuleProble
  * House rules of the group, which the official rules of How to be a Hero do not know. Mirrored from the
  * backend (character_app/house_rules.py) so the editor can show them while typing.
  * Leveling: a point won after the creation costs bonus points by tiers. Above 100: a skill stays at the
- * maximum and gives credit to its talent. In an adventure the base points of a character are locked.
+ * maximum and gives credit to its talent. Credit is a pot of its own with its own counter on every skill:
+ * it pays by the same tiers, but only for skills of its talent, and it never mixes with bonus points.
+ * In an adventure the base points of a character are locked.
  */
 
 /** What one point won by leveling costs, by the points the skill has after it: [up to, cost]. Above: LEVEL_TOP_COST. */
@@ -14,7 +16,7 @@ export const LEVEL_TOP_COST = 4;
 /** Points above the maximum that give one point of credit for the same talent. */
 export const OVERFLOW_RATE = 2;
 
-/** What the point that brings a skill to the given points costs in bonus points. */
+/** What the point that brings a skill to the given points costs. */
 export function levelCost(points: number): number {
   return LEVEL_STEPS.find(([limit]) => points <= limit)?.[1] ?? LEVEL_TOP_COST;
 }
@@ -28,8 +30,23 @@ export function bonusCost(skill: Skill): number {
   return cost;
 }
 
-/** The cost of the next point won by leveling in a skill. */
+/** What the points a skill bought with credit cost in credit; they lie above its bonus points. */
+export function creditCost(skill: Skill): number {
+  const start = skill.points + skill.bonus_points;
+  let cost = 0;
+  for (let points = start + 1; points <= start + (skill.credit_points ?? 0); points++) {
+    cost += levelCost(points);
+  }
+  return cost;
+}
+
+/** The cost of the next point won by leveling in a skill, in bonus points. */
 export function nextCost(skill: Skill): number {
+  return levelCost(skill.points + skill.bonus_points + 1);
+}
+
+/** The cost of the next point bought with credit, in credit. */
+export function nextCreditCost(skill: Skill): number {
   return levelCost(skillPoints(skill) + 1);
 }
 
@@ -39,42 +56,25 @@ export function refund(skills: Skill[], talent: Talent): number {
   return Math.floor(over / OVERFLOW_RATE);
 }
 
-function talentCost(skills: Skill[], talent: Talent): number {
-  return skills.filter((skill) => skill.talent === talent).reduce((sum, skill) => sum + bonusCost(skill), 0);
-}
-
 /**
- * Unspent bonus points. A character with the leveling rule pays by the tiers and gets the credit of its
- * talents back; any other character pays one bonus point for one point.
+ * Unspent bonus points. A character with the leveling rule pays by the tiers; any other character pays one
+ * bonus point for one point. Credit is a pot of its own and never pays for bonus points.
  */
 export function bonusPointsLeft(skills: Skill[], total: number, leveling = false): number {
   if (!leveling) {
     return total - skills.reduce((sum, skill) => sum + skill.bonus_points, 0);
   }
-  return total - TALENTS.reduce((sum, talent) => sum + Math.max(0, talentCost(skills, talent.id) - refund(skills, talent.id)), 0);
+  return total - skills.reduce((sum, skill) => sum + bonusCost(skill), 0);
 }
 
-/** The free bonus points and, for each talent, the credit that is not spent yet. */
-export interface CreditLeft {
-  free: number;
-  credit: Record<Talent, number>;
-}
-
-/**
- * Free points count as spent first. What is left over after them is credit, which only pays for skills of
- * its own talent. Both together are the unspent bonus points.
- */
-export function creditLeft(skills: Skill[], total: number): CreditLeft {
-  let free = bonusPointsLeft(skills, total, true);
-  const credit = { action: 0, knowledge: 0, social: 0 } as Record<Talent, number>;
+/** For each talent the credit that is not spent yet; below zero when more is spent than it has. */
+export function creditLeft(skills: Skill[]): Record<Talent, number> {
+  const left = { action: 0, knowledge: 0, social: 0 } as Record<Talent, number>;
   for (const { id } of TALENTS) {
-    const granted = refund(skills, id);
-    const cost = talentCost(skills, id);
-    const returned = Math.min(granted, cost, Math.max(0, free));
-    credit[id] = Math.max(0, granted - cost) + returned;
-    free -= returned;
+    const spent = skills.filter((skill) => skill.talent === id).reduce((sum, skill) => sum + creditCost(skill), 0);
+    left[id] = refund(skills, id) - spent;
   }
-  return { free, credit };
+  return left;
 }
 
 /** One thing that is wrong with the skills; index is the place of the skill in the list, null for the whole list. */
@@ -89,16 +89,28 @@ export interface Budgets {
   bonus: number;
 }
 
+function bought(skill: Skill | undefined): number {
+  return (skill?.bonus_points ?? 0) + (skill?.credit_points ?? 0);
+}
+
 function lockedProblems(skill: Skill, skills: Skill[], old: Skill | undefined): string[] {
   const name = skill.name.trim() || 'Fähigkeit';
   const texts: string[] = [];
   if (old && (skill.points < old.points || skill.talent !== old.talent)) {
     texts.push(`„${name}“: Grundpunkte und Begabung sind im Abenteuer fest.`);
   }
-  if (rawValue(skill, skills) > MAX_SKILL_VALUE && skill.bonus_points > (old?.bonus_points ?? 0)) {
+  if (rawValue(skill, skills) > MAX_SKILL_VALUE && bought(skill) > bought(old)) {
     texts.push(`„${name}“ ist schon bei ${MAX_SKILL_VALUE}. Mehr geht nicht.`);
   }
   return texts;
+}
+
+function creditProblems(skills: Skill[]): SkillProblem[] {
+  const left = creditLeft(skills);
+  return TALENTS.filter((talent) => left[talent.id] < 0).map((talent) => ({
+    index: null,
+    text: `In ${talent.label} ist mehr Guthaben eingesetzt, als die Begabung hat: ${-left[talent.id]} zu viel. Nimm Guthaben-Punkte zurück.`,
+  }));
 }
 
 /**
@@ -119,6 +131,7 @@ export function skillProblems(skills: Skill[], stored: Skill[], locked: boolean,
       }
     });
   }
+  problems.push(...creditProblems(skills));
   const base = basePointsLeft(skills, budgets.base);
   const bonus = bonusPointsLeft(skills, budgets.bonus, true);
   if (base < 0) {

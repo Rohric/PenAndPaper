@@ -4,6 +4,8 @@ import { Icon } from './icon';
 
 const MARGIN = 8;
 const GAP = 10;
+// Height a popup needs at least to open above a symbol; with less room it opens below.
+const ROOM = 300;
 
 /**
  * A surface that opens above the symbol that was clicked, without leaving the page. It closes with Escape,
@@ -13,7 +15,7 @@ const GAP = 10;
   selector: 'app-popup',
   imports: [Icon],
   template: `
-    <div class="popup" role="dialog" [attr.aria-label]="title()" [style.left.px]="left()" [style.bottom.px]="bottom()" [style.width.px]="width()">
+    <div class="popup" role="dialog" [attr.aria-label]="title()" [style.left.px]="left()" [style.top.px]="top()" [style.bottom.px]="bottom()" [style.width.px]="width()">
       <header class="popup__head">
         <strong>{{ title() }}</strong>
         <button type="button" class="btn btn--small" aria-label="Schließen" (click)="closed.emit()"><app-icon name="close" [size]="14" /></button>
@@ -29,6 +31,7 @@ const GAP = 10;
       flex-direction: column;
       gap: 10px;
       max-height: min(70vh, 620px);
+      max-width: calc(100vw - 16px);
       padding: 12px 14px;
       border: 1px solid var(--line-2);
       border-radius: var(--radius);
@@ -64,24 +67,45 @@ export class Popup {
   readonly anchor = input<HTMLElement | null>(null);
   /** The width in pixels the popup tries to have. */
   readonly size = input(560);
+  /** Where the popup opens: above its symbol; above, or below when there is no room; or at the left of it. */
+  readonly side = input<'above' | 'auto' | 'left'>('above');
   readonly closed = output<void>();
 
   protected readonly left = signal(MARGIN);
-  protected readonly bottom = signal(80);
+  protected readonly bottom = signal<number | null>(80);
+  protected readonly top = signal<number | null>(null);
   protected readonly width = signal(560);
 
   constructor() {
     afterNextRender(() => this.place());
   }
 
-  /** Put the popup over its symbol, kept inside the window. */
+  /** Put the popup at its symbol, kept inside the window. */
   protected place(): void {
     const width = Math.min(this.size(), window.innerWidth - 2 * MARGIN);
     const box = this.anchor()?.getBoundingClientRect();
-    const middle = box ? box.left + box.width / 2 : window.innerWidth / 2;
     this.width.set(width);
-    this.left.set(Math.max(MARGIN, Math.min(middle - width / 2, window.innerWidth - width - MARGIN)));
-    this.bottom.set(box ? window.innerHeight - box.top + GAP : 80);
+    if (!box) {
+      this.left.set(Math.max(MARGIN, (window.innerWidth - width) / 2));
+      this.bottom.set(80);
+      this.top.set(null);
+      return;
+    }
+    const side = this.side();
+    const middle = box.left + box.width / 2;
+    const beside = side === 'left' ? box.left - GAP - width : middle - width / 2;
+    this.left.set(Math.max(MARGIN, Math.min(beside, window.innerWidth - width - MARGIN)));
+    const above = side === 'above' || (side === 'auto' && box.top >= ROOM);
+    this.bottom.set(above ? window.innerHeight - box.top + GAP : null);
+    this.top.set(above ? null : this.topFor(side, box));
+  }
+
+  /** The top edge for a popup that opens at the left of its symbol or below it. */
+  private topFor(side: 'above' | 'auto' | 'left', box: DOMRect): number {
+    if (side !== 'left') {
+      return box.bottom + GAP;
+    }
+    return Math.max(MARGIN, Math.min(box.top, window.innerHeight - ROOM - MARGIN));
   }
 
   protected outside(event: MouseEvent): void {

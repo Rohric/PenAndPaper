@@ -1,3 +1,4 @@
+@if (nav.mode() === 'gm') {
 <header class="bar">
   <button
     type="button"
@@ -18,7 +19,9 @@
   </div>
 </header>
 
-@if (open()) {
+}
+
+@if (nav.mode() === 'gm' && open()) {
   <nav class="menu" aria-label="Hauptmenü">
     @if (nav.canSwitch()) {
       <div class="menu__group" role="group" aria-label="Bereich wechseln">

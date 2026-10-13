@@ -17,8 +17,8 @@ def round_half_up(value):
 
 
 def skill_points(skill):
-    """Return base points plus bonus points of one skill."""
-    return skill["points"] + skill["bonus_points"]
+    """Return base points, bonus points and points bought with credit of one skill."""
+    return skill["points"] + skill["bonus_points"] + skill.get("credit_points", 0)
 
 
 def talent_points(skills, talent):
@@ -71,7 +71,7 @@ def with_ids(skills, stored):
     return result
 
 
-def _talent_label(talent):
+def talent_label(talent):
     """Return the name of a talent."""
     return dict(BaseCharacter.Talent.choices)[talent]
 
@@ -88,7 +88,7 @@ def skill_rule_problems(skill, skills, capped=False):
     value = raw_value(skill, skills)
     if not capped and value > MAX_SKILL_VALUE:
         problems.append(
-            f"„{name}“ hat Wert {value}. Höchstwert ist {MAX_SKILL_VALUE}: Verteile {value - MAX_SKILL_VALUE} Punkte in {_talent_label(skill['talent'])} um."
+            f"„{name}“ hat Wert {value}. Höchstwert ist {MAX_SKILL_VALUE}: Verteile {value - MAX_SKILL_VALUE} Punkte in {talent_label(skill['talent'])} um."
         )
     return problems
 

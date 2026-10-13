@@ -1,3 +1,13 @@
+<ng-template #logPop>
+      <ul class="plain-list">
+        @for (line of battle()?.log ?? []; track $index) {
+          <li>{{ line }}</li>
+        } @empty {
+          <li class="soft">Noch nichts passiert.</li>
+        }
+      </ul>
+</ng-template>
+
 @if (battle(); as fight) {
   <div class="stack">
     <div class="panel">
@@ -47,17 +57,7 @@
       </div>
     } @else if (myTurn()) {
       <div class="panel">
-        <div class="row row--between">
-          <h3 class="subtitle">Du bist dran</h3>
-          <div class="row" role="group" aria-label="Was du in deinem Zug tust">
-            <button type="button" class="pill" [attr.aria-pressed]="mode() === 'attack'" (click)="mode.set('attack')">
-              <app-icon name="sword" [size]="16" /> Angriff
-            </button>
-            <button type="button" class="pill" [attr.aria-pressed]="mode() === 'action'" (click)="mode.set('action')">
-              <app-icon name="speech" [size]="16" /> Andere Aktion
-            </button>
-          </div>
-        </div>
+        <h3 class="subtitle">{{ mode() === 'attack' ? 'Du bist dran: Angriff' : 'Du bist dran: Andere Aktion' }}</h3>
         @if (mode() === 'action') {
           <div class="field">
             <label for="own-action">Was tust du</label>
@@ -118,16 +118,6 @@
       </div>
     }
 
-    <div class="panel">
-      <h3 class="subtitle">Verlauf</h3>
-      <ul class="plain-list">
-        @for (line of fight.log; track $index) {
-          <li>{{ line }}</li>
-        } @empty {
-          <li class="soft">Noch nichts passiert.</li>
-        }
-      </ul>
-    </div>
   </div>
 } @else {
   <div class="empty">

@@ -1,4 +1,4 @@
-import { Component, computed, input, output, signal } from '@angular/core';
+import { Component, computed, input, model, output, signal } from '@angular/core';
 
 import { questLabel } from '../../core/models';
 import { damageText } from '../../core/rules';
@@ -71,7 +71,10 @@ export class PlayerPanels {
   readonly fresh = input<number[]>([]);
 
   protected readonly query = signal('');
-  protected readonly status = signal<'all' | QuestStatus>('all');
+  /** The status of the quests that is shown; the page of a session can set it from its bar. */
+  readonly status = model<'all' | QuestStatus>('all');
+  /** Whether the row of pills for the status is drawn here. */
+  readonly statusPills = input(true);
   protected readonly sortBy = signal<'main' | 'name' | 'progress'>('main');
   protected readonly tag = signal('');
   protected readonly only = signal('');

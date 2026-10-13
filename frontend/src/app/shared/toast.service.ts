@@ -3,7 +3,7 @@ import { Injectable, signal } from '@angular/core';
 const VISIBLE_MS = 3500;
 const MAX_SHOWN = 3;
 
-/** One short message at the bottom of the screen. */
+/** One short message at the top of the screen. */
 export interface Toast {
   id: number;
   text: string;

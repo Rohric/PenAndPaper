@@ -74,6 +74,7 @@ def _clean_skill(entry):
         "talent": entry["talent"],
         "points": _clean_number(entry, "points", 0, MAX_SKILL_POINTS),
         "bonus_points": _clean_number(entry, "bonus_points", 0, MAX_SKILL_POINTS),
+        "credit_points": _clean_number(entry, "credit_points", 0, MAX_SKILL_POINTS),
         "description": _clean_text(entry, "description"),
     }
 
@@ -138,15 +139,18 @@ class CharacterSerializer(serializers.ModelSerializer):
         return summary
 
     def get_points_left(self, character):
-        """Return the unspent points of both budgets; with leveling the bonus points are the free ones and credit is split off."""
-        left = {"base": base_points_left(character.skills, character.skill_points_total)}
-        if self.leveling:
-            return {**left, **dict(zip(("bonus", "credit"), credit_left(character.skills, character.bonus_points_total).values()))}
-        return {**left, "bonus": bonus_points_left(character.skills, character.bonus_points_total), "credit": {}}
+        """Return the unspent points of both budgets and, with leveling, the open credit of each talent."""
+        skills, total = character.skills, character.bonus_points_total
+        return {
+            "base": base_points_left(skills, character.skill_points_total),
+            "bonus": bonus_points_left(skills, total, self.leveling),
+            "credit": credit_left(skills) if self.leveling else {},
+        }
 
     def validate_skills(self, skills):
-        """Check and complete every skill entry."""
-        return [_clean_skill(entry) for entry in _as_list(skills)]
+        """Check and complete every skill entry; only characters with the leveling rule have credit."""
+        cleaned = [_clean_skill(entry) for entry in _as_list(skills)]
+        return cleaned if self.leveling else [{**skill, "credit_points": 0} for skill in cleaned]
 
     def validate_inventory(self, items):
         """Check and complete every inventory entry."""
@@ -191,7 +195,7 @@ class NpcSerializer(CharacterSerializer):
 
     class Meta:
         model = Npc
-        fields = CHARACTER_FIELDS + ["phrases", "player_knowledge", "gm_knowledge"]
+        fields = CHARACTER_FIELDS + ["visible_from_start", "phrases", "player_knowledge", "gm_knowledge"]
 
     def validate_player_knowledge(self, pieces):
         """Check the knowledge pieces players can learn."""

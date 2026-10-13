@@ -74,9 +74,9 @@
       class="doc__text"
       rows="4"
       placeholder="Was in der Szene geschieht, was die Figuren wollen, was schiefgehen kann …"
-      [appAutoGrow]="draft().text"
-      [value]="draft().text"
-      (input)="set('text', $any($event.target).value)"
+      [appAutoGrow]="draft().description"
+      [value]="draft().description"
+      (input)="set('description', $any($event.target).value)"
     ></textarea>
   </div>
 

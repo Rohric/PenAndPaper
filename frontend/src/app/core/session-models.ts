@@ -41,6 +41,8 @@ export interface SessionEntry {
   shown: string[];
   /** What the group wrote about a quest. */
   log: Partial<QuestLog>;
+  /** What the game master noted about the entry in this session; the players never see it. */
+  gm_note: string;
 }
 
 /** What a group writes about a quest: notes, tags, points of its own, and the order of all points. */

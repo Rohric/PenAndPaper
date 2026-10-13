@@ -33,9 +33,183 @@
   overflow-x: auto;
 }
 
-@media (max-width: 767px) {
-  .editbar {
-    top: 68px;
+// Room at the bottom for the dock of a player.
+.has-dock {
+  padding-bottom: 150px;
+}
+
+// The dock of a player: the sections in a bar at the bottom. Points and save button hang on its top edge
+// as a row of their own, so they stay in view while the page scrolls.
+.dock {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 44;
+  display: flex;
+  justify-content: center;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.dock__float {
+  position: absolute;
+  right: 12px;
+  bottom: 100%;
+  left: 12px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  pointer-events: none;
+}
+
+.dock__float > * {
+  pointer-events: auto;
+}
+
+.dock__points {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid var(--line-2);
+  border-radius: 18px;
+  background: var(--surface);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 40%);
+}
+
+// One counter: a big number in a circle with its word under it.
+.count {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  min-width: 52px;
+  padding: 4px 6px;
+  border-radius: 12px;
+}
+
+.count__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  border: 3px solid currentcolor;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.count__word {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.count--base {
+  color: var(--accent);
+}
+
+.count--bonus {
+  color: var(--info);
+}
+
+.count--credit {
+  color: var(--danger);
+}
+
+.count--zero .count__num {
+  opacity: 0.45;
+}
+
+// More spent than there is: the circle is filled in red.
+.count--over .count__num {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: #fff;
+}
+
+.dock__sections {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 2px;
+  justify-content: space-around;
+  max-width: 420px;
+}
+
+.dock__section {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  min-width: 0;
+  padding: 4px 2px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.dock__section.is-active {
+  background: var(--surface);
+  color: var(--accent);
+}
+
+// The place of the save button stays, so nothing jumps when it appears.
+.dock__save {
+  display: flex;
+  flex: 0 0 60px;
+  justify-content: center;
+}
+
+.save {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 40%);
+  color: var(--accent-ink);
+  animation: pop 0.18s ease-out;
+}
+
+.save--errors {
+  background: var(--danger);
+  color: #fff;
+}
+
+.save__mark {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.6);
+  }
+
+  to {
+    transform: scale(1);
   }
 }
 

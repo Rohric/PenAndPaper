@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
 
@@ -7,17 +7,20 @@ import { readError } from '../../core/api-error';
 import { PlayerCharacter, TALENTS, Talent } from '../../core/models';
 import { inspirationLeft, inspirationPoints } from '../../core/rules';
 import {
-  ChatMessage, Message, Note, PlayerBattle, PlayerView, QuestLog, Roll, RollOrder, Session,
+  ChatMessage, Message, Note, PlayerBattle, PlayerView, QuestLog, QuestStatus, Roll, RollOrder, Session,
 } from '../../core/session-models';
+import { AuthService } from '../../core/auth.service';
 import { TutorialService } from '../../core/tutorial.service';
 import { Icon, IconName } from '../../shared/icon';
 import { Portrait } from '../../shared/portrait';
 import { SidePanel } from '../../shared/side-panel';
 import { ToastService } from '../../shared/toast.service';
-import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterEditor, EditorSection } from '../characters/character-editor';
 import { CharacterSheet, RollWish } from '../characters/character-sheet';
 import { CharacterService } from '../characters/character.service';
+import { PlayerBar } from '../player/player-bar';
+import { PlayerTools } from '../player/player-tools';
+import { Tool } from './cockpit-tools';
 import { ChatThread, groupBubbles } from './chat-thread';
 import { DiceRoll } from './dice-roll';
 import { NoteDetail } from './note-detail';
@@ -30,24 +33,15 @@ import { SessionRolls } from './session-rolls';
 import { SessionThread } from './session-thread';
 import { SessionService } from './session.service';
 
-/** Every page of the session; the bar at the bottom leads to five of them, "Mehr" to the rest. */
-type Page = 'round' | 'character' | 'roll' | 'quests' | 'chat' | 'more' | 'glossary' | 'notes' | 'group' | 'battle';
-type BarId = 'round' | 'character' | 'quests' | 'chat' | 'more';
+/** Every page of the session. The bar leads to six; "Mehr" is a popup with the others. */
+type Page = 'round' | 'character' | 'roll' | 'quests' | 'chat' | 'glossary' | 'notes' | 'group' | 'battle';
 
-const BAR: { id: BarId; label: string; icon: IconName }[] = [
-  { id: 'round', label: 'Runde', icon: 'flag' },
-  { id: 'character', label: 'Charakter', icon: 'sheet' },
-  { id: 'quests', label: 'Quests', icon: 'quest' },
-  { id: 'chat', label: 'Chat', icon: 'speech' },
-  { id: 'more', label: 'Mehr', icon: 'expand' },
+/** The pages that "Mehr" opens. */
+const MORE_PAGES: { id: Page; label: string; icon: IconName }[] = [
+  { id: 'glossary', label: 'Glossar', icon: 'book' },
+  { id: 'notes', label: 'Notizen', icon: 'note' },
+  { id: 'group', label: 'Gruppe', icon: 'group' },
 ];
-const MORE_TILES: { id: Page; label: string; icon: IconName; hint: string }[] = [
-  { id: 'glossary', label: 'Glossar', icon: 'book', hint: 'Orte, Figuren, Wissen und Gegenstände.' },
-  { id: 'notes', label: 'Notizen', icon: 'note', hint: 'Deine Notizen und der Gruppenblock.' },
-  { id: 'group', label: 'Gruppe', icon: 'group', hint: 'Wer mitspielt und wie es ihnen geht.' },
-  { id: 'battle', label: 'Kampf', icon: 'sword', hint: 'Zeitleiste und dein Zug.' },
-];
-const SUB_PAGES: Page[] = ['glossary', 'notes', 'group', 'battle'];
 const REFRESH_MS = 5000;
 const FEED_KEY = 'pnp.feed.';
 const CHAT_KEY = 'pnp.chat.seen.';
@@ -61,8 +55,8 @@ const TOASTED = 3;
 @Component({
   selector: 'app-player-session',
   imports: [
-    NgTemplateOutlet, RouterLink, Icon, Portrait, SidePanel, TutorialButton, CharacterEditor, CharacterSheet, ChatThread, DiceRoll,
-    NoteDetail, PlayerBattlePanel, PlayerPanels, RollPanel, SessionNotes, SessionRolls, SessionThread,
+    NgTemplateOutlet, RouterLink, Icon, Portrait, SidePanel, CharacterEditor, CharacterSheet, ChatThread, DiceRoll,
+    NoteDetail, PlayerBar, PlayerBattlePanel, PlayerPanels, RollPanel, SessionNotes, SessionRolls, SessionThread,
   ],
   templateUrl: './player-session.html',
   styleUrl: './player-session.scss',
@@ -72,12 +66,13 @@ export class PlayerSession {
   private readonly characterApi = inject(CharacterService);
   private readonly toast = inject(ToastService);
   private readonly tutorial = inject(TutorialService);
+  private readonly tools = inject(PlayerTools);
+  protected readonly auth = inject(AuthService);
 
   /** From the URL: /player/sessions/:sessionId */
   readonly sessionId = input.required<string>();
 
-  protected readonly bar = BAR;
-  protected readonly moreTiles = MORE_TILES;
+  protected readonly morePages = MORE_PAGES;
   protected readonly page = signal<Page>('round');
   protected readonly channel = signal<'group' | 'gm'>('group');
   protected readonly data = signal<PlayerView | null>(null);
@@ -113,14 +108,17 @@ export class PlayerSession {
   protected readonly chatUnread = computed(() => this.chat().filter((message) => !message.mine && message.id > this.chatSeen()).length);
   protected readonly bubbles = computed(() => groupBubbles(this.chat()));
   protected readonly battleHint = computed(() => this.hintFor(this.battle()));
-  protected readonly isSub = computed(() => SUB_PAGES.includes(this.page()));
-  protected readonly barOf = computed<BarId>(() => {
+  /** The status of the quests that the bar of the quest page chose. */
+  protected readonly questStatus = signal<'all' | QuestStatus>('all');
+  /** The place of a page in the bar: the pages behind "Mehr" count as "more". */
+  private readonly barPage = computed(() => {
     const page = this.page();
-    if (page === 'roll') {
-      return 'character';
-    }
-    return SUB_PAGES.includes(page) ? 'more' : (page as BarId);
+    return page === 'roll' ? 'character' : page;
   });
+  private readonly morePop = viewChild<TemplateRef<unknown>>('morePop');
+  private readonly rollsPop = viewChild<TemplateRef<unknown>>('rollsPop');
+  private readonly sparkPop = viewChild<TemplateRef<unknown>>('sparkPop');
+  private readonly logPop = viewChild<TemplateRef<unknown>>('logPop');
   protected readonly feed = computed(() => feedOf(this.seen(), this.current()));
   protected readonly freshQuests = computed(() => this.feed().flatMap((item) => (item.quest !== undefined ? [item.quest] : [])));
   protected readonly recentRolls = computed(() => this.rolls().slice(0, 5));
@@ -148,7 +146,75 @@ export class PlayerSession {
     return left > 0 ? { label: TALENTS.find((talent) => talent.id === roll.talent)?.label ?? '', left } : null;
   });
 
+  /** The sparks of inspiration that are left, over all talents. */
+  private readonly sparksLeft = computed(() => this.sparks().reduce((sum, talent) => sum + talent.left, 0));
+  /** The main row: the six places of the session. */
+  private readonly mainTools = computed<Tool[]>(() => {
+    const here = this.barPage();
+    const hint = this.battleHint();
+    const items: Tool[] = [
+      { id: 'round', word: 'Runde', icon: 'flag', count: this.feed().length, pressed: here === 'round', click: () => this.open('round') },
+      { id: 'character', word: 'Charakter', icon: 'sheet', pressed: here === 'character', click: () => this.open('character') },
+      { id: 'quests', word: 'Quests', icon: 'quest', count: this.freshQuests().length, pressed: here === 'quests', click: () => this.open('quests') },
+      { id: 'chat', word: 'Chat', icon: 'speech', count: this.chatUnread() + this.unread(), pressed: here === 'chat', click: () => this.open('chat') },
+    ];
+    if (this.battle()) {
+      items.push({ id: 'battle', word: 'Kampf', icon: 'sword', alert: !!hint && hint !== 'läuft', pressed: here === 'battle', click: () => this.open('battle') });
+    }
+    const behind = MORE_PAGES.some((item) => item.id === here);
+    return [...items, { id: 'more', word: 'Mehr', icon: 'expand', pressed: behind, popup: this.morePop(), popupTitle: 'Mehr' }];
+  });
+  /** The row of the open page above the main row. */
+  private readonly pageTools = computed<Tool[]>(() => {
+    const help = (topic: string, step: number | string = 0) => this.tools.help(topic, step);
+    switch (this.page()) {
+      case 'round':
+        return [
+          { id: 'seen', word: 'Gesehen', icon: 'check', disabled: !this.feed().length, click: () => this.markSeen() },
+          { id: 'rolls', word: 'Würfe', icon: 'dice', popup: this.rollsPop(), popupTitle: 'Letzte Würfe' },
+          help('my-sessions'),
+        ];
+      case 'character':
+      case 'roll':
+        return [
+          { id: 'sheet', word: 'Bogen', icon: 'sheet', pressed: this.page() === 'character', click: () => this.page.set('character') },
+          { id: 'roll', word: 'Würfeln', icon: 'dice', pressed: this.page() === 'roll', click: () => this.page.set('roll') },
+          { id: 'edit', word: 'Bearbeiten', icon: 'edit', disabled: !this.character(), click: () => this.startEdit('profile') },
+          { id: 'spark', word: 'Blitz', icon: 'flag', count: this.sparksLeft(), popup: this.sparkPop(), popupTitle: 'Geistesblitz' },
+          help('rules', 'check'),
+        ];
+      case 'quests':
+        return [
+          { id: 'status-all', word: 'Alle', icon: 'quest', pressed: this.questStatus() === 'all', click: () => this.questStatus.set('all') },
+          { id: 'status-running', word: 'Laufend', icon: 'flag', pressed: this.questStatus() === 'running', click: () => this.questStatus.set('running') },
+          { id: 'status-open', word: 'Offen', icon: 'pin', pressed: this.questStatus() === 'open', click: () => this.questStatus.set('open') },
+          { id: 'status-done', word: 'Beendet', icon: 'check', pressed: this.questStatus() === 'done', click: () => this.questStatus.set('done') },
+          help('my-sessions', 4),
+        ];
+      case 'chat':
+        return [
+          { id: 'channel-group', word: 'Gruppe', icon: 'group', count: this.chatUnread(), pressed: this.channel() === 'group', click: () => this.open('chat', 'group') },
+          { id: 'channel-gm', word: 'Spielleiter', icon: 'mail', count: this.unread(), pressed: this.channel() === 'gm', click: () => this.open('chat', 'gm') },
+          help('my-sessions', 7),
+        ];
+      case 'notes':
+        return [{ id: 'note-new', word: 'Neu', icon: 'plus', click: () => this.noteId.set(null) }, help('my-sessions', 6)];
+      case 'battle':
+        return [];
+      default:
+        return [help('my-sessions')];
+    }
+  });
+
   constructor() {
+    this.tools.provide('always', this.mainTools);
+    this.tools.provide('view', this.pageTools);
+    // When the fight is over the page of the fight has nothing left to show.
+    effect(() => {
+      if (!this.battle() && this.page() === 'battle') {
+        this.page.set('round');
+      }
+    });
     effect(() => {
       this.loadSeen(this.id());
       this.refresh(this.id());
@@ -161,14 +227,6 @@ export class PlayerSession {
     });
     const timer = setInterval(() => this.refresh(this.id()), REFRESH_MS);
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
-  }
-
-  /** The number on a symbol of the bar: what is waiting there. */
-  protected badge(id: BarId): number {
-    const counts: Record<BarId, number> = {
-      round: this.feed().length, character: 0, quests: this.freshQuests().length, chat: this.chatUnread() + this.unread(), more: 0,
-    };
-    return counts[id];
   }
 
   /** Open a page of the bar; opening the secret messages marks them as read. */
@@ -188,9 +246,16 @@ export class PlayerSession {
     this.open(target);
   }
 
-  /** Open a help topic. */
+  /** Open a help topic and close the popup. */
   protected help(topic: string): void {
     this.tutorial.open(topic);
+    this.tools.dismiss();
+  }
+
+  /** Open a page from the popup "Mehr". */
+  protected openMore(page: Page): void {
+    this.open(page);
+    this.tools.dismiss();
   }
 
   /** Remember that the player has seen all that is new. */
@@ -242,7 +307,6 @@ export class PlayerSession {
   protected editSaved(): void {
     this.editDirty.set(false);
     this.editing.set(null);
-    this.toast.show('Charakter gespeichert', 'ok');
     this.refresh(this.id());
   }
 
@@ -352,7 +416,7 @@ export class PlayerSession {
       this.seen.set(now);
       this.markSeen();
     }
-    const here = this.barOf();
+    const here = this.barPage();
     feedOf(before, now)
       .filter((item) => item.target !== here)
       .slice(0, TOASTED)

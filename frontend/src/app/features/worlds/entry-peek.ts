@@ -29,9 +29,15 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
             <app-icon [name]="editing() ? 'eye' : 'edit'" [size]="16" /> {{ editing() ? 'Lesen' : editLabel() }}
           </button>
         }
-        <button panelAction type="button" class="btn btn--small" (click)="openPage(shown)">
-          <app-icon name="expand" [size]="16" /> Ganze Seite
-        </button>
+        @if (jump()) {
+          <button panelAction type="button" class="btn btn--small" (click)="jumped.emit(shown)">
+            <app-icon name="expand" [size]="16" /> Zum Eintrag
+          </button>
+        } @else {
+          <button panelAction type="button" class="btn btn--small" (click)="openPage(shown)">
+            <app-icon name="expand" [size]="16" /> Ganze Seite
+          </button>
+        }
         @if (editing()) {
           <app-entry-form [entry]="shown" (saved)="editing.set(false)" (closed)="close()" />
         } @else {
@@ -48,6 +54,9 @@ export class EntryPeek {
 
   /** Whether the entry can be edited here; a page can switch that off. */
   readonly editable = input(true);
+  /** Instead of the whole page, the window offers a way to the place where the entry is edited; a session uses it. */
+  readonly jump = input(false);
+  readonly jumped = output<EntryRef>();
   /** What the edit button says; a session names the world, because it can also change things for itself only. */
   readonly editLabel = input('Bearbeiten');
   /** What the players see of the entry, when a session decides it; handed on to the reading view. */

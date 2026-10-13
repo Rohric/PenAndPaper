@@ -93,6 +93,11 @@ export class SessionStore {
     this.patch(kind, entryId, { shown: shown.includes(part) ? shown.filter((other) => other !== part) : [...shown, part] });
   }
 
+  /** Save the note of the game master about an entry; only this session and the game master see it. */
+  setNote(kind: SessionEntryKind, entryId: number, text: string): void {
+    this.patch(kind, entryId, { gm_note: text });
+  }
+
   /** Save what the group wrote about a quest. */
   setLog(kind: SessionEntryKind, entryId: number, log: QuestLog): void {
     this.patch(kind, entryId, { log });

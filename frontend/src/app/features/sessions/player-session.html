@@ -1,11 +1,7 @@
 <section class="stack">
-  <header class="row row--between">
-    <div>
-      <a class="btn btn--small" routerLink="/player/sessions"><app-icon name="back" [size]="16" /> Alle Runden</a>
-      <span class="kicker">{{ data()?.world }}{{ data()?.chapter ? ' · ' + data()?.chapter : '' }}</span>
-      <h1 class="title">{{ data()?.name }}</h1>
-    </div>
-    <app-tutorial-button topic="my-sessions" />
+  <header>
+    <span class="kicker">{{ data()?.world }}{{ data()?.chapter ? ' · ' + data()?.chapter : '' }}</span>
+    <h1 class="title">{{ data()?.name }}</h1>
   </header>
 
   @if (offline()) {
@@ -13,16 +9,6 @@
   }
   @if (error()) {
     <p class="notice notice--error" role="alert">{{ error() }}</p>
-  }
-
-  @if (battle() && page() !== 'battle') {
-    <button type="button" class="band" (click)="page.set('battle')">
-      <app-icon name="sword" /> Kampf läuft{{ battleHint() && battleHint() !== 'läuft' ? ' · ' + battleHint() : '' }}
-    </button>
-  }
-
-  @if (isSub()) {
-    <button type="button" class="btn btn--small back" (click)="page.set('more')"><app-icon name="back" [size]="16" /> Mehr</button>
   }
 
   <ng-template #inspirationTpl>
@@ -58,10 +44,7 @@
         </div>
 
         <section class="stack">
-          <div class="row row--between">
-            <h3 class="section-title"><app-icon name="flag" /> Neu seit deinem letzten Blick</h3>
-            <button type="button" class="btn btn--small" [disabled]="!feed().length" (click)="markSeen()">Alles gesehen</button>
-          </div>
+          <h3 class="section-title"><app-icon name="flag" /> Neu seit deinem letzten Blick</h3>
           @for (item of feed(); track item.key) {
             <button type="button" class="tile" (click)="go(item.target)">
               <span class="row"><app-icon [name]="item.icon" /> {{ item.text }}</span>
@@ -70,17 +53,8 @@
             <p class="soft">Nichts Neues. Neue Quests, Gegenstände, Nachrichten und Notizen erscheinen hier.</p>
           }
         </section>
-
-        <section class="stack">
-          <h3 class="section-title"><app-icon name="dice" /> Letzte Würfe</h3>
-          <app-session-rolls [rolls]="recentRolls()" />
-        </section>
       }
       @case ('character') {
-        <div class="row" role="group" aria-label="Charakter oder Würfeln">
-          <button type="button" class="pill" aria-pressed="true">Bogen</button>
-          <button type="button" class="pill" aria-pressed="false" (click)="page.set('roll')">Würfeln</button>
-        </div>
         @if (lastRoll(); as rolled) {
           <app-dice-roll
             [label]="rolled.label"
@@ -92,9 +66,7 @@
         }
         @if (character(); as own) {
           <p class="soft">Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln. Der Spielleiter sieht den Wurf.</p>
-          <app-character-sheet [character]="own" [rollable]="true" [editable]="true" (roll)="roll($event)" (edit)="startEdit($event)">
-            <button type="button" class="btn btn--small" (click)="startEdit('profile')">Bearbeiten</button>
-          </app-character-sheet>
+          <app-character-sheet [character]="own" [rollable]="true" [editable]="true" (roll)="roll($event)" (edit)="startEdit($event)" />
         } @else {
           <div class="empty">
             <p>Keiner deiner Charaktere spielt in dieser Runde.</p>
@@ -102,21 +74,17 @@
         }
       }
       @case ('roll') {
-        <div class="row" role="group" aria-label="Charakter oder Würfeln">
-          <button type="button" class="pill" aria-pressed="false" (click)="page.set('character')">Bogen</button>
-          <button type="button" class="pill" aria-pressed="true">Würfeln</button>
-        </div>
-        <app-tutorial-button topic="rules" step="check" label="? Proben und Würfe" />
         <ng-container *ngTemplateOutlet="inspirationTpl" />
         <div class="panel">
           <app-roll-panel [characters]="own()" [last]="lastRoll()" [rolls]="rolls()" (roll)="order($event)" />
         </div>
       }
       @case ('quests') {
-        <app-tutorial-button topic="my-sessions" [step]="4" label="? Questlog" />
         <app-player-panels
           [view]="shown"
           part="quests"
+          [(status)]="questStatus"
+          [statusPills]="false"
           [editable]="true"
           [fresh]="freshQuests()"
           (logChange)="saveLog($event)"
@@ -124,15 +92,6 @@
         />
       }
       @case ('chat') {
-        <app-tutorial-button topic="my-sessions" [step]="7" label="? Chat" />
-        <div class="row" role="group" aria-label="Kanal">
-          <button type="button" class="pill" [attr.aria-pressed]="channel() === 'group'" (click)="channel.set('group')">
-            Gruppe @if (chatUnread()) { <span class="chip chip--accent">{{ chatUnread() }}</span> }
-          </button>
-          <button type="button" class="pill" [attr.aria-pressed]="channel() === 'gm'" (click)="open('chat', 'gm')">
-            Spielleiter @if (unread()) { <span class="chip chip--accent">{{ unread() }}</span> }
-          </button>
-        </div>
         @if (channel() === 'group') {
           <p class="soft">Alle in der Runde lesen mit, auch der Spielleiter.</p>
           <app-chat-thread [bubbles]="bubbles()" emptyText="Noch keine Nachricht. Schreib die erste." (send)="sendChat($event)" />
@@ -145,55 +104,51 @@
           }
         }
       }
-      @case ('more') {
-        <div class="tiles">
-          @for (tile of moreTiles; track tile.id) {
-            <button type="button" class="tile" (click)="page.set(tile.id)">
-              <span class="tile__head"><app-icon [name]="tile.icon" /> <span class="tile__title">{{ tile.label }}</span></span>
-              <span class="soft">{{ tile.hint }}</span>
-            </button>
-          }
-          <button type="button" class="tile" (click)="help('my-sessions')">
-            <span class="tile__head"><app-icon name="flag" /> <span class="tile__title">Hilfe zur App</span></span>
-            <span class="soft">Wie diese Seite funktioniert.</span>
-          </button>
-          <button type="button" class="tile" (click)="help('rules')">
-            <span class="tile__head"><app-icon name="book" /> <span class="tile__title">Regelwerk</span></span>
-            <span class="soft">Proben, Skillung, Kampf und Leveln erklärt.</span>
-          </button>
-        </div>
-      }
       @case ('glossary') {
         <app-player-panels [view]="shown" part="glossary" />
       }
       @case ('notes') {
-        <app-tutorial-button topic="my-sessions" [step]="6" label="? Notizen" />
         <app-session-notes [notes]="notes()" (open)="noteId.set($event)" (quick)="quickNote($event)" />
       }
       @case ('group') {
         <app-player-panels [view]="shown" part="group" />
       }
       @case ('battle') {
-        <app-tutorial-button topic="rules" step="initiative" label="? Kampfregeln" />
         <app-player-battle [sessionId]="id()" [battle]="battle()" [character]="character()" (changed)="battle.set($event)" />
       }
     }
   }
 </section>
 
-<nav class="bottom" aria-label="Teile der Runde">
-  <div class="bottom__inner">
-    @for (item of bar; track item.id) {
-      <button type="button" class="bottom__btn" [class.is-active]="barOf() === item.id" [attr.aria-label]="item.label" (click)="open(item.id)">
-        <app-icon [name]="item.icon" [size]="22" />
-        {{ item.label }}
-        @if (badge(item.id); as count) {
-          <span class="bottom__badge">{{ count }}</span>
-        }
-      </button>
+<app-player-bar />
+
+<!-- The popups behind the symbols of the bar. -->
+<ng-template #morePop>
+  @for (item of morePages; track item.id) {
+    <button type="button" class="btn" (click)="openMore(item.id)"><app-icon [name]="item.icon" [size]="16" /> {{ item.label }}</button>
+  }
+  <button type="button" class="btn" (click)="help('rules')"><app-icon name="book" [size]="16" /> Regelwerk</button>
+  <button type="button" class="btn" (click)="help('my-sessions')"><app-icon name="help" [size]="16" /> Hilfe zur App</button>
+  <a class="btn" routerLink="/player/sessions">Alle Runden</a>
+  <a class="btn" routerLink="/player/characters">Meine Charaktere</a>
+  <button type="button" class="btn" (click)="auth.logout()">Abmelden</button>
+</ng-template>
+
+<ng-template #rollsPop>
+  <app-session-rolls [rolls]="recentRolls()" />
+</ng-template>
+
+<ng-template #sparkPop>
+  <div class="stack">
+    @for (talent of sparks(); track talent.label) {
+      <span class="chip">{{ talent.label }} · Geistesblitz {{ talent.left }}/{{ talent.total }}</span>
+    }
+    <ng-container *ngTemplateOutlet="inspirationTpl" />
+    @if (!inspiration()) {
+      <p class="soft">Der Knopf erscheint nach einer misslungenen Probe, solange du Punkte der Begabung hast.</p>
     }
   </div>
-</nav>
+</ng-template>
 
 @if (noteId() !== undefined) {
   <app-side-panel title="Notiz" (closed)="noteId.set(undefined)">

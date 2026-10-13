@@ -14,9 +14,9 @@ export function roundHalfUp(value: number): number {
   return Math.floor(value + 0.5);
 }
 
-/** Base points plus bonus points of one skill. */
+/** Base points, bonus points and points bought with credit of one skill. */
 export function skillPoints(skill: Skill): number {
-  return skill.points + skill.bonus_points;
+  return skill.points + skill.bonus_points + (skill.credit_points ?? 0);
 }
 
 /** Talent value: a tenth of all skill points of the talent. */

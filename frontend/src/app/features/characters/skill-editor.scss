@@ -44,12 +44,13 @@
 
 .skill__points {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .stepper {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   align-items: center;
 }
@@ -58,7 +59,7 @@
   display: inline-flex;
   gap: 4px;
   align-items: center;
-  min-width: 48px;
+  width: 96px;
   font-size: 13px;
   font-weight: 600;
   color: var(--soft);
@@ -96,18 +97,21 @@
   color: var(--danger);
 }
 
+.stepper--base .stepper__label {
+  color: var(--accent);
+}
+
+.stepper--bonus .stepper__label {
+  color: var(--info);
+}
+
 .stepper--credit .stepper__label {
   color: var(--danger);
 }
 
-.stepper--credit .stepper__input {
+// The counter of the credit is lit while the credit can pay for the next point of the tapped skill.
+.stepper--hot .stepper__input {
   border-color: var(--danger);
-}
-
-.skill__spend {
-  align-self: flex-start;
-  border-color: var(--danger);
-  color: var(--danger);
 }
 
 .add {

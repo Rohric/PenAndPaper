@@ -24,7 +24,7 @@ interface Unsent {
 
 const SAVE_AFTER_MS = 700;
 // What is written word by word: it stays as typed while the form is open, even after it was saved.
-const WRITTEN: string[] = ['name', 'text', 'to_read', 'dialogues'];
+const WRITTEN: string[] = ['name', 'description', 'to_read', 'dialogues'];
 const STATUS_TEXT: Record<Status, string> = {
   idle: '',
   unsaved: 'Wird gleich gespeichert …',

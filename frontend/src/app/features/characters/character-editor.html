@@ -1,4 +1,5 @@
-<div class="stack">
+<div class="stack" [class.has-dock]="!isNpc()">
+  @if (isNpc()) {
   <div class="editbar">
     <div class="editbar__row">
       <input
@@ -34,12 +35,8 @@
         <button type="button" class="tabs__tab" [class.is-active]="item.id === current()" (click)="current.set(item.id)">{{ item.label }}</button>
       }
     </nav>
-    @if (!isNpc()) {
-      <div class="row">
-        <app-tutorial-button topic="rules" label="? Regelwerk" />
-      </div>
-    }
   </div>
+  }
 
   @if (error()) {
     <p class="notice notice--error" role="alert">{{ error() }}</p>
@@ -48,6 +45,12 @@
   @switch (current()) {
     @case ('profile') {
       <div class="panel">
+        @if (!isNpc()) {
+          <div class="field">
+            <label for="character-name">Name</label>
+            <input id="character-name" class="input" placeholder="Name" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
+          </div>
+        }
         <div class="field">
           <span class="label">Symbol und Bild</span>
           <app-symbol-picker fallback="sheet" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
@@ -104,9 +107,11 @@
         <app-entry-texts-editor
           inputId="character-description"
           [description]="draft().description"
+          [visibleFromStart]="!!draft().visible_from_start"
           [playerKnowledge]="draft().player_knowledge ?? []"
           [gmKnowledge]="draft().gm_knowledge ?? []"
           (descriptionChange)="set('description', $event)"
+          (visibleFromStartChange)="set('visible_from_start', $event)"
           (playerKnowledgeChange)="set('player_knowledge', $event)"
           (gmKnowledgeChange)="set('gm_knowledge', $event)"
         />
@@ -151,6 +156,9 @@
       <div class="row">
         <app-tutorial-button topic="rules" step="points" label="? So skillst du" />
         <app-tutorial-button topic="rules" step="leveling" label="? Leveln" />
+        @if (!isNpc()) {
+          <app-tutorial-button topic="rules" label="? Regelwerk" />
+        }
       </div>
       @if (locked()) {
         <p class="notice">
@@ -189,3 +197,56 @@
     }
   }
 </div>
+
+@if (!isNpc()) {
+  <nav class="dock" aria-label="Charakter bearbeiten">
+    <div class="dock__float">
+      <button type="button" class="dock__points" [attr.aria-label]="pointsLabel()" (click)="togglePoints($event)">
+        <span class="count count--base" [class.count--zero]="!points().base" [class.count--over]="points().base < 0">
+          <span class="count__num">{{ points().base }}</span>
+          <span class="count__word">Grund</span>
+        </span>
+        <span class="count count--bonus" [class.count--zero]="!points().bonus" [class.count--over]="points().bonus < 0">
+          <span class="count__num">{{ points().bonus }}</span>
+          <span class="count__word">Bonus</span>
+        </span>
+        @if (points().credit) {
+          <span class="count count--credit" [class.count--over]="points().credit < 0">
+            <span class="count__num">{{ points().credit }}</span>
+            <span class="count__word">Guthaben</span>
+          </span>
+        }
+      </button>
+      <span class="dock__save">
+        @if (state() !== 'saved') {
+          <button
+            type="button"
+            class="save"
+            [class.save--errors]="state() === 'errors'"
+            [disabled]="state() === 'busy'"
+            [attr.aria-label]="saveLabel()"
+            (click)="onSave()"
+          >
+            <app-icon name="check" [size]="30" />
+            @if (state() === 'errors') {
+              <span class="save__mark">{{ errors() }}</span>
+            }
+          </button>
+        }
+      </span>
+    </div>
+    <div class="dock__sections">
+      @for (item of sections(); track item.id) {
+        <button type="button" class="dock__section" [class.is-active]="item.id === current()" [attr.aria-label]="item.label" (click)="goTo(item.id)">
+          <app-icon [name]="item.icon" [size]="22" />
+          {{ item.short }}
+        </button>
+      }
+    </div>
+  </nav>
+  @if (pointsOpen()) {
+    <app-popup title="Punkte" [anchor]="pointsAnchor()" [size]="360" (closed)="pointsOpen.set(false)">
+      <app-points-overview [skills]="draft().skills" [budgets]="budgets()" [leveling]="true" [used]="draft().inspiration_used" />
+    </app-popup>
+  }
+}

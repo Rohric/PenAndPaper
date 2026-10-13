@@ -1,13 +1,17 @@
-import { Component, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { Component, ElementRef, computed, effect, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { readError } from '../../core/api-error';
 import { AnyCharacter } from '../../core/models';
-import { creditLeft, skillHints, skillProblems } from '../../core/house-rules';
+import { bonusPointsLeft, creditLeft, skillHints, skillProblems } from '../../core/house-rules';
 import { EntryTextsEditor } from '../../shared/entry-texts-editor';
-import { Icon } from '../../shared/icon';
+import { basePointsLeft } from '../../core/rules';
+import { Icon, IconName } from '../../shared/icon';
+import { Popup } from '../../shared/popup';
+import { ToastService } from '../../shared/toast.service';
 import { SymbolPicker } from '../../shared/symbol-picker';
 import { TutorialButton } from '../../shared/tutorial-button';
+import { PlayerTools } from '../player/player-tools';
 import { CharacterService, CharacterSource } from './character.service';
 import { InventoryEditor } from './inventory-editor';
 import { PhraseListEditor } from './phrase-list-editor';
@@ -20,12 +24,12 @@ type NumberField = 'life_points' | 'max_life_points' | 'skill_points_total' | 'b
 /** The parts of the editor; the phrases belong to NPCs only. */
 export type EditorSection = 'profile' | 'skills' | 'inventory' | 'abilities' | 'phrases';
 
-const SECTIONS: { id: EditorSection; label: string; npcOnly?: boolean }[] = [
-  { id: 'profile', label: 'Steckbrief' },
-  { id: 'skills', label: 'Skillung' },
-  { id: 'inventory', label: 'Inventar' },
-  { id: 'abilities', label: 'Besonderes' },
-  { id: 'phrases', label: 'Sätze', npcOnly: true },
+const SECTIONS: { id: EditorSection; label: string; short: string; icon: IconName; npcOnly?: boolean }[] = [
+  { id: 'profile', label: 'Steckbrief', short: 'Profil', icon: 'sheet' },
+  { id: 'skills', label: 'Skillung', short: 'Skillung', icon: 'dice' },
+  { id: 'inventory', label: 'Inventar', short: 'Inventar', icon: 'gift' },
+  { id: 'abilities', label: 'Besonderes', short: 'Extra', icon: 'flag' },
+  { id: 'phrases', label: 'Sätze', short: 'Sätze', icon: 'speech', npcOnly: true },
 ];
 
 /**
@@ -37,13 +41,15 @@ const SECTIONS: { id: EditorSection; label: string; npcOnly?: boolean }[] = [
   selector: 'app-character-editor',
   imports: [
     FormsModule, Icon, SymbolPicker, SkillEditor, InventoryEditor, PhraseListEditor, PointsOverview, SpecialAbilityListEditor,
-    EntryTextsEditor, TutorialButton,
+    EntryTextsEditor, TutorialButton, Popup,
   ],
   templateUrl: './character-editor.html',
   styleUrl: './character-editor.scss',
 })
 export class CharacterEditor {
   private readonly service = inject(CharacterService);
+  private readonly toast = inject(ToastService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   readonly character = input.required<AnyCharacter>();
   readonly kind = input.required<'npc' | 'player'>();
@@ -77,8 +83,20 @@ export class CharacterEditor {
       (problem) => problem.index === null || !!draft.skills[problem.index].name.trim(),
     );
   });
-  /** The free bonus points and the credit of each talent; only a player character has credit. */
-  protected readonly credit = computed(() => (this.isNpc() ? undefined : creditLeft(this.draft().skills, this.draft().bonus_points_total)));
+  /** The open credit of each talent; only a player character has credit. */
+  protected readonly credit = computed(() => (this.isNpc() ? undefined : creditLeft(this.draft().skills)));
+  /** The open points of a player: base points, free bonus points and the credit of all talents together. */
+  protected readonly points = computed(() => {
+    const { skills } = this.draft();
+    const credit = Object.values(creditLeft(skills)).reduce((sum, left) => sum + left, 0);
+    return { base: basePointsLeft(skills, this.budgets().base), bonus: bonusPointsLeft(skills, this.budgets().bonus, true), credit };
+  });
+  protected readonly pointsLabel = computed(() => {
+    const { base, bonus, credit } = this.points();
+    return `Offene Punkte: ${base} Grundpunkte, ${bonus} Bonuspunkte, ${credit} Guthaben`;
+  });
+  protected readonly pointsOpen = signal(false);
+  protected readonly pointsAnchor = signal<HTMLElement | null>(null);
   protected readonly hints = computed(() => skillHints(this.draft().skills));
   protected readonly errors = computed(() => this.shownProblems().length + (this.draft().name.trim() ? 0 : 1));
   protected readonly state = computed<'busy' | 'errors' | 'dirty' | 'saved'>(() => {
@@ -96,7 +114,21 @@ export class CharacterEditor {
   });
 
   constructor() {
+    // The bar of the player pages gives way to the dock of this editor.
+    inject(PlayerTools).cover();
     effect(() => this.dirtyChange.emit(this.dirty()));
+  }
+
+  /** Show the big overview of the points above the dock, or hide it. */
+  protected togglePoints(event: MouseEvent): void {
+    this.pointsAnchor.set(event.currentTarget as HTMLElement);
+    this.pointsOpen.update((open) => !open);
+  }
+
+  /** Open a section and bring the start of the editor into view. */
+  protected goTo(section: EditorSection): void {
+    this.current.set(section);
+    setTimeout(() => this.host.nativeElement.scrollIntoView({ block: 'start' }));
   }
 
   /** Change one field of the draft. */
@@ -175,6 +207,7 @@ export class CharacterEditor {
   private done(character: AnyCharacter): void {
     this.busy.set(false);
     this.error.set('');
+    this.toast.show('Gespeichert', 'ok');
     this.saved.emit(character);
   }
 

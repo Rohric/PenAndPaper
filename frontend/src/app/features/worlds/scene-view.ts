@@ -42,8 +42,8 @@ interface Named {
           <p class="prose">{{ scene().to_read }}</p>
         </div>
       }
-      @if (scene().text) {
-        <p class="prose">{{ scene().text }}</p>
+      @if (scene().description) {
+        <p class="prose">{{ scene().description }}</p>
       }
 
       <app-dialogue-view [dialogues]="scene().dialogues" />
@@ -66,7 +66,7 @@ interface Named {
         <app-link-row label="Wissen" [items]="trivia()" />
       }
 
-      @if (!scene().to_read && !scene().text) {
+      @if (!scene().to_read && !scene().description) {
         <p class="soft">Zu dieser Szene ist noch nichts geschrieben.</p>
       }
     </article>

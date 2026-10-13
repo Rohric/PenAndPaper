@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 
 import { ToastService } from './toast.service';
 
-/** The place where the short messages appear: above the bar at the bottom, read out by screen readers. */
+/** The place where the short messages appear: at the top of the screen, read out by screen readers. */
 @Component({
   selector: 'app-toast-outlet',
   template: `
@@ -16,7 +16,7 @@ import { ToastService } from './toast.service';
     .toasts {
       position: fixed;
       right: 12px;
-      bottom: 84px;
+      top: calc(10px + env(safe-area-inset-top));
       left: 12px;
       z-index: 60;
       display: flex;

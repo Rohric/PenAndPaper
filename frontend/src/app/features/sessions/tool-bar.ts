@@ -26,13 +26,16 @@ import { CockpitTools, Tool } from './cockpit-tools';
                 [disabled]="tool.disabled"
                 [attr.aria-pressed]="tool.pressed ?? null"
                 [attr.aria-expanded]="tool.popup ? openId() === tool.id : null"
-                [attr.aria-label]="tool.word + (tool.count ? ', ' + tool.count : '')"
+                [attr.title]="tool.title ?? tool.word"
+                [attr.aria-label]="(tool.title ?? tool.word) + (tool.count ? ', ' + tool.count : '')"
                 (click)="use(tool, $event)"
               >
                 <app-icon [class]="tool.tone ?? ''" [name]="tool.icon" [size]="20" />
                 <span class="tool__word">{{ tool.word }}</span>
                 @if (tool.count) {
                   <span class="tool__badge">{{ tool.count }}</span>
+                } @else if (tool.alert) {
+                  <span class="tool__dot"></span>
                 }
               </button>
             }

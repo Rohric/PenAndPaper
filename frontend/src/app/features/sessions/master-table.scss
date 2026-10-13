@@ -1,0 +1,166 @@
+// Desktop only. Notes on the left and characters on the right stay in view; the table is in the middle.
+.master {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 64px;
+  gap: 18px;
+  align-items: start;
+}
+
+.master__side,
+.master__people {
+  position: sticky;
+  top: 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+}
+
+.master__people {
+  align-items: center;
+}
+
+.master__main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.line {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.line:hover {
+  border-color: var(--accent);
+}
+
+.line--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.line__title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line__text {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus {
+  border-color: var(--accent);
+}
+
+.placed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.found {
+  padding: 0;
+  list-style: none;
+}
+
+.input--small {
+  min-height: 32px;
+  padding: 2px 8px;
+}
+
+// One big button for every kind of entry; exactly one drawer is open.
+.drawers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.drawer {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+  padding: 6px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.drawer[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.drawer__count {
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: 12px;
+  line-height: 22px;
+  text-align: center;
+}
+
+// A character as a round button with a thin life bar and the number of unread secret messages.
+.person {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.person__life {
+  width: 44px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--line-2);
+}
+
+.person__fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.person__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+}

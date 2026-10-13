@@ -112,9 +112,9 @@ export class QuestBoard {
   protected readonly newQuest = signal('');
   private readonly newQuestForm = viewChild<TemplateRef<unknown>>('newQuestForm');
   protected readonly tools = computed<Tool[]>(() => [
-    { id: 'quests-new', word: 'Neue Quest', icon: 'plus', tone: 'kind--quests', popup: this.newQuestForm(), popupTitle: 'Neue Quest' },
-    { id: 'quests-shared', word: 'Nur geteilte', icon: 'eye', pressed: this.onlyShared(), click: () => this.onlyShared.set(!this.onlyShared()) },
-    { id: 'quests-pinned', word: 'Nur angepinnte', icon: 'pin', pressed: this.onlyPinned(), click: () => this.onlyPinned.set(!this.onlyPinned()) },
+    { id: 'quests-new', word: 'Neu', title: 'Neue Quest', icon: 'plus', tone: 'kind--quests', popup: this.newQuestForm(), popupTitle: 'Neue Quest' },
+    { id: 'quests-shared', word: 'Geteilte', title: 'Nur geteilte', icon: 'eye', pressed: this.onlyShared(), click: () => this.onlyShared.set(!this.onlyShared()) },
+    { id: 'quests-pinned', word: 'Angepinnt', title: 'Nur angepinnte', icon: 'pin', pressed: this.onlyPinned(), click: () => this.onlyPinned.set(!this.onlyPinned()) },
   ]);
   protected readonly chapter = computed(() => this.world.chapters().find((chapter) => chapter.id === this.chapterId()) ?? null);
   /** Main quests in the order of their number, side quests in the order of the alphabet. */

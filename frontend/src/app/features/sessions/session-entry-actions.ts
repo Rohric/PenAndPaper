@@ -49,6 +49,10 @@ const PARTS: Record<string, string[]> = {
           <button type="button" class="btn btn--small" (click)="showAll(true)"><app-icon name="eye" [size]="16" /> Alles zeigen</button>
           <button type="button" class="btn btn--small" (click)="showAll(false)"><app-icon name="eye-off" [size]="16" /> Alles verbergen</button>
         </div>
+        <div class="field">
+          <label for="entry-note">Notiz (nur für dich)</label>
+          <textarea id="entry-note" class="input" rows="2" [value]="state()?.gm_note ?? ''" (change)="session.setNote(sessionKind, entry().id, $any($event.target).value)"></textarea>
+        </div>
       </div>
 
       @if (quest(); as found) {
@@ -63,6 +67,7 @@ const PARTS: Record<string, string[]> = {
           />
         </div>
 
+        @if (!readonly()) {
         <div class="panel">
           <h3 class="section-title"><app-icon name="edit" /> In dieser Runde ändern</h3>
           <p class="soft">Gilt nur für diese Runde. Die Welt bleibt, wie sie ist.</p>
@@ -118,6 +123,7 @@ const PARTS: Record<string, string[]> = {
             </div>
           }
         </div>
+        }
       }
     }
   `,
@@ -135,6 +141,8 @@ export class SessionEntryActions {
 
   /** The entry that is looked up in the side panel. */
   readonly entry = input.required<EntryRef>();
+  /** Only look and use: the box to change the quest for this session is left out. */
+  readonly readonly = input(false);
 
   protected readonly kind = computed(() => SESSION_KINDS[this.entry().kind]);
   protected readonly state = computed(() => {

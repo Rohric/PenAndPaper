@@ -38,6 +38,8 @@ export interface Skill {
   talent: Talent;
   points: number;
   bonus_points: number;
+  /** Points bought with the credit of the talent (house rule); missing in old data. */
+  credit_points?: number;
   description: string;
 }
 
@@ -87,6 +89,8 @@ export interface Dialogue {
  */
 export interface EntryTexts {
   description: string;
+  /** Whether a new session shows the entry to its players right away. */
+  visible_from_start: boolean;
   player_knowledge: Knowledge[];
   gm_knowledge: Knowledge[];
 }
@@ -197,7 +201,8 @@ export interface Chapter {
   id: number;
   number: number;
   name: string;
-  text: string;
+  description: string;
+  visible_from_start: boolean;
   to_read: string;
   quests: number[];
   events: number[];
@@ -216,7 +221,8 @@ export interface Scene {
   position: number;
   optional: boolean;
   name: string;
-  text: string;
+  description: string;
+  visible_from_start: boolean;
   to_read: string;
   dialogues: Dialogue[];
   location: number | null;
@@ -288,6 +294,8 @@ export interface Character {
   gender: string;
   profession: string;
   description: string;
+  /** Whether a new session shows an NPC to its players right away; player characters ignore it. */
+  visible_from_start?: boolean;
   /** Key of the symbol the character carries; empty means the usual symbol. */
   symbol: string;
   /** Address of the picture of the character, and whether it is shown instead of the symbol. */
