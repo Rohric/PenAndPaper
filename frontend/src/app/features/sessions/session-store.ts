@@ -3,7 +3,9 @@ import { Observable, forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { EntryKind, PlayerCharacter } from '../../core/models';
-import { ItemGift, Message, Note, Roll, Session, SessionEntry, SessionEntryKind } from '../../core/session-models';
+import {
+  ItemGift, Message, Note, QuestChanges, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
+} from '../../core/session-models';
 import { CharacterService } from '../characters/character.service';
 import { SessionService } from './session.service';
 
@@ -32,6 +34,8 @@ export class SessionStore {
   readonly characters = signal<PlayerCharacter[]>([]);
   readonly notes = signal<Note[]>([]);
   readonly rolls = signal<Roll[]>([]);
+  /** The roll the game master made last. */
+  readonly lastRoll = signal<Roll | null>(null);
   readonly messages = signal<Message[]>([]);
   readonly error = signal('');
 
@@ -135,9 +139,17 @@ export class SessionStore {
     return this.messages().filter((m) => m.character === characterId && !m.from_gm && !m.read).length;
   }
 
-  /** Roll a check as game master. */
-  roll(label: string, value: number): void {
-    this.run(this.api.roll(this.id(), label, value), () => this.refresh());
+  /** Roll as game master: a check for somebody, or free dice. */
+  roll(order: RollOrder): void {
+    this.run(this.api.roll(this.id(), order), (roll) => {
+      this.lastRoll.set(roll);
+      this.refresh();
+    });
+  }
+
+  /** Set what this session has different about an entry than the world; an empty object takes it all back. */
+  setChanges(kind: SessionEntryKind, entryId: number, changes: QuestChanges): void {
+    this.setEntry(kind, entryId, { changes });
   }
 
   private id(): number {

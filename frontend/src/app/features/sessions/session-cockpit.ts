@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
-import { EntryKind, EntryLink, Option, Scene } from '../../core/models';
+import { EntryKind, EntryLink, Option, Scene, Trivia } from '../../core/models';
 import { Battle, ItemGift, PlayerView, ROLL_RESULTS, SessionEntryKind } from '../../core/session-models';
 import { Icon } from '../../shared/icon';
 import { IdSelect } from '../../shared/id-select';
@@ -11,7 +11,11 @@ import { SidePanel } from '../../shared/side-panel';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterSheet } from '../characters/character-sheet';
 import { EntryPeek } from '../worlds/entry-peek';
+import { isItem } from '../worlds/entry-views';
+import { GLOSSARY_SECTIONS, GlossaryTiles, SectionId } from '../worlds/glossary-tiles';
+import { Carrier } from '../worlds/item-rows';
 import { SceneThread } from '../worlds/scene-thread';
+import { WorldSearch } from '../worlds/world-search';
 import { WorldStore } from '../worlds/world-store';
 import { BattleView } from './battle-view';
 import { ChapterCloseForm } from './chapter-close-form';
@@ -19,6 +23,7 @@ import { CharacterPanel } from './character-tile';
 import { ItemGiftForm, ItemTemplate } from './item-gift-form';
 import { NoteDetail } from './note-detail';
 import { PlayerPanels } from './player-panels';
+import { RollPanel } from './roll-panel';
 import { SessionArchive } from './session-archive';
 import { SessionEntryActions } from './session-entry-actions';
 import { SessionGroup } from './session-group';
@@ -30,7 +35,6 @@ import { SessionThread } from './session-thread';
 import { SessionService } from './session.service';
 
 const REFRESH_MS = 5000;
-const ITEM_CATEGORY = 'gegenstand';
 const SEEN_KEY = 'pnp.notes.seen.';
 
 /** What the window at the side shows. Only one is open at a time. */
@@ -39,10 +43,11 @@ type Panel =
   | { kind: 'note'; noteId: number | null }
   | { kind: 'archive' }
   | { kind: 'rolls' }
+  | { kind: 'roll' }
   | { kind: 'level' };
 
 /** What fills the page between the two bars. */
-type View = 'story' | 'notes' | 'players';
+type View = 'story' | 'notes' | 'players' | 'glossary';
 
 const PANEL_TITLES: Record<Panel['kind'], string> = {
   sheet: 'Charakterbogen',
@@ -51,6 +56,7 @@ const PANEL_TITLES: Record<Panel['kind'], string> = {
   note: 'Notiz',
   archive: 'Archiv',
   rolls: 'Letzte Würfe',
+  roll: 'Würfeln',
   level: 'Kapitel abschließen',
 };
 
@@ -65,17 +71,18 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
 };
 
 /**
- * The cockpit of the game master for a running session. A bar with the tools on top, the group as
- * a row of tiles, below it the thread of the story beside the scene with its open quests and events,
- * and a bar with pins and the last roll at the bottom. Everything else opens in a window at the side.
+ * The cockpit of the game master for a running session. A bar with the tools and a search on top,
+ * the group as a row of tiles, below it the thread of the story beside the scene with its quests and
+ * events, and a bar with pins and the last roll at the bottom. The glossary of the world, the notes
+ * and the view of the players fill the page instead; everything else opens in a window at the side.
  * It is built for the desktop only.
  */
 @Component({
   selector: 'app-session-cockpit',
   imports: [
     RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
-    ChapterCloseForm, ItemGiftForm, NoteDetail, PlayerPanels, SessionArchive, SessionEntryActions, SessionGroup, SessionNotes,
-    SessionRolls, SessionStory, SessionThread,
+    ChapterCloseForm, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, RollPanel, SessionArchive, SessionEntryActions,
+    SessionGroup, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch,
   ],
   providers: [WorldStore, SessionStore],
   templateUrl: './session-cockpit.html',
@@ -97,6 +104,14 @@ export class SessionCockpit {
   protected readonly playerView = signal<PlayerView | null>(null);
   protected readonly error = signal('');
   protected readonly results = ROLL_RESULTS;
+  protected readonly sections = GLOSSARY_SECTIONS;
+  /** The part of the glossary that is open. */
+  protected readonly sectionId = signal<SectionId>('locations');
+  protected readonly section = computed(() => GLOSSARY_SECTIONS.find((part) => part.id === this.sectionId()) ?? GLOSSARY_SECTIONS[0]);
+  /** The characters of the group as carriers of items, so the glossary lists their equipment. */
+  protected readonly carriers = computed<Carrier[]>(() =>
+    this.store.characters().map((character) => ({ id: character.id, name: character.name, isPlayer: true, inventory: character.inventory })),
+  );
 
   protected readonly chapterId = computed(() => this.store.session()?.chapter ?? this.world.chapters()[0]?.id ?? null);
   protected readonly chapterOptions = computed<Option[]>(() =>
@@ -125,12 +140,13 @@ export class SessionCockpit {
     return this.store.notes().find((note) => note.id === id) ?? null;
   });
   protected readonly thread = computed(() => this.store.messages().filter((m) => m.character === this.panelCharacter()?.id));
-  /** Prepared items: the knowledge entries of the world in the category "Gegenstand". */
+  /** Prepared items: the items of the world; those that belong to the opened scene come first. */
   protected readonly items = computed<ItemTemplate[]>(() =>
     this.world
       .trivia()
-      .filter((entry) => entry.category.trim().toLowerCase() === ITEM_CATEGORY)
-      .map((entry) => ({ name: entry.name, description: entry.description })),
+      .filter(isItem)
+      .map((entry) => ({ id: entry.id, name: entry.name, description: entry.description, here: this.inScene(entry) }))
+      .sort((a, b) => Number(b.here) - Number(a.here)),
   );
 
   /** Notes and comments in the notepad of the group, and how many of them the game master has seen. */
@@ -164,6 +180,8 @@ export class SessionCockpit {
     });
     // Links to scenes stay in the cockpit instead of leading to the writing tool.
     this.world.openScene = (sceneId) => this.sceneId.set(sceneId);
+    // Quests are shown as this session has them, without changing the world.
+    this.world.questChanges = (questId) => this.store.state('quest', questId)?.changes ?? {};
     const timer = setInterval(() => this.store.refresh(), REFRESH_MS);
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
   }
@@ -222,6 +240,16 @@ export class SessionCockpit {
   protected closeChapter(points: Record<number, number>): void {
     this.store.level(points);
     this.panel.set(null);
+  }
+
+  /** Whether an item belongs to the opened scene: to the scene itself, its place, its characters or its quests. */
+  private inScene(item: Trivia): boolean {
+    const scene = this.scene();
+    if (!scene) {
+      return false;
+    }
+    const linked = item.npcs.some((npc) => scene.npcs.includes(npc)) || item.quests.some((quest) => scene.quests.includes(quest));
+    return scene.trivia.includes(item.id) || (scene.location !== null && item.locations.includes(scene.location)) || linked;
   }
 
   private loadPlayerView(): void {

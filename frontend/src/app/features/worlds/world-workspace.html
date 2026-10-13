@@ -1,20 +1,24 @@
 <section class="stack">
-  <header class="head">
-    <a class="btn btn--small" routerLink="/gm/worlds">Alle Welten</a>
-    <div>
-      <span class="kicker">Welt</span>
-      <h1 class="title">{{ store.world()?.name }}</h1>
+  <header class="bar bar--top">
+    <div class="bar__title">
+      <a class="btn btn--small" routerLink="/gm/worlds" aria-label="Alle Welten"><app-icon name="back" /></a>
+      <div>
+        <span class="kicker">Welt</span>
+        <h1 class="subtitle">{{ store.world()?.name }}</h1>
+      </div>
     </div>
+    <nav class="row" aria-label="Teile der Welt">
+      <a class="btn" routerLink="chapters" routerLinkActive ariaCurrentWhenActive="page"><app-icon name="book" /> Kapitel</a>
+      <a class="btn" routerLink="glossary" routerLinkActive ariaCurrentWhenActive="page"><app-icon name="archive" /> Glossar</a>
+      @if (store.world()) {
+        <app-world-search />
+      }
+    </nav>
   </header>
 
   @if (store.error()) {
     <p class="notice notice--error" role="alert">{{ store.error() }}</p>
   }
-
-  <nav class="tabs" aria-label="Teile der Welt">
-    <a class="tabs__tab" routerLink="chapters" routerLinkActive="is-active">Kapitel</a>
-    <a class="tabs__tab" routerLink="glossary" routerLinkActive="is-active">Glossar</a>
-  </nav>
 
   @if (store.world()) {
     <router-outlet />

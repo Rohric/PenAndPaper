@@ -17,6 +17,8 @@ type NumberField = 'quantity' | 'damage_dice' | 'damage_bonus';
 })
 export class InventoryEditor {
   readonly items = input.required<InventoryItem[]>();
+  /** Whether an entry can be hidden from the group; that only matters for a player character. */
+  readonly hideable = input(false);
   readonly itemsChange = output<InventoryItem[]>();
 
   protected readonly damageText = damageText;

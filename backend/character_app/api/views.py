@@ -1,13 +1,22 @@
 """Endpoints for the NPCs of a game master and the characters of the players."""
 
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from auth_app.api.permissions import IsGameMaster
 from character_app.models import PlayerCharacter
-from character_app.utils import npcs_for_user, player_characters_for_user
+from character_app.utils import npcs_for_user, player_characters_for_user, set_image
 
-from .serializers import NpcSerializer, PlayerCharacterLevelSerializer, PlayerCharacterSerializer
+from .serializers import (
+    CharacterImageSerializer,
+    NpcSerializer,
+    PlayerCharacterLevelSerializer,
+    PlayerCharacterSerializer,
+)
 
 GAME_MASTER_ONLY = [IsAuthenticated, IsGameMaster]
 
@@ -88,3 +97,55 @@ class GmPlayerCharacterDetail(generics.RetrieveUpdateAPIView):
     serializer_class = PlayerCharacterLevelSerializer
     permission_classes = GAME_MASTER_ONLY
     queryset = PlayerCharacter.objects.select_related("owner")
+
+
+class CharacterImage(APIView):
+    """
+    Base for the picture of a character; subclasses say whose characters and how they are returned.
+
+    - PUT: upload the picture (multipart, field "image"); it replaces the one before.
+    - DELETE: remove the picture.
+    """
+
+    parser_classes = [MultiPartParser]
+    serializer_class = None
+
+    def characters(self):
+        """Return the characters the requesting user may change; overridden by the subclasses."""
+        raise NotImplementedError
+
+    def put(self, request, pk):
+        """Store the uploaded picture and return the character."""
+        upload = CharacterImageSerializer(data=request.data)
+        upload.is_valid(raise_exception=True)
+        return self.answer(set_image(get_object_or_404(self.characters(), pk=pk), upload.validated_data["image"]))
+
+    def delete(self, request, pk):
+        """Remove the picture and return the character."""
+        return self.answer(set_image(get_object_or_404(self.characters(), pk=pk), None))
+
+    def answer(self, character):
+        """Return the character as its usual serializer shows it."""
+        return Response(self.serializer_class(character, context={"request": self.request}).data)
+
+
+class NpcImage(CharacterImage):
+    """Upload or remove the picture of an NPC of the requesting game master."""
+
+    permission_classes = GAME_MASTER_ONLY
+    serializer_class = NpcSerializer
+
+    def characters(self):
+        """Return the NPCs the requesting user owns."""
+        return npcs_for_user(self.request.user)
+
+
+class PlayerCharacterImage(CharacterImage):
+    """Upload or remove the picture of a character of the requesting player."""
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = PlayerCharacterSerializer
+
+    def characters(self):
+        """Return the characters the requesting user owns."""
+        return player_characters_for_user(self.request.user)

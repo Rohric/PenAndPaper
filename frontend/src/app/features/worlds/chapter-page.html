@@ -1,20 +1,20 @@
 @if (chapter(); as current) {
   <div class="stack">
     <header class="row row--between">
-      <div>
-        <span class="kicker">Kapitel {{ current.number }}</span>
-        <h2 class="subtitle">{{ current.name }}</h2>
-      </div>
       <div class="row">
-        <a class="btn btn--small" [routerLink]="chaptersLink()">Alle Kapitel</a>
-        <app-tutorial-button [topic]="topic()" />
+        <a class="btn btn--small" [routerLink]="chaptersLink()" aria-label="Alle Kapitel"><app-icon name="back" /></a>
+        <div>
+          <span class="kicker">Kapitel {{ current.number }}</span>
+          <h2 class="subtitle">{{ current.name }}</h2>
+        </div>
       </div>
+      <app-tutorial-button [topic]="topic()" />
     </header>
 
     <nav class="tabs" aria-label="Teile des Kapitels">
       @for (item of tabs; track item.id) {
         <a class="tabs__tab" [routerLink]="[]" [queryParams]="{ tab: item.id }" [class.is-active]="item.id === currentTab()">
-          {{ item.label }}
+          <app-icon [name]="item.icon" [size]="16" /> {{ item.label }}
         </a>
       }
     </nav>
@@ -34,30 +34,38 @@
         <app-chapter-links kind="events" [chapter]="current" />
       }
       @case ('overview') {
-        @if (editingOverview()) {
-          <button type="button" class="btn btn--small" (click)="editingOverview.set(false)">Zur Leseansicht</button>
-          <app-chapter-editor [entry]="current" (saved)="editingOverview.set(false)" (closed)="leave()" />
-        } @else {
-          <article class="panel">
-            <header class="row row--between">
-              <h3 class="subtitle">Überblick</h3>
-              <button type="button" class="btn btn--small" (click)="editingOverview.set(true)">Bearbeiten</button>
-            </header>
-            @if (current.to_read) {
-              <div class="read-aloud">
-                <span class="kicker">Vorlesen</span>
-                <p class="prose">{{ current.to_read }}</p>
+        <div class="page">
+          @if (editingOverview()) {
+            <div class="stack">
+              <div class="row">
+                <button type="button" class="btn btn--small" (click)="editingOverview.set(false)"><app-icon name="eye" [size]="16" /> Lesen</button>
               </div>
-            }
-            @if (current.text) {
-              <p class="prose">{{ current.text }}</p>
-            } @else {
-              <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ schreibst du, worum es geht.</p>
-            }
-            <app-link-row label="Orte dieses Kapitels" [items]="places()" />
-            <app-link-row label="Figuren dieses Kapitels" [items]="npcs()" />
-          </article>
-        }
+              <app-chapter-editor [entry]="current" (saved)="editingOverview.set(false)" (closed)="leave()" />
+            </div>
+          } @else {
+            <article class="panel">
+              <header class="row row--between">
+                <h3 class="subtitle">Überblick</h3>
+                <button type="button" class="btn btn--small" (click)="editingOverview.set(true)">
+                  <app-icon name="edit" [size]="16" /> Bearbeiten
+                </button>
+              </header>
+              @if (current.to_read) {
+                <div class="read-aloud">
+                  <span class="kicker">Vorlesen</span>
+                  <p class="prose">{{ current.to_read }}</p>
+                </div>
+              }
+              @if (current.text) {
+                <p class="prose">{{ current.text }}</p>
+              } @else {
+                <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ schreibst du, worum es geht.</p>
+              }
+              <app-link-row label="Orte dieses Kapitels" [items]="places()" />
+              <app-link-row label="Figuren dieses Kapitels" [items]="npcs()" />
+            </article>
+          }
+        </div>
       }
     }
   </div>
@@ -75,7 +83,6 @@
 <ng-template #sceneTpl>
   @if (openScene(); as shown) {
     @if (editing()) {
-      <button type="button" class="btn btn--small" (click)="stopEditing()">Zur Leseansicht</button>
       <app-scene-form [entry]="shown" (saved)="stopEditing()" (closed)="closeScene()" />
     } @else {
       <app-scene-view [scene]="shown" (edit)="editing.set(true)" />

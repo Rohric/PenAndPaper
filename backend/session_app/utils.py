@@ -1,4 +1,4 @@
-"""Helpers for sessions: who may open one, what the players see, leveling, items and rolls."""
+"""Helpers for sessions: who may open one, what the players see, leveling, items, equipment and rolls."""
 
 from collections import defaultdict, deque
 
@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-from battle_app.rules import check
+from battle_app.rules import check, roll_die
 from character_app.models import Npc
 from session_app.models import Session
 from world.world_app.models import Quest
@@ -65,16 +65,27 @@ def give_item(character, item):
     character.save(update_fields=["inventory"])
 
 
-def roll_check(session, who, label, value):
-    """Roll a check, remember it for the session and return it."""
-    roll = {"who": who, "label": label, **check(value)}
+def remember_roll(session, roll):
+    """Put a roll in front of the latest rolls of the session and return it."""
     ROLLS[session.pk].appendleft(roll)
     return roll
 
 
-def latest_rolls(session):
-    """Return the latest rolls of a session, newest first."""
-    return list(ROLLS[session.pk])
+def roll_check(session, who, label, value, secret=False):
+    """Roll a check against a value, remember it for the session and return it."""
+    return remember_roll(session, {"who": who, "label": label, "secret": secret, **check(value)})
+
+
+def roll_dice(session, who, label, sides, count, secret=False):
+    """Roll dice without a value, remember the roll for the session and return it."""
+    dice = [roll_die(sides) for _ in range(count)]
+    name = label or f"{count}W{sides}"
+    return remember_roll(session, {"who": who, "label": name, "secret": secret, "dice": dice, "total": sum(dice)})
+
+
+def latest_rolls(session, with_secret):
+    """Return the latest rolls of a session, newest first; secret rolls are only for the game master."""
+    return [roll for roll in ROLLS[session.pk] if with_secret or not roll["secret"]]
 
 
 def known_pieces(entry, state):
@@ -86,7 +97,7 @@ def shared_entry(kind, entry, state):
     """Return what players see of one revealed entry: name, description and what they found out."""
     return {
         "kind": kind, "id": entry.pk, "name": entry.name, "category": getattr(entry, "category", ""),
-        "description": entry.description, "knowledge": known_pieces(entry, state),
+        "symbol": entry.symbol, "description": entry.description, "knowledge": known_pieces(entry, state),
     }
 
 
@@ -141,8 +152,23 @@ def group_of(session):
     ]
 
 
-def player_view(session):
-    """Return everything the players of a session may see."""
+def equipment_of(session, user):
+    """Return what the characters of a session carry, as the given user may see it.
+
+    A hidden line is shown only to the owner of the character and to the game master.
+    """
+    sees_all = session.owner_id == user.pk
+    lines = []
+    for character in session.characters.all():
+        for line in character.inventory:
+            hidden = bool(line.get("hidden"))
+            if sees_all or character.owner_id == user.pk or not hidden:
+                lines.append({**line, "hidden": hidden, "owner": character.name})
+    return lines
+
+
+def player_view(session, user):
+    """Return everything the given user may see of a session as one of its players."""
     states = {(state.kind, state.entry_id): state for state in session.entries.filter(revealed=True)}
     quests = session.world.quests.filter(pk__in=[pk for kind, pk in states if kind == "quest"]).select_related("giver")
     return {
@@ -151,4 +177,5 @@ def player_view(session):
         "group": group_of(session),
         "quests": [shared_quest(quest, states["quest", quest.pk]) for quest in quests],
         "glossary": glossary_for_players(session, states),
+        "equipment": equipment_of(session, user),
     }

@@ -46,6 +46,10 @@ export interface InventoryItem {
   damage_dice: number;
   damage_bonus: number;
   description: string;
+  /** Id of the item of the world this line comes from, when the game master handed it over. */
+  item?: number | null;
+  /** A hidden line is seen only by its owner and the game master. */
+  hidden?: boolean;
 }
 
 /** One choice in a select or in the list of a link picker; the hint says a little more about it. */
@@ -59,6 +63,18 @@ export interface Option {
 export interface Knowledge {
   title: string;
   text: string;
+}
+
+/** One line of a dialogue: what is said and, if wanted, which character says it. */
+export interface DialogueLine {
+  npc: number | null;
+  text: string;
+}
+
+/** What is said in a scene, a quest or an event: one statement, or several that form a conversation. */
+export interface Dialogue {
+  title: string;
+  lines: DialogueLine[];
 }
 
 /**
@@ -84,6 +100,8 @@ export interface Location extends EntryTexts {
   id: number;
   parent: number | null;
   name: string;
+  /** Key of the symbol the entry carries; empty means the usual symbol of its kind. */
+  symbol: string;
 }
 
 /** The link between a world and one of its NPCs. `npc` is the id of the character itself. */
@@ -92,7 +110,10 @@ export interface WorldNpc {
   npc: number;
   name: string;
   profession: string;
+  symbol: string;
   location: number | null;
+  /** What the character carries. Read only here; it is changed at the character itself. */
+  inventory: InventoryItem[];
 }
 
 export type QuestKind = 'main' | 'side';
@@ -112,13 +133,18 @@ export function questLabel(quest: { kind: QuestKind; number: number | null }): s
 export interface Quest extends EntryTexts {
   id: number;
   name: string;
+  symbol: string;
+  dialogues: Dialogue[];
   kind: QuestKind;
   /** The number of a main quest; side quests have none. */
   number: number | null;
   goal: string;
   checklist: string[];
+  /** The place where the quest starts. */
   location: number | null;
   giver: number | null;
+  /** The scene in which the quest comes up. */
+  scene: number | null;
   npcs: number[];
 }
 
@@ -126,6 +152,12 @@ export interface Quest extends EntryTexts {
 export interface WorldEvent extends EntryTexts {
   id: number;
   name: string;
+  symbol: string;
+  /** What sets the event off. */
+  trigger: string;
+  /** What happens once it is set off. */
+  happening: string;
+  dialogues: Dialogue[];
   location: number | null;
 }
 
@@ -133,6 +165,7 @@ export interface WorldEvent extends EntryTexts {
 export interface Trivia extends EntryTexts {
   id: number;
   name: string;
+  symbol: string;
   category: string;
   locations: number[];
   npcs: number[];
@@ -163,6 +196,7 @@ export interface Scene {
   name: string;
   text: string;
   to_read: string;
+  dialogues: Dialogue[];
   location: number | null;
   npcs: number[];
   leads_to: number[];
@@ -186,6 +220,11 @@ export interface EntryRef {
   id: number;
 }
 
+/** The entry in the window at the side; "edit" opens its form instead of the reading view. */
+export interface Peek extends EntryRef {
+  edit?: boolean;
+}
+
 /** A pointer to an entry together with the text shown for it. */
 export interface EntryLink extends EntryRef {
   label: string;
@@ -206,6 +245,11 @@ export interface Character {
   gender: string;
   profession: string;
   description: string;
+  /** Key of the symbol the character carries; empty means the usual symbol. */
+  symbol: string;
+  /** Address of the picture of the character, and whether it is shown instead of the symbol. */
+  image: string | null;
+  shows_image: boolean;
   /** The life points right now, and the most the character can have. */
   life_points: number;
   max_life_points: number;

@@ -1,0 +1,70 @@
+<ol class="line" aria-label="Reihenfolge im Kampf">
+  @for (entry of entries(); track entry.id) {
+    <li class="who" [class.is-current]="entry.id === current()">
+      @if (editable()) {
+        <button
+          type="button"
+          class="who__face"
+          [attr.aria-label]="'Zustände von ' + entry.name"
+          [attr.aria-expanded]="opened()?.id === entry.id"
+          (click)="toggle(entry.id)"
+        >
+          <app-portrait [symbol]="entry.symbol" [fallback]="entry.isPlayer ? 'sheet' : 'sword'" [state]="stateOf(entry)" [size]="52" />
+        </button>
+      } @else {
+        <span class="who__face">
+          <app-portrait [symbol]="entry.symbol" [fallback]="entry.isPlayer ? 'sheet' : 'sword'" [state]="stateOf(entry)" [size]="52" />
+        </span>
+      }
+      <strong class="who__name">{{ entry.name }}</strong>
+      <span class="soft">{{ lineOf(entry) }}</span>
+      @for (status of entry.statuses; track status.name) {
+        <span class="chip" [class.chip--info]="status.skips">{{ describe(status) }}</span>
+      }
+    </li>
+  } @empty {
+    <li class="soft">Noch kein Teilnehmer.</li>
+  }
+</ol>
+
+@if (editable() && opened(); as entry) {
+  <div class="panel">
+    <div class="row row--between">
+      <span class="kicker">Zustände von {{ entry.name }}</span>
+      <button type="button" class="btn btn--small" (click)="toggle(entry.id)"><app-icon name="close" [size]="16" /> Schließen</button>
+    </div>
+    @for (status of entry.statuses; track $index) {
+      <div class="row row--between">
+        <span>{{ describe(status) }}</span>
+        <button type="button" class="btn btn--small" (click)="remove(entry, $index)">Wegnehmen</button>
+      </div>
+    } @empty {
+      <p class="soft">Kein Zustand.</p>
+    }
+
+    <div class="row" role="group" aria-label="Häufige Zustände">
+      @for (preset of presets; track preset.name) {
+        <button type="button" class="pill" [attr.aria-pressed]="name() === preset.name" (click)="usePreset(preset)">{{ preset.name }}</button>
+      }
+    </div>
+    <form class="stack" (ngSubmit)="give(entry)">
+      <div class="grid-fields">
+        <div class="field">
+          <label for="status-name">Zustand</label>
+          <input id="status-name" class="input" name="name" placeholder="z. B. gefroren" [(ngModel)]="name" />
+        </div>
+        <div class="field">
+          <label for="status-rounds">Dauer in eigenen Zügen</label>
+          <input id="status-rounds" class="input" name="rounds" type="number" min="1" max="99" placeholder="leer = bis du ihn nimmst" [(ngModel)]="rounds" />
+        </div>
+      </div>
+      <label class="check">
+        <input type="checkbox" name="skips" [(ngModel)]="skips" />
+        Setzt aus: wird übersprungen, solange der Zustand anhält
+      </label>
+      <div class="row">
+        <button type="submit" class="btn btn--primary btn--small" [disabled]="!name().trim()">Zustand geben</button>
+      </div>
+    </form>
+  </div>
+}

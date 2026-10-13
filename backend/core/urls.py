@@ -1,5 +1,7 @@
 """URL configuration for the core project."""
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
@@ -11,3 +13,7 @@ urlpatterns = [
     path("api/", include("session_app.api.urls")),
     path("api/", include("battle_app.api.urls")),
 ]
+
+# While developing, Django itself hands out the uploaded pictures.
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

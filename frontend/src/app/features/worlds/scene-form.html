@@ -1,86 +1,151 @@
-<div class="stack">
-  <div class="panel">
-    <div class="field">
-      <label for="scene-name">Name</label>
-      <input id="scene-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
-    </div>
-    <label class="check">
-      <input type="checkbox" [ngModel]="draft().optional" (ngModelChange)="set('optional', $event)" />
-      Optionale Szene: hängt nicht am roten Faden und kann eingesetzt werden, wo sie passt
-    </label>
-    <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
-  </div>
-
-  <div class="panel">
-    <div class="field">
-      <label for="scene-read">Zum Vorlesen</label>
-      <textarea id="scene-read" class="input" rows="5" [ngModel]="draft().to_read" (ngModelChange)="set('to_read', $event)"></textarea>
-    </div>
-    <div class="field">
-      <label for="scene-text">Was passiert</label>
-      <textarea id="scene-text" class="input" rows="10" [ngModel]="draft().text" (ngModelChange)="set('text', $event)"></textarea>
+<article class="panel doc">
+  <div class="row row--between">
+    <span class="kicker">Szene schreiben</span>
+    <div class="row">
+      <span class="soft" role="status">{{ statusText() }}</span>
+      <button type="button" class="btn btn--small btn--primary" (click)="finish()"><app-icon name="check" [size]="16" /> Fertig</button>
+      <button type="button" class="btn btn--small btn--danger" (click)="remove()"><app-icon name="trash" [size]="16" /> Löschen</button>
     </div>
   </div>
 
-  <div class="panel">
-    <h2 class="subtitle">Verknüpfungen</h2>
-    <div class="field">
-      <label for="scene-location">Ort</label>
-      <app-id-select
-        inputId="scene-location"
-        emptyLabel="Kein Ort"
-        [options]="store.locationOptions()"
-        [value]="draft().location"
-        (valueChange)="set('location', $event)"
-      />
-    </div>
-    <div class="field">
-      <span class="label">Figuren in der Szene</span>
-      <app-link-picker
-        label="Figuren"
-        [creatable]="true"
-        [options]="store.npcOptions()"
-        [selected]="draft().npcs"
-        (selectedChange)="set('npcs', $event)"
-        (create)="addNew('npcs', $event)"
-      />
-    </div>
-    <div class="field">
-      <span class="label">Führt zu diesen Szenen</span>
-      <app-link-picker label="Szenen" [options]="otherScenes()" [selected]="draft().leads_to" (selectedChange)="set('leads_to', $event)" />
-    </div>
-    <div class="field">
-      <span class="label">Quests</span>
-      <app-link-picker
-        label="Quests"
-        [creatable]="true"
-        [options]="store.questOptions()"
-        [selected]="draft().quests"
-        (selectedChange)="set('quests', $event)"
-        (create)="addNew('quests', $event)"
-      />
-    </div>
-    <div class="field">
-      <span class="label">Ereignisse</span>
-      <app-link-picker
-        label="Ereignisse"
-        [creatable]="true"
-        [options]="store.eventOptions()"
-        [selected]="draft().events"
-        (selectedChange)="set('events', $event)"
-        (create)="addNew('events', $event)"
-      />
-    </div>
-    <div class="field">
-      <span class="label">Wissen</span>
-      <app-link-picker
-        label="Wissen"
-        [creatable]="true"
-        [options]="store.triviaOptions()"
-        [selected]="draft().trivia"
-        (selectedChange)="set('trivia', $event)"
-        (create)="addNew('trivia', $event)"
-      />
-    </div>
+  @if (error()) {
+    <p class="notice notice--error" role="alert">{{ error() }}</p>
+  }
+
+  <input
+    #title
+    class="doc__title"
+    aria-label="Name der Szene"
+    placeholder="Name der Szene"
+    [value]="draft().name"
+    (input)="set('name', $any($event.target).value)"
+  />
+
+  <label class="check">
+    <input type="checkbox" [checked]="draft().optional" (change)="set('optional', $any($event.target).checked)" />
+    Optionale Szene: hängt nicht am roten Faden und kann eingesetzt werden, wo sie passt
+  </label>
+
+  <div class="doc__line">
+    <label for="scene-location">Ort</label>
+    <app-link-picker
+      single
+      inputId="scene-location"
+      label="Ort der Szene"
+      emptyText="Wo spielt die Szene?"
+      [options]="store.locationOptions()"
+      [value]="draft().location"
+      (valueChange)="set('location', $event)"
+      (look)="lookUp('locations', $event)"
+    />
   </div>
-</div>
+  <div class="doc__line">
+    <label for="scene-npcs">Figuren</label>
+    <app-link-picker
+      inputId="scene-npcs"
+      label="Figuren in der Szene"
+      emptyText="Wer tritt auf?"
+      [creatable]="true"
+      [options]="store.npcOptions()"
+      [selected]="draft().npcs"
+      (selectedChange)="set('npcs', $event)"
+      (create)="addNew('npcs', $event)"
+      (look)="lookUp('npcs', $event)"
+    />
+  </div>
+
+  <div class="read-aloud">
+    <label class="kicker" for="scene-read">Vorlesen</label>
+    <textarea
+      id="scene-read"
+      class="doc__text"
+      rows="2"
+      placeholder="Was du den Spielern vorliest …"
+      [appAutoGrow]="draft().to_read"
+      [value]="draft().to_read"
+      (input)="set('to_read', $any($event.target).value)"
+    ></textarea>
+  </div>
+
+  <div class="field">
+    <label for="scene-text">Was passiert</label>
+    <textarea
+      id="scene-text"
+      class="doc__text"
+      rows="4"
+      placeholder="Was in der Szene geschieht, was die Figuren wollen, was schiefgehen kann …"
+      [appAutoGrow]="draft().text"
+      [value]="draft().text"
+      (input)="set('text', $any($event.target).value)"
+    ></textarea>
+  </div>
+
+  <div class="field">
+    <span class="label">Dialoge</span>
+    <app-dialogue-list-editor
+      [dialogues]="draft().dialogues"
+      [speakers]="store.npcOptions()"
+      (dialoguesChange)="set('dialogues', $event)"
+      (look)="lookUp('npcs', $event)"
+    />
+  </div>
+
+  <div class="doc__line">
+    <label for="scene-events">Ereignisse</label>
+    <app-link-picker
+      inputId="scene-events"
+      label="Ereignisse der Szene"
+      emptyText="Was kann hier passieren?"
+      [creatable]="true"
+      [options]="store.eventOptions()"
+      [selected]="draft().events"
+      (selectedChange)="set('events', $event)"
+      (create)="addNew('events', $event)"
+      (look)="lookUp('events', $event)"
+    />
+  </div>
+  <div class="doc__line">
+    <label for="scene-quests">Quests</label>
+    <app-link-picker
+      inputId="scene-quests"
+      label="Quests der Szene"
+      emptyText="Welche Quests spielen hier eine Rolle?"
+      [creatable]="true"
+      [options]="store.questOptions()"
+      [selected]="draft().quests"
+      (selectedChange)="set('quests', $event)"
+      (create)="addNew('quests', $event)"
+      (look)="lookUp('quests', $event)"
+    />
+  </div>
+  <div class="doc__line">
+    <label for="scene-trivia">Wissen</label>
+    <app-link-picker
+      inputId="scene-trivia"
+      label="Wissen und Gegenstände der Szene"
+      emptyText="Wissen oder Gegenstände, die hier wichtig sind"
+      [creatable]="true"
+      [options]="store.triviaOptions()"
+      [selected]="draft().trivia"
+      (selectedChange)="set('trivia', $event)"
+      (create)="addNew('trivia', $event)"
+      (look)="lookUp('trivia', $event)"
+    />
+  </div>
+  <div class="doc__line">
+    <label for="scene-next">Führt zu</label>
+    <app-link-picker
+      inputId="scene-next"
+      label="Szenen, zu denen diese führt"
+      emptyText="Welche Szene kann folgen?"
+      [options]="otherScenes()"
+      [selected]="draft().leads_to"
+      (selectedChange)="set('leads_to', $event)"
+    />
+  </div>
+
+  <p class="soft">
+    Tab springt zum nächsten Feld. In einem Verknüpfungsfeld: tippen sucht, Pfeiltasten wählen, Enter verknüpft, die Rücktaste nimmt
+    den letzten Eintrag weg. Ein Klick auf einen verknüpften Eintrag öffnet ihn rechts zum Lesen und Bearbeiten.
+  </p>
+</article>

@@ -4,13 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Location } from '../../core/models';
 import { EditorBar } from '../../shared/editor-bar';
 import { EntryTextsEditor } from '../../shared/entry-texts-editor';
-import { IdSelect } from '../../shared/id-select';
+import { LinkPicker } from '../../shared/link-picker';
+import { SymbolPicker } from '../../shared/symbol-picker';
 import { EntryEditor } from './entry-editor';
+import { EntryItems } from './entry-items';
 
-/** Edit one location: its name, the place it lies in and what is known about it. */
+/** Edit one location: its name, the place it lies in, what is known about it and the items found there. */
 @Component({
   selector: 'app-location-editor',
-  imports: [FormsModule, EditorBar, IdSelect, EntryTextsEditor],
+  imports: [FormsModule, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems],
   template: `
     <div class="stack">
       <div class="panel">
@@ -19,13 +21,20 @@ import { EntryEditor } from './entry-editor';
           <input id="location-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
         </div>
         <div class="field">
+          <span class="label">Symbol</span>
+          <app-symbol-picker fallback="pin" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
+        </div>
+        <div class="field">
           <label for="location-parent">Liegt in</label>
-          <app-id-select
+          <app-link-picker
+            single
             inputId="location-parent"
-            emptyLabel="In keinem anderen Ort"
+            label="Ort, in dem dieser liegt"
+            emptyText="In keinem anderen Ort"
             [options]="parents()"
             [value]="draft().parent"
             (valueChange)="set('parent', $event)"
+            (look)="lookUp('locations', $event)"
           />
         </div>
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
@@ -40,6 +49,12 @@ import { EntryEditor } from './entry-editor';
         (playerKnowledgeChange)="set('player_knowledge', $event)"
         (gmKnowledgeChange)="set('gm_knowledge', $event)"
       />
+
+      <div class="panel">
+        <h2 class="subtitle">Gegenstände</h2>
+        <p class="soft">Was hier zu finden ist. Das wird sofort gespeichert.</p>
+        <app-entry-items kind="locations" [entryId]="entry().id" />
+      </div>
     </div>
   `,
 })

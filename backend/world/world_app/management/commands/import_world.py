@@ -38,11 +38,12 @@ def pick_all(entries, names, kind):
 
 
 def texts(entry):
-    """Return what an entry says: its description and its knowledge for players and for the game master."""
+    """Return what an entry says: its description, its knowledge for players and game master, its symbol."""
     return {
         "description": entry.get("description", ""),
         "player_knowledge": entry.get("player_knowledge", []),
         "gm_knowledge": entry.get("gm_knowledge", []),
+        "symbol": entry.get("symbol", ""),
     }
 
 
@@ -117,7 +118,7 @@ class Command(BaseCommand):
             quest = Quest.objects.create(
                 world=self.world, name=entry["name"], kind=entry.get("kind", Quest.Kind.SIDE),
                 number=entry.get("number"), goal=entry.get("goal", ""), checklist=entry.get("checklist", []),
-                **texts(entry),
+                **texts(entry), dialogues=self._dialogues(entry),
                 location=pick(self.locations, entry.get("location"), "Der Ort"),
                 giver=pick(self.npcs, entry.get("giver"), "Die Figur"),
             )
@@ -129,7 +130,9 @@ class Command(BaseCommand):
         for entry in entries:
             place = pick(self.locations, entry.get("location"), "Der Ort")
             self.events[entry["name"]] = Event.objects.create(
-                world=self.world, name=entry["name"], location=place, **texts(entry)
+                world=self.world, name=entry["name"], location=place, **texts(entry),
+                trigger=entry.get("trigger", ""), happening=entry.get("happening", ""),
+                dialogues=self._dialogues(entry),
             )
 
     def _trivia(self, entries):
@@ -168,13 +171,25 @@ class Command(BaseCommand):
         scene = Scene.objects.create(
             chapter=chapter, position=position, optional=entry.get("optional", False), name=entry["name"],
             text=entry.get("text", ""), to_read=entry.get("to_read", ""),
-            location=pick(self.locations, entry.get("location"), "Der Ort"),
+            location=pick(self.locations, entry.get("location"), "Der Ort"), dialogues=self._dialogues(entry),
         )
         scene.npcs.set(pick_all(self.npcs, entry.get("npcs"), "Die Figur"))
         scene.quests.set(pick_all(self.quests, entry.get("quests"), "Die Quest"))
         scene.events.set(pick_all(self.events, entry.get("events"), "Das Ereignis"))
         scene.trivia.set(pick_all(self.trivia, entry.get("trivia"), "Das Wissen"))
         return scene
+
+    def _dialogues(self, entry):
+        """Return the dialogues of an entry; who speaks is named in the file and stored as the character's id."""
+        return [
+            {"title": dialogue.get("title", ""), "lines": [self._line(line) for line in dialogue.get("lines", [])]}
+            for dialogue in entry.get("dialogues", [])
+        ]
+
+    def _line(self, line):
+        """Return one line of a dialogue; a line without a speaker is told by the game master."""
+        speaker = pick(self.npcs, line.get("npc"), "Die Figur")
+        return {"npc": speaker.pk if speaker else None, "text": line["text"]}
 
     def _report(self):
         """Tell the user what was created."""

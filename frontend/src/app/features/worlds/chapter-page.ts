@@ -3,6 +3,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { EntryLink } from '../../core/models';
+import { Icon, IconName } from '../../shared/icon';
 import { MasterDetail } from '../../shared/master-detail';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { ChapterEditor } from './chapter-editor';
@@ -16,11 +17,11 @@ import { WorldStore } from './world-store';
 
 type Tab = 'scenes' | 'quests' | 'events' | 'overview';
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'scenes', label: 'Szenen' },
-  { id: 'quests', label: 'Quests' },
-  { id: 'events', label: 'Ereignisse' },
-  { id: 'overview', label: 'Überblick' },
+const TABS: { id: Tab; label: string; icon: IconName }[] = [
+  { id: 'scenes', label: 'Szenen', icon: 'note' },
+  { id: 'quests', label: 'Quests', icon: 'quest' },
+  { id: 'events', label: 'Ereignisse', icon: 'flag' },
+  { id: 'overview', label: 'Überblick', icon: 'eye' },
 ];
 
 /**
@@ -29,7 +30,7 @@ const TABS: { id: Tab; label: string }[] = [
  */
 @Component({
   selector: 'app-chapter-page',
-  imports: [RouterLink, MasterDetail, TutorialButton, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
+  imports: [RouterLink, Icon, MasterDetail, TutorialButton, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
   templateUrl: './chapter-page.html',
 })
 export class ChapterPage {
@@ -51,7 +52,7 @@ export class ChapterPage {
   protected readonly error = signal('');
   protected readonly editingOverview = signal(false);
 
-  /** A fresh scene opens as a form, every other scene opens to read. */
+  /** A fresh scene opens to write, every other scene opens to read. */
   private createdId: number | null = null;
   protected readonly editing = linkedSignal({
     source: this.sceneId,

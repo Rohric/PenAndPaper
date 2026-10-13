@@ -1,7 +1,10 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 
 import { EntryKind, EntryLink, Scene } from '../../core/models';
-import { npcLinks, summaryOf } from './entry-views';
+import { Icon } from '../../shared/icon';
+import { DialogueView } from './dialogue-view';
+import { npcLinks } from './entry-views';
+import { EventTile } from './event-tile';
 import { LinkRow } from './link-row';
 import { WorldStore } from './world-store';
 
@@ -13,7 +16,7 @@ interface Named {
 /** Read one scene: where it plays, who appears, what is read aloud, what happens and what it points to. */
 @Component({
   selector: 'app-scene-view',
-  imports: [LinkRow],
+  imports: [Icon, LinkRow, DialogueView, EventTile],
   template: `
     <article class="panel">
       <header class="row row--between">
@@ -22,7 +25,7 @@ interface Named {
           <h2 class="subtitle">{{ scene().name }}</h2>
         </div>
         @if (editable()) {
-          <button type="button" class="btn btn--small" (click)="edit.emit()">Bearbeiten</button>
+          <button type="button" class="btn btn--small" (click)="edit.emit()"><app-icon name="edit" [size]="16" /> Schreiben</button>
         } @else {
           <ng-content />
         }
@@ -41,18 +44,14 @@ interface Named {
         <p class="prose">{{ scene().text }}</p>
       }
 
+      <app-dialogue-view [dialogues]="scene().dialogues" />
+
       @if (showEvents() && events().length) {
         <div class="field">
           <span class="label">Ereignisse in dieser Szene</span>
           <div class="tiles tiles--wide">
             @for (event of events(); track event.id) {
-              <button type="button" class="tile" (click)="lookUp(event.id)">
-                <span class="kicker">Ereignis</span>
-                <span class="tile__title">{{ event.name }}</span>
-                @if (summary(event); as text) {
-                  <span class="prose soft">{{ text }}</span>
-                }
-              </button>
+              <app-event-tile [event]="event" [whole]="true" />
             }
           </div>
         </div>
@@ -86,18 +85,17 @@ export class SceneView {
     const sources = this.store.scenes().filter((other) => other.leads_to.includes(this.scene().id));
     return this.links('scenes', sources, sources.map((source) => source.id));
   });
-  protected readonly quests = computed(() => this.links('quests', this.store.quests(), this.scene().quests));
+  /** The quests the scene points to, and the quests that come up in it. */
+  protected readonly quests = computed<EntryLink[]>(() => {
+    const scene = this.scene();
+    return this.store
+      .quests()
+      .filter((quest) => scene.quests.includes(quest.id) || quest.scene === scene.id)
+      .map((quest) => ({ kind: 'quests', id: quest.id, label: quest.scene === scene.id ? `${quest.name} (beginnt hier)` : quest.name }));
+  });
   /** The events that hang on this scene, shown with their text so they can be read in place. */
   protected readonly events = computed(() => this.store.events().filter((event) => this.scene().events.includes(event.id)));
   protected readonly trivia = computed(() => this.links('trivia', this.store.trivia(), this.scene().trivia));
-
-  /** What an event is about, to read it right in the scene. */
-  protected readonly summary = summaryOf;
-
-  /** Look an event up in the side panel. */
-  protected lookUp(id: number): void {
-    this.store.peek.set({ kind: 'events', id });
-  }
 
   private links(kind: EntryKind, entries: Named[], ids: (number | null)[]): EntryLink[] {
     return entries.filter((entry) => ids.includes(entry.id)).map((entry) => ({ kind, id: entry.id, label: entry.name }));

@@ -1,4 +1,4 @@
-import { Knowledge } from './models';
+import { InventoryItem, Knowledge, Quest } from './models';
 
 /** One group that plays a world over several evenings. */
 export interface Session {
@@ -30,7 +30,12 @@ export interface SessionEntry {
   steps: number[];
   /** Positions of the pieces of player knowledge the group knows. */
   known: number[];
+  /** What this session has different about the entry than the world; used for quests. */
+  changes: QuestChanges;
 }
+
+/** What a session can have different about a quest, without changing the world. */
+export type QuestChanges = Partial<Pick<Quest, 'name' | 'goal' | 'giver' | 'location' | 'scene'>>;
 
 export interface NoteComment {
   id: number;
@@ -78,10 +83,32 @@ export interface Check {
   result: RollResult;
 }
 
-/** A check rolled in a session, with who rolled it and on what. */
-export interface Roll extends Check {
+/**
+ * A roll made in a session, with who rolled it and on what. A check has a value, the roll and a result;
+ * free dice have every die and their sum. A secret roll is only shown to the game master.
+ */
+export interface Roll {
   who: string;
   label: string;
+  secret: boolean;
+  value?: number;
+  rolled?: number;
+  result?: RollResult;
+  dice?: number[];
+  total?: number;
+}
+
+/** What is asked to be rolled: a check against a value, or free dice when the value is null. */
+export interface RollOrder {
+  /** The own character of a player; the game master names nobody here. */
+  character: number | null;
+  /** Whoever the game master rolls for; empty for a roll of his own. */
+  who: string;
+  label: string;
+  value: number | null;
+  sides: 10 | 100;
+  count: number;
+  secret: boolean;
 }
 
 /** A character as the whole group sees it. */
@@ -99,6 +126,7 @@ export interface SharedEntry {
   id: number;
   name: string;
   category: string;
+  symbol: string;
   description: string;
   /** The pieces of knowledge the group has found out. */
   knowledge: Knowledge[];
@@ -126,6 +154,14 @@ export interface PlayerView {
   group: GroupMember[];
   quests: SharedQuest[];
   glossary: SharedEntry[];
+  /** What the characters of the group carry; hidden lines only reach their owner and the game master. */
+  equipment: EquipmentLine[];
+}
+
+/** One line of the inventory of a character of the group, with the name of the character. */
+export interface EquipmentLine extends InventoryItem {
+  owner: string;
+  hidden: boolean;
 }
 
 /** An item the game master hands to a character. */
@@ -136,6 +172,18 @@ export interface ItemGift {
   damage_dice: number;
   damage_bonus: number;
   description: string;
+  /** Id of the item of the world it comes from, and whether the rest of the group does not see it. */
+  item: number | null;
+  hidden: boolean;
+}
+
+/** A running status of a combatant, like "gefroren". */
+export interface Status {
+  name: string;
+  /** Own turns it still lasts; null until the game master takes it away. */
+  rounds: number | null;
+  /** Whether the combatant sits out while it lasts. */
+  skips: boolean;
 }
 
 /** One participant of a battle. */
@@ -144,24 +192,33 @@ export interface Combatant {
   npc: number | null;
   player_character: number | null;
   name: string;
+  /** Key of the symbol of the character behind the combatant. */
+  symbol: string;
   action_value: number;
   initiative: number;
   life_points: number;
   surprised: boolean;
   has_parried: boolean;
+  statuses: Status[];
 }
 
 /**
- * An attack that is rolled but does not count yet. First it waits for the parry of the defender,
- * then for the game master to close the turn. Only then the damage is taken off.
+ * What a combatant did in its turn and does not count yet: an attack, or another action with or
+ * without a roll. An attack first waits for the parry of the defender. Then everything waits for the
+ * game master to close the turn; only then the damage is taken off.
  */
 export interface Exchange {
+  kind: 'attack' | 'action';
+  /** What is done, for an action that is no attack. */
+  label: string;
   stage: 'parry' | 'close';
   attacker: number;
-  defender: number;
+  /** The combatant that is attacked; an action has none. */
+  defender: number | null;
   attacker_name: string;
   defender_name: string;
-  attack: Check;
+  /** The roll of the attack, or the check of an action; null for an action without a roll. */
+  attack: Check | null;
   parry: Check | null;
   damage: { dice: number[]; total: number } | null;
 }
@@ -203,6 +260,8 @@ export interface PlayerCombatant {
   /** Whether the combatant cannot act anymore. */
   out: boolean;
   has_parried: boolean;
+  statuses: Status[];
+  symbol: string;
 }
 
 /** The running battle of a session as its players see it. */

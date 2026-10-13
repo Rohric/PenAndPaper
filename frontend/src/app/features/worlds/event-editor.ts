@@ -4,14 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { WorldEvent } from '../../core/models';
 import { EditorBar } from '../../shared/editor-bar';
 import { EntryTextsEditor } from '../../shared/entry-texts-editor';
-import { IdSelect } from '../../shared/id-select';
+import { AutoGrow } from '../../shared/auto-grow';
+import { DialogueListEditor } from '../../shared/dialogue-list-editor';
+import { LinkPicker } from '../../shared/link-picker';
+import { SymbolPicker } from '../../shared/symbol-picker';
 import { EntryEditor } from './entry-editor';
 import { EventScenes } from './event-scenes';
 
-/** Edit one event, the place where it happens and, if wanted, the scenes it hangs on. */
+/** Edit one event: what sets it off, what happens, what is said, where it happens and the scenes it hangs on. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, EditorBar, IdSelect, EventScenes, EntryTextsEditor],
+  imports: [FormsModule, EditorBar, LinkPicker, SymbolPicker, AutoGrow, DialogueListEditor, EventScenes, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -20,13 +23,43 @@ import { EventScenes } from './event-scenes';
           <input id="event-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
         </div>
         <div class="field">
+          <span class="label">Symbol</span>
+          <app-symbol-picker fallback="flag" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
+        </div>
+        <div class="field">
+          <label for="event-trigger">Auslöser</label>
+          <span class="soft">Wann das Ereignis eintritt, zum Beispiel „nachts auf dem Pass“.</span>
+          <textarea
+            id="event-trigger"
+            class="input"
+            rows="2"
+            [appAutoGrow]="draft().trigger"
+            [ngModel]="draft().trigger"
+            (ngModelChange)="set('trigger', $event)"
+          ></textarea>
+        </div>
+        <div class="field">
+          <label for="event-happening">Was passiert</label>
+          <textarea
+            id="event-happening"
+            class="input"
+            rows="4"
+            [appAutoGrow]="draft().happening"
+            [ngModel]="draft().happening"
+            (ngModelChange)="set('happening', $event)"
+          ></textarea>
+        </div>
+        <div class="field">
           <label for="event-location">Ort</label>
-          <app-id-select
+          <app-link-picker
+            single
             inputId="event-location"
-            emptyLabel="Kein Ort"
+            label="Ort des Ereignisses"
+            emptyText="Wo passiert es?"
             [options]="store.locationOptions()"
             [value]="draft().location"
             (valueChange)="set('location', $event)"
+            (look)="lookUp('locations', $event)"
           />
         </div>
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
@@ -41,6 +74,17 @@ import { EventScenes } from './event-scenes';
         (playerKnowledgeChange)="set('player_knowledge', $event)"
         (gmKnowledgeChange)="set('gm_knowledge', $event)"
       />
+
+      <div class="panel">
+        <h2 class="subtitle">Dialoge</h2>
+        <p class="soft">Was gesagt wird, wenn das Ereignis eintritt. Wer spricht, ist freiwillig.</p>
+        <app-dialogue-list-editor
+          [dialogues]="draft().dialogues"
+          [speakers]="store.npcOptions()"
+          (dialoguesChange)="set('dialogues', $event)"
+          (look)="lookUp('npcs', $event)"
+        />
+      </div>
 
       <div class="panel">
         <h2 class="subtitle">Hängt an Szenen</h2>

@@ -1,0 +1,54 @@
+// Desktop only. A scene is written like a page: no boxes around the text, one field below the other.
+.doc {
+  gap: 14px;
+  max-width: 980px;
+}
+
+.doc__title {
+  width: 100%;
+  padding: 4px 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+// A word on the left, its field on the right.
+.doc__line {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.doc__line > label {
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+// Text grows with what is written; the height is set by the auto-grow directive.
+.doc__text {
+  width: 100%;
+  min-height: 2.6em;
+  padding: 6px 0;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px dashed var(--line-2);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.6;
+  resize: none;
+}
+
+// The field with the cursor shows a line in the accent colour instead of a frame.
+.doc__title:focus-visible,
+.doc__text:focus-visible {
+  outline: 0;
+  border-bottom: 2px solid var(--accent);
+}

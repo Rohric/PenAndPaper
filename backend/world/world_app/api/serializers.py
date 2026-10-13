@@ -2,8 +2,9 @@
 
 from rest_framework import serializers
 
+from core.dialogues import clean_dialogues, speakers
 from core.knowledge import clean_knowledge
-from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, World, WorldNpc
+from world.world_app.models import Chapter, Event, Location, Picture, Quest, Scene, Trivia, World, WorldNpc
 from world.world_app.utils import create_world_npc, lies_inside, next_chapter_number, npcs_in_world
 
 OTHER_WORLD = "Dieser Eintrag gehört zu einer anderen Welt."
@@ -73,13 +74,21 @@ class WorldScopedSerializer(serializers.ModelSerializer):
         """Check the knowledge pieces only the game master reads."""
         return clean_knowledge(pieces)
 
+    def validate_dialogues(self, dialogues):
+        """Check the dialogues; whoever speaks in them must be an NPC of the same world."""
+        cleaned = clean_dialogues(dialogues)
+        allowed = set(npcs_in_world(self.get_world()).values_list("pk", flat=True))
+        if not speakers(cleaned) <= allowed:
+            raise serializers.ValidationError(OTHER_WORLD)
+        return cleaned
+
 
 class LocationSerializer(WorldScopedSerializer):
     """Serialize a location; its parent must be another place of the same world."""
 
     class Meta:
         model = Location
-        fields = ["id", "parent", "name", "description", "player_knowledge", "gm_knowledge"]
+        fields = ["id", "parent", "name", "symbol", "description", "player_knowledge", "gm_knowledge"]
 
     def validate_parent(self, parent):
         """Reject a parent from another world and a place that would contain itself."""
@@ -90,14 +99,17 @@ class LocationSerializer(WorldScopedSerializer):
 
 
 class WorldNpcSerializer(WorldScopedSerializer):
-    """Serialize the link between a world and one of its NPCs."""
+    """Serialize the link between a world and one of its NPCs, with what the NPC carries."""
 
     name = serializers.CharField(source="npc.name", max_length=200)
     profession = serializers.CharField(source="npc.profession", read_only=True)
+    symbol = serializers.CharField(source="npc.symbol", read_only=True)
+    # Read only: the glossary lists the items of all characters; they are edited at the character.
+    inventory = serializers.JSONField(source="npc.inventory", read_only=True)
 
     class Meta:
         model = WorldNpc
-        fields = ["id", "npc", "name", "profession", "location"]
+        fields = ["id", "npc", "name", "profession", "symbol", "location", "inventory"]
         read_only_fields = ["npc"]
 
     def create(self, validated_data):
@@ -117,8 +129,8 @@ class QuestSerializer(WorldScopedSerializer):
     class Meta:
         model = Quest
         fields = [
-            "id", "name", "kind", "number", "description", "goal", "checklist",
-            "player_knowledge", "gm_knowledge", "location", "giver", "scene", "npcs",
+            "id", "name", "symbol", "kind", "number", "description", "goal", "checklist",
+            "player_knowledge", "gm_knowledge", "dialogues", "location", "giver", "scene", "npcs",
         ]
 
     def validate_scene(self, scene):
@@ -140,11 +152,14 @@ class QuestSerializer(WorldScopedSerializer):
 
 
 class EventSerializer(WorldScopedSerializer):
-    """Serialize an event."""
+    """Serialize an event with what sets it off, what happens then, and its dialogues."""
 
     class Meta:
         model = Event
-        fields = ["id", "name", "description", "player_knowledge", "gm_knowledge", "location"]
+        fields = [
+            "id", "name", "symbol", "trigger", "happening", "description", "player_knowledge", "gm_knowledge",
+            "dialogues", "location",
+        ]
 
 
 class TriviaSerializer(WorldScopedSerializer):
@@ -153,7 +168,7 @@ class TriviaSerializer(WorldScopedSerializer):
     class Meta:
         model = Trivia
         fields = [
-            "id", "name", "category", "description", "player_knowledge", "gm_knowledge",
+            "id", "name", "symbol", "category", "description", "player_knowledge", "gm_knowledge",
             "locations", "npcs", "quests", "events",
         ]
 
@@ -186,7 +201,7 @@ class SceneSerializer(WorldScopedSerializer):
     class Meta:
         model = Scene
         fields = [
-            "id", "chapter", "position", "optional", "name", "text", "to_read",
+            "id", "chapter", "position", "optional", "name", "text", "to_read", "dialogues",
             "location", "npcs", "leads_to", "quests", "events", "trivia",
         ]
         read_only_fields = ["chapter"]
@@ -203,3 +218,11 @@ class SceneSerializer(WorldScopedSerializer):
         if self.instance and self.instance in scenes:
             raise serializers.ValidationError("Eine Szene kann nicht zu sich selbst führen.")
         return scenes
+
+
+class PictureSerializer(serializers.ModelSerializer):
+    """Serialize one picture of a place or an item; the address says where it hangs."""
+
+    class Meta:
+        model = Picture
+        fields = ["id", "image", "position"]

@@ -1,7 +1,10 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { EntryRef, Npc } from '../../core/models';
+import { Icon } from '../../shared/icon';
+import { Portrait } from '../../shared/portrait';
 import { CharacterService } from '../characters/character.service';
+import { DialogueView } from './dialogue-view';
 import { viewOf } from './entry-views';
 import { LinkRow } from './link-row';
 import { WorldStore } from './world-store';
@@ -9,20 +12,23 @@ import { WorldStore } from './world-store';
 /** Read one entry of the glossary: its texts, its lists and everything it is linked with. */
 @Component({
   selector: 'app-entry-view',
-  imports: [LinkRow],
+  imports: [Icon, Portrait, LinkRow, DialogueView],
   template: `
     @if (view(); as shown) {
       <article class="panel">
         <header class="row row--between">
-          <div>
-            <span class="kicker">{{ shown.kicker }}</span>
-            <h2 class="subtitle">{{ shown.title }}</h2>
-            @if (shown.sub) {
-              <p class="soft">{{ shown.sub }}</p>
-            }
+          <div class="tile__head">
+            <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="52" />
+            <div>
+              <span class="kicker">{{ shown.kicker }}</span>
+              <h2 class="subtitle">{{ shown.title }}</h2>
+              @if (shown.sub) {
+                <p class="soft">{{ shown.sub }}</p>
+              }
+            </div>
           </div>
           @if (editable()) {
-            <button type="button" class="btn btn--small" (click)="edit.emit()">Bearbeiten</button>
+            <button type="button" class="btn btn--small" (click)="edit.emit()"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
           }
         </header>
 
@@ -46,6 +52,8 @@ import { WorldStore } from './world-store';
             }
           </div>
         }
+
+        <app-dialogue-view [dialogues]="shown.dialogues" />
 
         @for (list of shown.lists; track list.label) {
           <div class="field">
@@ -76,6 +84,17 @@ import { WorldStore } from './world-store';
           <app-link-row [label]="group.label" [items]="group.items" />
         }
 
+        @if (shown.pictures) {
+          <div class="field">
+            <span class="label">Bilder</span>
+            <div class="row">
+              @for (slot of slots(shown.pictures); track slot) {
+                <span class="picture-slot"><app-icon name="image" [size]="20" /> Bild folgt</span>
+              }
+            </div>
+          </div>
+        }
+
         @if (isEmpty()) {
           <p class="soft">Hier steht noch nichts.</p>
         }
@@ -102,9 +121,14 @@ export class EntryView {
   protected readonly view = computed(() => viewOf(this.store, this.entry(), this.npc()));
   protected readonly isEmpty = computed(() => {
     const view = this.view();
-    const parts = view ? [view.blocks, view.knowledge, view.lists, view.phrases, view.links] : [];
+    const parts = view ? [view.blocks, view.knowledge, view.lists, view.phrases, view.links, view.dialogues] : [];
     return !!view && parts.every((part) => !part.length);
   });
+
+  /** The numbers of the places for pictures. */
+  protected slots(count: number): number[] {
+    return Array.from({ length: count }, (_, index) => index);
+  }
 
   constructor() {
     // Load the character whenever another NPC is shown.

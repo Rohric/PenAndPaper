@@ -5,6 +5,8 @@ import { readError } from '../../core/api-error';
 import { AnyCharacter } from '../../core/models';
 import { basePointsLeft, bonusPointsLeft } from '../../core/rules';
 import { EntryTextsEditor } from '../../shared/entry-texts-editor';
+import { Icon } from '../../shared/icon';
+import { SymbolPicker } from '../../shared/symbol-picker';
 import { CharacterService, CharacterSource } from './character.service';
 import { InventoryEditor } from './inventory-editor';
 import { PhraseListEditor } from './phrase-list-editor';
@@ -20,7 +22,9 @@ type NumberField = 'life_points' | 'max_life_points' | 'skill_points_total' | 'b
  */
 @Component({
   selector: 'app-character-editor',
-  imports: [FormsModule, SkillEditor, InventoryEditor, PhraseListEditor, SpecialAbilityListEditor, EntryTextsEditor],
+  imports: [
+    FormsModule, Icon, SymbolPicker, SkillEditor, InventoryEditor, PhraseListEditor, SpecialAbilityListEditor, EntryTextsEditor,
+  ],
   templateUrl: './character-editor.html',
 })
 export class CharacterEditor {

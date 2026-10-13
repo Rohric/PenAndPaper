@@ -1,7 +1,10 @@
 import { Params, Router } from '@angular/router';
 
-import { EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, questLabel } from '../../core/models';
+import {
+  Dialogue, EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, Trivia, questLabel,
+} from '../../core/models';
 import { damageText, skillValue } from '../../core/rules';
+import { IconName } from '../../shared/icon';
 import { WorldStore } from './world-store';
 
 /**
@@ -12,17 +15,18 @@ export interface EntryViewModel {
   kicker: string;
   title: string;
   sub: string;
+  /** The symbol the entry carries, and the usual symbol of its kind. */
+  symbol: string;
+  fallback: IconName;
+  /** How many pictures the entry can show; places and items have room for three. */
+  pictures: number;
+  dialogues: Dialogue[];
   blocks: { label: string; text: string }[];
   /** Knowledge pieces in two groups: what players can learn, and what only the game master knows. */
   knowledge: { label: string; gmOnly: boolean; pieces: Knowledge[] }[];
   lists: { label: string; items: string[] }[];
   phrases: Phrase[];
   links: { label: string; items: EntryLink[] }[];
-}
-
-/** A search result: a link with the kind of entry it leads to. */
-export interface SearchHit extends EntryLink {
-  kicker: string;
 }
 
 interface Named {
@@ -39,6 +43,13 @@ export const KIND_LABELS: Record<EntryKind, string> = {
   chapters: 'Kapitel',
   scenes: 'Szene',
 };
+
+const ITEM_CATEGORY = 'gegenstand';
+
+/** Whether a knowledge entry is an item: its category is "Gegenstand". */
+export function isItem(trivia: Trivia): boolean {
+  return trivia.category.trim().toLowerCase() === ITEM_CATEGORY;
+}
 
 const links = (kind: EntryKind, entries: Named[]): EntryLink[] => entries.map((e) => ({ kind, id: e.id, label: e.name }));
 const among = <T extends Named>(entries: T[], ids: (number | null)[]): T[] => entries.filter((e) => ids.includes(e.id));
@@ -89,9 +100,18 @@ export function summaryOf(entry: EntryTexts): string {
 }
 
 /** Everything written about an entry as one text, to search in. */
-function allText(entry: EntryTexts): string {
+export function allText(entry: EntryTexts): string {
   const pieces = [...entry.player_knowledge, ...entry.gm_knowledge].map((piece) => `${piece.title} ${piece.text}`);
   return [entry.description, ...pieces].join(' ');
+}
+
+/** The knowledge attached to an entry, in two groups: its items and everything else. */
+function attached(store: WorldStore, kind: 'locations' | 'npcs' | 'quests' | 'events', id: number): EntryViewModel['links'] {
+  const all = store.trivia().filter((trivia) => trivia[kind].includes(id));
+  return [
+    { label: 'Gegenstände', items: links('trivia', all.filter(isItem)) },
+    { label: 'Wissen', items: links('trivia', all.filter((trivia) => !isItem(trivia))) },
+  ];
 }
 
 function tidy(view: EntryViewModel): EntryViewModel {
@@ -112,6 +132,7 @@ function locationView(store: WorldStore, id: number): EntryViewModel | null {
   const here = <T extends { location: number | null }>(entries: T[]) => entries.filter((e) => e.location === id);
   return tidy({
     kicker: 'Ort', title: place.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(place),
+    symbol: place.symbol, fallback: 'pin', pictures: 3, dialogues: [],
     blocks: [{ label: 'Beschreibung', text: place.description }],
     links: [
       { label: 'Liegt in', items: links('locations', among(store.locations(), [place.parent])) },
@@ -119,7 +140,7 @@ function locationView(store: WorldStore, id: number): EntryViewModel | null {
       { label: 'Figuren hier', items: npcLinks(store, here(store.npcs()).map((n) => n.npc)) },
       { label: 'Quests hier', items: links('quests', here(store.quests())) },
       { label: 'Ereignisse hier', items: links('events', here(store.events())) },
-      { label: 'Wissen', items: links('trivia', store.trivia().filter((t) => t.locations.includes(id))) },
+      ...attached(store, 'locations', id),
       { label: 'Szenen hier', items: sceneLinks(store, here(store.scenes())) },
     ],
   });
@@ -133,6 +154,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
   const loaded = npc?.id === id ? npc : null;
   return tidy({
     kicker: 'Figur', title: link.name, sub: link.profession, phrases: loaded?.phrases ?? [],
+    symbol: loaded?.symbol ?? link.symbol, fallback: 'sheet', pictures: 0, dialogues: [],
     knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
       { label: 'Beschreibung', text: loaded?.description ?? '' },
@@ -147,7 +169,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
       { label: 'Anzutreffen in', items: links('locations', among(store.locations(), [link.location])) },
       { label: 'Quests', items: links('quests', store.quests().filter((q) => q.giver === id || q.npcs.includes(id))) },
       { label: 'Szenen', items: sceneLinks(store, store.scenes().filter((s) => s.npcs.includes(id))) },
-      { label: 'Wissen', items: links('trivia', store.trivia().filter((t) => t.npcs.includes(id))) },
+      ...attached(store, 'npcs', id),
     ],
   });
 }
@@ -171,18 +193,21 @@ function abilityLines(npc: Npc): string[] {
 }
 
 function questView(store: WorldStore, id: number): EntryViewModel | null {
-  const quest = store.quests().find((q) => q.id === id);
-  if (!quest) {
+  const found = store.quests().find((q) => q.id === id);
+  if (!found) {
     return null;
   }
+  const quest = store.questNow(found);
   return tidy({
     kicker: questLabel(quest), title: quest.name, sub: '', phrases: [],
+    symbol: quest.symbol, fallback: 'quest', pictures: 0, dialogues: quest.dialogues,
     knowledge: knowledgeOf(quest),
     blocks: [{ label: 'Beschreibung', text: quest.description }, { label: 'Ziel', text: quest.goal }],
     lists: [{ label: 'Checkliste', items: quest.checklist }],
     links: [
-      { label: 'Ort', items: links('locations', among(store.locations(), [quest.location])) },
-      { label: 'Auftraggeber', items: npcLinks(store, [quest.giver]) },
+      { label: 'Startgebiet', items: links('locations', among(store.locations(), [quest.location])) },
+      { label: 'Questgeber', items: npcLinks(store, [quest.giver]) },
+      { label: 'Entsteht in Szene', items: sceneLinks(store, among(store.scenes(), [quest.scene])) },
       { label: 'Beteiligte Figuren', items: npcLinks(store, quest.npcs) },
       ...usedIn(store, 'quests', id),
     ],
@@ -196,7 +221,12 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
   }
   return tidy({
     kicker: 'Ereignis', title: event.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(event),
-    blocks: [{ label: 'Beschreibung', text: event.description }],
+    symbol: event.symbol, fallback: 'flag', pictures: 0, dialogues: event.dialogues,
+    blocks: [
+      { label: 'Auslöser', text: event.trigger },
+      { label: 'Was passiert', text: event.happening },
+      { label: 'Beschreibung', text: event.description },
+    ],
     links: [
       { label: 'Ort', items: links('locations', among(store.locations(), [event.location])) },
       ...usedIn(store, 'events', id),
@@ -204,13 +234,13 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
   });
 }
 
-/** Where a quest or an event is used: chapters, scenes and knowledge. */
+/** Where a quest or an event is used: chapters and scenes, and the items and knowledge attached to it. */
 function usedIn(store: WorldStore, kind: 'quests' | 'events', id: number): EntryViewModel['links'] {
   const chapters = store.chapters().filter((chapter) => chapter[kind].includes(id));
   return [
     { label: 'Kapitel', items: chapters.map((c) => ({ kind: 'chapters', id: c.id, label: `Kapitel ${c.number} · ${c.name}` })) },
     { label: 'Szenen', items: sceneLinks(store, store.scenes().filter((scene) => scene[kind].includes(id))) },
-    { label: 'Wissen', items: links('trivia', store.trivia().filter((trivia) => trivia[kind].includes(id))) },
+    ...attached(store, kind, id),
   ];
 }
 
@@ -221,6 +251,7 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
   }
   return tidy({
     kicker: trivia.category || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(trivia),
+    symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note', pictures: isItem(trivia) ? 3 : 0, dialogues: [],
     blocks: [{ label: 'Beschreibung', text: trivia.description }],
     links: [
       { label: 'Orte', items: links('locations', among(store.locations(), trivia.locations)) },
@@ -230,20 +261,6 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
       { label: 'Szenen', items: sceneLinks(store, store.scenes().filter((s) => s.trivia.includes(id))) },
     ],
   });
-}
-
-/** Find the typed text in names and texts of the whole glossary. */
-export function searchGlossary(store: WorldStore, text: string): SearchHit[] {
-  const query = text.trim().toLowerCase();
-  const has = (...texts: string[]) => texts.some((t) => t.toLowerCase().includes(query));
-  const hits = (kind: EntryKind, entries: Named[]) => links(kind, entries).map((l) => ({ ...l, kicker: KIND_LABELS[kind] }));
-  return [
-    ...hits('locations', store.locations().filter((l) => has(l.name, allText(l)))),
-    ...npcLinks(store, store.npcs().filter((n) => has(n.name, n.profession)).map((n) => n.npc)).map((l) => ({ ...l, kicker: 'Figur' })),
-    ...hits('quests', store.quests().filter((q) => has(q.name, q.goal, allText(q)))),
-    ...hits('events', store.events().filter((e) => has(e.name, allText(e)))),
-    ...hits('trivia', store.trivia().filter((t) => has(t.name, t.category, allText(t)))),
-  ];
 }
 
 /** Where an entry lives in the app: scenes and chapters on the chapter page, the rest in the glossary. */
@@ -256,7 +273,8 @@ export function entryAddress(store: WorldStore, ref: EntryRef): { commands: unkn
     const chapter = store.scenes().find((scene) => scene.id === ref.id)?.chapter;
     return { commands: [...base, 'chapters', chapter], queryParams: { tab: 'scenes', scene: ref.id } };
   }
-  return { commands: [...base, 'glossary', ref.kind], queryParams: { entry: ref.id } };
+  const item = ref.kind === 'trivia' && store.trivia().some((trivia) => trivia.id === ref.id && isItem(trivia));
+  return { commands: [...base, 'glossary', item ? 'items' : ref.kind], queryParams: { entry: ref.id } };
 }
 
 /** Follow a link: scenes and chapters are opened, everything else is looked up in the side panel. */

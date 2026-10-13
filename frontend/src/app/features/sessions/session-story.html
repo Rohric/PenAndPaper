@@ -1,15 +1,6 @@
-<!-- A quest as a tile: look it up, mark it as done, share it with the players. -->
+<!-- A quest as a tile with the buttons of a session: mark it as done, share it with the players. -->
 <ng-template #questTile let-quest>
-  <article class="tile" [class.tile--done]="is('quest', quest.id, 'done')">
-    <button type="button" class="tile__body" (click)="lookUp('quests', quest.id)">
-      <span class="kicker">
-        {{ quest.kicker }}{{ is('quest', quest.id, 'revealed') ? ' · geteilt' : '' }}{{ is('quest', quest.id, 'done') ? ' · erledigt' : '' }}
-      </span>
-      <span class="tile__title">{{ quest.name }}</span>
-      @if (quest.text) {
-        <span class="soft clamp">{{ quest.text }}</span>
-      }
-    </button>
+  <app-quest-tile [quest]="quest" [done]="is('quest', quest.id, 'done')" [marks]="marks(quest.id)" [stepsDone]="stepsDone(quest.id)">
     <div class="row">
       <button type="button" class="btn btn--small" [attr.aria-pressed]="is('quest', quest.id, 'done')" (click)="store.toggle('quest', quest.id, 'done')">
         <app-icon name="check" [size]="16" /> Erledigt
@@ -18,25 +9,18 @@
         <app-icon name="eye" [size]="16" /> {{ is('quest', quest.id, 'revealed') ? 'Geteilt' : 'Teilen' }}
       </button>
     </div>
-  </article>
+  </app-quest-tile>
 </ng-template>
 
-<!-- An event as a tile; "whole" shows all of its text instead of the beginning. -->
+<!-- An event as a tile; "whole" shows all of what happens instead of the beginning. -->
 <ng-template #eventTile let-event let-whole="whole">
-  <article class="tile">
-    <button type="button" class="tile__body" (click)="lookUp('events', event.id)">
-      <span class="kicker">{{ event.kicker }}</span>
-      <span class="tile__title">{{ event.name }}</span>
-      @if (event.text) {
-        <span class="soft" [class.clamp]="!whole" [class.prose]="whole">{{ event.text }}</span>
-      }
-    </button>
+  <app-event-tile [event]="event" [whole]="whole" [marks]="is('event', event.id, 'revealed') ? ' · für Spieler sichtbar' : ''">
     <div class="row">
       <button type="button" class="btn btn--small" (click)="store.toggle('event', event.id, 'done')">
         <app-icon name="check" [size]="16" /> Erledigt
       </button>
     </div>
-  </article>
+  </app-event-tile>
 </ng-template>
 
 @if (scene(); as shown) {
@@ -74,7 +58,7 @@
 
 <section class="stack">
   <h3 class="section-title"><app-icon name="quest" /> Hauptquests</h3>
-  <div class="tiles">
+  <div class="tiles tiles--wide">
     @for (quest of mainQuests(); track quest.id) {
       <ng-container *ngTemplateOutlet="questTile; context: { $implicit: quest }" />
     } @empty {
@@ -83,24 +67,60 @@
   </div>
 </section>
 
-<section class="stack">
-  <h3 class="section-title"><app-icon name="quest" /> Offene Nebenquests</h3>
-  <div class="tiles">
-    @for (quest of sideQuests(); track quest.id) {
-      <ng-container *ngTemplateOutlet="questTile; context: { $implicit: quest }" />
-    } @empty {
-      <p class="soft">Keine offene Nebenquest in diesem Kapitel.</p>
+<details class="fold">
+  <summary class="section-title">
+    <app-icon class="fold__mark" name="right" /> <app-icon name="quest" /> Nebenquests
+    <span class="chip">{{ sideCount() }} offen</span>
+  </summary>
+  <div class="stack">
+    <form class="list-row" (ngSubmit)="addQuest()">
+      <input
+        class="input"
+        name="newQuest"
+        aria-label="Titel einer neuen Quest"
+        placeholder="Neue Quest, der Titel genügt"
+        [disabled]="!chapter()"
+        [(ngModel)]="newQuest"
+      />
+      <button type="submit" class="btn btn--small" [disabled]="!newQuest().trim() || !chapter()"><app-icon name="plus" [size]="16" /> Quest</button>
+    </form>
+    <p class="soft">
+      {{ chapter() ? 'Sie kommt als Nebenquest in die Welt, hängt am Kapitel der Runde und ist sofort mit den Spielern geteilt.' : 'Wähle oben ein Kapitel, dann kannst du hier schnell eine Quest anlegen.' }}
+    </p>
+    @for (group of sideQuests(); track group.label) {
+      @if (group.entries.length) {
+        <span class="kicker">{{ group.label }}</span>
+        <div class="tiles tiles--wide">
+          @for (quest of group.entries; track quest.id) {
+            <ng-container *ngTemplateOutlet="questTile; context: { $implicit: quest }" />
+          }
+        </div>
+      }
+    }
+    @if (!sideCount()) {
+      <p class="soft">Keine offene Nebenquest.</p>
     }
   </div>
-</section>
+</details>
 
-<section class="stack">
-  <h3 class="section-title"><app-icon name="flag" /> Weitere offene Ereignisse</h3>
-  <div class="tiles">
-    @for (event of otherEvents(); track event.id) {
-      <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: false }" />
-    } @empty {
-      <p class="soft">Kein weiteres offenes Ereignis in diesem Kapitel.</p>
+<details class="fold">
+  <summary class="section-title">
+    <app-icon class="fold__mark" name="right" /> <app-icon name="flag" /> Freie Ereignisse
+    <span class="chip">{{ freeCount() }} offen</span>
+  </summary>
+  <div class="stack">
+    @for (group of freeEvents(); track group.label) {
+      @if (group.entries.length) {
+        <span class="kicker">{{ group.label }}</span>
+        <div class="tiles tiles--wide">
+          @for (event of group.entries; track event.id) {
+            <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: false }" />
+          }
+        </div>
+      }
+    }
+    @if (!freeCount()) {
+      <p class="soft">Kein offenes Ereignis.</p>
     }
   </div>
-</section>
+</details>

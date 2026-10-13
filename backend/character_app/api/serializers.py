@@ -18,13 +18,14 @@ CHARACTER_FIELDS = [
     "id", "name", "age", "gender", "profession", "description",
     "life_points", "max_life_points", "skill_points_total", "bonus_points_total",
     "skills", "inventory", "special_abilities", "talents", "points_left",
+    "symbol", "image", "shows_image",
 ]
 # What only the game master changes on a player character.
 LEVEL_FIELDS = ["life_points", "max_life_points", "skill_points_total", "bonus_points_total"]
 # What only the player changes on a player character.
 PLAYER_FIELDS = [
     "name", "age", "gender", "profession", "description",
-    "skills", "inventory", "special_abilities", "backstory",
+    "skills", "inventory", "special_abilities", "backstory", "symbol", "shows_image",
 ]
 
 
@@ -73,14 +74,27 @@ def _clean_skill(entry):
     }
 
 
+def _clean_link(entry, key):
+    """Return the id stored under key, or None when the entry is not linked."""
+    value = entry.get(key)
+    if value is not None and (isinstance(value, bool) or not isinstance(value, int) or value < 1):
+        raise serializers.ValidationError(f"{key} muss eine Id sein oder fehlen.")
+    return value
+
+
 def _clean_item(entry):
-    """Return one inventory entry with every field checked and filled."""
+    """Return one inventory entry with every field checked and filled.
+
+    "item" is the id of the world item it comes from, "hidden" keeps it from the rest of the group.
+    """
     return {
         "name": _clean_name(entry),
         "quantity": _clean_number(entry, "quantity", 1, MAX_AMOUNT),
         "damage_dice": _clean_number(entry, "damage_dice", 0, MAX_DAMAGE_DICE),
         "damage_bonus": _clean_number(entry, "damage_bonus", 0, MAX_AMOUNT),
         "description": _clean_text(entry, "description"),
+        "item": _clean_link(entry, "item"),
+        "hidden": entry.get("hidden") is True,
     }
 
 
@@ -106,6 +120,8 @@ class CharacterSerializer(serializers.ModelSerializer):
 
     talents = serializers.SerializerMethodField()
     points_left = serializers.SerializerMethodField()
+    # The picture is uploaded through its own endpoint; here it is only shown.
+    image = serializers.ImageField(read_only=True)
 
     def get_talents(self, character):
         """Return talent value and inspiration points for each talent."""
@@ -125,6 +141,10 @@ class CharacterSerializer(serializers.ModelSerializer):
     def validate_inventory(self, items):
         """Check and complete every inventory entry."""
         return [_clean_item(entry) for entry in _as_list(items)]
+
+    def validate_shows_image(self, shows):
+        """Show the picture instead of the symbol only when the character has a picture."""
+        return bool(shows and self.instance and self.instance.image)
 
     def validate_special_abilities(self, abilities):
         """Check and complete every special ability."""
@@ -187,3 +207,9 @@ class PlayerCharacterLevelSerializer(PlayerCharacterSerializer):
 
     class Meta(PlayerCharacterSerializer.Meta):
         read_only_fields = PLAYER_FIELDS
+
+
+class CharacterImageSerializer(serializers.Serializer):
+    """Read the uploaded picture of a character."""
+
+    image = serializers.ImageField()

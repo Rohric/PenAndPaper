@@ -15,10 +15,12 @@ from battle_app.models import Combatant
 from session_app.utils import session_for_member
 
 from .serializers import (
+    ActionSerializer,
     AttackSerializer,
     BattleSerializer,
     CombatantSerializer,
     ParrySerializer,
+    PlayerActionSerializer,
     PlayerAttackSerializer,
     PlayerParrySerializer,
 )
@@ -103,10 +105,12 @@ class CombatantDetail(generics.RetrieveUpdateDestroyAPIView):
         return Combatant.objects.filter(battle__owner=self.request.user)
 
     def perform_update(self, serializer):
-        """Save the combatant; life points set by hand go onto its player character at once."""
+        """Save the combatant; life points set by hand go onto its player character, new statuses into the log."""
+        before = {status["name"] for status in serializer.instance.statuses}
         combatant = serializer.save()
         if "life_points" in serializer.validated_data:
             utils.carry_life(combatant)
+        utils.log_new_statuses(combatant, before)
 
 
 class BattleStep(BattleMixin, APIView):
@@ -156,6 +160,21 @@ class BattleAttack(BattleStep):
         utils.attack(
             self.battle, data["attacker"], data["defender"], data["value"], data["damage_dice"], data["damage_bonus"]
         )
+
+
+class BattleAction(BattleStep):
+    """Keep an action of any combatant open that is no attack, with or without a roll."""
+
+    def step(self, request):
+        """Check that the combatant fights in this battle, then note the action and roll if a value is given."""
+        serializer = ActionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        if self.battle.pending:
+            raise ValidationError(TURN_OPEN)
+        if data["actor"].battle_id != self.battle.pk:
+            raise ValidationError("Der Teilnehmer muss zu diesem Kampf gehören.")
+        utils.act(self.battle, data["actor"], data["label"], data["value"])
 
 
 class BattleParry(BattleStep):
@@ -251,6 +270,23 @@ class PlayerBattleAttack(PlayerBattleMixin, APIView):
         value = utils.attack_value(own.player_character, data["skill"])
         dice, bonus = utils.weapon_damage(own.player_character, data["weapon"])
         utils.attack(self.battle, own, data["defender"], value, dice, bonus)
+        return self.answer()
+
+
+class PlayerBattleAction(PlayerBattleMixin, APIView):
+    """Let a player do something else than an attack when it is the turn of the own character."""
+
+    def post(self, request, session_id):
+        """Note what the character does; with a roll, the check goes against a skill of the own sheet."""
+        serializer = PlayerActionSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data, own = serializer.validated_data, self.own
+        if self.battle.pending:
+            raise ValidationError(TURN_OPEN)
+        if self.battle.current_id != own.pk:
+            raise PermissionDenied("Du bist nicht dran.")
+        value = utils.attack_value(own.player_character, data["skill"]) if data["rolls"] else None
+        utils.act(self.battle, own, data["label"], value)
         return self.answer()
 
 

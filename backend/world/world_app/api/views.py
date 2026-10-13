@@ -2,17 +2,28 @@
 
 from functools import cached_property
 
+from django.shortcuts import get_object_or_404
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 
 from auth_app.api.permissions import IsGameMaster
 from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, WorldNpc
-from world.world_app.utils import chapter_for_user, delete_world, world_for_user, worlds_for_user
+from world.world_app.utils import (
+    MAX_PICTURES,
+    chapter_for_user,
+    delete_world,
+    pictures_for_user,
+    world_for_user,
+    worlds_for_user,
+)
 
 from .serializers import (
     ChapterSerializer,
     EventSerializer,
     LocationSerializer,
+    PictureSerializer,
     QuestSerializer,
     SceneSerializer,
     TriviaSerializer,
@@ -238,3 +249,63 @@ class SceneDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         """Return only scenes from worlds the requesting user owns."""
         return Scene.objects.filter(chapter__world__owner=self.request.user)
+
+
+class PictureList(generics.ListCreateAPIView):
+    """
+    Base for the pictures of one entry; subclasses name the model the pictures hang on.
+
+    - GET: the pictures of the entry.
+    - POST: upload one more picture (multipart, field "image"); an entry takes three at most.
+    """
+
+    serializer_class = PictureSerializer
+    permission_classes = GAME_MASTER_ONLY
+    parser_classes = [MultiPartParser]
+    model = None
+    field = None
+
+    @cached_property
+    def entry(self):
+        """Return the entry from the URL, or raise a 404 when it is not the user's."""
+        return get_object_or_404(self.model.objects.filter(world__owner=self.request.user), pk=self.kwargs["pk"])
+
+    def get_queryset(self):
+        """Return the pictures of the entry."""
+        return self.entry.pictures.all()
+
+    def perform_create(self, serializer):
+        """Save the picture at the entry, unless it has three already."""
+        if self.entry.pictures.count() >= MAX_PICTURES:
+            raise ValidationError(f"Mehr als {MAX_PICTURES} Bilder gehen nicht.")
+        serializer.save(**{self.field: self.entry})
+
+
+class LocationPictureList(PictureList):
+    """List and upload the pictures of a place."""
+
+    model = Location
+    field = "location"
+
+
+class TriviaPictureList(PictureList):
+    """List and upload the pictures of a knowledge entry, which is how items are stored."""
+
+    model = Trivia
+    field = "trivia"
+
+
+class PictureDetail(generics.DestroyAPIView):
+    """Delete one picture of a place or an item."""
+
+    serializer_class = PictureSerializer
+    permission_classes = GAME_MASTER_ONLY
+
+    def get_queryset(self):
+        """Return only pictures from worlds the requesting user owns."""
+        return pictures_for_user(self.request.user)
+
+    def perform_destroy(self, instance):
+        """Delete the file together with the picture."""
+        instance.image.delete(save=False)
+        instance.delete()

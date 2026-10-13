@@ -30,10 +30,16 @@ class BaseCharacter(models.Model):
     bonus_points_total = models.PositiveIntegerField(default=0)
     # Each skill: name, talent, points, bonus_points, description.
     skills = models.JSONField(default=list, blank=True)
-    # Each item: name, quantity, damage_dice, damage_bonus, description.
+    # Each item: name, quantity, damage_dice, damage_bonus, description. Optional: item (id of the
+    # world item it comes from) and hidden (then only its owner and the game master see it).
     inventory = models.JSONField(default=list, blank=True)
     # Each special ability: name, description, roll_condition.
     special_abilities = models.JSONField(default=list, blank=True)
+    # Name of the symbol shown for the character; empty means the usual symbol.
+    symbol = models.CharField(max_length=40, blank=True)
+    # A picture of the character, and whether it is shown instead of the symbol.
+    image = models.ImageField(upload_to="characters/", blank=True)
+    shows_image = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

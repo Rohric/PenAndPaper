@@ -5,13 +5,14 @@ import { Observable } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { AnyCharacter, Npc, Option } from '../../core/models';
 import { damageText, skillValue, talentValue } from '../../core/rules';
-import { Battle, Combatant } from '../../core/session-models';
+import { Battle, Combatant, Status } from '../../core/session-models';
 import { Icon } from '../../shared/icon';
 import { IdSelect } from '../../shared/id-select';
 import { CharacterService } from '../characters/character.service';
 import { WorldStore } from '../worlds/world-store';
 import { BattleExchange } from './battle-exchange';
 import { combatantKey, recall, remember } from './battle-memory';
+import { BattleTimeline, TimelineEntry } from './battle-timeline';
 import { SessionStore } from './session-store';
 import { SessionService } from './session.service';
 
@@ -34,14 +35,14 @@ interface Weapon {
 }
 
 /**
- * A fight by the rules of How to be a Hero as the game master runs it: the combatants in the order
- * of their initiative, the attack, the parry of the target and the log. A rolled attack stays open
+ * A fight by the rules of How to be a Hero as the game master runs it: the timeline with the order
+ * and the statuses, the attack or another action, the parry of the target and the log. A rolled attack stays open
  * until the game master closes the turn; only then it counts. The server rolls all dice.
  * What a combatant attacked and parried with last time is remembered in the browser.
  */
 @Component({
   selector: 'app-battle-view',
-  imports: [FormsModule, Icon, IdSelect, BattleExchange],
+  imports: [FormsModule, Icon, IdSelect, BattleExchange, BattleTimeline],
   templateUrl: './battle-view.html',
   styleUrl: './battle-view.scss',
 })
@@ -68,6 +69,10 @@ export class BattleView {
   private readonly typedValue = signal(DEFAULT_VALUE);
   private readonly typedDice = signal(1);
   private readonly typedBonus = signal(0);
+  // Instead of an attack a combatant can do something else, with or without a roll on the picked value.
+  protected readonly mode = signal<'attack' | 'action'>('attack');
+  protected readonly actionLabel = signal('');
+  protected readonly actionRolls = signal(false);
   // The parry of the target of the open hit, picked the same way.
   protected readonly parrySkill = signal('');
   private readonly typedParry = signal(DEFAULT_VALUE);
@@ -79,6 +84,13 @@ export class BattleView {
   protected readonly newLife = signal(100);
 
   protected readonly combatants = computed(() => this.battle()?.combatants ?? []);
+  /** The combatants as the timeline shows them, in the order of their initiative. */
+  protected readonly timeline = computed<TimelineEntry[]>(() =>
+    this.combatants().map((c) => ({
+      id: c.id, name: c.name, symbol: c.symbol, isPlayer: c.player_character !== null, initiative: c.initiative,
+      out: c.life_points <= 0, statuses: c.statuses,
+    })),
+  );
   /** The attack that is rolled but not closed yet. */
   protected readonly open = computed(() => this.battle()?.pending ?? null);
   /** Whether the target of the open hit is a player character; then its player can decide the parry himself. */
@@ -145,6 +157,23 @@ export class BattleView {
     remember(combatantKey(attacker), { defender, skill: this.skill(), weapon: this.weapon(), value: this.value(), dice, bonus });
     const attack = { attacker: attacker.id, defender, value: this.value(), damage_dice: dice, damage_bonus: bonus };
     this.run(this.api.attack(this.battleId(), attack), (battle) => this.afterStep(battle));
+  }
+
+  /** Keep what a combatant does instead of an attack; with a roll it goes against the picked value. */
+  protected act(): void {
+    const actor = this.attackerId();
+    const label = this.actionLabel().trim();
+    if (actor === null || !label) {
+      return;
+    }
+    const action = { actor, label, value: this.actionRolls() ? this.value() : null };
+    this.run(this.api.action(this.battleId(), action), (battle) => this.afterStep(battle));
+    this.actionLabel.set('');
+  }
+
+  /** Give or take statuses of a combatant. */
+  protected setStatuses(change: { id: number; statuses: Status[] }): void {
+    this.run(this.api.updateCombatant(change.id, { statuses: change.statuses }), () => this.afterChange());
   }
 
   /** Decide the parry of the open hit: roll it, or take the hit. */
@@ -228,7 +257,7 @@ export class BattleView {
     if (battle.current !== before?.current) {
       this.pickAttacker(battle.current);
     }
-    if (battle.pending && !before?.pending) {
+    if (battle.pending?.defender && !before?.pending) {
       this.recallParry(battle.pending.defender);
     }
   }

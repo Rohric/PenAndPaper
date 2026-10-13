@@ -1,6 +1,8 @@
 import { Component, computed, input } from '@angular/core';
 
-/** The line symbols of the app, each drawn from one or more paths on a 24 by 24 grid. */
+import { SYMBOLS, Shape } from './symbols';
+
+/** The line symbols of the user interface, each drawn from one or more paths on a 24 by 24 grid. */
 const ICONS = {
   back: ['M15 18l-6-6 6-6'],
   down: ['M6 9l6 6 6-6'],
@@ -26,11 +28,23 @@ const ICONS = {
   plus: ['M12 5v14', 'M5 12h14'],
   close: ['M18 6L6 18', 'M6 6l12 12'],
   undo: ['M3 12a9 9 0 1 0 3-6.7L3 8', 'M3 3v5h5'],
+  edit: ['M12 20h9', 'M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z'],
+  search: ['M3 11a8 8 0 1 0 16 0a8 8 0 1 0-16 0', 'M21 21l-4.35-4.35'],
+  expand: ['M15 3h6v6', 'M9 21H3v-6', 'M21 3l-7 7', 'M3 21l7-7'],
+  trash: ['M3 6h18', 'M8 6V4h8v2', 'M19 6l-1 14H6L5 6', 'M10 11v6', 'M14 11v6'],
+  speech: ['M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'],
+  clock: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M12 6v6l4 2'],
+  image: ['M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z', 'M7 9a2 2 0 1 0 4 0a2 2 0 1 0-4 0', 'M21 15l-5-5L5 21'],
+  lock: ['M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z', 'M7 11V7a5 5 0 0 1 10 0v4'],
 } satisfies Record<string, string[]>;
 
 export type IconName = keyof typeof ICONS;
 
-/** One line symbol. It is decoration: the button around it carries the text or the label. */
+/**
+ * One line symbol. "name" picks a symbol of the user interface. "symbol" names one of the symbols
+ * an entry or a character carries; when it is set and known it is drawn instead, and "name" is
+ * only the fallback. The symbol is decoration: the button around it carries the text or the label.
+ */
 @Component({
   selector: 'app-icon',
   template: `
@@ -45,8 +59,37 @@ export type IconName = keyof typeof ICONS;
       [attr.width]="size()"
       [attr.height]="size()"
     >
-      @for (path of paths(); track path) {
-        <path [attr.d]="path" />
+      @for (shape of shapes(); track $index) {
+        @switch (shape[0]) {
+          @case ('path') {
+            <path [attr.d]="shape[1]['d']" [attr.fill]="shape[1]['fill']" />
+          }
+          @case ('circle') {
+            <circle [attr.cx]="shape[1]['cx']" [attr.cy]="shape[1]['cy']" [attr.r]="shape[1]['r']" [attr.fill]="shape[1]['fill']" />
+          }
+          @case ('line') {
+            <line [attr.x1]="shape[1]['x1']" [attr.y1]="shape[1]['y1']" [attr.x2]="shape[1]['x2']" [attr.y2]="shape[1]['y2']" />
+          }
+          @case ('rect') {
+            <rect
+              [attr.x]="shape[1]['x']"
+              [attr.y]="shape[1]['y']"
+              [attr.width]="shape[1]['width']"
+              [attr.height]="shape[1]['height']"
+              [attr.rx]="shape[1]['rx']"
+              [attr.ry]="shape[1]['ry']"
+            />
+          }
+          @case ('ellipse') {
+            <ellipse [attr.cx]="shape[1]['cx']" [attr.cy]="shape[1]['cy']" [attr.rx]="shape[1]['rx']" [attr.ry]="shape[1]['ry']" />
+          }
+          @case ('polyline') {
+            <polyline [attr.points]="shape[1]['points']" />
+          }
+          @case ('polygon') {
+            <polygon [attr.points]="shape[1]['points']" />
+          }
+        }
       }
     </svg>
   `,
@@ -59,6 +102,10 @@ export type IconName = keyof typeof ICONS;
 })
 export class Icon {
   readonly name = input.required<IconName>();
+  /** Key of a symbol an entry or a character carries; empty or unknown draws "name". */
+  readonly symbol = input('');
+  /** Width and height in pixels. */
   readonly size = input(18);
-  protected readonly paths = computed<string[]>(() => ICONS[this.name()]);
+
+  protected readonly shapes = computed<Shape[]>(() => SYMBOLS[this.symbol()] ?? ICONS[this.name()].map((d): Shape => ['path', { d }]));
 }

@@ -52,6 +52,9 @@ class Combatant(models.Model):
     surprised = models.BooleanField(default=False)
     # A combatant can parry once per round.
     has_parried = models.BooleanField(default=False)
+    # Running statuses the game master gives. Each: name, rounds (turns left, or None until it is
+    # taken away) and skips (the combatant sits out while it lasts).
+    statuses = models.JSONField(default=list, blank=True)
 
     class Meta:
         ordering = ["-initiative", "id"]

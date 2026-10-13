@@ -18,6 +18,10 @@
       <button type="button" class="btn" [attr.aria-pressed]="view() === 'players'" (click)="show('players')">
         <app-icon name="eye" /> Spieleransicht
       </button>
+      <button type="button" class="btn" [attr.aria-pressed]="view() === 'glossary'" (click)="show('glossary')">
+        <app-icon name="book" /> Glossar
+      </button>
+      <button type="button" class="btn" (click)="openPanel({ kind: 'roll' })"><app-icon name="dice" /> Würfeln</button>
       <button type="button" class="btn btn--primary" (click)="openBattle()"><app-icon name="sword" /> Kampf</button>
       <button type="button" class="btn" [attr.aria-pressed]="view() === 'notes'" (click)="show('notes')">
         <app-icon name="note" /> Notizen
@@ -27,6 +31,9 @@
       </button>
       <button type="button" class="btn" (click)="openPanel({ kind: 'archive' })"><app-icon name="archive" /> Archiv</button>
       <button type="button" class="btn" (click)="openPanel({ kind: 'level' })"><app-icon name="flag" /> Kapitel abschließen</button>
+      @if (world.world()) {
+        <app-world-search />
+      }
       <app-tutorial-button topic="sessions" />
     </nav>
   </header>
@@ -47,6 +54,21 @@
       }
       @case ('notes') {
         <app-session-notes [notes]="store.notes()" (open)="openPanel({ kind: 'note', noteId: $event })" />
+      }
+      @case ('glossary') {
+        <nav class="tabs" aria-label="Bereiche des Glossars">
+          @for (part of sections; track part.id) {
+            <button type="button" class="tabs__tab" [class.is-active]="part.id === sectionId()" (click)="sectionId.set(part.id)">
+              <app-icon [name]="part.icon" [size]="16" /> {{ part.label }}
+            </button>
+          }
+        </nav>
+        <app-glossary-tiles
+          [section]="section()"
+          [creatable]="false"
+          [carriers]="carriers()"
+          (carrier)="openPanel({ kind: 'sheet', characterId: $event })"
+        />
       }
       @default {
         <section class="stack">
@@ -78,10 +100,14 @@
     <div class="row">
       <app-icon name="dice" />
       @if (lastRoll(); as roll) {
-        <span><strong>{{ roll.who }}</strong> · {{ roll.label }} {{ roll.value }}</span>
-        <span class="chip" [class.chip--accent]="roll.result === 'critical'" [class.chip--danger]="roll.result === 'fumble'">
-          {{ roll.rolled }} · {{ results[roll.result] }}
-        </span>
+        <span><strong>{{ roll.who }}</strong> · {{ roll.label }}{{ roll.result ? ' ' + roll.value : '' }}</span>
+        @if (roll.result; as result) {
+          <span class="chip" [class.chip--accent]="result === 'critical'" [class.chip--danger]="result === 'fumble'">
+            {{ roll.rolled }} · {{ results[result] }}
+          </span>
+        } @else {
+          <span class="chip">{{ roll.total }}</span>
+        }
       } @else {
         <span class="soft">Noch kein Wurf.</span>
       }
@@ -90,7 +116,7 @@
   </footer>
 </section>
 
-<app-entry-peek>
+<app-entry-peek editLabel="In der Welt bearbeiten">
   @if (world.peek(); as looked) {
     <app-session-entry-actions [entry]="looked" />
   }
@@ -130,6 +156,16 @@
       }
       @case ('rolls') {
         <app-session-rolls [rolls]="store.rolls()" />
+      }
+      @case ('roll') {
+        <app-roll-panel
+          [gameMaster]="true"
+          [characters]="store.characters()"
+          [npcs]="world.npcOptions()"
+          [last]="store.lastRoll()"
+          [rolls]="store.rolls()"
+          (roll)="store.roll($event)"
+        />
       }
       @case ('level') {
         <app-chapter-close-form [characters]="store.characters()" (close)="closeChapter($event)" />

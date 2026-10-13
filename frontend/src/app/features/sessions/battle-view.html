@@ -28,6 +28,13 @@
       }
     </div>
 
+    <div class="panel">
+      <app-battle-timeline [entries]="timeline()" [current]="fight.current" [editable]="!fight.finished" (statuses)="setStatuses($event)" />
+      @if (!fight.finished) {
+        <p class="soft">Klick auf ein Portrait, um einen Zustand zu geben oder zu nehmen, zum Beispiel „gefroren“ für zwei Züge.</p>
+      }
+    </div>
+
     <div class="fight">
       <div class="stack">
         @if (open(); as exchange) {
@@ -73,20 +80,44 @@
           </div>
         } @else if (fight.round > 0 && !fight.finished) {
           <div class="panel">
-            <h3 class="subtitle">Angriff</h3>
-            <div class="grid-fields">
-              <div class="field">
-                <label for="attack-attacker">Wer greift an</label>
-                <app-id-select inputId="attack-attacker" emptyLabel="Angreifer wählen" [options]="combatantOptions()" [value]="attackerId()" (valueChange)="pickAttacker($event)" />
-              </div>
-              <div class="field">
-                <label for="attack-defender">Wen</label>
-                <app-id-select inputId="attack-defender" emptyLabel="Ziel wählen" [options]="combatantOptions()" [value]="defenderId()" (valueChange)="defenderId.set($event)" />
+            <div class="row row--between">
+              <h3 class="subtitle">{{ mode() === 'attack' ? 'Angriff' : 'Andere Aktion' }}</h3>
+              <div class="row" role="group" aria-label="Was der Teilnehmer in seinem Zug tut">
+                <button type="button" class="pill" [attr.aria-pressed]="mode() === 'attack'" (click)="mode.set('attack')">
+                  <app-icon name="sword" [size]="16" /> Angriff
+                </button>
+                <button type="button" class="pill" [attr.aria-pressed]="mode() === 'action'" (click)="mode.set('action')">
+                  <app-icon name="speech" [size]="16" /> Andere Aktion
+                </button>
               </div>
             </div>
             <div class="grid-fields">
               <div class="field">
-                <label for="attack-skill">Angriff mit</label>
+                <label for="attack-attacker">{{ mode() === 'attack' ? 'Wer greift an' : 'Wer handelt' }}</label>
+                <app-id-select inputId="attack-attacker" emptyLabel="Teilnehmer wählen" [options]="combatantOptions()" [value]="attackerId()" (valueChange)="pickAttacker($event)" />
+              </div>
+              @if (mode() === 'attack') {
+                <div class="field">
+                  <label for="attack-defender">Wen</label>
+                  <app-id-select inputId="attack-defender" emptyLabel="Ziel wählen" [options]="combatantOptions()" [value]="defenderId()" (valueChange)="defenderId.set($event)" />
+                </div>
+              } @else {
+                <div class="field">
+                  <label for="action-label">Was wird getan</label>
+                  <input id="action-label" class="input" placeholder="z. B. mischt eine Bombe" [ngModel]="actionLabel()" (ngModelChange)="actionLabel.set($event)" />
+                </div>
+              }
+            </div>
+            @if (mode() === 'action') {
+              <label class="check">
+                <input type="checkbox" [ngModel]="actionRolls()" (ngModelChange)="actionRolls.set($event)" />
+                Dafür wird gewürfelt
+              </label>
+            }
+            @if (mode() === 'attack' || actionRolls()) {
+            <div class="grid-fields">
+              <div class="field">
+                <label for="attack-skill">{{ mode() === 'attack' ? 'Angriff mit' : 'Probe auf' }}</label>
                 <select id="attack-skill" class="input" [ngModel]="shownSkill()" (ngModelChange)="skill.set($event)">
                   <option value="">Wert selbst eintragen</option>
                   @for (choice of attackChoices(); track choice.label) {
@@ -95,9 +126,10 @@
                 </select>
               </div>
               <div class="field">
-                <label for="attack-value">Wert des Angriffs</label>
+                <label for="attack-value">{{ mode() === 'attack' ? 'Wert des Angriffs' : 'Wert der Probe' }}</label>
                 <input id="attack-value" class="input" type="number" min="0" [ngModel]="value()" (ngModelChange)="typeValue(+$event)" />
               </div>
+              @if (mode() === 'attack') {
               <div class="field">
                 <label for="attack-weapon">Waffe</label>
                 <select id="attack-weapon" class="input" [ngModel]="shownWeapon()" (ngModelChange)="weapon.set($event)">
@@ -115,11 +147,19 @@
                 <label for="attack-bonus">Schadensbonus</label>
                 <input id="attack-bonus" class="input" type="number" min="0" [ngModel]="damage().bonus" (ngModelChange)="typeDamage(damage().dice, +$event)" />
               </div>
+              }
             </div>
+            }
             <div class="row">
-              <button type="button" class="btn btn--primary" [disabled]="attackerId() === null || defenderId() === null" (click)="attack()">
-                <app-icon name="dice" /> Angriff würfeln
-              </button>
+              @if (mode() === 'attack') {
+                <button type="button" class="btn btn--primary" [disabled]="attackerId() === null || defenderId() === null" (click)="attack()">
+                  <app-icon name="dice" /> Angriff würfeln
+                </button>
+              } @else {
+                <button type="button" class="btn btn--primary" [disabled]="attackerId() === null || !actionLabel().trim()" (click)="act()">
+                  <app-icon [name]="actionRolls() ? 'dice' : 'check'" /> {{ actionRolls() ? 'Probe würfeln' : 'Aktion festhalten' }}
+                </button>
+              }
               <span class="soft">Ist ein Spieler dran, kann er auf seiner Seite selbst würfeln. Die letzte Auswahl jedes Teilnehmers bleibt gemerkt.</span>
             </div>
           </div>

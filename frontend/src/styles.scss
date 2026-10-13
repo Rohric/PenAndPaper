@@ -172,6 +172,7 @@ a.card:hover,
   background: var(--surface-2);
   color: var(--text);
   font-weight: 600;
+  text-decoration: none;
 }
 
 .btn--primary {
@@ -192,7 +193,8 @@ a.card:hover,
   font-size: 14px;
 }
 
-// A button that is switched on, for example the view that is open.
+// A button that is switched on, for example the view that is open, or the link to the page that is shown.
+.btn[aria-current='page'],
 .btn[aria-pressed='true'] {
   border-color: var(--accent);
   color: var(--accent);
@@ -375,6 +377,36 @@ textarea.input {
   padding-left: 20px;
 }
 
+// Desktop only. A bar with tools that stays in view while the page below it scrolls.
+.bar {
+  position: sticky;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.bar--top {
+  top: 8px;
+}
+
+.bar__title {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+// One entry or one text on a page of its own stays as wide as a page of a book.
+.page {
+  max-width: 980px;
+}
+
 // Tiles: small cards in a grid that fills the width, as many per row as fit.
 .tiles {
   display: grid;
@@ -431,6 +463,15 @@ textarea.input {
   text-align: left;
 }
 
+// A tile that is a link as a whole, like a chapter.
+.tile--link {
+  text-decoration: none;
+}
+
+.tile--link:hover {
+  border-color: var(--accent);
+}
+
 // A tile that is a button as a whole, like a note on the board.
 button.tile {
   gap: 6px;
@@ -445,6 +486,35 @@ button.tile:hover {
 
 .tile__body:hover .tile__title {
   color: var(--accent);
+}
+
+// The top of a tile: the symbol of the entry beside its kind and its name.
+.tile__head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tile__names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+// The place where a picture will be shown once pictures can be uploaded.
+.picture-slot {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 82px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .tile__title {
@@ -498,6 +568,34 @@ button.tabs__tab {
 .tabs__tab.is-active {
   border-bottom-color: var(--accent);
   color: var(--accent);
+}
+
+// A part of a page that folds: closed it shows only its heading, a click on the heading opens it.
+.fold > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold[open] > summary {
+  margin-bottom: 14px;
+}
+
+.fold__mark {
+  transition: transform 0.15s;
+}
+
+.fold[open] > summary .fold__mark {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold__mark {
+    transition: none;
+  }
 }
 
 // Dark layer behind a panel or a window that lies over the page.

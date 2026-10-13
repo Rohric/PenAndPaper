@@ -1,34 +1,53 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 
-import { Exchange, ROLL_RESULTS } from '../../core/session-models';
+import { Exchange } from '../../core/session-models';
+import { DiceRoll } from './dice-roll';
 
 /**
- * The attack that is open in a battle: the rolls so far and the damage it would do.
+ * What is open in a battle and does not count yet: an attack with its rolls for attack, parry and
+ * damage, or another action with or without a check. Every roll is shown as a die with its result.
  * Whoever shows it puts the buttons for the next decision below.
  */
 @Component({
   selector: 'app-battle-exchange',
+  imports: [DiceRoll],
   template: `
-    <div class="read-aloud" role="status">
-      <span class="kicker">Offener Wurf · {{ exchange().attacker_name }} greift {{ exchange().defender_name }} an</span>
-      <p>Angriff: {{ exchange().attack.rolled }} gegen {{ exchange().attack.value }} · {{ results[exchange().attack.result] }}</p>
+    @if (exchange().kind === 'action') {
+      <span class="kicker">Offen · Aktion von {{ exchange().attacker_name }}</span>
+      <p class="read-aloud">{{ exchange().label }}</p>
+      @if (exchange().attack; as rolled) {
+        <app-dice-roll label="Probe" [check]="rolled" />
+      } @else {
+        <p class="soft">Ohne Wurf.</p>
+      }
+    } @else {
+      <span class="kicker">Offen · {{ exchange().attacker_name }} greift {{ exchange().defender_name }} an</span>
+      @if (exchange().attack; as hit) {
+        <app-dice-roll label="Angriff" [check]="hit" />
+      }
       @if (exchange().parry; as parry) {
-        <p>Parade: {{ parry.rolled }} gegen {{ parry.value }} · {{ results[parry.result] }}</p>
+        <app-dice-roll label="Parade" [check]="parry" />
       }
       @if (exchange().stage === 'close') {
         @if (exchange().damage; as damage) {
-          <p>
-            Schaden: {{ damage.dice.join(' + ') }} → <strong>{{ damage.total }}</strong>
-          </p>
+          <app-dice-roll label="Schaden" [dice]="damage.dice" [total]="damage.total" [note]="damageNote()" />
         } @else {
-          <p>Kein Schaden.</p>
+          <p class="soft">Kein Schaden.</p>
         }
       }
-    </div>
+    }
+  `,
+  styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
   `,
 })
 export class BattleExchange {
   readonly exchange = input.required<Exchange>();
 
-  protected readonly results = ROLL_RESULTS;
+  /** A word about the sum of the damage: a critical hit counts its dice twice. */
+  protected readonly damageNote = computed(() => (this.exchange().attack?.result === 'critical' ? 'kritisch, Würfel zählen doppelt' : ''));
 }

@@ -2,29 +2,37 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 
 import { readError } from '../../core/api-error';
 import { AnyCharacter, Npc, WorldNpc } from '../../core/models';
-import { IdSelect } from '../../shared/id-select';
+import { LinkPicker } from '../../shared/link-picker';
 import { CharacterEditor } from '../characters/character-editor';
 import { CharacterService } from '../characters/character.service';
+import { EntryItems } from './entry-items';
 import { WorldStore } from './world-store';
 
 /** Edit an NPC of the world: where it can be met, and the character itself. */
 @Component({
   selector: 'app-world-npc-editor',
-  imports: [CharacterEditor, IdSelect],
+  imports: [CharacterEditor, LinkPicker, EntryItems],
   template: `
     <div class="stack">
       <div class="panel">
         <h2 class="subtitle">In dieser Welt</h2>
         <div class="field">
           <label for="npc-location">Anzutreffen in</label>
-          <app-id-select
+          <app-link-picker
+            single
             inputId="npc-location"
-            emptyLabel="Kein fester Ort"
+            label="Ort, an dem die Figur anzutreffen ist"
+            emptyText="Kein fester Ort"
             [options]="store.locationOptions()"
             [value]="link().location"
             (valueChange)="setLocation($event)"
           />
         </div>
+        <div class="field">
+          <span class="label">Gegenstände der Welt bei dieser Figur</span>
+          <app-entry-items kind="npcs" [entryId]="link().npc" />
+        </div>
+        <p class="soft">Ort und Gegenstände werden sofort gespeichert. Was die Figur bei sich trägt, steht unten im Inventar.</p>
         @if (error()) {
           <p class="notice notice--error" role="alert">{{ error() }}</p>
         }
@@ -67,7 +75,7 @@ export class WorldNpcEditor {
   protected onSaved(saved: AnyCharacter): void {
     const npc = saved as Npc;
     this.npc.set(npc);
-    this.store.patchLocal('world-npcs', this.link().id, { name: npc.name, profession: npc.profession });
+    this.store.patchLocal('world-npcs', this.link().id, { name: npc.name, profession: npc.profession, inventory: npc.inventory });
     this.saved.emit();
   }
 

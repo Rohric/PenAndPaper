@@ -6,34 +6,10 @@
   min-height: calc(100vh - 96px);
 }
 
-.bar {
-  position: sticky;
-  z-index: 10;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 18px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  border: 1px solid var(--line-2);
-  border-radius: var(--radius);
-  background: var(--surface);
-}
-
-.bar--top {
-  top: 8px;
-}
-
-// Pushed to the bottom of the page when the story is short.
+// The bar at the bottom is pushed down when the story is short. The bar itself is styled for all pages.
 .bar--bottom {
   bottom: 8px;
   margin-top: auto;
-}
-
-.bar__title {
-  display: flex;
-  gap: 12px;
-  align-items: center;
 }
 
 // The thread of the story beside the scene. Breakpoints: laptop (default), large screen.

@@ -19,6 +19,7 @@ from session_app.utils import (
     latest_rolls,
     player_view,
     roll_check,
+    roll_dice,
     session_for_game_master,
     session_for_member,
     sessions_for_game_master,
@@ -170,8 +171,8 @@ class PlayerView(SessionMixin, APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, session_id):
-        """Return group, shared quests and the glossary of the players."""
-        return Response(player_view(self.session))
+        """Return group, shared quests, the glossary of the players and what the group carries."""
+        return Response(player_view(self.session, request.user))
 
 
 class NoteList(SessionMixin, generics.ListCreateAPIView):
@@ -260,23 +261,35 @@ class MessagesRead(SessionMixin, APIView):
 
 class RollList(SessionMixin, APIView):
     """
-    Roll checks in a session and read the latest ones.
+    Roll in a session and read the latest rolls.
 
-    - GET: the latest rolls of the session, newest first.
-    - POST: roll a W100 against a value, for an own character or as game master.
+    - GET: the latest rolls of the session, newest first; secret ones only for the game master.
+    - POST: roll a W100 against a value, or free dice without one. A player rolls for the own
+      character, the game master for whoever he names, and secretly if he wants.
     """
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request, session_id):
-        """Return the latest rolls of the session."""
-        return Response(latest_rolls(self.session))
+        """Return the latest rolls the requesting user may see."""
+        return Response(latest_rolls(self.session, self.is_game_master))
 
     def post(self, request, session_id):
-        """Roll the check and return it."""
+        """Roll and return the roll."""
         serializer = RollSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        character = serializer.validated_data.get("character")
-        who = self.own_character(character).name if character else "Spielleiter"
-        roll = roll_check(self.session, who, serializer.validated_data["label"], serializer.validated_data["value"])
+        data = serializer.validated_data
+        who, secret = self.roller(data), data["secret"] and self.is_game_master
+        if data["value"] is None:
+            roll = roll_dice(self.session, who, data["label"], data["sides"], data["count"], secret)
+        else:
+            roll = roll_check(self.session, who, data["label"], data["value"], secret)
         return Response(roll, status=status.HTTP_201_CREATED)
+
+    def roller(self, data):
+        """Return the name the roll is made under: the own character of a player, or whoever the game master names."""
+        if self.is_game_master:
+            return data["who"] or "Spielleiter"
+        if data["character"] is None:
+            raise PermissionDenied(NOT_IN_SESSION)
+        return self.own_character(data["character"]).name

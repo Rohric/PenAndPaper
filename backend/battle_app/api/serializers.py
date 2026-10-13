@@ -3,25 +3,49 @@
 from rest_framework import serializers
 
 from battle_app.models import Battle, Combatant
-from battle_app.utils import add_character, battle_log, create_battle
+from battle_app.utils import add_character, battle_log, create_battle, symbol_of
 from character_app.utils import MAX_DAMAGE_DICE
 from world.world_app.models import Scene
 
 MAX_AMOUNT = 9999
 MAX_CHECK_VALUE = 300
+MAX_ROUNDS = 99
 NOT_YOURS = "Dieser Eintrag gehört dir nicht."
 
 
+def clean_status(status):
+    """Return one status with its name, the turns it lasts (or None) and whether the combatant sits out."""
+    name = status.get("name") if isinstance(status, dict) else None
+    if not isinstance(name, str) or not name.strip():
+        raise serializers.ValidationError("Jeder Zustand braucht einen Namen.")
+    rounds = status.get("rounds")
+    if rounds is not None and (isinstance(rounds, bool) or not isinstance(rounds, int) or not 1 <= rounds <= MAX_ROUNDS):
+        raise serializers.ValidationError(f"Runden: eine ganze Zahl von 1 bis {MAX_ROUNDS}, oder leer.")
+    return {"name": name.strip(), "rounds": rounds, "skips": status.get("skips") is True}
+
+
 class CombatantSerializer(serializers.ModelSerializer):
-    """Serialize one participant of a battle; a linked character brings its own values."""
+    """Serialize one participant of a battle; a linked character brings its own values and its symbol."""
+
+    symbol = serializers.SerializerMethodField()
 
     class Meta:
         model = Combatant
         fields = [
-            "id", "npc", "player_character", "name", "action_value", "initiative",
-            "life_points", "surprised", "has_parried",
+            "id", "npc", "player_character", "name", "symbol", "action_value", "initiative",
+            "life_points", "surprised", "has_parried", "statuses",
         ]
+
+    def get_symbol(self, combatant):
+        """Return the symbol of the character behind the combatant."""
+        return symbol_of(combatant)
         extra_kwargs = {"name": {"required": False}}
+
+    def validate_statuses(self, statuses):
+        """Check every status the game master gives."""
+        if not isinstance(statuses, list):
+            raise serializers.ValidationError("Hier wird eine Liste erwartet.")
+        return [clean_status(status) for status in statuses]
 
     def validate_npc(self, npc):
         """Accept only an NPC of the requesting game master."""
@@ -98,6 +122,22 @@ class AttackSerializer(serializers.Serializer):
     value = serializers.IntegerField(min_value=0, max_value=MAX_CHECK_VALUE)
     damage_dice = serializers.IntegerField(min_value=0, max_value=MAX_DAMAGE_DICE)
     damage_bonus = serializers.IntegerField(min_value=0, max_value=MAX_AMOUNT, default=0)
+
+
+class ActionSerializer(serializers.Serializer):
+    """Read an action that is no attack: who acts, what is done and, if it needs a roll, the value to roll against."""
+
+    actor = serializers.PrimaryKeyRelatedField(queryset=Combatant.objects.all())
+    label = serializers.CharField(max_length=200)
+    value = serializers.IntegerField(min_value=0, max_value=MAX_CHECK_VALUE, allow_null=True, default=None)
+
+
+class PlayerActionSerializer(serializers.Serializer):
+    """Read the action of a player: what the own character does and, if it needs a roll, the skill to roll on."""
+
+    label = serializers.CharField(max_length=200)
+    rolls = serializers.BooleanField(default=False)
+    skill = serializers.CharField(max_length=200, allow_blank=True, default="")
 
 
 class ParrySerializer(serializers.Serializer):

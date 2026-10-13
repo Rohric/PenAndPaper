@@ -1,0 +1,72 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// One view for both screens: the portraits stand on a line and scroll sideways when they do not fit.
+.line {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 4px 4px;
+  overflow-x: auto;
+  list-style: none;
+}
+
+// The line the portraits hang on.
+.line::before {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--line-2);
+  content: '';
+}
+
+.who {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  width: 118px;
+  padding: 0 4px 8px;
+  border-bottom: 3px solid transparent;
+  font-size: 13px;
+  text-align: center;
+}
+
+// Whose turn it is: a line in the accent colour below, on top of the colour of the portrait.
+.who.is-current {
+  border-bottom-color: var(--accent);
+}
+
+.who.is-current .who__name {
+  color: var(--accent);
+}
+
+.who__face {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+}
+
+.who__name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 900px) {
+  .who {
+    width: 132px;
+    font-size: 14px;
+  }
+}

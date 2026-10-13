@@ -31,10 +31,12 @@
     @switch (tab()) {
       @case ('character') {
         @if (lastRoll(); as rolled) {
-          <div class="read-aloud" role="status">
-            <span class="kicker">{{ rolled.label }} · Wert {{ rolled.value }}</span>
-            <p>Gewürfelt: {{ rolled.rolled }} · {{ results[rolled.result] }}</p>
-          </div>
+          <app-dice-roll
+            [label]="rolled.label"
+            [check]="rolled.result ? { value: rolled.value ?? 0, rolled: rolled.rolled ?? 0, result: rolled.result } : null"
+            [dice]="rolled.dice ?? null"
+            [total]="rolled.total ?? null"
+          />
         }
         @if (character(); as own) {
           <p class="soft">Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln. Der Spielleiter sieht den Wurf.</p>
@@ -44,6 +46,11 @@
             <p>Keiner deiner Charaktere spielt in dieser Runde.</p>
           </div>
         }
+      }
+      @case ('roll') {
+        <div class="panel">
+          <app-roll-panel [characters]="own()" [last]="lastRoll()" [rolls]="rolls()" (roll)="order($event)" />
+        </div>
       }
       @case ('battle') {
         <app-player-battle [sessionId]="id()" [battle]="battle()" [character]="character()" (changed)="battle.set($event)" />

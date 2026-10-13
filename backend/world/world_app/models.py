@@ -32,6 +32,8 @@ class Entry(models.Model):
     player_knowledge = models.JSONField(default=list, blank=True)
     # Each piece: title, text. Only the game master reads these.
     gm_knowledge = models.JSONField(default=list, blank=True)
+    # Name of the symbol shown for the entry; empty means the usual symbol of its kind.
+    symbol = models.CharField(max_length=40, blank=True)
 
     class Meta:
         abstract = True
@@ -85,6 +87,8 @@ class Quest(Entry):
     kind = models.CharField(max_length=10, choices=Kind.choices, default=Kind.SIDE)
     # The number of a main quest; side quests have none.
     number = models.PositiveIntegerField(null=True, blank=True)
+    # Each dialogue: title, lines. Each line: npc (id of the speaking character, or None) and text.
+    dialogues = models.JSONField(default=list, blank=True)
 
 
 class Event(Entry):
@@ -92,6 +96,12 @@ class Event(Entry):
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="events")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="events")
+    # What sets the event off, like "on the pass, in the first night".
+    trigger = models.TextField(blank=True)
+    # What happens once it is set off.
+    happening = models.TextField(blank=True)
+    # Each dialogue: title, lines. Each line: npc (id of the speaking character, or None) and text.
+    dialogues = models.JSONField(default=list, blank=True)
 
 
 class Trivia(Entry):
@@ -149,6 +159,8 @@ class Scene(models.Model):
     quests = models.ManyToManyField(Quest, blank=True, related_name="scenes")
     events = models.ManyToManyField(Event, blank=True, related_name="scenes")
     trivia = models.ManyToManyField(Trivia, blank=True, related_name="scenes")
+    # Each dialogue: title, lines. Each line: npc (id of the speaking character, or None) and text.
+    dialogues = models.JSONField(default=list, blank=True)
 
     class Meta:
         ordering = ["position", "id"]
@@ -156,3 +168,20 @@ class Scene(models.Model):
     def __str__(self):
         """Return the scene's name for admin and shell."""
         return self.name
+
+
+class Picture(models.Model):
+    """Store one picture of a place or of an item; each of them can have up to three."""
+
+    # A picture hangs on exactly one of the two: a place, or a knowledge entry that is an item.
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True, related_name="pictures")
+    trivia = models.ForeignKey(Trivia, on_delete=models.CASCADE, null=True, blank=True, related_name="pictures")
+    image = models.ImageField(upload_to="pictures/")
+    position = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["position", "id"]
+
+    def __str__(self):
+        """Return what the picture shows for admin and shell."""
+        return f"Bild von {self.location or self.trivia}"

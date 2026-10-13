@@ -114,11 +114,18 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class RollSerializer(serializers.Serializer):
-    """Read what a check is rolled on: a character (empty for the game master), a label and the value."""
+    """Read a roll: a check against a value, or free dice when no value is given.
+
+    A player rolls for the own character. The game master names whoever the roll is for and may keep it secret.
+    """
 
     character = serializers.PrimaryKeyRelatedField(queryset=PlayerCharacter.objects.all(), required=False, allow_null=True)
-    label = serializers.CharField(max_length=200)
-    value = serializers.IntegerField(min_value=0, max_value=MAX_CHECK_VALUE)
+    who = serializers.CharField(max_length=200, allow_blank=True, default="")
+    label = serializers.CharField(max_length=200, allow_blank=True, default="")
+    value = serializers.IntegerField(min_value=0, max_value=MAX_CHECK_VALUE, allow_null=True, default=None)
+    sides = serializers.ChoiceField(choices=[10, 100], default=100)
+    count = serializers.IntegerField(min_value=1, max_value=10, default=1)
+    secret = serializers.BooleanField(default=False)
 
 
 class ItemSerializer(serializers.Serializer):
@@ -130,6 +137,9 @@ class ItemSerializer(serializers.Serializer):
     damage_dice = serializers.IntegerField(min_value=0, max_value=MAX_DAMAGE_DICE, default=0)
     damage_bonus = serializers.IntegerField(min_value=0, max_value=MAX_AMOUNT, default=0)
     description = serializers.CharField(allow_blank=True, default="")
+    # Id of the world item it comes from, and whether the rest of the group does not see it.
+    item = serializers.IntegerField(min_value=1, allow_null=True, default=None)
+    hidden = serializers.BooleanField(default=False)
 
 
 class LevelSerializer(serializers.Serializer):

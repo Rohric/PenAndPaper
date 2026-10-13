@@ -1,6 +1,7 @@
 import { Directive, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
+import { EntryKind } from '../../core/models';
 import { Kind, WorldStore } from './world-store';
 
 /**
@@ -32,6 +33,18 @@ export abstract class EntryEditor<T extends { id: number }> {
   /** Change a number field; empty or negative input counts as 0. */
   protected setNumber<K extends keyof T>(key: K, value: number | null): void {
     this.set(key, Math.max(0, Math.floor(value ?? 0)) as T[K]);
+  }
+
+  /**
+   * Look a linked entry up in the window at the side. Not while this form itself is open there
+   * with unsaved changes, because the window would leave it.
+   */
+  protected lookUp(kind: EntryKind, id: number): void {
+    const shown = this.store.peek();
+    const openHere = shown?.kind === this.kind && shown.id === this.entry().id;
+    if (!openHere || !this.dirty()) {
+      this.store.peek.set({ kind, id });
+    }
   }
 
   /** Send the draft to the server. */

@@ -53,6 +53,12 @@
       />
       <button type="button" class="btn btn--small" [attr.aria-label]="item.name + ' entfernen'" (click)="remove($index)">Entfernen</button>
     </div>
+    @if (hideable()) {
+      <label class="check">
+        <input type="checkbox" [ngModel]="!!item.hidden" (ngModelChange)="change($index, { hidden: $event })" />
+        Versteckt: Die Gruppe sieht diesen Gegenstand nicht, nur du und der Spielleiter
+      </label>
+    }
   </div>
 } @empty {
   <p class="soft">Noch nichts im Inventar.</p>

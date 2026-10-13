@@ -24,6 +24,10 @@
         />
       </div>
     }
+    <div class="field">
+      <span class="label">Symbol</span>
+      <app-symbol-picker fallback="quest" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
+    </div>
     <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
   </div>
 
@@ -51,30 +55,74 @@
   </div>
 
   <div class="panel">
+    <h2 class="subtitle">Dialoge</h2>
+    <p class="soft">Was zur Quest gesagt wird, zum Beispiel wie der Questgeber sie vergibt. Wer spricht, ist freiwillig.</p>
+    <app-dialogue-list-editor
+      [dialogues]="draft().dialogues"
+      [speakers]="store.npcOptions()"
+      (dialoguesChange)="set('dialogues', $event)"
+      (look)="lookUp('npcs', $event)"
+    />
+  </div>
+
+  <div class="panel">
     <h2 class="subtitle">Verknüpfungen</h2>
+    <p class="soft">Alles freiwillig, eine Quest braucht nur ihren Namen. Tippen sucht, Enter verknüpft.</p>
     <div class="field">
-      <label for="quest-location">Ort</label>
-      <app-id-select
-        inputId="quest-location"
-        emptyLabel="Kein Ort"
-        [options]="store.locationOptions()"
-        [value]="draft().location"
-        (valueChange)="set('location', $event)"
-      />
-    </div>
-    <div class="field">
-      <label for="quest-giver">Auftraggeber</label>
-      <app-id-select
+      <label for="quest-giver">Questgeber</label>
+      <app-link-picker
+        single
         inputId="quest-giver"
-        emptyLabel="Kein Auftraggeber"
+        label="Questgeber"
+        emptyText="Wer vergibt die Quest?"
         [options]="store.npcOptions()"
         [value]="draft().giver"
         (valueChange)="set('giver', $event)"
+        (look)="lookUp('npcs', $event)"
       />
     </div>
     <div class="field">
-      <span class="label">Beteiligte Figuren</span>
-      <app-link-picker label="Figuren" [options]="store.npcOptions()" [selected]="draft().npcs" (selectedChange)="set('npcs', $event)" />
+      <label for="quest-location">Startgebiet</label>
+      <app-link-picker
+        single
+        inputId="quest-location"
+        label="Startgebiet"
+        emptyText="Wo beginnt die Quest?"
+        [options]="store.locationOptions()"
+        [value]="draft().location"
+        (valueChange)="set('location', $event)"
+        (look)="lookUp('locations', $event)"
+      />
     </div>
+    <div class="field">
+      <label for="quest-scene">Entsteht in Szene</label>
+      <app-link-picker
+        single
+        inputId="quest-scene"
+        label="Szene, in der die Quest entsteht"
+        emptyText="In welcher Szene kommt die Quest auf?"
+        [options]="store.sceneOptions()"
+        [value]="draft().scene"
+        (valueChange)="set('scene', $event)"
+      />
+    </div>
+    <div class="field">
+      <label for="quest-npcs">Beteiligte Figuren</label>
+      <app-link-picker
+        inputId="quest-npcs"
+        label="Beteiligte Figuren"
+        emptyText="Wer spielt noch eine Rolle?"
+        [options]="store.npcOptions()"
+        [selected]="draft().npcs"
+        (selectedChange)="set('npcs', $event)"
+        (look)="lookUp('npcs', $event)"
+      />
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="subtitle">Gegenstände</h2>
+    <p class="soft">Belohnungen und alles, was zur Quest gehört. Das wird sofort gespeichert.</p>
+    <app-entry-items kind="quests" [entryId]="entry().id" />
   </div>
 </div>

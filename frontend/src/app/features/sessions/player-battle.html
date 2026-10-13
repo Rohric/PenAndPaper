@@ -6,29 +6,14 @@
       @if (error()) {
         <p class="notice notice--error" role="alert">{{ error() }}</p>
       }
-      @for (combatant of fight.combatants; track combatant.id) {
-        <div class="row row--between">
-          <span>
-            @if (combatant.id === fight.current) {
-              <span class="chip chip--accent">ist dran</span>
-            }
-            <strong>{{ combatant.name }}</strong>
-            @if (combatant.mine) {
-              <span class="soft">(du)</span>
-            }
-          </span>
-          <span class="row">
-            @if (combatant.has_parried) {
-              <span class="chip">hat pariert</span>
-            }
-            @if (combatant.out) {
-              <span class="chip chip--danger">kampfunfähig</span>
-            } @else if (combatant.life_points !== null) {
-              <span class="chip">LP {{ combatant.life_points }}</span>
-            }
-          </span>
-        </div>
-      }
+      <app-battle-timeline [entries]="timeline()" [current]="fight.current" />
+      <div class="row">
+        @for (combatant of fight.combatants; track combatant.id) {
+          @if (combatant.life_points !== null) {
+            <span class="chip" [class.chip--danger]="combatant.out">{{ combatant.name }} · LP {{ combatant.life_points }}</span>
+          }
+        }
+      </div>
     </div>
 
     @if (open(); as exchange) {
@@ -57,8 +42,29 @@
       </div>
     } @else if (myTurn()) {
       <div class="panel">
-        <h3 class="subtitle">Du bist dran</h3>
+        <div class="row row--between">
+          <h3 class="subtitle">Du bist dran</h3>
+          <div class="row" role="group" aria-label="Was du in deinem Zug tust">
+            <button type="button" class="pill" [attr.aria-pressed]="mode() === 'attack'" (click)="mode.set('attack')">
+              <app-icon name="sword" [size]="16" /> Angriff
+            </button>
+            <button type="button" class="pill" [attr.aria-pressed]="mode() === 'action'" (click)="mode.set('action')">
+              <app-icon name="speech" [size]="16" /> Andere Aktion
+            </button>
+          </div>
+        </div>
+        @if (mode() === 'action') {
+          <div class="field">
+            <label for="own-action">Was tust du</label>
+            <input id="own-action" class="input" placeholder="z. B. Ich mische eine Bombe" [ngModel]="actionLabel()" (ngModelChange)="actionLabel.set($event)" />
+          </div>
+          <label class="check">
+            <input type="checkbox" [ngModel]="actionRolls()" (ngModelChange)="actionRolls.set($event)" />
+            Dafür muss ich würfeln
+          </label>
+        }
         <div class="grid-fields">
+          @if (mode() === 'attack') {
           <div class="field">
             <label for="own-target">Ziel</label>
             <select id="own-target" class="input" [ngModel]="target()" (ngModelChange)="defenderId.set($event)">
@@ -68,8 +74,10 @@
               }
             </select>
           </div>
+          }
+          @if (mode() === 'attack' || actionRolls()) {
           <div class="field">
-            <label for="own-skill">Angriff mit</label>
+            <label for="own-skill">{{ mode() === 'attack' ? 'Angriff mit' : 'Probe auf' }}</label>
             <select id="own-skill" class="input" [ngModel]="skill()" (ngModelChange)="skill.set($event)">
               <option value="">Handeln · {{ actionValue() }}</option>
               @for (choice of skills(); track choice.name) {
@@ -77,6 +85,8 @@
               }
             </select>
           </div>
+          }
+          @if (mode() === 'attack') {
           <div class="field">
             <label for="own-weapon">Waffe</label>
             <select id="own-weapon" class="input" [ngModel]="weapon()" (ngModelChange)="weapon.set($event)">
@@ -86,13 +96,20 @@
               }
             </select>
           </div>
+          }
         </div>
         <div class="row">
-          <button type="button" class="btn btn--primary" [disabled]="target() === null" (click)="attack()">
-            <app-icon name="dice" /> Angriff würfeln
-          </button>
+          @if (mode() === 'attack') {
+            <button type="button" class="btn btn--primary" [disabled]="target() === null" (click)="attack()">
+              <app-icon name="dice" /> Angriff würfeln
+            </button>
+          } @else {
+            <button type="button" class="btn btn--primary" [disabled]="!actionLabel().trim()" (click)="act()">
+              <app-icon [name]="actionRolls() ? 'dice' : 'check'" /> {{ actionRolls() ? 'Probe würfeln' : 'Aktion ansagen' }}
+            </button>
+          }
         </div>
-        <p class="soft">Machst du etwas anderes als einen Angriff, sag es dem Spielleiter. Er gibt dann an den Nächsten weiter.</p>
+        <p class="soft">Angriff oder Aktion zählen erst, wenn der Spielleiter den Zug abschließt.</p>
       </div>
     }
 

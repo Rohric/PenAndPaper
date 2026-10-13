@@ -93,11 +93,19 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Optionale Szenen',
-        text: 'Unter dem Faden stehen die optionalen Szenen. Sie müssen nicht passieren. Du ziehst sie beim Spielen hinzu, wo sie passen.\n\nOb eine Szene am Faden hängt oder optional ist, stellst du im Formular der Szene mit einem Haken um.',
+        text: 'Unter dem Faden stehen die optionalen Szenen. Sie müssen nicht passieren. Du ziehst sie beim Spielen hinzu, wo sie passen.\n\nOb eine Szene am Faden hängt oder optional ist, stellst du beim Schreiben der Szene mit einem Haken um.',
       },
       {
         title: 'Was in einer Szene steht',
         text: 'Eine Szene hat einen Namen, einen Text für dich und einen Text zum Vorlesen. Der Vorlesetext wird abgesetzt dargestellt, damit du ihn am Tisch sofort findest.\n\nGespeichert wird die Szene in ihrem Kapitel.',
+      },
+      {
+        title: 'Schreiben wie auf einer Seite',
+        text: '„Schreiben“ öffnet die Szene wie eine Seite Text: Name, Ort, Figuren, Vorlesen, Was passiert, dann Ereignisse, Quests, Wissen und „Führt zu“.\n\nMit Tab springst du von Feld zu Feld. Einen Speichern-Knopf gibt es nicht: Kurz nach dem Tippen wird von selbst gespeichert, oben steht „Gespeichert“. „Fertig“ bringt dich zurück zum Lesen.',
+      },
+      {
+        title: 'Verknüpfen durch Tippen',
+        text: 'In einem Verknüpfungsfeld tippst du einfach los. Darunter erscheint, was passt. Mit den Pfeiltasten wählst du, Enter verknüpft, die Rücktaste im leeren Feld nimmt den letzten Eintrag wieder weg.\n\nGibt es den Eintrag noch nicht, steht unten „neu anlegen“. Ein Klick auf einen verknüpften Eintrag öffnet ihn rechts im Seitenfenster.',
       },
       {
         title: 'Verknüpfungen',
@@ -118,8 +126,16 @@ export const TUTORIALS: Tutorial[] = [
         text: 'Im Glossar steht alles, was es in deiner Welt gibt: Lore, Orte, Figuren, Quests, Ereignisse und Wissen.\n\nJeder Eintrag wird einmal angelegt und gehört zur Welt, nicht zu einem Kapitel.',
       },
       {
+        title: 'Kacheln und Seitenfenster',
+        text: 'Jeder Bereich zeigt seine Einträge als Kacheln. Ein Klick öffnet den Eintrag rechts im Seitenfenster, ohne dass du die Seite verlässt.\n\nIm Seitenfenster liest du, mit „Bearbeiten“ änderst du den Eintrag gleich dort, mit „Zurück“ gehst du den Weg durch verlinkte Einträge zurück, und „Ganze Seite“ öffnet den Eintrag groß.',
+      },
+      {
         title: 'Suchen',
-        text: 'Das Suchfeld sucht über alle Bereiche zugleich, in Namen und in Texten. Ein Klick auf einen Treffer öffnet den Eintrag.',
+        text: 'Das Suchfeld oben in der Leiste sucht in der ganzen Welt, in Namen und in Texten, egal auf welcher Seite du gerade bist. Tippen, mit den Pfeiltasten wählen, Enter: Der Eintrag öffnet sich im Seitenfenster.',
+      },
+      {
+        title: 'Gegenstände',
+        text: 'Unter „Gegenstände“ steht alles, was man in die Hand nehmen kann: die Gegenstände der Welt und was deine Figuren im Inventar tragen, mit „Getragen von“.\n\nEin Gegenstand der Welt ist ein Wissens-Eintrag der Kategorie „Gegenstand“. Du kannst ihn an Orte, Figuren und Quests hängen.',
       },
       {
         title: 'Kommt vor in',
@@ -222,7 +238,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Das Cockpit',
-        text: 'Oben liegt die Leiste mit den Werkzeugen: Kapitel wählen, Spieleransicht, Kampf, Notizen, Archiv und Kapitel abschließen.\n\nDarunter steht die Gruppe als Reihe von Kacheln, dann links der rote Faden und rechts die gewählte Szene mit ihren Ereignissen, darunter die Hauptquests, die offenen Nebenquests und die übrigen Ereignisse. Unten bleiben die Stecknadeln und der letzte Wurf stehen.',
+        text: 'Oben liegt die Leiste mit den Werkzeugen: Kapitel wählen, Spieleransicht, Glossar, Würfeln, Kampf, Notizen, Archiv, Kapitel abschließen und die Suche über die ganze Welt.\n\nDarunter steht die Gruppe als Reihe von Kacheln, dann links der rote Faden und rechts die gewählte Szene mit ihren Ereignissen und Dialogen, darunter die Hauptquests. „Nebenquests“ und „Freie Ereignisse“ stehen immer darunter, sind aber zugeklappt: Ein Klick auf die Überschrift öffnet sie. Unten bleiben die Stecknadeln und der letzte Wurf stehen.',
       },
       {
         title: 'Das Seitenfenster',
@@ -234,7 +250,19 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Was die Spieler sehen',
-        text: 'Öffne einen Eintrag und gib ihn für die Spieler frei. Dann sehen sie seinen Namen und seine Beschreibung in ihrem Glossar. Jedes Stück „Wissen für Spieler“ hakst du einzeln an, sobald sie es herausfinden.\n\nEine Quest teilst du genauso. Die Spieler sehen dann Beschreibung, Ziel, Checkliste und Auftraggeber. „Wissen nur für dich“ sehen sie nie.',
+        text: 'Öffne einen Eintrag: Im Seitenfenster steht der Block „Das sehen die Spieler“. Mit dem Haken dort erscheint der Eintrag im Glossar der Spieler. Darunter steht in Worten, was sie gerade davon haben: den Namen, die Beschreibung (falls eine geschrieben ist) und wie viele Stücke „Wissen für Spieler“.\n\nJedes Stück hakst du einzeln an, sobald sie es herausfinden. Hat ein Eintrag keine Beschreibung und kein angehaktes Wissen, sehen die Spieler nur den Namen; das Fenster warnt dich dann. „Wissen nur für dich“ sehen sie nie.\n\nEine Quest teilst du genauso. Die Spieler sehen dann Beschreibung, Ziel, Checkliste und Questgeber.',
+      },
+      {
+        title: 'Glossar und Suche',
+        text: '„Glossar“ zeigt dir die ganze Welt als Kacheln: Orte, Figuren, Quests, Ereignisse, Gegenstände und Wissen. Unter „Gegenstände“ steht auch, was die Charaktere der Gruppe und die Figuren tragen.\n\nMit der Suche in der Leiste findest du jeden Eintrag, ohne die Ansicht zu wechseln.',
+      },
+      {
+        title: 'Ändern: in der Runde oder in der Welt',
+        text: 'Im Seitenfenster einer Quest gibt es zwei Wege. „In dieser Runde ändern“ gilt nur für diese Gruppe: Name, Ziel, Questgeber, Startgebiet und die Szene, in der sie entsteht. Die Welt bleibt, wie sie ist.\n\n„In der Welt bearbeiten“ oben im Fenster ändert den Eintrag selbst, für alle Runden dieser Welt.\n\nUnter „Nebenquests“ legst du mitten im Spiel eine Quest nur mit ihrem Titel an. Sie hängt am Kapitel der Runde und ist sofort mit den Spielern geteilt.',
+      },
+      {
+        title: 'Würfeln',
+        text: '„Würfeln“ öffnet das Würfelfenster. Wähle einen Charakter der Gruppe oder eine Figur der Welt und klick auf einen ihrer Werte: Der Server würfelt einen W100 dagegen. Mit dem Haken „Heimlich“ sehen die Spieler den Wurf nicht.\n\nOhne Wert würfelst du frei: einen W100 oder 1 bis 10 W10.',
       },
       {
         title: 'Spieleransicht',
@@ -242,7 +270,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Die Gruppe',
-        text: 'Jeder Charakter ist eine Kachel zum Auf- und Zuklappen. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters. Aufgeklappt änderst du die Lebenspunkte, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Wissens-Einträge der Kategorie „Gegenstand“.',
+        text: 'Jeder Charakter ist eine Kachel zum Auf- und Zuklappen. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters. Aufgeklappt änderst du die Lebenspunkte, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Gegenstände der Welt; die der offenen Szene stehen in der Auswahl oben. Mit „Versteckt“ sehen nur dieser Spieler und du den Gegenstand im Glossar.',
       },
       {
         title: 'Notizen und Würfe',
@@ -251,6 +279,14 @@ export const TUTORIALS: Tutorial[] = [
       {
         title: 'Kampf',
         text: 'Nur du startest einen Kampf. „Kampf“ oben in der Leiste nimmt alle Charaktere der Runde. „Kampf in dieser Szene“ an der Szene nimmt zusätzlich alle Figuren der Szene mit. Läuft schon ein Kampf, kommen sie dazu.\n\nErst würfelst du die Initiative (1W10 plus Handeln), dann ist jeder der Reihe nach dran. Spieler würfeln ihren Angriff auf ihrer eigenen Seite, du kannst es auch für sie tun. Ihre Lebenspunkte sehen sie, die der Gegner nicht.',
+      },
+      {
+        title: 'Zeitleiste und Zustände',
+        text: 'Oben im Kampf steht die Zeitleiste: alle Teilnehmer als Portraits in der Reihenfolge ihrer Initiative. Wer dran ist, ist markiert; wer kampfunfähig ist, ist ausgegraut.\n\nEin Klick auf ein Portrait gibt oder nimmt Zustände, zum Beispiel „gefroren“ für zwei Züge. Ein Zustand mit „setzt aus“ lässt den Teilnehmer überspringen. Die Dauer zählt bei jedem eigenen Zug herunter, das Portrait färbt sich passend, und alles steht im Verlauf.',
+      },
+      {
+        title: 'Andere Aktion statt Angriff',
+        text: 'Wer dran ist, muss nicht angreifen. Mit „Andere Aktion“ hältst du fest, was jemand tut, zum Beispiel „mischt eine Bombe“. Braucht es einen Wurf, setz den Haken und wähle den Wert.\n\nAuch eine Aktion bleibt offen, bis du den Zug abschließt.',
       },
       {
         title: 'Wurf, Parade, Zug abschließen',
@@ -272,11 +308,11 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Charakter und Würfeln',
-        text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf.',
+        text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf.\n\nIm Reiter „Würfeln“ stehen deine Werte als Knöpfe, dazu freie Würfel ohne Wert (W100 oder 1 bis 10 W10) und die letzten Würfe der Runde.',
       },
       {
         title: 'Quests und Glossar',
-        text: 'Hier steht nur, was der Spielleiter mit euch geteilt hat. Das Glossar wächst, während ihr spielt: Orte, Figuren und Wissen kommen dazu, sobald ihr sie entdeckt.',
+        text: 'Hier steht nur, was der Spielleiter mit euch geteilt hat. Das Glossar wächst, während ihr spielt: Orte, Figuren und Wissen kommen dazu, sobald ihr sie entdeckt. Ein Klick auf eine Kachel öffnet alles, was ihr dazu wisst.\n\nUnter „Gegenstände“ steht auch die Ausrüstung der Gruppe mit „Getragen von“. Einen Gegenstand, den du in deinem Charakterbogen als versteckt markierst, sehen nur du und der Spielleiter.',
       },
       {
         title: 'Notizen',
@@ -288,7 +324,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Kampf',
-        text: 'Startet der Spielleiter einen Kampf, zeigt der Reiter „Kampf“ die Reihenfolge, wer dran ist und was passiert ist. Von deiner Gruppe siehst du die Lebenspunkte, von Gegnern nicht.\n\nBist du dran, wählst du Ziel, Fähigkeit und Waffe und würfelst den Angriff. Wirst du getroffen, entscheidest du, ob du parierst. Das geht einmal pro Runde. Deine letzte Auswahl bleibt gemerkt.\n\nEin Wurf zählt erst, wenn der Spielleiter den Zug abschließt.',
+        text: 'Startet der Spielleiter einen Kampf, zeigt der Reiter „Kampf“ die Zeitleiste: wer in welcher Reihenfolge dran ist, wer aussetzt und wer kampfunfähig ist. Von deiner Gruppe siehst du die Lebenspunkte, von Gegnern nicht.\n\nBist du dran, greifst du an (Ziel, Fähigkeit, Waffe) oder machst mit „Andere Aktion“ etwas anderes, mit oder ohne Wurf. Wirst du getroffen, entscheidest du, ob du parierst. Das geht einmal pro Runde. Deine letzte Auswahl bleibt gemerkt.\n\nNichts zählt, bevor der Spielleiter den Zug abschließt.',
       },
     ],
   },
@@ -302,7 +338,11 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Verknüpfungen',
-        text: 'Eine Quest kann einen Ort, einen Auftraggeber und beteiligte Figuren haben.\n\nIn welchem Kapitel sie vorkommt, legst du im Kapitel fest. Szenen können ebenfalls auf sie verweisen.',
+        text: 'Pflicht ist nur der Name. Alles andere ist freiwillig: Questgeber, Startgebiet, die Szene, in der die Quest entsteht, beteiligte Figuren und Gegenstände.\n\nIn welchem Kapitel sie vorkommt, legst du im Kapitel fest. Szenen können ebenfalls auf sie verweisen. Eine Quest, die in einer Szene entsteht, gehört von selbst zum Kapitel dieser Szene.',
+      },
+      {
+        title: 'Die Quest-Kachel',
+        text: 'Eine Quest-Kachel zeigt Art und Nummer, das Ziel, die Zahl der Schritte und als Marken alles Verknüpfte: Questgeber, Startgebiet, Szene, Figuren, Gegenstände. Ein Klick auf eine Marke öffnet den Eintrag im Seitenfenster.',
       },
     ],
   },
@@ -334,11 +374,11 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Kategorie',
-        text: 'Die Kategorie ist freier Text. Schreib „Tier“, „Gegenstand“ oder was dir hilft. Einträge mit derselben Kategorie stehen in der Liste zusammen.',
+        text: 'Die Kategorie ist freier Text. Schreib „Tier“, „Volk“ oder was dir hilft. Einträge mit derselben Kategorie stehen zusammen.\n\nDie Kategorie „Gegenstand“ ist besonders: Solche Einträge stehen im Glossar unter „Gegenstände“ und lassen sich in einer Runde an Charaktere übergeben.',
       },
       {
         title: 'Allein oder angehängt',
-        text: 'Ein Wissens-Eintrag kann für sich stehen. Du kannst ihn aber auch an Orte, Figuren, Quests und Ereignisse hängen, dann erscheint er dort unter „Wissen“.\n\nSzenen können ebenfalls auf Wissen verweisen.',
+        text: 'Ein Wissens-Eintrag kann für sich stehen. Du kannst ihn aber auch an Orte, Figuren, Quests und Ereignisse hängen, dann erscheint er dort unter „Wissen“, ein Gegenstand unter „Gegenstände“.\n\nSzenen können ebenfalls auf Wissen verweisen.',
       },
     ],
   },

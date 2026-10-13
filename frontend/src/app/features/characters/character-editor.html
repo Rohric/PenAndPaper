@@ -4,6 +4,23 @@
       <label for="character-name">Name</label>
       <input id="character-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
     </div>
+    <div class="field">
+      <span class="label">Symbol und Bild</span>
+      <app-symbol-picker fallback="sheet" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
+      <div class="row">
+        <span class="picture-slot"><app-icon name="image" [size]="20" /> Bild folgt</span>
+        <label class="check">
+          <input
+            type="checkbox"
+            [disabled]="!draft().image"
+            [checked]="draft().shows_image"
+            (change)="set('shows_image', $any($event.target).checked)"
+          />
+          Bild statt Symbol zeigen
+        </label>
+      </div>
+      <span class="soft">Ein Bild lässt sich hier noch nicht hochladen. Bis dahin steht überall das Symbol.</span>
+    </div>
     <div class="row">
       <button type="button" class="btn btn--primary" [disabled]="!dirty() || busy() || !draft().name.trim()" (click)="save()">
         Speichern
@@ -109,7 +126,7 @@
 
   <div class="panel">
     <h2 class="subtitle">Inventar und Waffen</h2>
-    <app-inventory-editor [items]="draft().inventory" (itemsChange)="set('inventory', $event)" />
+    <app-inventory-editor [items]="draft().inventory" [hideable]="!isNpc()" (itemsChange)="set('inventory', $event)" />
   </div>
 
   <div class="panel">

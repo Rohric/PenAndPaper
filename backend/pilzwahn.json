@@ -2470,10 +2470,6 @@
           "text": "Begegnung"
         },
         {
-          "title": "Was passiert",
-          "text": "Ein Bär mit fast durchtrenntem Hals frisst Leichen mit Skalden-Abzeichen."
-        },
-        {
           "title": "Folgen",
           "text": "Erster Hinweis auf Wesen, die nicht sterben."
         },
@@ -2482,6 +2478,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Ein Bär mit fast durchtrenntem Hals frisst Leichen mit Skalden-Abzeichen.",
       "location": "Der Rastplatz am Waldrand"
     },
     {
@@ -2494,10 +2492,6 @@
           "text": "Hintergrund"
         },
         {
-          "title": "Was passiert",
-          "text": "Der Bruder des Jarls kommt nur als Kopf mit Botschaft zurück."
-        },
-        {
           "title": "Folgen",
           "text": "Der Jarl ruft zum Krieg."
         },
@@ -2506,6 +2500,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Der Bruder des Jarls kommt nur als Kopf mit Botschaft zurück.",
       "location": "Skaldeby"
     },
     {
@@ -2518,10 +2514,6 @@
           "text": "Wendepunkt"
         },
         {
-          "title": "Was passiert",
-          "text": "Die Helden widersprechen dem Jarl."
-        },
-        {
           "title": "Folgen",
           "text": "Er schickt sie als Bierhändler nach Björnsvig."
         },
@@ -2530,6 +2522,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Die Helden widersprechen dem Jarl.",
       "location": "Das Langhaus von Skaldeby"
     },
     {
@@ -2542,10 +2536,6 @@
           "text": "Begegnung"
         },
         {
-          "title": "Was passiert",
-          "text": "Krieger aus Helheim, viel zu weit im Inland, sterben erst ohne Kopf."
-        },
-        {
           "title": "Folgen",
           "text": "Zweiter Hinweis."
         },
@@ -2554,6 +2544,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Krieger aus Helheim, viel zu weit im Inland, sterben erst ohne Kopf.",
       "location": "Die Straße nach Björnsvig"
     },
     {
@@ -2566,10 +2558,6 @@
           "text": "Gefahr"
         },
         {
-          "title": "Was passiert",
-          "text": "Attentäter in alten Björnsvikinger-Rüstungen."
-        },
-        {
           "title": "Folgen",
           "text": "Die Helden glauben, Björnsvig wolle sie tot sehen."
         },
@@ -2578,6 +2566,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Attentäter in alten Björnsvikinger-Rüstungen.",
       "location": "Das Bauernfeld vor der Stadt"
     },
     {
@@ -2590,10 +2580,6 @@
           "text": "Wendepunkt"
         },
         {
-          "title": "Was passiert",
-          "text": "Jarl Rotbart stirbt an ihrem Bier, Rauch, die Helden voller Blut."
-        },
-        {
           "title": "Folgen",
           "text": "Sie werden als Mörder verhaftet."
         },
@@ -2602,6 +2588,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Jarl Rotbart stirbt an ihrem Bier, Rauch, die Helden voller Blut.",
       "location": "Der Festplatz"
     },
     {
@@ -2614,10 +2602,6 @@
           "text": "Wendepunkt"
         },
         {
-          "title": "Was passiert",
-          "text": "Der Druide verletzt Jira und befiehlt den Angriff."
-        },
-        {
           "title": "Folgen",
           "text": "Björnsvig brennt."
         },
@@ -2626,6 +2610,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Der Druide verletzt Jira und befiehlt den Angriff.",
       "location": "Björnsvig"
     },
     {
@@ -2638,10 +2624,6 @@
           "text": "Wendepunkt"
         },
         {
-          "title": "Was passiert",
-          "text": "Der Druide flieht auf einer Bestie nach Drakkarheim."
-        },
-        {
           "title": "Folgen",
           "text": "Die Helden folgen."
         },
@@ -2650,6 +2632,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Der Druide flieht auf einer Bestie nach Drakkarheim.",
       "location": "Björnsvig"
     },
     {
@@ -2662,10 +2646,6 @@
           "text": "Wendepunkt"
         },
         {
-          "title": "Was passiert",
-          "text": "Pilzsud im Brunnen, die Stadt zerfleischt sich."
-        },
-        {
           "title": "Folgen",
           "text": "Jarl Reiner und Astrid sterben, die Schiffe sind zerstört."
         },
@@ -2674,6 +2654,8 @@
           "text": "ausgelöst"
         }
       ],
+      "trigger": "",
+      "happening": "Pilzsud im Brunnen, die Stadt zerfleischt sich.",
       "location": "Der Brunnen von Drakkarheim"
     },
     {
@@ -2686,14 +2668,6 @@
           "text": "Gefahr · Tag 2"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler in der Hafenstadt unterwegs sind."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Ein Wirt hat es durch den Schmugglergang in die Hafenstadt geschafft. Er versteckt sich zwischen den Flüchtlingen. Noch hat er niemanden angegriffen."
-        },
-        {
           "title": "Folgen",
           "text": "Finden die Spieler ihn diskret, bekommen sie die Audienz bei Bjarki. Sonst bricht Panik aus, und Bjarki lässt alle Flüchtlinge einsperren."
         },
@@ -2702,6 +2676,8 @@
           "text": "Hafenstadt, Schmugglergang · Figuren: Hallvard, Sigrun, Wirte · Quests: Sich beweisen, Der Schwarzmarkt"
         }
       ],
+      "trigger": "die Spieler in der Hafenstadt unterwegs sind.",
+      "happening": "Ein Wirt hat es durch den Schmugglergang in die Hafenstadt geschafft. Er versteckt sich zwischen den Flüchtlingen. Noch hat er niemanden angegriffen.",
       "location": "Die Hafenstadt"
     },
     {
@@ -2714,14 +2690,6 @@
           "text": "Atmosphäre · Tag 2"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler nachts an der Brücke sind oder in der Nähe schlafen."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Die Wirte testen die Ketten der Zugbrücke."
-        },
-        {
           "title": "Folgen",
           "text": "Die Wachen werden nervöser. Die Brücke hält nicht ewig."
         },
@@ -2730,6 +2698,8 @@
           "text": "Zugbrücke · Quests: Die Brücke halten"
         }
       ],
+      "trigger": "die Spieler nachts an der Brücke sind oder in der Nähe schlafen.",
+      "happening": "Die Wirte testen die Ketten der Zugbrücke.",
       "location": "Die Zugbrücke"
     },
     {
@@ -2742,14 +2712,6 @@
           "text": "Wendepunkt · Tag 3"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "in der Nacht von Tag 3."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Der Alchemist lässt im Klippenhafen ein Schiff zu Wasser und segelt nach Ulmar. Wer am Haupttor Ausschau hält, sieht ein Schiff ohne Licht unter den Klippen hervorgleiten."
-        },
-        {
           "title": "Folgen",
           "text": "Ab jetzt ist er weg. Sind die Spieler schon in der Wolfshalle, gibt es eine Verfolgung zum Klippenhafen. Er entkommt knapp."
         },
@@ -2758,6 +2720,8 @@
           "text": "Klippenhafen, Haupttor · Figuren: Alchemist · Quests: Dem Alchemisten auf der Spur"
         }
       ],
+      "trigger": "in der Nacht von Tag 3.",
+      "happening": "Der Alchemist lässt im Klippenhafen ein Schiff zu Wasser und segelt nach Ulmar. Wer am Haupttor Ausschau hält, sieht ein Schiff ohne Licht unter den Klippen hervorgleiten.",
       "location": "Der Klippenhafen"
     },
     {
@@ -2770,14 +2734,6 @@
           "text": "Begegnung · Tag 4"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler in den Gassen unterwegs sind."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Bjarkis Wachen haben Eyvinds Versteck gefunden und jagen ihn durch die Gassen. Er rennt den Spielern direkt in die Arme."
-        },
-        {
           "title": "Folgen",
           "text": "Retten die Spieler ihn, haben sie einen dankbaren Informanten. Sonst wird er an Tag 5 gehängt."
         },
@@ -2786,6 +2742,8 @@
           "text": "Hafenstadt · Figuren: Eyvind · Quests: Der Wachsfinger"
         }
       ],
+      "trigger": "die Spieler in den Gassen unterwegs sind.",
+      "happening": "Bjarkis Wachen haben Eyvinds Versteck gefunden und jagen ihn durch die Gassen. Er rennt den Spielern direkt in die Arme.",
       "location": "Die Hafenstadt"
     },
     {
@@ -2798,14 +2756,6 @@
           "text": "Wendepunkt · Tag 6"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "am Morgen von Tag 6."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Großangriff der Wirte auf die Zugbrücke. Bjarki befiehlt, die Ketten zu kappen."
-        },
-        {
           "title": "Folgen",
           "text": "Ohne Eingreifen stürzt die Brücke in die Schlucht. Mit Grimurs Wissen über das schwache Glied lässt sie sich halten oder gezielt kappen."
         },
@@ -2814,6 +2764,8 @@
           "text": "Zugbrücke · Figuren: Bjarki, Grimur, Wirte · Quests: Die Brücke halten"
         }
       ],
+      "trigger": "am Morgen von Tag 6.",
+      "happening": "Großangriff der Wirte auf die Zugbrücke. Bjarki befiehlt, die Ketten zu kappen.",
       "location": "Die Zugbrücke"
     },
     {
@@ -2826,14 +2778,6 @@
           "text": "Wendepunkt · Tag 8"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Lage in der Hafenstadt verzweifelt ist."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Bjarki öffnet heimlich seinen beschlagnahmten Pilzvorrat für die eigene Garde."
-        },
-        {
           "title": "Folgen",
           "text": "Auch die Hafenstadt beginnt zu kippen. Hallvard sucht Verbündete, vielleicht die Spieler."
         },
@@ -2842,6 +2786,8 @@
           "text": "Bärenhalle · Figuren: Bjarki, Hallvard · Quests: Sich beweisen"
         }
       ],
+      "trigger": "die Lage in der Hafenstadt verzweifelt ist.",
+      "happening": "Bjarki öffnet heimlich seinen beschlagnahmten Pilzvorrat für die eigene Garde.",
       "location": "Die Bärenhalle"
     },
     {
@@ -2854,14 +2800,6 @@
           "text": "Wendepunkt · Tag 10"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler die Wolfshalle bis Tag 10 nicht erreicht haben."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Ulfr ist ganz verwandelt."
-        },
-        {
           "title": "Folgen",
           "text": "Infos über Ulmar gibt es nur noch aus dem Labor."
         },
@@ -2870,6 +2808,8 @@
           "text": "Wolfshalle · Figuren: Ulfr · Quests: Dem Alchemisten auf der Spur, Bringt ihn mir lebend"
         }
       ],
+      "trigger": "die Spieler die Wolfshalle bis Tag 10 nicht erreicht haben.",
+      "happening": "Ulfr ist ganz verwandelt.",
       "location": "Die Wolfshalle"
     },
     {
@@ -2882,14 +2822,6 @@
           "text": "Begegnung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler am Haupttor sind oder kurz danach."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Eine Familie aus der Klippenstadt ist mit einem Fluchtboot gestrandet und fleht um Einlass. Die Wache verweigert ihn. Einer von ihnen trägt seinen Schal ungewöhnlich hoch."
-        },
-        {
           "title": "Folgen",
           "text": "Lassen die Spieler sie rein, ist einer ein frischer Wirt. Bleiben sie draußen, hören alle in der Nacht die Schreie."
         },
@@ -2898,6 +2830,8 @@
           "text": "Haupttor, Wrackstrand · Figuren: Kalle"
         }
       ],
+      "trigger": "die Spieler am Haupttor sind oder kurz danach.",
+      "happening": "Eine Familie aus der Klippenstadt ist mit einem Fluchtboot gestrandet und fleht um Einlass. Die Wache verweigert ihn. Einer von ihnen trägt seinen Schal ungewöhnlich hoch.",
       "location": "Das Haupttor"
     },
     {
@@ -2910,14 +2844,6 @@
           "text": "Versuchung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "Kalle mit den Spielern Wache hält oder in Gefahr gerät."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Kalle holt die Pilzknolle aus der Tasche. Seine Hände zittern."
-        },
-        {
           "title": "Folgen",
           "text": "Halten die Spieler ihn ab, haben sie einen Freund fürs Leben. Wenn nicht, sehen sie zum ersten Mal den Rausch aus der Nähe."
         },
@@ -2926,6 +2852,8 @@
           "text": "Haupttor · Figuren: Kalle"
         }
       ],
+      "trigger": "Kalle mit den Spielern Wache hält oder in Gefahr gerät.",
+      "happening": "Kalle holt die Pilzknolle aus der Tasche. Seine Hände zittern.",
       "location": "Das Haupttor"
     },
     {
@@ -2938,14 +2866,6 @@
           "text": "Begegnung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler sich in der Hafenstadt sicher fühlen."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Dieselbe unscheinbare Gestalt taucht an drei verschiedenen Orten hinter ihnen auf. Es ist einer von Sigruns Spitzeln."
-        },
-        {
           "title": "Folgen",
           "text": "Stellen die Spieler ihn, weiß Sigrun, dass sie aufmerksam sind, und rückt mit mehr Wissen heraus."
         },
@@ -2954,6 +2874,8 @@
           "text": "Hafenstadt · Figuren: Sigrun · Quests: Der Schwarzmarkt"
         }
       ],
+      "trigger": "die Spieler sich in der Hafenstadt sicher fühlen.",
+      "happening": "Dieselbe unscheinbare Gestalt taucht an drei verschiedenen Orten hinter ihnen auf. Es ist einer von Sigruns Spitzeln.",
       "location": "Die Hafenstadt"
     },
     {
@@ -2966,14 +2888,6 @@
           "text": "Begegnung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Spieler dem Schwarzmarkt nachgehen."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Nach Mitternacht hinter dem Halben Horn: Ketill verkauft Knollen an zitternde Flüchtlinge. Die Ware hat er eben aus dem Keller geholt."
-        },
-        {
           "title": "Folgen",
           "text": "Folgen die Spieler ihm, führt die Spur direkt zur Falltür."
         },
@@ -2982,6 +2896,8 @@
           "text": "Halbes Horn · Figuren: Ketill°, Tove · Quests: Der Schwarzmarkt"
         }
       ],
+      "trigger": "die Spieler dem Schwarzmarkt nachgehen.",
+      "happening": "Nach Mitternacht hinter dem Halben Horn: Ketill verkauft Knollen an zitternde Flüchtlinge. Die Ware hat er eben aus dem Keller geholt.",
       "location": "Taverne Halbes Horn"
     },
     {
@@ -2994,14 +2910,6 @@
           "text": "Atmosphäre · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "nachts im Halben Horn."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Ylva murmelt im Schlaf: „Er hat dasselbe Gesicht. Er schreit, und keiner hört ihn.“ Am Morgen weiß sie nichts davon."
-        },
-        {
           "title": "Folgen",
           "text": "Erster Hinweis auf den Träumer."
         },
@@ -3010,6 +2918,8 @@
           "text": "Halbes Horn · Figuren: Ylva"
         }
       ],
+      "trigger": "nachts im Halben Horn.",
+      "happening": "Ylva murmelt im Schlaf: „Er hat dasselbe Gesicht. Er schreit, und keiner hört ihn.“ Am Morgen weiß sie nichts davon.",
       "location": "Taverne Halbes Horn"
     },
     {
@@ -3022,14 +2932,6 @@
           "text": "Begegnung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "die Stimmung einen Lichtblick braucht oder die Spieler Toves Vertrauen gewinnen sollen."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Ein Bürger beschimpft die Flüchtlinge als Pilzfresser. Krüge fliegen."
-        },
-        {
           "title": "Folgen",
           "text": "Schaffen die Spieler Ordnung, öffnet Tove sich ihnen und verweist auf den Wachsfinger."
         },
@@ -3038,6 +2940,8 @@
           "text": "Halbes Horn · Figuren: Tove, Bersi · Quests: Der Wachsfinger"
         }
       ],
+      "trigger": "die Stimmung einen Lichtblick braucht oder die Spieler Toves Vertrauen gewinnen sollen.",
+      "happening": "Ein Bürger beschimpft die Flüchtlinge als Pilzfresser. Krüge fliegen.",
       "location": "Taverne Halbes Horn"
     },
     {
@@ -3050,14 +2954,6 @@
           "text": "Begegnung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "beim ersten großen Kampf in der Klippenstadt."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Unter den Wirten kämpft einer mit einem Schild, das Sigruns Familienzeichen trägt."
-        },
-        {
           "title": "Folgen",
           "text": "Töten, K.o. schlagen oder fliehen? Was die Spieler Sigrun später erzählen, entscheidet über ihre Freundschaft."
         },
@@ -3066,6 +2962,8 @@
           "text": "Senke · Figuren: Arni, Sigrun · Quests: Sigruns Bruder"
         }
       ],
+      "trigger": "beim ersten großen Kampf in der Klippenstadt.",
+      "happening": "Unter den Wirten kämpft einer mit einem Schild, das Sigruns Familienzeichen trägt.",
       "location": "Die Senke"
     },
     {
@@ -3078,14 +2976,6 @@
           "text": "Versuchung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "ein Spieler verletzt oder erschöpft ist."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Frische Pilze, weiß und prall, zwischen den Pflastersteinen. Sie riechen süßlich nach Kraft."
-        },
-        {
           "title": "Folgen",
           "text": "Wer nimmt, erlebt den Rausch: Stärke und der Blick von außen auf sich selbst. Und den Wunsch nach mehr."
         },
@@ -3094,6 +2984,8 @@
           "text": "Senke"
         }
       ],
+      "trigger": "ein Spieler verletzt oder erschöpft ist.",
+      "happening": "Frische Pilze, weiß und prall, zwischen den Pflastersteinen. Sie riechen süßlich nach Kraft.",
       "location": "Die Senke"
     },
     {
@@ -3106,14 +2998,6 @@
           "text": "Gefahr · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "auf halbem Weg durch den Schmugglergang."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Ein Stützbalken bricht, Geröll rutscht nach. Hinter den Spielern ist der Rückweg verschüttet."
-        },
-        {
           "title": "Folgen",
           "text": "Zurück zur Hafenstadt geht es nur noch über die Brücke oder den Wolfspass."
         },
@@ -3122,6 +3006,8 @@
           "text": "Schmugglergang · Figuren: Eyvind"
         }
       ],
+      "trigger": "auf halbem Weg durch den Schmugglergang.",
+      "happening": "Ein Stützbalken bricht, Geröll rutscht nach. Hinter den Spielern ist der Rückweg verschüttet.",
       "location": "Der Schmugglergang"
     },
     {
@@ -3134,14 +3020,6 @@
           "text": "Begegnung · frei"
         },
         {
-          "title": "Einsetzen, wenn",
-          "text": "auf dem Wolfspass, in der ersten Nacht."
-        },
-        {
-          "title": "Was passiert",
-          "text": "Ein ausgehungerter Bär, angelockt vom Geruch der Wirte, die den Pass ebenfalls nutzen."
-        },
-        {
           "title": "Folgen",
           "text": "Kampf oder Umweg. Der Umweg kostet einen halben Tag."
         },
@@ -3150,6 +3028,8 @@
           "text": "Wolfspass"
         }
       ],
+      "trigger": "auf dem Wolfspass, in der ersten Nacht.",
+      "happening": "Ein ausgehungerter Bär, angelockt vom Geruch der Wirte, die den Pass ebenfalls nutzen.",
       "location": "Der Wolfspass"
     }
   ],

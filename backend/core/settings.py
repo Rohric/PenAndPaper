@@ -111,6 +111,10 @@ USE_TZ = True
 # Static files
 STATIC_URL = "static/"
 
+# Uploaded pictures of characters, places and items
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Email (console backend, the app sends no mail yet)
 MAILERS = {
     "default": {

@@ -1,6 +1,6 @@
 @if (shows().group) {
   <div class="panel">
-    <h3 class="subtitle">Gruppe</h3>
+    <h3 class="section-title"><app-icon name="group" /> Gruppe</h3>
     @for (member of view().group; track member.id) {
       <div class="row row--between">
         <span><strong>{{ member.name }}</strong> <span class="soft">({{ member.player }})</span></span>
@@ -13,54 +13,140 @@
 }
 
 @if (shows().quests) {
-  <div class="panel">
-    <h3 class="subtitle">Quests</h3>
-    @for (quest of quests(); track quest.id) {
-      <article class="knowledge">
-        <span class="kicker">{{ quest.main ? 'Hauptquest' + (quest.number ? ' ' + quest.number : '') : 'Nebenquest' }}{{ quest.done ? ' · erledigt' : '' }}</span>
-        <strong>{{ quest.name }}</strong>
-        @if (quest.giver) {
-          <span class="soft">Auftraggeber: {{ quest.giver }}</span>
+  <section class="stack">
+    <h3 class="section-title"><app-icon name="quest" /> Quests</h3>
+    <div class="tiles tiles--wide">
+      @for (quest of quests(); track quest.id) {
+        <button type="button" class="tile" [class.tile--done]="quest.done" (click)="openKey.set('quest:' + quest.id)">
+          <span class="tile__head">
+            <app-portrait fallback="quest" [symbol]="quest.symbol" [size]="36" />
+            <span class="tile__names">
+              <span class="kicker">{{ kicker(quest) }}</span>
+              <span class="tile__title">{{ quest.name }}</span>
+            </span>
+          </span>
+          @if (quest.goal) {
+            <span class="soft clamp"><strong>Ziel:</strong> {{ quest.goal }}</span>
+          }
+          <span class="row">
+            @if (quest.giver) {
+              <span class="chip">Questgeber · {{ quest.giver }}</span>
+            }
+            @if (quest.checklist.length) {
+              <span class="chip">{{ stepsDone(quest) }} von {{ quest.checklist.length }} Schritten</span>
+            }
+          </span>
+        </button>
+      } @empty {
+        <p class="soft">Noch keine Quest geteilt.</p>
+      }
+    </div>
+  </section>
+}
+
+@if (shows().glossary) {
+  @for (section of sections(); track section.label) {
+    <section class="stack">
+      <h3 class="section-title"><app-icon [name]="section.icon" /> {{ section.label }}</h3>
+      <div class="tiles">
+        @for (card of section.cards; track card.key) {
+          <button type="button" class="tile" (click)="openKey.set(card.key)">
+            <span class="tile__head">
+              <app-portrait [symbol]="card.symbol" [fallback]="card.fallback" [size]="36" />
+              <span class="tile__names">
+                @if (card.kicker) {
+                  <span class="kicker">{{ card.kicker }}</span>
+                }
+                <span class="tile__title">{{ card.title }}</span>
+              </span>
+            </span>
+            <span class="soft clamp">{{ card.text || nothingMore }}</span>
+          </button>
         }
-        @if (quest.description) {
-          <p class="prose">{{ quest.description }}</p>
-        }
-        @if (quest.goal) {
-          <p class="prose"><span class="soft">Ziel:</span> {{ quest.goal }}</p>
-        }
-        @if (quest.checklist.length) {
+      </div>
+    </section>
+  } @empty {
+    <div class="empty">
+      <p>Noch nichts im Glossar. Es füllt sich, während ihr spielt.</p>
+    </div>
+  }
+}
+
+@if (openQuest(); as quest) {
+  <app-side-panel title="Quest" (closed)="openKey.set(null)">
+    <article class="panel">
+      <span class="kicker">{{ kicker(quest) }}</span>
+      <h2 class="subtitle">{{ quest.name }}</h2>
+      @if (quest.giver) {
+        <p class="soft">Questgeber: {{ quest.giver }}</p>
+      }
+      @if (quest.description) {
+        <p class="prose">{{ quest.description }}</p>
+      }
+      @if (quest.goal) {
+        <div class="field">
+          <span class="label">Ziel</span>
+          <p class="prose">{{ quest.goal }}</p>
+        </div>
+      }
+      @if (quest.checklist.length) {
+        <div class="field">
+          <span class="label">Schritte</span>
           <ul class="plain-list">
             @for (step of quest.checklist; track $index) {
               <li>{{ step.done ? '☑' : '☐' }} {{ step.text }}</li>
             }
           </ul>
-        }
-        @for (piece of quest.knowledge; track $index) {
-          <p class="prose">{{ piece.title ? piece.title + ': ' : '' }}{{ piece.text }}</p>
-        }
-      </article>
-    } @empty {
-      <p class="soft">Noch keine Quest geteilt.</p>
-    }
-  </div>
+        </div>
+      }
+      @for (piece of quest.knowledge; track $index) {
+        <div class="knowledge">
+          @if (piece.title) {
+            <span class="kicker">{{ piece.title }}</span>
+          }
+          <p class="prose">{{ piece.text }}</p>
+        </div>
+      }
+    </article>
+  </app-side-panel>
 }
 
-@if (shows().glossary) {
-  <div class="panel">
-    <h3 class="subtitle">Glossar</h3>
-    @for (entry of view().glossary; track entry.kind + entry.id) {
-      <article class="knowledge">
-        <span class="kicker">{{ entry.category || labels[entry.kind] }}</span>
-        <strong>{{ entry.name }}</strong>
-        @if (entry.description) {
+@if (openCard(); as card) {
+  <app-side-panel title="Glossar" (closed)="openKey.set(null)">
+    <article class="panel">
+      <div class="tile__head">
+        <app-portrait [symbol]="card.symbol" [fallback]="card.fallback" [size]="52" />
+        <div>
+          @if (card.kicker) {
+            <span class="kicker">{{ card.kicker }}</span>
+          }
+          <h2 class="subtitle">{{ card.title }}</h2>
+        </div>
+      </div>
+      @if (card.item; as item) {
+        @if (item.text) {
+          <p class="prose">{{ item.text }}</p>
+        }
+        @if (item.hidden) {
+          <p class="soft"><app-icon name="lock" [size]="14" /> Versteckt: Das sehen nur du und der Spielleiter.</p>
+        }
+      }
+      @if (card.entry; as entry) {
+        @if (entry.description && entry.description !== card.item?.text) {
           <p class="prose">{{ entry.description }}</p>
         }
         @for (piece of entry.knowledge; track $index) {
-          <p class="prose">{{ piece.title ? piece.title + ': ' : '' }}{{ piece.text }}</p>
+          <div class="knowledge">
+            @if (piece.title) {
+              <span class="kicker">{{ piece.title }}</span>
+            }
+            <p class="prose">{{ piece.text }}</p>
+          </div>
         }
-      </article>
-    } @empty {
-      <p class="soft">Noch nichts im Glossar.</p>
-    }
-  </div>
+      }
+      @if (!card.text && !card.entry?.knowledge?.length) {
+        <p class="soft">{{ nothingMore }}</p>
+      }
+    </article>
+  </app-side-panel>
 }

@@ -4,7 +4,7 @@ import { Observable, forkJoin, tap } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { ApiService } from '../../core/api.service';
 import {
-  Chapter, EntryRef, EntryTexts, Location, Option, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, questLabel,
+  Chapter, EntryTexts, Location, Option, Peek, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, questLabel,
 } from '../../core/models';
 
 /** The lists inside a world, named like their part of the API address. */
@@ -63,9 +63,11 @@ export class WorldStore {
   readonly scenes = signal<Scene[]>([]);
   readonly error = signal('');
   /** The entry that is looked up in the side panel, without leaving the page. */
-  readonly peek = signal<EntryRef | null>(null);
+  readonly peek = signal<Peek | null>(null);
   /** Set by a session: how a scene is opened there, instead of going to its chapter page. */
   openScene: ((sceneId: number) => void) | null = null;
+  /** Set by a session: what it has different about a quest. While the world is written, nothing. */
+  questChanges: (questId: number) => Partial<Quest> = () => ({});
 
   readonly locationOptions = computed<Option[]>(() =>
     this.locations().map((l) => ({ id: l.id, label: l.name, hint: this.parentHint(l) || excerpt(l) })),
@@ -78,6 +80,10 @@ export class WorldStore {
   readonly eventOptions = computed<Option[]>(() => this.events().map((e) => ({ id: e.id, label: e.name, hint: excerpt(e) })));
   readonly triviaOptions = computed<Option[]>(() =>
     this.trivia().map((t) => ({ id: t.id, label: t.name, hint: [t.category, excerpt(t)].filter(Boolean).join(' · ') })),
+  );
+  /** Every scene of the world, with its chapter as a hint. */
+  readonly sceneOptions = computed<Option[]>(() =>
+    this.scenes().map((scene) => ({ id: scene.id, label: scene.name, hint: this.chapterHint(scene) })),
   );
 
   private readonly lists: Record<Kind, WritableSignal<Entry[]>> = {
@@ -150,6 +156,16 @@ export class WorldStore {
   /** The scenes of one chapter in their order. */
   scenesOf(chapterId: number): Scene[] {
     return this.scenes().filter((scene) => scene.chapter === chapterId);
+  }
+
+  /** A quest as it counts right now: in a session with what that session has different about it. */
+  questNow(quest: Quest): Quest {
+    return { ...quest, ...this.questChanges(quest.id) };
+  }
+
+  private chapterHint(scene: Scene): string {
+    const chapter = this.chapters().find((other) => other.id === scene.chapter);
+    return chapter ? `Kapitel ${chapter.number} · ${chapter.name}` : '';
   }
 
   private parentHint(location: Location): string {

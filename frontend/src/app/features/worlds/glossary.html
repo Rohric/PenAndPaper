@@ -1,46 +1,47 @@
 <div class="stack">
-  <div class="row row--between">
-    <nav class="row" aria-label="Bereiche des Glossars">
-      @for (item of sections; track item.id) {
-        <a class="pill" [routerLink]="linkTo(item.id)" routerLinkActive="is-active">{{ item.label }}</a>
-      }
-    </nav>
-    <app-tutorial-button [topic]="topic()" />
-  </div>
-
-  <input
-    class="input"
-    type="search"
-    aria-label="Im ganzen Glossar suchen"
-    placeholder="Im ganzen Glossar suchen …"
-    [ngModel]="query()"
-    (ngModelChange)="query.set($event)"
-  />
-
-  @if (query().trim()) {
-    @for (hit of hits(); track hit.kind + hit.id) {
-      <button type="button" class="card" (click)="openHit(hit)">
-        <span class="kicker">{{ hit.kicker }}</span>
-        <span class="card__title">{{ hit.label }}</span>
-      </button>
-    } @empty {
-      <div class="empty">
-        <p>Nichts gefunden.</p>
-      </div>
+  <nav class="tabs" aria-label="Bereiche des Glossars">
+    <a class="tabs__tab" [routerLink]="linkTo('lore')" routerLinkActive="is-active"><app-icon name="book" [size]="16" /> Lore</a>
+    @for (item of sections; track item.id) {
+      <a class="tabs__tab" [routerLink]="linkTo(item.id)" routerLinkActive="is-active">
+        <app-icon [name]="item.icon" [size]="16" /> {{ item.label }}
+      </a>
     }
-  } @else if (current().kind) {
-    <app-master-detail [list]="listTpl" [detail]="detailTpl" [open]="!!opened()" (back)="close()" />
+    <app-tutorial-button [topic]="topic()" />
+  </nav>
+
+  @if (current(); as shown) {
+    @if (opened(); as page) {
+      <div class="row">
+        <a class="btn btn--small" [routerLink]="[]" [queryParams]="{}"><app-icon name="back" [size]="16" /> Alle {{ shown.label }}</a>
+        @if (editing()) {
+          <button type="button" class="btn btn--small" (click)="editing.set(false)"><app-icon name="eye" [size]="16" /> Lesen</button>
+        }
+      </div>
+      <div class="page">
+        @if (editing()) {
+          <app-entry-form [entry]="page" (saved)="editing.set(false)" (closed)="close()" />
+        } @else {
+          <app-entry-view [entry]="page" [editable]="true" (edit)="editing.set(true)" />
+        }
+      </div>
+    } @else {
+      <app-glossary-tiles [section]="shown" />
+    }
   } @else if (editing()) {
-    <button type="button" class="btn btn--small" (click)="stopEditing()">Zur Leseansicht</button>
-    <app-lore-editor (saved)="stopEditing()" />
+    <div class="row">
+      <button type="button" class="btn btn--small" (click)="editing.set(false)"><app-icon name="eye" [size]="16" /> Lesen</button>
+    </div>
+    <div class="page">
+      <app-lore-editor (saved)="editing.set(false)" />
+    </div>
   } @else {
-    <article class="panel">
+    <article class="panel page">
       <header class="row row--between">
         <div>
           <span class="kicker">Lore</span>
           <h2 class="subtitle">{{ store.world()?.name }}</h2>
         </div>
-        <button type="button" class="btn btn--small" (click)="editing.set(true)">Bearbeiten</button>
+        <button type="button" class="btn btn--small" (click)="editing.set(true)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
       </header>
       @if (store.world()?.lore) {
         <p class="prose">{{ store.world()?.lore }}</p>
@@ -50,74 +51,3 @@
     </article>
   }
 </div>
-
-<ng-template #listTpl>
-  <form class="list-row" (ngSubmit)="create()">
-    <input class="input" name="newName" [attr.aria-label]="current().newLabel" [placeholder]="current().newLabel ?? ''" [(ngModel)]="newName" />
-    <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()">Anlegen</button>
-  </form>
-
-  @if (error()) {
-    <p class="notice notice--error" role="alert">{{ error() }}</p>
-  }
-
-  @for (item of items(); track item.id) {
-    <a
-      class="card"
-      [routerLink]="[]"
-      [queryParams]="{ entry: item.id }"
-      [class.is-active]="item.id === entryId()"
-      [style.margin-left.px]="item.depth * 18"
-    >
-      <span class="card__title">{{ item.title }}</span>
-      @if (item.sub) {
-        <span class="soft">{{ item.sub }}</span>
-      }
-    </a>
-  } @empty {
-    <div class="empty">
-      <p>{{ current().empty }}</p>
-    </div>
-  }
-</ng-template>
-
-<ng-template #detailTpl>
-  @if (opened(); as shown) {
-    @if (editing()) {
-      <button type="button" class="btn btn--small" (click)="stopEditing()">Zur Leseansicht</button>
-      @switch (shown.kind) {
-        @case ('locations') {
-          @if (location(); as entry) {
-            <app-location-editor [entry]="entry" (saved)="stopEditing()" (closed)="close()" />
-          }
-        }
-        @case ('npcs') {
-          @if (npcLink(); as link) {
-            <app-world-npc-editor [link]="link" (saved)="stopEditing()" (closed)="close()" />
-          }
-        }
-        @case ('quests') {
-          @if (quest(); as entry) {
-            <app-quest-editor [entry]="entry" (saved)="stopEditing()" (closed)="close()" />
-          }
-        }
-        @case ('events') {
-          @if (event(); as entry) {
-            <app-event-editor [entry]="entry" (saved)="stopEditing()" (closed)="close()" />
-          }
-        }
-        @case ('trivia') {
-          @if (trivia(); as entry) {
-            <app-trivia-editor [entry]="entry" (saved)="stopEditing()" (closed)="close()" />
-          }
-        }
-      }
-    } @else {
-      <app-entry-view [entry]="shown" [editable]="true" (edit)="editing.set(true)" />
-    }
-  } @else {
-    <div class="empty">
-      <p>Wähle einen Eintrag aus der Liste oder leg einen neuen an.</p>
-    </div>
-  }
-</ng-template>

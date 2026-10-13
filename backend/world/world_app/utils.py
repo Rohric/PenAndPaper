@@ -1,11 +1,14 @@
 """Query helpers for worlds: ownership filters and collections across relations."""
 
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, Q
 from django.shortcuts import get_object_or_404
 
 from character_app.models import Npc
-from world.world_app.models import Chapter, Location, World, WorldNpc
+from world.world_app.models import Chapter, Location, Picture, World, WorldNpc
+
+# How many pictures a place or an item can have.
+MAX_PICTURES = 3
 
 
 def worlds_for_user(user):
@@ -21,6 +24,11 @@ def world_for_user(user, world_id):
 def chapter_for_user(user, chapter_id):
     """Return the chapter with the given id from one of the user's worlds or raise a 404."""
     return get_object_or_404(Chapter.objects.filter(world__owner=user), pk=chapter_id)
+
+
+def pictures_for_user(user):
+    """Return the pictures of places and items in the worlds the given game master owns."""
+    return Picture.objects.filter(Q(location__world__owner=user) | Q(trivia__world__owner=user))
 
 
 def npcs_in_world(world):

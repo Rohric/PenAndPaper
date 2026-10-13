@@ -25,4 +25,7 @@ urlpatterns = [
     path("worlds/<int:world_id>/scenes/", views.WorldSceneList.as_view(), name="world-scene-list"),
     path("chapters/<int:chapter_id>/scenes/", views.SceneList.as_view(), name="scene-list"),
     path("scenes/<int:pk>/", views.SceneDetail.as_view(), name="scene-detail"),
+    path("locations/<int:pk>/pictures/", views.LocationPictureList.as_view(), name="location-picture-list"),
+    path("trivia/<int:pk>/pictures/", views.TriviaPictureList.as_view(), name="trivia-picture-list"),
+    path("pictures/<int:pk>/", views.PictureDetail.as_view(), name="picture-detail"),
 ]

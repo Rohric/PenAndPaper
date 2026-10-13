@@ -4,23 +4,26 @@ import { Observable, forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { PlayerCharacter } from '../../core/models';
-import { Message, Note, PlayerBattle, PlayerView, ROLL_RESULTS, Roll, Session } from '../../core/session-models';
+import { Message, Note, PlayerBattle, PlayerView, Roll, RollOrder, Session } from '../../core/session-models';
 import { Icon, IconName } from '../../shared/icon';
 import { SidePanel } from '../../shared/side-panel';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterSheet, RollWish } from '../characters/character-sheet';
 import { CharacterService } from '../characters/character.service';
+import { DiceRoll } from './dice-roll';
 import { NoteDetail } from './note-detail';
 import { PlayerBattlePanel } from './player-battle';
 import { PlayerPanels } from './player-panels';
+import { RollPanel } from './roll-panel';
 import { SessionNotes } from './session-notes';
 import { SessionThread } from './session-thread';
 import { SessionService } from './session.service';
 
-type Tab = 'character' | 'battle' | 'quests' | 'glossary' | 'notes' | 'messages' | 'group';
+type Tab = 'character' | 'roll' | 'battle' | 'quests' | 'glossary' | 'notes' | 'messages' | 'group';
 
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'character', label: 'Charakter', icon: 'sheet' },
+  { id: 'roll', label: 'Würfeln', icon: 'dice' },
   { id: 'battle', label: 'Kampf', icon: 'sword' },
   { id: 'quests', label: 'Quests', icon: 'quest' },
   { id: 'glossary', label: 'Glossar', icon: 'book' },
@@ -37,8 +40,8 @@ const REFRESH_MS = 5000;
 @Component({
   selector: 'app-player-session',
   imports: [
-    RouterLink, Icon, SidePanel, TutorialButton, CharacterSheet, NoteDetail, PlayerBattlePanel, PlayerPanels, SessionNotes,
-    SessionThread,
+    RouterLink, Icon, SidePanel, TutorialButton, CharacterSheet, DiceRoll, NoteDetail, PlayerBattlePanel, PlayerPanels, RollPanel,
+    SessionNotes, SessionThread,
   ],
   templateUrl: './player-session.html',
 })
@@ -57,6 +60,13 @@ export class PlayerSession {
   /** The own character that plays in this session. */
   protected readonly character = signal<PlayerCharacter | null>(null);
   protected readonly lastRoll = signal<Roll | null>(null);
+  /** The latest rolls of the whole group; secret rolls of the game master are not among them. */
+  protected readonly rolls = signal<Roll[]>([]);
+  /** The own character as the only one the player rolls for. */
+  protected readonly own = computed(() => {
+    const character = this.character();
+    return character ? [character] : [];
+  });
   /** The battle the session fights right now. */
   protected readonly battle = signal<PlayerBattle | null>(null);
   /** What the tab of the battle says: whether it runs, and whether the player has to act. */
@@ -65,7 +75,6 @@ export class PlayerSession {
   protected readonly noteId = signal<number | null | undefined>(undefined);
   protected readonly openNote = computed(() => this.notes().find((note) => note.id === this.noteId()) ?? null);
   protected readonly error = signal('');
-  protected readonly results = ROLL_RESULTS;
   protected readonly unread = computed(() => this.messages().filter((message) => message.from_gm && !message.read).length);
   protected readonly id = computed(() => Number(this.sessionId()));
 
@@ -86,7 +95,15 @@ export class PlayerSession {
 
   /** Roll a check on a skill or a talent of the own character. */
   protected roll(wish: RollWish): void {
-    this.run(this.api.roll(this.id(), wish.label, wish.value, this.character()?.id ?? null), (roll) => this.lastRoll.set(roll));
+    this.order({ character: this.character()?.id ?? null, who: '', label: wish.label, value: wish.value, sides: 100, count: 1, secret: false });
+  }
+
+  /** Roll what was asked for and show it. */
+  protected order(order: RollOrder): void {
+    this.run(this.api.roll(this.id(), order), (roll) => {
+      this.lastRoll.set(roll);
+      this.refresh(this.id());
+    });
   }
 
   /** Answer the game master in the secret thread. */
@@ -121,6 +138,7 @@ export class PlayerSession {
       view: this.api.playerView(id),
       notes: this.api.notes(id),
       messages: this.api.messages(id),
+      rolls: this.api.rolls(id),
       battle: this.api.playerBattle(id),
       sessions: this.api.mine(),
       characters: this.characterApi.list<PlayerCharacter>('player-characters'),
@@ -131,7 +149,7 @@ export class PlayerSession {
   private fill(
     id: number,
     data: {
-      view: PlayerView; notes: Note[]; messages: Message[]; battle: PlayerBattle | null; sessions: Session[];
+      view: PlayerView; notes: Note[]; messages: Message[]; rolls: Roll[]; battle: PlayerBattle | null; sessions: Session[];
       characters: PlayerCharacter[];
     },
   ): void {
@@ -139,6 +157,7 @@ export class PlayerSession {
     this.view.set(data.view);
     this.notes.set(data.notes);
     this.messages.set(data.messages);
+    this.rolls.set(data.rolls);
     this.battle.set(data.battle);
     this.character.set(data.characters.find((character) => inSession.includes(character.id)) ?? null);
     this.error.set('');

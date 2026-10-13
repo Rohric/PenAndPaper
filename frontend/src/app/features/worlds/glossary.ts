@@ -1,56 +1,49 @@
-import { Component, computed, inject, input, linkedSignal, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, input, linkedSignal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
-import { readError } from '../../core/api-error';
-import { EntryKind, EntryRef, questLabel } from '../../core/models';
-import { MasterDetail } from '../../shared/master-detail';
+import { EntryKind, EntryRef } from '../../core/models';
+import { Icon } from '../../shared/icon';
 import { TutorialButton } from '../../shared/tutorial-button';
+import { EntryForm } from './entry-form';
 import { EntryView } from './entry-view';
-import { SearchHit, searchGlossary } from './entry-views';
-import { EventEditor } from './event-editor';
-import { LocationEditor } from './location-editor';
+import { GLOSSARY_SECTIONS, GlossarySection, GlossaryTiles, SectionId } from './glossary-tiles';
 import { LoreEditor } from './lore-editor';
-import { QuestEditor } from './quest-editor';
-import { TriviaEditor } from './trivia-editor';
-import { WorldNpcEditor } from './world-npc-editor';
-import { Kind, WorldStore } from './world-store';
+import { WorldStore } from './world-store';
 
-interface Section {
-  /** Part of the address; for the lists it is also the kind of entry. */
-  id: string;
-  label: string;
-  /** List of the world this section shows; the lore section has none. */
-  kind?: Exclude<Kind, 'chapters' | 'scenes'>;
-  newLabel?: string;
-  empty?: string;
-}
+/** The kind of entry a part of the glossary shows on a whole page. */
+const PAGE_KINDS: Record<SectionId, EntryKind> = {
+  locations: 'locations',
+  npcs: 'npcs',
+  quests: 'quests',
+  events: 'events',
+  items: 'trivia',
+  trivia: 'trivia',
+};
 
-interface ListItem {
-  id: number;
-  title: string;
-  sub: string;
-  /** Indent level, used for places that lie inside other places. */
-  depth: number;
-}
+/** Which tutorial explains a part of the glossary. */
+const TOPICS: Record<SectionId, string> = {
+  locations: 'locations',
+  npcs: 'npcs',
+  quests: 'quests',
+  events: 'events',
+  items: 'trivia',
+  trivia: 'trivia',
+};
 
-const SECTIONS: Section[] = [
-  { id: 'lore', label: 'Lore' },
-  { id: 'locations', label: 'Orte', kind: 'locations', newLabel: 'Name des neuen Ortes', empty: 'Noch kein Ort.' },
-  { id: 'npcs', label: 'Figuren', kind: 'world-npcs', newLabel: 'Name der neuen Figur', empty: 'Noch keine Figur.' },
-  { id: 'quests', label: 'Quests', kind: 'quests', newLabel: 'Name der neuen Quest', empty: 'Noch keine Quest.' },
-  { id: 'events', label: 'Ereignisse', kind: 'events', newLabel: 'Name des neuen Ereignisses', empty: 'Noch kein Ereignis.' },
-  { id: 'trivia', label: 'Wissen', kind: 'trivia', newLabel: 'Name des neuen Eintrags', empty: 'Noch kein Wissen.' },
-];
-
-/** The glossary of a world: everything that exists in it, to search, read and edit. */
+/**
+ * The glossary of a world: everything that exists in it. Every part is a wall of tiles; a click
+ * looks an entry up at the side, and from there its whole page can be opened to read and edit.
+ */
 @Component({
   selector: 'app-glossary',
-  imports: [
-    FormsModule, RouterLink, RouterLinkActive, MasterDetail, TutorialButton, EntryView,
-    LoreEditor, LocationEditor, WorldNpcEditor, QuestEditor, EventEditor, TriviaEditor,
-  ],
+  imports: [RouterLink, RouterLinkActive, Icon, TutorialButton, EntryForm, EntryView, GlossaryTiles, LoreEditor],
   templateUrl: './glossary.html',
+  styles: `
+    .tabs app-tutorial-button {
+      align-self: center;
+      margin-left: auto;
+    }
+  `,
 })
 export class Glossary {
   protected readonly store = inject(WorldStore);
@@ -60,110 +53,31 @@ export class Glossary {
   readonly section = input('lore');
   readonly entry = input<string>();
 
-  protected readonly sections = SECTIONS;
-  protected readonly current = computed(() => SECTIONS.find((s) => s.id === this.section()) ?? SECTIONS[0]);
-  protected readonly entryId = computed(() => Number(this.entry()) || null);
-  protected readonly items = computed(() => this.listItems());
+  protected readonly sections = GLOSSARY_SECTIONS;
+  /** The opened part; the lore of the world is none of the lists. */
+  protected readonly current = computed<GlossarySection | null>(() => GLOSSARY_SECTIONS.find((s) => s.id === this.section()) ?? null);
+  private readonly entryId = computed(() => Number(this.entry()) || null);
+  /** The entry that fills the whole page, when the address names one. */
   protected readonly opened = computed<EntryRef | null>(() => {
+    const section = this.current();
     const id = this.entryId();
-    const isThere = this.items().some((item) => item.id === id);
-    return id !== null && isThere ? { kind: this.current().id as EntryKind, id } : null;
+    return section && id !== null ? { kind: PAGE_KINDS[section.id], id } : null;
   });
-  /** Lore has its own tutorial text in the general glossary tutorial. */
-  protected readonly topic = computed(() => (this.current().kind ? this.current().id : 'glossary'));
-
-  protected readonly newName = signal('');
-  protected readonly error = signal('');
-  protected readonly query = signal('');
-  protected readonly hits = computed(() => (this.query().trim() ? searchGlossary(this.store, this.query()) : []));
-
-  /** A fresh entry opens as a form, every other entry opens to read. */
-  private createdId: number | null = null;
-  protected readonly editing = linkedSignal({
-    source: () => `${this.section()}:${this.entryId()}`,
-    computation: () => this.entryId() !== null && this.entryId() === this.createdId,
+  /** The lore is explained in the general tutorial of the glossary. */
+  protected readonly topic = computed(() => {
+    const section = this.current();
+    return section ? TOPICS[section.id] : 'glossary';
   });
+  /** Every page starts in the reading view. */
+  protected readonly editing = linkedSignal({ source: () => `${this.section()}:${this.entry()}`, computation: () => false });
 
-  protected readonly location = computed(() => this.store.locations().find((l) => l.id === this.entryId()) ?? null);
-  protected readonly npcLink = computed(() => this.store.npcs().find((n) => n.npc === this.entryId()) ?? null);
-  protected readonly quest = computed(() => this.store.quests().find((q) => q.id === this.entryId()) ?? null);
-  protected readonly event = computed(() => this.store.events().find((e) => e.id === this.entryId()) ?? null);
-  protected readonly trivia = computed(() => this.store.trivia().find((t) => t.id === this.entryId()) ?? null);
-
-  /** Address of a section of the glossary. */
+  /** Address of a part of the glossary. */
   protected linkTo(section: string): unknown[] {
     return ['/gm/worlds', this.store.worldId(), 'glossary', section];
   }
 
-  /** Create an entry in the current section from the typed name and open its form. */
-  protected create(): void {
-    const kind = this.current().kind;
-    if (!kind) {
-      return;
-    }
-    this.store.add<{ id: number; npc?: number }>(kind, { name: this.newName().trim() }).subscribe({
-      next: (created) => this.created(created.npc ?? created.id),
-      error: (e: unknown) => this.error.set(readError(e)),
-    });
-  }
-
-  /** Open a search result in its section. */
-  protected openHit(hit: SearchHit): void {
-    this.query.set('');
-    void this.router.navigate(this.linkTo(hit.kind), { queryParams: { entry: hit.id } });
-  }
-
-  /** Go back from the form to the reading view. */
-  protected stopEditing(): void {
-    this.createdId = null;
-    this.editing.set(false);
-  }
-
-  /** Close the opened entry and show the list again. */
+  /** Leave the whole page of an entry and show the tiles again. */
   protected close(): void {
     void this.router.navigate([], { queryParams: {} });
-  }
-
-  private created(id: number): void {
-    this.newName.set('');
-    this.error.set('');
-    this.createdId = id;
-    void this.router.navigate([], { queryParams: { entry: id } });
-  }
-
-  private listItems(): ListItem[] {
-    const flat = (id: number, title: string, sub = ''): ListItem => ({ id, title, sub, depth: 0 });
-    switch (this.current().kind) {
-      case 'locations':
-        return this.locationTree(null, 0, new Set());
-      case 'world-npcs':
-        return this.store.npcs().map((n) => flat(n.npc, n.name, n.profession));
-      case 'quests':
-        return this.store.quests().map((q) => flat(q.id, q.name, questLabel(q)));
-      case 'events':
-        return this.store.events().map((e) => flat(e.id, e.name));
-      case 'trivia':
-        return this.triviaByCategory().map((t) => flat(t.id, t.name, t.category));
-      default:
-        return [];
-    }
-  }
-
-  /** Knowledge grouped by its category; entries without one come last. */
-  private triviaByCategory() {
-    const rank = (category: string) => (category ? `0${category.toLowerCase()}` : '1');
-    return [...this.store.trivia()].sort((a, b) => rank(a.category).localeCompare(rank(b.category)));
-  }
-
-  /** Places as a tree: every place is followed by the places that lie inside it. */
-  private locationTree(parent: number | null, depth: number, seen: Set<number>): ListItem[] {
-    return this.store
-      .locations()
-      .filter((location) => location.parent === parent && !seen.has(location.id))
-      .flatMap((location) => {
-        seen.add(location.id);
-        const item = { id: location.id, title: location.name, sub: '', depth };
-        return [item, ...this.locationTree(location.id, depth + 1, seen)];
-      });
   }
 }

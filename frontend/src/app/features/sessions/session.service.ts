@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../core/api.service';
 import {
-  Attack, Battle, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, Roll, Session, SessionEntry,
-  SessionEntryKind,
+  Attack, Battle, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, Roll, RollOrder, Session,
+  SessionEntry, SessionEntryKind,
 } from '../../core/session-models';
 
 /** Backend calls for sessions and for the battles fought in them. */
@@ -101,9 +101,9 @@ export class SessionService {
     return this.api.get<Roll[]>(`sessions/${id}/rolls/`);
   }
 
-  /** Roll a check; without a character the game master rolls. */
-  roll(id: number, label: string, value: number, character: number | null = null): Observable<Roll> {
-    return this.api.post<Roll>(`sessions/${id}/rolls/`, { character, label, value });
+  /** Roll a check against a value, or free dice without one. */
+  roll(id: number, order: RollOrder): Observable<Roll> {
+    return this.api.post<Roll>(`sessions/${id}/rolls/`, order);
   }
 
   /** The battles of a session, newest first. */
@@ -145,6 +145,11 @@ export class SessionService {
     return this.api.post<Battle>(`battles/${battleId}/attack/`, attack);
   }
 
+  /** Keep an action open that is no attack; with a value it is rolled against it. */
+  action(battleId: number, action: { actor: number; label: string; value: number | null }): Observable<Battle> {
+    return this.api.post<Battle>(`battles/${battleId}/action/`, action);
+  }
+
   /** Decide the parry of the open hit: the target parries with a value, or takes the damage (null). */
   parry(battleId: number, parryValue: number | null): Observable<Battle> {
     return this.api.post<Battle>(`battles/${battleId}/parry/`, { parry_value: parryValue });
@@ -158,6 +163,11 @@ export class SessionService {
   /** Roll the attack of the own character with a skill and a weapon from the own sheet. */
   playerAttack(sessionId: number, attack: { defender: number; skill: string; weapon: string }): Observable<PlayerBattle> {
     return this.api.post<PlayerBattle>(`sessions/${sessionId}/battle/attack/`, attack);
+  }
+
+  /** Do something else than an attack with the own character; with a roll it goes against a skill of the own sheet. */
+  playerAction(sessionId: number, action: { label: string; rolls: boolean; skill: string }): Observable<PlayerBattle> {
+    return this.api.post<PlayerBattle>(`sessions/${sessionId}/battle/action/`, action);
   }
 
   /** Decide whether the own character parries the hit that waits, and with which skill. */

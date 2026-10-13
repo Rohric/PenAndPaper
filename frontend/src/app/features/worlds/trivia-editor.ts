@@ -5,12 +5,13 @@ import { Trivia } from '../../core/models';
 import { EditorBar } from '../../shared/editor-bar';
 import { EntryTextsEditor } from '../../shared/entry-texts-editor';
 import { LinkPicker } from '../../shared/link-picker';
+import { SymbolPicker } from '../../shared/symbol-picker';
 import { EntryEditor } from './entry-editor';
 
 /** Edit one piece of knowledge and the entries it is attached to. */
 @Component({
   selector: 'app-trivia-editor',
-  imports: [FormsModule, EditorBar, LinkPicker, EntryTextsEditor],
+  imports: [FormsModule, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -19,12 +20,16 @@ import { EntryEditor } from './entry-editor';
           <input id="trivia-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
         </div>
         <div class="field">
+          <span class="label">Symbol</span>
+          <app-symbol-picker fallback="note" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
+        </div>
+        <div class="field">
           <label for="trivia-category">Kategorie</label>
           <input
             id="trivia-category"
             class="input"
             list="trivia-categories"
-            placeholder="Zum Beispiel Tier, Gegenstand, Volk"
+            placeholder="Zum Beispiel Tier, Volk. „Gegenstand“ macht den Eintrag zu einem Gegenstand"
             [ngModel]="draft().category"
             (ngModelChange)="set('category', $event)"
           />
@@ -51,19 +56,19 @@ import { EntryEditor } from './entry-editor';
         <h2 class="subtitle">Gehört zu</h2>
         <div class="field">
           <span class="label">Orte</span>
-          <app-link-picker label="Orte" [options]="store.locationOptions()" [selected]="draft().locations" (selectedChange)="set('locations', $event)" />
+          <app-link-picker label="Orte" [options]="store.locationOptions()" [selected]="draft().locations" (selectedChange)="set('locations', $event)" (look)="lookUp('locations', $event)" />
         </div>
         <div class="field">
           <span class="label">Figuren</span>
-          <app-link-picker label="Figuren" [options]="store.npcOptions()" [selected]="draft().npcs" (selectedChange)="set('npcs', $event)" />
+          <app-link-picker label="Figuren" [options]="store.npcOptions()" [selected]="draft().npcs" (selectedChange)="set('npcs', $event)" (look)="lookUp('npcs', $event)" />
         </div>
         <div class="field">
           <span class="label">Quests</span>
-          <app-link-picker label="Quests" [options]="store.questOptions()" [selected]="draft().quests" (selectedChange)="set('quests', $event)" />
+          <app-link-picker label="Quests" [options]="store.questOptions()" [selected]="draft().quests" (selectedChange)="set('quests', $event)" (look)="lookUp('quests', $event)" />
         </div>
         <div class="field">
           <span class="label">Ereignisse</span>
-          <app-link-picker label="Ereignisse" [options]="store.eventOptions()" [selected]="draft().events" (selectedChange)="set('events', $event)" />
+          <app-link-picker label="Ereignisse" [options]="store.eventOptions()" [selected]="draft().events" (selectedChange)="set('events', $event)" (look)="lookUp('events', $event)" />
         </div>
       </div>
     </div>

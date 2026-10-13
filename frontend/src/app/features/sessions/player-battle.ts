@@ -9,16 +9,18 @@ import { PlayerBattle } from '../../core/session-models';
 import { Icon } from '../../shared/icon';
 import { BattleExchange } from './battle-exchange';
 import { ownKey, recall, remember } from './battle-memory';
+import { BattleTimeline, TimelineEntry } from './battle-timeline';
 import { SessionService } from './session.service';
 
 /**
- * The running battle of a session as a player takes part in it: who fights in which order,
- * the attack of the own character when it is its turn, and the parry when it is hit.
+ * The running battle of a session as a player takes part in it: the timeline with the order and
+ * the statuses, the attack or another action of the own character when it is its turn, and the
+ * parry when it is hit.
  * Skill, weapon and target of the last turn are remembered in the browser.
  */
 @Component({
   selector: 'app-player-battle',
-  imports: [FormsModule, Icon, BattleExchange],
+  imports: [FormsModule, Icon, BattleExchange, BattleTimeline],
   templateUrl: './player-battle.html',
 })
 export class PlayerBattlePanel {
@@ -37,9 +39,20 @@ export class PlayerBattlePanel {
   protected readonly skill = signal('');
   protected readonly weapon = signal('');
   protected readonly parrySkill = signal('');
+  // Instead of an attack the own character can do something else, with or without a roll on the picked skill.
+  protected readonly mode = signal<'attack' | 'action'>('attack');
+  protected readonly actionLabel = signal('');
+  protected readonly actionRolls = signal(false);
 
   protected readonly own = computed(() => this.battle()?.combatants.find((combatant) => combatant.mine) ?? null);
   protected readonly open = computed(() => this.battle()?.pending ?? null);
+  /** The combatants as the timeline shows them, in the order of their initiative. */
+  protected readonly timeline = computed<TimelineEntry[]>(() =>
+    (this.battle()?.combatants ?? []).map((c) => ({
+      id: c.id, name: c.mine ? `${c.name} (du)` : c.name, symbol: c.symbol, isPlayer: c.is_player, initiative: c.initiative,
+      out: c.out, statuses: c.statuses,
+    })),
+  );
   protected readonly myTurn = computed(() => {
     const own = this.own();
     return !!own && !own.out && this.battle()?.current === own.id;
@@ -70,6 +83,15 @@ export class PlayerBattlePanel {
     if (defender !== null) {
       this.keep({ defender, skill: this.skill(), weapon: this.weapon() });
       this.run(this.api.playerAttack(this.sessionId(), { defender, skill: this.skill(), weapon: this.weapon() }));
+    }
+  }
+
+  /** Do something else than an attack; with a roll it goes against the picked skill. */
+  protected act(): void {
+    const label = this.actionLabel().trim();
+    if (label) {
+      this.run(this.api.playerAction(this.sessionId(), { label, rolls: this.actionRolls(), skill: this.skill() }));
+      this.actionLabel.set('');
     }
   }
 

@@ -4,38 +4,43 @@ import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { Chapter } from '../../core/models';
+import { Icon } from '../../shared/icon';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { WorldStore } from './world-store';
 
-/** The chapters of a world as cards, with a form to start a new one. */
+/** The chapters of a world as tiles, with a form to start a new one. */
 @Component({
   selector: 'app-chapter-list',
-  imports: [FormsModule, RouterLink, TutorialButton],
+  imports: [FormsModule, RouterLink, Icon, TutorialButton],
   template: `
     <div class="stack">
       <div class="row row--between">
-        <p class="soft">Hier schreibst du die Geschichte, Kapitel für Kapitel.</p>
+        <h2 class="section-title"><app-icon name="book" /> Kapitel</h2>
         <app-tutorial-button topic="chapters" />
       </div>
 
       <form class="list-row" (ngSubmit)="create()">
         <input class="input" name="newName" aria-label="Name des neuen Kapitels" placeholder="Name des neuen Kapitels" [(ngModel)]="newName" />
-        <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()">Kapitel anlegen</button>
+        <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()"><app-icon name="plus" [size]="16" /> Kapitel anlegen</button>
       </form>
 
       @if (error()) {
         <p class="notice notice--error" role="alert">{{ error() }}</p>
       }
 
-      <div class="cards">
+      <div class="tiles tiles--wide">
         @for (chapter of store.chapters(); track chapter.id) {
-          <a class="card" [routerLink]="[chapter.id]">
+          <a class="tile tile--link" [routerLink]="[chapter.id]">
             <span class="kicker">Kapitel {{ chapter.number }}</span>
-            <span class="card__title">{{ chapter.name }}</span>
-            <span class="soft">{{ summary(chapter) }}</span>
+            <span class="tile__title">{{ chapter.name }}</span>
             @if (chapter.text) {
               <span class="soft clamp">{{ chapter.text }}</span>
             }
+            <span class="row">
+              @for (count of counts(chapter); track count) {
+                <span class="chip">{{ count }}</span>
+              }
+            </span>
           </a>
         }
       </div>
@@ -63,9 +68,9 @@ export class ChapterList {
     });
   }
 
-  /** How much is written in a chapter, as one line for its card. */
-  protected summary(chapter: Chapter): string {
+  /** How much is written in a chapter, as small labels for its tile. */
+  protected counts(chapter: Chapter): string[] {
     const scenes = this.store.scenesOf(chapter.id).length;
-    return `${scenes} Szenen · ${chapter.quests.length} Quests · ${chapter.events.length} Ereignisse`;
+    return [`${scenes} Szenen`, `${chapter.quests.length} Quests`, `${chapter.events.length} Ereignisse`];
   }
 }

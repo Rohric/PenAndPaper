@@ -1,66 +1,35 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
-import { Chapter, questLabel } from '../../core/models';
+import { Chapter, Quest, WorldEvent } from '../../core/models';
+import { Icon } from '../../shared/icon';
 import { LinkPicker } from '../../shared/link-picker';
-import { summaryOf } from './entry-views';
 import { EventScenes } from './event-scenes';
+import { EventTile } from './event-tile';
+import { QuestTile } from './quest-tile';
 import { WorldStore } from './world-store';
 
-interface Card {
-  id: number;
-  name: string;
-  kicker: string;
-  text: string;
+/** An event that plays a part in the chapter. */
+interface ChapterEvent {
+  event: WorldEvent;
   /** False for an event that is only here because it hangs on a scene of the chapter. */
   inChapter: boolean;
 }
 
 /**
- * The quests or the events of one chapter as cards to read, with adding and removing.
- * An event can also hang on scenes of the chapter; then it is listed here as well.
+ * The quests or the events of one chapter as tiles, with adding, editing and removing.
+ * What hangs on a scene of the chapter is listed here as well.
  */
 @Component({
   selector: 'app-chapter-links',
-  imports: [LinkPicker, EventScenes],
+  imports: [Icon, LinkPicker, EventScenes, EventTile, QuestTile],
   template: `
     <div class="stack">
-      @for (card of cards(); track card.id) {
-        <article class="card">
-          <div class="row row--between">
-            <div>
-              @if (card.kicker) {
-                <span class="kicker">{{ card.kicker }}</span>
-              }
-              <h3 class="card__title">{{ card.name }}</h3>
-            </div>
-            <div class="row">
-              <button type="button" class="btn btn--small" (click)="open(card.id)">Öffnen</button>
-              @if (card.inChapter) {
-                <button type="button" class="btn btn--small" (click)="unlink(card.id)">Aus dem Kapitel nehmen</button>
-              }
-            </div>
-          </div>
-          @if (card.text) {
-            <p class="prose soft clamp">{{ card.text }}</p>
-          }
-          @if (kind() === 'events') {
-            <div class="field">
-              <span class="label">Hängt an Szenen (freiwillig)</span>
-              <app-event-scenes [eventId]="card.id" [chapterId]="chapter().id" />
-            </div>
-          }
-        </article>
-      } @empty {
-        <div class="empty">
-          <p>{{ kind() === 'quests' ? 'Dieses Kapitel hat noch keine Quest.' : 'Dieses Kapitel hat noch kein Ereignis.' }}</p>
-        </div>
-      }
-
       <app-link-picker
         [chips]="false"
         [creatable]="true"
-        [label]="kind() === 'quests' ? 'Quests' : 'Ereignisse'"
+        [label]="kind() === 'quests' ? 'Quest zum Kapitel hinzufügen' : 'Ereignis zum Kapitel hinzufügen'"
+        [emptyText]="kind() === 'quests' ? 'Quest suchen oder neu anlegen …' : 'Ereignis suchen oder neu anlegen …'"
         [options]="kind() === 'quests' ? store.questOptions() : store.eventOptions()"
         [selected]="ids()"
         (selectedChange)="save($event)"
@@ -69,6 +38,46 @@ interface Card {
 
       @if (error()) {
         <p class="notice notice--error" role="alert">{{ error() }}</p>
+      }
+
+      <div class="tiles tiles--wide">
+        @if (kind() === 'quests') {
+          @for (quest of quests(); track quest.id) {
+            <app-quest-tile [quest]="quest">
+              <div class="row">
+                <button type="button" class="btn btn--small" (click)="edit(quest.id)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
+                @if (ids().includes(quest.id)) {
+                  <button type="button" class="btn btn--small" (click)="unlink(quest.id)">
+                    <app-icon name="close" [size]="16" /> Aus dem Kapitel nehmen
+                  </button>
+                }
+              </div>
+            </app-quest-tile>
+          }
+        } @else {
+          @for (item of events(); track item.event.id) {
+            <app-event-tile [event]="item.event">
+              <div class="field">
+                <span class="label">Hängt an Szenen (freiwillig)</span>
+                <app-event-scenes [eventId]="item.event.id" [chapterId]="chapter().id" />
+              </div>
+              <div class="row">
+                <button type="button" class="btn btn--small" (click)="edit(item.event.id)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
+                @if (item.inChapter) {
+                  <button type="button" class="btn btn--small" (click)="unlink(item.event.id)">
+                    <app-icon name="close" [size]="16" /> Aus dem Kapitel nehmen
+                  </button>
+                }
+              </div>
+            </app-event-tile>
+          }
+        }
+      </div>
+
+      @if (isEmpty()) {
+        <div class="empty">
+          <p>{{ kind() === 'quests' ? 'Dieses Kapitel hat noch keine Quest.' : 'Dieses Kapitel hat noch kein Ereignis.' }}</p>
+        </div>
       }
     </div>
   `,
@@ -80,12 +89,29 @@ export class ChapterLinks {
   readonly kind = input.required<'quests' | 'events'>();
 
   protected readonly error = signal('');
+  /** What the chapter itself names; scenes can add more. */
   protected readonly ids = computed(() => this.chapter()[this.kind()]);
-  protected readonly cards = computed<Card[]>(() => (this.kind() === 'quests' ? this.questCards() : this.eventCards()));
+  private readonly scenes = computed(() => this.store.scenesOf(this.chapter().id));
+  /** The quests of the chapter, of its scenes, and those that come up in one of its scenes. */
+  protected readonly quests = computed<Quest[]>(() => {
+    const scenes = this.scenes();
+    const onScenes = scenes.flatMap((scene) => scene.quests);
+    const here = (quest: Quest) => this.ids().includes(quest.id) || onScenes.includes(quest.id) || scenes.some((scene) => scene.id === quest.scene);
+    return this.store.quests().filter(here);
+  });
+  /** The events of the chapter together with the events that hang on one of its scenes. */
+  protected readonly events = computed<ChapterEvent[]>(() => {
+    const onScenes = this.scenes().flatMap((scene) => scene.events);
+    return this.store
+      .events()
+      .filter((event) => this.ids().includes(event.id) || onScenes.includes(event.id))
+      .map((event) => ({ event, inChapter: this.ids().includes(event.id) }));
+  });
+  protected readonly isEmpty = computed(() => (this.kind() === 'quests' ? !this.quests().length : !this.events().length));
 
-  /** Look the entry up in the side panel. */
-  protected open(id: number): void {
-    this.store.peek.set({ kind: this.kind(), id });
+  /** Open the form of the entry in the window at the side. */
+  protected edit(id: number): void {
+    this.store.peek.set({ kind: this.kind(), id, edit: true });
   }
 
   /** Take the entry out of the chapter; it stays in the glossary. */
@@ -107,19 +133,5 @@ export class ChapterLinks {
       next: (created) => this.save([...this.ids(), created.id]),
       error: (e: unknown) => this.error.set(readError(e)),
     });
-  }
-
-  private questCards(): Card[] {
-    const quests = this.store.quests().filter((quest) => this.ids().includes(quest.id));
-    return quests.map((quest) => ({ id: quest.id, name: quest.name, kicker: questLabel(quest), text: summaryOf(quest), inChapter: true }));
-  }
-
-  /** The events of the chapter together with the events that hang on one of its scenes. */
-  private eventCards(): Card[] {
-    const onScenes = this.store.scenesOf(this.chapter().id).flatMap((scene) => scene.events);
-    const events = this.store.events().filter((event) => this.ids().includes(event.id) || onScenes.includes(event.id));
-    return events.map((event) => ({
-      id: event.id, name: event.name, kicker: '', text: summaryOf(event), inChapter: this.ids().includes(event.id),
-    }));
   }
 }
