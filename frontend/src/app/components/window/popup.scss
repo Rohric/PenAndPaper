@@ -1,0 +1,44 @@
+// The page behind a popup: a little darker, and it takes no clicks.
+.shade {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-popup);
+  background: rgb(0 0 0 / 40%);
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--z-popup);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+  width: min(var(--popup-width, 560px), var(--popup-max, 880px), 100vw - 2 * var(--gap-3));
+  max-height: var(--popup-height, 70vh);
+  padding: var(--gap-3) var(--gap-4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--bg);
+  box-shadow: 0 10px 34px rgb(0 0 0 / 35%);
+  transform: translate(-50%, -50%);
+}
+
+.popup__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.popup__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  justify-content: flex-end;
+}
+
+.popup__foot:empty {
+  display: none;
+}

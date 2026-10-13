@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Knowledge } from '../core/models';
+import { Knowledge } from '../../core/models';
 import { KnowledgeListEditor } from './knowledge-list-editor';
 
 /**
@@ -45,13 +45,7 @@ import { KnowledgeListEditor } from './knowledge-list-editor';
       <app-knowledge-list-editor [pieces]="gmKnowledge()" (piecesChange)="gmKnowledgeChange.emit($event)" />
     </div>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-  `,
+  styleUrl: './entry-texts-editor.scss',
 })
 export class EntryTextsEditor {
   /** Id of the description field, unique on the page. */

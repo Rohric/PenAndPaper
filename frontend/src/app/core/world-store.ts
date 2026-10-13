@@ -1,11 +1,11 @@
 import { Injectable, WritableSignal, computed, inject, signal } from '@angular/core';
 import { Observable, forkJoin, tap } from 'rxjs';
 
-import { readError } from '../../core/api-error';
-import { ApiService } from '../../core/api.service';
+import { readError } from './api-error';
+import { ApiService } from './api.service';
 import {
-  Chapter, EntryTexts, Location, Option, Peek, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, isItem, questLabel,
-} from '../../core/models';
+  Chapter, EntryRef, EntryTexts, Location, Option, Peek, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, isItem, questLabel,
+} from './models';
 
 /** The lists inside a world, named like their part of the API address. */
 export type Kind = 'locations' | 'world-npcs' | 'quests' | 'events' | 'trivia' | 'chapters' | 'scenes';
@@ -26,6 +26,8 @@ interface WorldData {
 }
 
 type Sorter = (a: never, b: never) => number;
+/** The lists of a chapter that tag entries with it. */
+type TagList = 'locations' | 'npcs' | 'quests' | 'events' | 'trivia';
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
 const HINT_LENGTH = 90;
@@ -62,7 +64,9 @@ export class WorldStore {
   /** The scenes of all chapters, so every entry can show where it appears. */
   readonly scenes = signal<Scene[]>([]);
   readonly error = signal('');
-  /** The entry that is looked up in the side panel, without leaving the page. */
+  /** The entry in the popup: the short look that every click on a tile or a link opens first. */
+  readonly popup = signal<EntryRef | null>(null);
+  /** The entry in the window at the side, to read and edit without leaving the page. */
   readonly peek = signal<Peek | null>(null);
   /** Set by a session: the scene that is open, so cards can add entries to it. */
   readonly activeScene = signal<number | null>(null);
@@ -88,6 +92,10 @@ export class WorldStore {
     this.trivia().map((t) => ({
       id: t.id, label: t.name, hint: [t.category, excerpt(t)].filter(Boolean).join(' · '), tone: isItem(t) ? 'items' : 'trivia',
     })),
+  );
+  /** The chapters as tags to choose from. */
+  readonly chapterOptions = computed<Option[]>(() =>
+    this.chapters().map((chapter) => ({ id: chapter.id, label: `Kapitel ${chapter.number}`, hint: chapter.name, tone: 'chapters' })),
   );
   /** Every scene of the world, with its chapter as a hint. */
   readonly sceneOptions = computed<Option[]>(() =>
@@ -119,6 +127,31 @@ export class WorldStore {
     }).subscribe({ next: (data) => this.fill(data), error: (e: unknown) => this.error.set(readError(e)) });
   }
 
+  /**
+   * Follow a click on a tile or a link by the rule of the windows: it opens the popup first. While the window
+   * at the side is open, the click changes what that window shows.
+   */
+  look(ref: EntryRef): void {
+    const target = { kind: ref.kind, id: ref.id };
+    if (this.peek()) {
+      this.peek.set(target);
+    } else {
+      this.popup.set(target);
+    }
+  }
+
+  /** Go on into the window at the side to read the entry, or to edit it; the popup closes. */
+  read(ref: EntryRef, edit = false): void {
+    this.popup.set(null);
+    this.peek.set({ kind: ref.kind, id: ref.id, edit });
+  }
+
+  /** Close both windows of the entries, when the page moves on. */
+  closeWindows(): void {
+    this.popup.set(null);
+    this.peek.set(null);
+  }
+
   /** Create an entry in one of the lists of the world. */
   add<T extends Entry>(kind: Exclude<Kind, 'scenes'>, body: unknown): Observable<T> {
     return this.created(kind, this.api.post<T>(`worlds/${this.worldId()}/${kind}/`, body));
@@ -133,7 +166,10 @@ export class WorldStore {
   save<T extends Entry>(kind: Kind, id: number, changes: unknown): Observable<T> {
     return this.api
       .patch<T>(`${kind}/${id}/`, changes)
-      .pipe(tap((entry) => this.put(kind, this.lists[kind]().map((old) => (old.id === id ? entry : old)))));
+      .pipe(
+        tap((entry) => this.put(kind, this.lists[kind]().map((old) => (old.id === id ? entry : old)))),
+        tap(() => this.followTags(kind, changes)),
+      );
   }
 
   /** Delete one entry, then reload, because other entries may have pointed to it. */
@@ -169,6 +205,35 @@ export class WorldStore {
   /** A quest as it counts right now: in a session with what that session has different about it. */
   questNow(quest: Quest): Quest {
     return { ...quest, ...this.questChanges(quest.id) };
+  }
+
+  /**
+   * Keep the chapter tags in step after a save. A scene tags what hangs on it by itself and an entry names its
+   * chapters, so the chapters are loaded again; a chapter that was saved is the truth already.
+   */
+  private followTags(kind: Kind, changes: unknown): void {
+    if (kind === 'chapters') {
+      this.syncTags();
+    } else if (kind === 'scenes' || 'chapters' in (changes as object)) {
+      this.api.get<Chapter[]>(`worlds/${this.worldId()}/chapters/`).subscribe((chapters) => {
+        this.chapters.set(chapters);
+        this.syncTags();
+      });
+    }
+  }
+
+  /** Write the tags of every entry anew from the lists of the chapters; an entry whose tags stay keeps its object. */
+  private syncTags(): void {
+    const chapters = this.chapters();
+    const tagged = <T extends { chapters: number[] }>(entry: T, list: TagList, id: number): T => {
+      const tags = chapters.filter((chapter) => chapter[list].includes(id)).map((chapter) => chapter.id);
+      return tags.join() === entry.chapters.join() ? entry : { ...entry, chapters: tags };
+    };
+    this.locations.update((all) => all.map((entry) => tagged(entry, 'locations', entry.id)));
+    this.npcs.update((all) => all.map((entry) => tagged(entry, 'npcs', entry.npc)));
+    this.quests.update((all) => all.map((entry) => tagged(entry, 'quests', entry.id)));
+    this.events.update((all) => all.map((entry) => tagged(entry, 'events', entry.id)));
+    this.trivia.update((all) => all.map((entry) => tagged(entry, 'trivia', entry.id)));
   }
 
   private chapterHint(scene: Scene): string {

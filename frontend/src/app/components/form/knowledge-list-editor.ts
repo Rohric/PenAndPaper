@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Knowledge } from '../core/models';
+import { Knowledge } from '../../core/models';
 
 /** Edit a list of knowledge pieces: each one a text with an optional title. */
 @Component({
@@ -33,23 +33,7 @@ import { Knowledge } from '../core/models';
     }
     <button type="button" class="btn btn--small add" (click)="add()">+ Stück Wissen</button>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .piece {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .add {
-      align-self: flex-start;
-    }
-  `,
+  styleUrl: './knowledge-list-editor.scss',
 })
 export class KnowledgeListEditor {
   readonly pieces = input.required<Knowledge[]>();

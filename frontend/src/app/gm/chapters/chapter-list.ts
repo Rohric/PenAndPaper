@@ -1,30 +1,20 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { Chapter } from '../../core/models';
-import { Icon } from '../../shared/icon';
-import { TutorialButton } from '../../shared/tutorial-button';
-import { RecentEntries } from './recent-entries';
-import { WorldStore } from './world-store';
+import { NameDialog } from '../../components/form/name-dialog';
+import { NavService } from '../../global/frame/nav.service';
+import { Tools } from '../../global/tool-bar/tools.service';
+import { RecentEntries } from '../worlds/recent-entries';
+import { WorldStore } from '../../core/world-store';
 
-/** The chapters of a world as tiles, with a form to start a new one, and below what was written and changed last. */
+/** The chapters of a world as tiles, and below what was written and changed last; "Neu" in the bar starts a chapter. */
 @Component({
   selector: 'app-chapter-list',
-  imports: [FormsModule, RouterLink, Icon, TutorialButton, RecentEntries],
+  imports: [RouterLink, RecentEntries, NameDialog],
   template: `
     <div class="stack">
-      <div class="row row--between">
-        <h2 class="section-title kind--chapters"><app-icon name="book" /> Kapitel</h2>
-        <app-tutorial-button topic="chapters" />
-      </div>
-
-      <form class="list-row" (ngSubmit)="create()">
-        <input class="input" name="newName" aria-label="Name des neuen Kapitels" placeholder="Name des neuen Kapitels" [(ngModel)]="newName" />
-        <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()"><app-icon name="plus" [size]="16" /> Kapitel anlegen</button>
-      </form>
-
       @if (error()) {
         <p class="notice notice--error" role="alert">{{ error() }}</p>
       }
@@ -48,24 +38,35 @@ import { WorldStore } from './world-store';
 
       @if (!store.chapters().length) {
         <div class="empty">
-          <p>Noch kein Kapitel. Gib oben einen Namen ein und leg das erste an.</p>
+          <p>Noch kein Kapitel. Mit „Neu“ unten in der Leiste legst du das erste an.</p>
         </div>
       }
 
       <app-recent-entries />
     </div>
+
+    @if (creating()) {
+      <app-name-dialog title="Neues Kapitel" label="Name des Kapitels" [error]="error()" (create)="create($event)" (closed)="creating.set(false)" />
+    }
   `,
 })
 export class ChapterList {
   protected readonly store = inject(WorldStore);
   private readonly router = inject(Router);
 
-  protected readonly newName = signal('');
+  protected readonly creating = signal(false);
   protected readonly error = signal('');
 
+  constructor() {
+    const nav = inject(NavService);
+    nav.crumbs.provide(signal([{ label: 'Kapitel' }]));
+    nav.topic.provide(signal(['chapters']));
+    inject(Tools).provide('view', signal([{ id: 'new', word: 'Neu', title: 'Neues Kapitel', icon: 'plus', click: () => this.creating.set(true) }]));
+  }
+
   /** Create a chapter from the typed name and open it. */
-  protected create(): void {
-    this.store.add<Chapter>('chapters', { name: this.newName().trim() }).subscribe({
+  protected create(name: string): void {
+    this.store.add<Chapter>('chapters', { name }).subscribe({
       next: (chapter) => void this.router.navigate(['/gm/worlds', this.store.worldId(), 'chapters', chapter.id]),
       error: (e: unknown) => this.error.set(readError(e)),
     });

@@ -1,0 +1,69 @@
+// The area of the players, built for the phone from 320px on. Together with gm.scss this is the only
+// place with media queries: a breakpoint changes the sizes below, components only read them.
+.area-player {
+  --page-gap: 14px;
+  --tile-min: 100%;
+  --side-window: 100%;
+  --side-window-wide: 100%;
+  --popup-max: 100%;
+  --dialog: 100%;
+  --dialog-gap: 0px;
+  --dialog-height: 100vh;
+  --dialog-radius: 0;
+  --popup-height: 80vh;
+  // The line of steps in a tutorial shrinks to a narrow column of numbers.
+  --tutorial-rail: 44px;
+  --tutorial-rail-height: none;
+  --tutorial-titles: none;
+  --tutorial-item: center;
+  --symbol: 54px;
+}
+
+@media (min-width: 400px) {
+  .area-player {
+    --page-gap: 18px;
+  }
+}
+
+// From here on the page stays one column in the middle, also on a large screen.
+@media (min-width: 560px) {
+  .area-player {
+    --side-window: var(--column);
+    --side-window-wide: var(--column);
+    --popup-max: var(--column);
+    --dialog: var(--column);
+    --dialog-gap: var(--gap-3);
+    --dialog-height: auto;
+    --dialog-radius: var(--radius);
+  }
+}
+
+.area-player .frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.area-player .frame__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--gap-4);
+  width: 100%;
+  max-width: var(--column);
+  margin: 0 auto;
+  padding: var(--gap-4) var(--page-gap);
+}
+
+// The login page has no frame of its own; next to the form it shows the code for phones once there is room.
+.auth {
+  --auth-columns: minmax(0, 1fr);
+  --auth-code: none;
+}
+
+@media (min-width: 900px) {
+  .auth {
+    --auth-columns: minmax(0, 1fr) minmax(0, 1fr);
+    --auth-code: flex;
+  }
+}

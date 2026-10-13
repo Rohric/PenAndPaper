@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 
-import { Icon } from './icon';
+import { Icon } from '../basic/icon';
 
 /**
  * A small eye in front of a part of an entry: open in the accent colour when the players see it,
@@ -22,36 +22,7 @@ import { Icon } from './icon';
       <app-icon [name]="shown() ? 'eye' : 'eye-off'" [size]="size()" />
     </button>
   `,
-  styles: `
-    :host {
-      display: inline-flex;
-    }
-
-    .eye {
-      display: inline-flex;
-      padding: 3px;
-      border: 0;
-      border-radius: var(--radius-sm);
-      background: transparent;
-      color: var(--muted);
-      opacity: 0.7;
-      cursor: pointer;
-    }
-
-    .eye:hover {
-      background: var(--surface-2, var(--line));
-      opacity: 1;
-    }
-
-    .eye--on {
-      color: var(--accent);
-      opacity: 1;
-    }
-
-    .eye--faded {
-      opacity: 0.35;
-    }
-  `,
+  styleUrl: './eye-toggle.scss',
 })
 export class EyeToggle {
   /** Whether the players see this part. */

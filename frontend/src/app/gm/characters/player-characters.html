@@ -1,37 +1,14 @@
 <section class="stack">
-  <header class="row row--between">
-    <div>
-      <span class="kicker">Spielleiter</span>
-      <h1 class="title">Figuren der Spieler</h1>
-    </div>
-    <app-tutorial-button topic="gm-characters" />
-  </header>
-
   @if (error()) {
     <p class="notice notice--error" role="alert">{{ error() }}</p>
   }
 
-  <div class="stack">
-    <input class="input" aria-label="Charaktere suchen" placeholder="Name oder Spieler suchen" [ngModel]="query()" (ngModelChange)="query.set($event)" />
-    <div class="row" role="group" aria-label="Filter">
-      <button type="button" class="pill" [attr.aria-pressed]="filter() === 'all'" (click)="filter.set('all')">Alle</button>
-      <button type="button" class="pill" [attr.aria-pressed]="filter() === 'free'" (click)="filter.set('free')">Frei</button>
-      @for (adventure of adventures(); track adventure.id) {
-        <button type="button" class="pill" [attr.aria-pressed]="filter() === '' + adventure.id" (click)="filter.set('' + adventure.id)">
-          {{ adventure.name }}
-        </button>
-      }
-    </div>
-    <div class="row" role="group" aria-label="Sortierung">
-      @for (sort of sorts; track sort.id) {
-        <button type="button" class="pill" [attr.aria-pressed]="sortBy() === sort.id" (click)="sortBy.set(sort.id)">{{ sort.label }}</button>
-      }
-    </div>
-
-  </div>
-
-  <app-master-detail [list]="listTpl" [detail]="detailTpl" [open]="!!selected()" (back)="selectedId.set(null)" />
+  <app-master-detail [list]="listTpl" [detail]="detailTpl" />
 </section>
+
+<ng-template #searchBox>
+  <input class="input" aria-label="Charaktere suchen" placeholder="Name oder Spieler suchen" [ngModel]="query()" (ngModelChange)="query.set($event)" />
+</ng-template>
 
 <ng-template #listTpl>
   <div class="stack">

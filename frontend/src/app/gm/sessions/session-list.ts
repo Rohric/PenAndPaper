@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, TemplateRef, computed, inject, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -7,19 +7,19 @@ import { readError } from '../../core/api-error';
 import { ApiService } from '../../core/api.service';
 import { Option, PlayerCharacter, World } from '../../core/models';
 import { Session } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { IdSelect } from '../../shared/id-select';
-import { LinkPicker } from '../../shared/link-picker';
-import { LoginQr } from '../../shared/login-qr';
-import { SidePanel } from '../../shared/side-panel';
-import { TutorialButton } from '../../shared/tutorial-button';
-import { CharacterService } from '../characters/character.service';
-import { SessionService } from './session.service';
+import { IdSelect } from '../../components/form/id-select';
+import { LinkPicker } from '../../components/form/link-picker';
+import { LoginQr } from '../../components/basic/login-qr';
+import { Dialog } from '../../components/window/dialog';
+import { NavService } from '../../global/frame/nav.service';
+import { Tool, Tools } from '../../global/tool-bar/tools.service';
+import { CharacterService } from '../../core/character.service';
+import { SessionService } from '../../core/session.service';
 
-/** The sessions of the game master, with the form that starts a new one. */
+/** The sessions of the game master; "Neu" in the bar at the bottom opens the form that starts one. */
 @Component({
   selector: 'app-session-list',
-  imports: [FormsModule, RouterLink, Icon, IdSelect, LinkPicker, LoginQr, SidePanel, TutorialButton],
+  imports: [FormsModule, RouterLink, IdSelect, LinkPicker, LoginQr, Dialog],
   templateUrl: './session-list.html',
 })
 export class SessionList {
@@ -30,8 +30,13 @@ export class SessionList {
   protected readonly worlds = signal<World[]>([]);
   protected readonly characters = signal<PlayerCharacter[]>([]);
   protected readonly error = signal('');
-  /** Whether the window with the QR code for the phones of the players is open. */
-  protected readonly qrOpen = signal(false);
+  protected readonly creating = signal(false);
+  private readonly qrPop = viewChild<TemplateRef<unknown>>('qrPop');
+  /** The QR code that brings the phones of the players to the login. */
+  private readonly listTools = computed<Tool[]>(() => [
+    { id: 'new', word: 'Neu', title: 'Neue Runde starten', icon: 'plus', click: () => this.creating.set(true) },
+    { id: 'qr', word: 'QR-Code', title: 'QR-Code für die Handys der Spieler', icon: 'expand', popup: this.qrPop(), popupTitle: 'Mit dem Handy dabei' },
+  ]);
 
   protected readonly name = signal('');
   protected readonly date = signal(new Date().toISOString().slice(0, 10));
@@ -44,6 +49,10 @@ export class SessionList {
   );
 
   constructor() {
+    const nav = inject(NavService);
+    nav.crumbs.provide(signal([{ label: 'Runden' }]));
+    nav.topic.provide(signal(['sessions']));
+    inject(Tools).provide('view', this.listTools);
     const parts = {
       sessions: this.api.list(),
       worlds: inject(ApiService).get<World[]>('worlds/'),

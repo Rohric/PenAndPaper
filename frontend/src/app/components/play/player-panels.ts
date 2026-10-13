@@ -5,10 +5,11 @@ import { damageText } from '../../core/rules';
 import {
   EquipmentLine, PlayerView, QUEST_STATUSES, QuestLog, QuestStatus, SessionEntryKind, SharedEntry, SharedQuest, questStatus,
 } from '../../core/session-models';
-import { Icon, IconName } from '../../shared/icon';
-import { Portrait } from '../../shared/portrait';
-import { SidePanel } from '../../shared/side-panel';
-import { tagColour } from '../../shared/tag-colour';
+import { Icon, IconName } from '../basic/icon';
+import { Portrait } from '../basic/portrait';
+import { Popup } from '../window/popup';
+import { SideWindow } from '../window/side-window';
+import { tagColour } from '../entry/tag-colour';
 import { QuestLogView } from './quest-log';
 
 /** Something the group carries: who has it, what is known about it, and its entry of the world if that is revealed. */
@@ -54,7 +55,7 @@ const isItem = (entry: SharedEntry) => entry.kind === 'trivia' && entry.category
  */
 @Component({
   selector: 'app-player-panels',
-  imports: [Icon, Portrait, SidePanel, QuestLogView],
+  imports: [Icon, Portrait, Popup, SideWindow, QuestLogView],
   templateUrl: './player-panels.html',
 })
 export class PlayerPanels {
@@ -83,6 +84,8 @@ export class PlayerPanels {
   protected readonly colourOf = tagColour;
   /** Key of the tile that is open at the side; the tile is looked up again with every reload. */
   protected readonly openKey = signal<string | null>(null);
+  /** Whether the opened card is read in the window at the side; before that it is a popup with the short look. */
+  protected readonly full = signal(false);
   protected readonly shows = computed(() => ({
     quests: this.part() === 'all' || this.part() === 'quests',
     glossary: this.part() === 'all' || this.part() === 'glossary',
@@ -133,6 +136,12 @@ export class PlayerPanels {
     const loose = revealed.filter((entry) => !carried.some((item) => item.entry === entry));
     return [...carried, ...loose.map((entry) => ({ name: entry.name, text: entry.description, owners: [], hidden: false, entry }))];
   });
+
+  /** Close the popup or the window of the opened card. */
+  protected close(): void {
+    this.openKey.set(null);
+    this.full.set(false);
+  }
 
   /** How far the group is with a quest, in percent. */
   protected percent(quest: SharedQuest): number {

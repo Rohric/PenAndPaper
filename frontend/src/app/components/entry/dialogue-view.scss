@@ -1,0 +1,16 @@
+// One conversation: its lines hang on a line at the left, so it reads as one block.
+.talk {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 4px 12px;
+  border-left: 3px solid var(--line-2);
+}
+
+.speaker {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--kind-npc);
+  font-weight: 600;
+}

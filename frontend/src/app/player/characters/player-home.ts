@@ -6,16 +6,15 @@ import { readError } from '../../core/api-error';
 import { AuthService } from '../../core/auth.service';
 import { PlayerCharacter } from '../../core/models';
 import { basePointsLeft } from '../../core/rules';
-import { Portrait } from '../../shared/portrait';
-import { TutorialButton } from '../../shared/tutorial-button';
-import { CharacterService } from '../characters/character.service';
-import { PlayerBar } from './player-bar';
-import { PlayerTools } from './player-tools';
+import { Portrait } from '../../components/basic/portrait';
+import { TutorialButton } from '../../global/tutorial/tutorial-button';
+import { CharacterService } from '../../core/character.service';
+import { PlayerTools } from '../../global/tool-bar/player-tools';
 
 /** Start page of every account: the characters of the player, with a form to create one. */
 @Component({
   selector: 'app-player-home',
-  imports: [FormsModule, RouterLink, Portrait, TutorialButton, PlayerBar],
+  imports: [FormsModule, RouterLink, Portrait, TutorialButton],
   templateUrl: './player-home.html',
 })
 export class PlayerHome {

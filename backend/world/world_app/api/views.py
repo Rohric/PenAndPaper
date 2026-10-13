@@ -15,6 +15,7 @@ from world.world_app.utils import (
     chapter_for_user,
     delete_world,
     pictures_for_user,
+    tag_chapter,
     world_for_user,
     worlds_for_user,
 )
@@ -236,8 +237,8 @@ class SceneList(generics.ListCreateAPIView):
         return {**super().get_serializer_context(), "chapter": self.chapter}
 
     def perform_create(self, serializer):
-        """Save the new scene inside the chapter."""
-        serializer.save(chapter=self.chapter)
+        """Save the new scene inside the chapter and tag what hangs on it with the chapter."""
+        tag_chapter(serializer.save(chapter=self.chapter))
 
 
 class SceneDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -249,6 +250,10 @@ class SceneDetail(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         """Return only scenes from worlds the requesting user owns."""
         return Scene.objects.filter(chapter__world__owner=self.request.user)
+
+    def perform_update(self, serializer):
+        """Save the scene and tag what hangs on it now with its chapter."""
+        tag_chapter(serializer.save())
 
 
 class PictureList(generics.ListCreateAPIView):

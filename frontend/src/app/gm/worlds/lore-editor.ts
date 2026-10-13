@@ -3,8 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { readError } from '../../core/api-error';
-import { EditorBar } from '../../shared/editor-bar';
-import { WorldStore } from './world-store';
+import { EditorBar } from '../../components/form/editor-bar';
+import { WorldStore } from '../../core/world-store';
 
 /** Edit the world itself: its name and its lore. */
 @Component({

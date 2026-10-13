@@ -1,10 +1,10 @@
 // Desktop only. The bar of tools stays in view at the bottom and wraps when the window is narrow.
 :host {
   position: sticky;
-  bottom: 8px;
-  z-index: 10;
+  bottom: var(--gap-2);
+  z-index: var(--z-bar);
   display: block;
-  margin-top: auto;
+  margin: auto var(--page-gap) var(--gap-2);
 }
 
 .tools {

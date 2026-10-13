@@ -1,12 +1,12 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 
 import { EntryKind, EntryLink, Scene } from '../../core/models';
-import { Icon } from '../../shared/icon';
-import { DialogueView } from './dialogue-view';
-import { npcLinks } from './entry-views';
-import { EventTile } from './event-tile';
-import { LinkRow } from './link-row';
-import { WorldStore } from './world-store';
+import { Icon } from '../../components/basic/icon';
+import { DialogueView } from '../../components/entry/dialogue-view';
+import { npcLinks } from '../../components/entry/entry-views';
+import { EntryCard } from '../../components/entry/entry-card';
+import { LinkRow } from '../../components/entry/link-row';
+import { WorldStore } from '../../core/world-store';
 
 interface Named {
   id: number;
@@ -16,7 +16,7 @@ interface Named {
 /** Read one scene: where it plays, who appears, what is read aloud, what happens and what it points to. */
 @Component({
   selector: 'app-scene-view',
-  imports: [Icon, LinkRow, DialogueView, EventTile],
+  imports: [Icon, LinkRow, DialogueView, EntryCard],
   template: `
     <article class="panel kind--scenes">
       <header class="row row--between">
@@ -53,7 +53,7 @@ interface Named {
           <span class="label">Ereignisse in dieser Szene</span>
           <div class="tiles tiles--wide">
             @for (event of events(); track event.id) {
-              <app-event-tile [event]="event" [whole]="true" />
+              <app-entry-card size="card" [whole]="true" [ref]="{ kind: 'events', id: event.id }" />
             }
           </div>
         </div>

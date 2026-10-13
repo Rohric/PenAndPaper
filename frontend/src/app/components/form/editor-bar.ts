@@ -15,13 +15,7 @@ import { Component, input, output } from '@angular/core';
       <p class="notice notice--error" role="alert">{{ error() }}</p>
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-  `,
+  styleUrl: './editor-bar.scss',
 })
 export class EditorBar {
   readonly dirty = input(false);

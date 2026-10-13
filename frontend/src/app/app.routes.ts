@@ -2,48 +2,48 @@ import { Routes } from '@angular/router';
 
 import { authGuard, gameMasterGuard, guestGuard } from './core/auth.guard';
 import { leaveGuard } from './core/leave.guard';
-import { Shell } from './layout/shell';
+import { Frame } from './global/frame/frame';
 
 export const routes: Routes = [
   {
     path: 'login',
     canActivate: [guestGuard],
     data: { mode: 'login' },
-    loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
+    loadComponent: () => import('./auth/auth-page').then((m) => m.AuthPage),
   },
   {
     path: 'register',
     canActivate: [guestGuard],
     data: { mode: 'register' },
-    loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
+    loadComponent: () => import('./auth/auth-page').then((m) => m.AuthPage),
   },
   {
     path: '',
-    component: Shell,
+    component: Frame,
     canActivate: [authGuard],
     children: [
       { path: 'player', pathMatch: 'full', redirectTo: 'player/characters' },
       {
         path: 'player/characters',
-        loadComponent: () => import('./features/player/player-home').then((m) => m.PlayerHome),
+        loadComponent: () => import('./player/characters/player-home').then((m) => m.PlayerHome),
       },
       {
         path: 'player/sessions',
-        loadComponent: () => import('./features/sessions/my-sessions').then((m) => m.MySessions),
+        loadComponent: () => import('./player/sessions/my-sessions').then((m) => m.MySessions),
       },
       {
         path: 'player/sessions/:sessionId',
-        loadComponent: () => import('./features/sessions/player-session').then((m) => m.PlayerSession),
+        loadComponent: () => import('./player/session/player-session').then((m) => m.PlayerSession),
       },
       {
         path: 'player/characters/:id',
         canDeactivate: [leaveGuard],
-        loadComponent: () => import('./features/player/character-page').then((m) => m.CharacterPage),
+        loadComponent: () => import('./player/characters/character-page').then((m) => m.CharacterPage),
       },
       {
         path: 'gm',
         canActivate: [gameMasterGuard],
-        loadChildren: () => import('./features/gm/gm.routes').then((m) => m.GM_ROUTES),
+        loadChildren: () => import('./gm/gm.routes').then((m) => m.GM_ROUTES),
       },
       { path: '', pathMatch: 'full', redirectTo: 'player/characters' },
     ],

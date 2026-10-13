@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ApiService } from '../../core/api.service';
+import { ApiService } from './api.service';
 import {
   Attack, Battle, ChatMessage, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, QuestLog, Roll, RollOrder,
   Session, SessionEntry, SessionEntryKind,
-} from '../../core/session-models';
+} from './session-models';
 
 /** Backend calls for sessions and for the battles fought in them. */
 @Injectable({ providedIn: 'root' })

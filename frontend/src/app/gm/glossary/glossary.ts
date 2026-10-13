@@ -1,14 +1,15 @@
 import { Component, computed, inject, input, linkedSignal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { EntryKind, EntryRef } from '../../core/models';
-import { Icon } from '../../shared/icon';
-import { TutorialButton } from '../../shared/tutorial-button';
+import { Icon } from '../../components/basic/icon';
+import { Crumb, NavService } from '../../global/frame/nav.service';
 import { EntryForm } from './entry-form';
-import { EntryView } from './entry-view';
+import { EntryView } from '../../components/entry/entry-view';
+import { viewOf } from '../../components/entry/entry-views';
 import { GLOSSARY_SECTIONS, GlossarySection, GlossaryTiles, SectionId } from './glossary-tiles';
-import { LoreEditor } from './lore-editor';
-import { WorldStore } from './world-store';
+import { LoreEditor } from '../worlds/lore-editor';
+import { WorldStore } from '../../core/world-store';
 
 /** The kind of entry a part of the glossary shows on a whole page. */
 const PAGE_KINDS: Record<SectionId, EntryKind> = {
@@ -36,14 +37,8 @@ const TOPICS: Record<SectionId, string> = {
  */
 @Component({
   selector: 'app-glossary',
-  imports: [RouterLink, RouterLinkActive, Icon, TutorialButton, EntryForm, EntryView, GlossaryTiles, LoreEditor],
+  imports: [RouterLink, Icon, EntryForm, EntryView, GlossaryTiles, LoreEditor],
   templateUrl: './glossary.html',
-  styles: `
-    .tabs app-tutorial-button {
-      align-self: center;
-      margin-left: auto;
-    }
-  `,
 })
 export class Glossary {
   protected readonly store = inject(WorldStore);
@@ -53,7 +48,6 @@ export class Glossary {
   readonly section = input('lore');
   readonly entry = input<string>();
 
-  protected readonly sections = GLOSSARY_SECTIONS;
   /** The opened part; the lore of the world is none of the lists. */
   protected readonly current = computed<GlossarySection | null>(() => GLOSSARY_SECTIONS.find((s) => s.id === this.section()) ?? null);
   private readonly entryId = computed(() => Number(this.entry()) || null);
@@ -64,12 +58,24 @@ export class Glossary {
     return section && id !== null ? { kind: PAGE_KINDS[section.id], id } : null;
   });
   /** The lore is explained in the general tutorial of the glossary. */
-  protected readonly topic = computed(() => {
+  private readonly topic = computed(() => {
     const section = this.current();
-    return section ? TOPICS[section.id] : 'glossary';
+    return [section ? TOPICS[section.id] : 'glossary'];
+  });
+  /** The part of the glossary and, on its whole page, the entry. */
+  private readonly crumbs = computed<Crumb[]>(() => {
+    const page = this.opened();
+    const part: Crumb = { label: this.current()?.label ?? 'Lore', path: this.linkTo(this.section()) };
+    return page ? [part, { label: viewOf(this.store, page, null)?.title ?? 'Eintrag' }] : [part];
   });
   /** Every page starts in the reading view. */
   protected readonly editing = linkedSignal({ source: () => `${this.section()}:${this.entry()}`, computation: () => false });
+
+  constructor() {
+    const nav = inject(NavService);
+    nav.crumbs.provide(this.crumbs);
+    nav.topic.provide(this.topic);
+  }
 
   /** Address of a part of the glossary. */
   protected linkTo(section: string): unknown[] {

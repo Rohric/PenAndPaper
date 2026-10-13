@@ -1,0 +1,127 @@
+// The rail stays at the left edge while the page scrolls; its own content scrolls when it is too long.
+:host {
+  display: contents;
+}
+
+.rail {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  align-self: start;
+  height: 100vh;
+  padding: var(--gap-2) 6px;
+  overflow: hidden auto;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+}
+
+// The menu of the players lies over the page and comes from the left.
+.rail--menu {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--z-menu);
+  width: min(280px, 82vw);
+  height: auto;
+  padding: var(--gap-4) var(--gap-3) calc(var(--gap-4) + env(safe-area-inset-bottom));
+  box-shadow: 10px 0 34px rgb(0 0 0 / 35%);
+}
+
+.shade {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-menu);
+  background: rgb(0 0 0 / 55%);
+}
+
+.rail__group,
+.rail__foot {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rail__group--here,
+.rail__foot {
+  padding-top: var(--gap-2);
+  border-top: 1px solid var(--line);
+}
+
+.rail__foot {
+  margin-top: auto;
+}
+
+.rail__tab {
+  position: relative;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--gap-3);
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--soft);
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.is-open .rail__tab {
+  justify-content: flex-start;
+  padding: 0 var(--gap-3);
+}
+
+.rail__tab:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.rail__tab.is-active {
+  background: var(--surface-2);
+  color: var(--accent);
+}
+
+.rail__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rail__key {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.rail__count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+}
+
+// Closed, the number sits in the corner of the symbol.
+.rail:not(.is-open) .rail__count {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.rail__account {
+  padding: var(--gap-2) var(--gap-3) 0;
+  color: var(--muted);
+  font-size: 12px;
+}

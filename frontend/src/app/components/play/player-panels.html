@@ -126,11 +126,45 @@
   }
 }
 
-@if (openQuest(); as quest) {
-  <app-side-panel title="Quest" (closed)="openKey.set(null)">
+@if (!full()) {
+  @if (openQuest(); as quest) {
+    <app-popup tone="kind--quests" [kind]="kicker(quest)" [title]="quest.name" [size]="420" (closed)="close()">
+      @if (quest.goal) {
+        <div class="field">
+          <span class="label">Ziel</span>
+          <p class="prose clamp">{{ quest.goal }}</p>
+        </div>
+      }
+      @if (quest.description) {
+        <p class="prose clamp">{{ quest.description }}</p>
+      }
+      @if (quest.checklist.length) {
+        <span class="soft">Stand: {{ stepsDone(quest) }} von {{ quest.checklist.length }} Punkten</span>
+      }
+      @if (!quest.goal && !quest.description) {
+        <p class="soft">{{ nothingMore }}</p>
+      }
+      <button windowFoot type="button" class="btn btn--small btn--primary" (click)="full.set(true)"><app-icon name="sheet" [size]="16" /> Seitenfenster</button>
+    </app-popup>
+  }
+  @if (openCard(); as card) {
+    <app-popup [tone]="'kind--' + card.tone" [kind]="card.kicker" [title]="card.title" [size]="420" (closed)="close()">
+      @if (card.text) {
+        <p class="prose clamp">{{ card.text }}</p>
+      } @else {
+        <p class="soft">{{ nothingMore }}</p>
+      }
+      @if (card.entry?.knowledge?.length; as known) {
+        <span class="soft">{{ known }} {{ known === 1 ? 'Sache' : 'Sachen' }} habt ihr dazu herausgefunden.</span>
+      }
+      <button windowFoot type="button" class="btn btn--small btn--primary" (click)="full.set(true)"><app-icon name="sheet" [size]="16" /> Seitenfenster</button>
+    </app-popup>
+  }
+}
+
+@if (full() && openQuest(); as quest) {
+  <app-side-window tone="kind--quests" [kind]="kicker(quest)" [title]="quest.name" (closed)="close()">
     <article class="panel kind--quests">
-      <span class="kicker kicker--kind">{{ kicker(quest) }}</span>
-      <h2 class="subtitle">{{ quest.name }}</h2>
       <div class="row">
         @if (quest.giver) {
           <span class="chip">Questgeber · {{ quest.giver }}</span>
@@ -170,11 +204,11 @@
         (stepToggle)="toggleStep(quest, $event)"
       />
     </div>
-  </app-side-panel>
+  </app-side-window>
 }
 
-@if (openCard(); as card) {
-  <app-side-panel title="Glossar" (closed)="openKey.set(null)">
+@if (full() && openCard(); as card) {
+  <app-side-window [tone]="'kind--' + card.tone" [kind]="card.kicker || 'Glossar'" [title]="card.title" (closed)="close()">
     <article [class]="'panel kind--' + card.tone">
       <div class="tile__head">
         <app-portrait [symbol]="card.symbol" [fallback]="card.fallback" [size]="52" />
@@ -222,5 +256,5 @@
         <p class="soft">{{ nothingMore }}</p>
       }
     </article>
-  </app-side-panel>
+  </app-side-window>
 }

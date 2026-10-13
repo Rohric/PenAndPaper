@@ -33,10 +33,10 @@
   flex-direction: column;
   gap: 4px;
   align-items: center;
-  width: 118px;
+  width: var(--who-width, 118px);
   padding: 0 4px 8px;
   border-bottom: 3px solid transparent;
-  font-size: 13px;
+  font-size: var(--who-font, 13px);
   text-align: center;
 }
 
@@ -62,11 +62,4 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-@media (min-width: 900px) {
-  .who {
-    width: 132px;
-    font-size: 14px;
-  }
 }

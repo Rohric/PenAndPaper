@@ -37,13 +37,7 @@ import { DiceRoll } from './dice-roll';
       }
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-  `,
+  styleUrl: './battle-exchange.scss',
 })
 export class BattleExchange {
   readonly exchange = input.required<Exchange>();

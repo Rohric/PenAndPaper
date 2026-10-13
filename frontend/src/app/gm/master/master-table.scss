@@ -68,8 +68,32 @@
   white-space: nowrap;
 }
 
-.focus {
-  border-color: var(--accent);
+// The head of a table: a click folds the table shut or open.
+.table__head {
+  display: flex;
+  gap: var(--gap-2);
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.table__mark {
+  transition: transform 0.15s;
+}
+
+.table__mark.is-open {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table__mark {
+    transition: none;
+  }
 }
 
 .placed {

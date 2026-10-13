@@ -1,7 +1,7 @@
 import { Component, ElementRef, booleanAttribute, computed, input, output, signal, viewChild } from '@angular/core';
 
-import { Option } from '../core/models';
-import { Icon } from './icon';
+import { Option } from '../../core/models';
+import { Icon } from '../basic/icon';
 
 const SHOWN = 8;
 let fields = 0;
@@ -88,127 +88,7 @@ interface Choice {
       </div>
     }
   `,
-  styles: `
-    :host {
-      position: relative;
-      display: block;
-      min-width: 0;
-    }
-
-    // Looks like a text field, holds the chips and the place to type.
-    .box {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      min-height: 46px;
-      padding: 6px 8px;
-      border: 1px solid var(--line-2);
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      cursor: text;
-    }
-
-    .box:focus-within {
-      border-color: var(--accent);
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-
-    .box__input {
-      flex: 1;
-      min-width: 140px;
-      min-height: 30px;
-      padding: 0 4px;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-    }
-
-    .token {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid var(--kind, var(--info));
-      border-radius: 999px;
-      background: color-mix(in srgb, var(--kind, var(--info)) 12%, transparent);
-    }
-
-    .token__name,
-    .token__x {
-      display: inline-flex;
-      align-items: center;
-      min-height: 30px;
-      border: 0;
-      background: transparent;
-    }
-
-    .token__name {
-      padding: 0 4px 0 12px;
-      color: var(--kind, var(--info));
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .token__x {
-      padding: 0 8px 0 4px;
-      color: var(--muted);
-    }
-
-    .token__x:hover {
-      color: var(--danger);
-    }
-
-    // The list lies over the page, so opening it moves nothing.
-    .list {
-      position: absolute;
-      top: calc(100% + 4px);
-      right: 0;
-      left: 0;
-      z-index: 30;
-      display: flex;
-      flex-direction: column;
-      padding: 6px;
-      border: 1px solid var(--line-2);
-      border-radius: var(--radius-sm);
-      background: var(--surface-2);
-      box-shadow: 0 12px 28px rgb(0 0 0 / 45%);
-    }
-
-    // A choice carries the colour of its kind on its left edge and in its name.
-    .list__item {
-      display: flex;
-      flex-direction: column;
-      padding: 6px 10px;
-      border-left: 3px solid var(--kind, transparent);
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    .list__item.is-active {
-      background: var(--surface);
-      outline: 1px solid var(--accent);
-    }
-
-    .list__label {
-      color: var(--kind, var(--text));
-      font-weight: 600;
-    }
-
-    .list__hint {
-      overflow: hidden;
-      color: var(--muted);
-      font-size: 13px;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .list__note {
-      padding: 6px 10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-  `,
+  styleUrl: './link-picker.scss',
 })
 export class LinkPicker {
   /** Everything that can be linked. */

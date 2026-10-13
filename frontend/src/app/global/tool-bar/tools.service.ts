@@ -1,23 +1,24 @@
-import { DestroyRef, Injectable, Signal, TemplateRef, computed, inject, signal } from '@angular/core';
+import { Injectable, Signal, TemplateRef, signal } from '@angular/core';
 
-import { IconName } from '../../shared/icon';
+import { IconName } from '../../components/basic/icon';
+import { Slot } from '../../core/slot';
 
-/** One symbol of the bar at the bottom of the cockpit: a word, a number, and what a click does. */
+/** One symbol of the bar at the bottom: a word, a number, and what a click does. */
 export interface Tool {
   id: string;
   word: string;
+  /** The full name, shown as a tooltip and read out; the word under the symbol stays short. */
+  title?: string;
   icon: IconName;
   /** The colour class of a kind of entry, like "kind--quests". */
   tone?: string;
   /** The number on the symbol; nothing is shown for 0 or null. */
   count?: number | null;
+  /** A small dot on the symbol: something here waits for the user. */
+  alert?: boolean;
   /** The symbol is a switch and is on. */
   pressed?: boolean;
   disabled?: boolean;
-  /** The full name, shown as a tooltip and read out; the word under the symbol stays short. */
-  title?: string;
-  /** A small dot on the symbol: something here waits for the user. */
-  alert?: boolean;
   /** What a click does when it opens no popup. */
   click?: () => void;
   /** What a click opens above the symbol. */
@@ -32,25 +33,20 @@ export interface Tool {
 /** Where in the bar a symbol stands: the same in every view, the ones of the view, or the same again on the right. */
 export type ToolPart = 'always' | 'view' | 'right';
 
-interface Source {
-  part: ToolPart;
-  tools: Signal<Tool[]>;
-}
-
 /**
- * The symbols of the bar at the bottom of the cockpit. Every part of the cockpit that has tools reports them
- * here while it is on the screen and takes them back when it leaves, so the middle of the bar always matches the view.
+ * The symbols of the bar at the bottom of the game master pages. Every page and every part of a page that has
+ * tools reports them here while it is on the screen, so the middle of the bar always matches the view.
  */
-@Injectable()
-export class CockpitTools {
-  private readonly sources = signal<Source[]>([]);
+@Injectable({ providedIn: 'root' })
+export class Tools {
+  private readonly parts: Record<ToolPart, Slot<Tool>> = { always: new Slot<Tool>(), view: new Slot<Tool>(), right: new Slot<Tool>() };
   private readonly dismissals = signal(0);
   /** Counts how often a popup was asked to close; the bar closes its popup whenever this changes. */
   readonly dismissed = this.dismissals.asReadonly();
 
   /** The symbols of one part of the bar, in the order they were reported. */
   of(part: ToolPart): Signal<Tool[]> {
-    return computed(() => this.sources().filter((source) => source.part === part).flatMap((source) => source.tools()));
+    return this.parts[part].items;
   }
 
   /** Close the open popup, for example because a window at the side opens. */
@@ -60,8 +56,6 @@ export class CockpitTools {
 
   /** Report symbols. Call it in the constructor of the component; they are taken back when the component is destroyed. */
   provide(part: ToolPart, tools: Signal<Tool[]>): void {
-    const source: Source = { part, tools };
-    this.sources.update((all) => [...all, source]);
-    inject(DestroyRef).onDestroy(() => this.sources.update((all) => all.filter((other) => other !== source)));
+    this.parts[part].provide(tools);
   }
 }

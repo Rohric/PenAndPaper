@@ -1,7 +1,7 @@
 import { Component, input, output, signal } from '@angular/core';
 
-import { Icon, IconName } from './icon';
-import { Portrait } from './portrait';
+import { Icon, IconName } from '../basic/icon';
+import { Portrait } from '../basic/portrait';
 import { SYMBOL_GROUPS } from './symbols';
 
 /**
@@ -46,37 +46,7 @@ import { SYMBOL_GROUPS } from './symbols';
       }
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .picks {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .pick {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      border: 1px solid var(--line-2);
-      border-radius: var(--radius-sm);
-      background: var(--bg);
-      color: var(--soft);
-    }
-
-    .pick:hover,
-    .pick.is-active {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-  `,
+  styleUrl: './symbol-picker.scss',
 })
 export class SymbolPicker {
   /** Key of the picked symbol; empty means the usual symbol. */

@@ -164,6 +164,10 @@ class CharacterSerializer(serializers.ModelSerializer):
         """Check and complete every special ability."""
         return [_clean_ability(entry) for entry in _as_list(abilities)]
 
+    def _bonus_counts(self):
+        """Return whether the bonus budget is checked; a player character checks it only in an adventure."""
+        return True
+
     def _current(self, data, field, default):
         """Return the new value of a field, or the stored one on a partial update."""
         return data.get(field, getattr(self.instance, field, default))
@@ -178,7 +182,7 @@ class CharacterSerializer(serializers.ModelSerializer):
         if base < 0:
             raise serializers.ValidationError(f"Es sind {-base} Grundpunkte zu viel verteilt.")
         bonus = bonus_points_left(skills, self._current(data, "bonus_points_total", 0), self.leveling)
-        if bonus < 0:
+        if bonus < 0 and self._bonus_counts():
             raise serializers.ValidationError(f"Es sind {-bonus} Bonuspunkte zu viel ausgegeben.")
         return self._within_maximum(data)
 
@@ -222,13 +226,20 @@ class PlayerCharacterSerializer(CharacterSerializer):
         fields = CHARACTER_FIELDS + ADVENTURE_FIELDS + ["inspiration_used"]
         read_only_fields = LEVEL_FIELDS + ["inspiration_used"]
 
+    def _locked(self):
+        """Return whether the character plays in a running adventure, where the house rules count."""
+        return bool(self.instance and self.instance.sessions.filter(finished=False).exists())
+
+    def _bonus_counts(self):
+        """Check the bonus budget only in an adventure; the creation of a character knows no bonus points."""
+        return self._locked()
+
     def validate(self, data):
         """Check the skills against the rules of the player: the maximum, the minimum and the base points."""
         if "skills" in data:
             stored = with_ids(getattr(self.instance, "skills", []), [])
             data["skills"] = with_ids(data["skills"], stored)
-            locked = bool(self.instance and self.instance.sessions.filter(finished=False).exists())
-            problems = skill_problems(data["skills"], stored, locked)
+            problems = skill_problems(data["skills"], stored, self._locked())
             if problems:
                 raise serializers.ValidationError({"skills": problems})
         return super().validate(data)

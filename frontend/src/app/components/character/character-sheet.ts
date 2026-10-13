@@ -2,8 +2,8 @@ import { Component, computed, input, output, signal } from '@angular/core';
 
 import { AnyCharacter, Skill, TALENTS } from '../../core/models';
 import { damageText, inspirationPoints, skillValue, talentValue } from '../../core/rules';
-import { Icon } from '../../shared/icon';
-import { Portrait } from '../../shared/portrait';
+import { Icon } from '../basic/icon';
+import { Portrait } from '../basic/portrait';
 import { EditorSection } from './character-editor';
 import { PointsOverview } from './points-overview';
 
@@ -42,8 +42,11 @@ export class CharacterSheet {
     return [character.age && `Alter ${character.age}`, character.gender].filter(Boolean).join(' · ');
   });
   protected readonly budgets = computed(() => ({ base: this.character().skill_points_total, bonus: this.character().bonus_points_total }));
-  /** Only a player character pays bonus points by the tiers of the leveling rule. */
-  protected readonly leveling = computed(() => this.character().backstory !== undefined);
+  private readonly isPlayer = computed(() => this.character().backstory !== undefined);
+  /** The house rules (tiers, credit) count for a player character while it plays in an adventure. */
+  protected readonly leveling = computed(() => this.isPlayer() && !!this.character().adventure);
+  /** Bonus points are shown for NPCs and in an adventure; the creation of a player character knows only base points. */
+  protected readonly bonus = computed(() => !this.isPlayer() || this.leveling());
   protected readonly lifePercent = computed(() => {
     const { life_points, max_life_points } = this.character();
     return max_life_points ? Math.min(100, Math.max(0, (life_points / max_life_points) * 100)) : 0;

@@ -1,31 +1,19 @@
 <section class="cockpit">
-  <header class="bar bar--top">
-    <div class="bar__title">
-      <a class="btn btn--small" routerLink="/gm/sessions" aria-label="Alle Runden"><app-icon name="back" /></a>
-      <div>
-        <span class="kicker">Runde · {{ store.session()?.world_name }}</span>
-        <h1 class="subtitle">{{ store.session()?.name }}</h1>
-      </div>
-      <app-id-select
-        inputId="cockpit-chapter"
-        emptyLabel="Kapitel wählen"
-        [options]="chapterOptions()"
-        [value]="chapterId()"
-        (valueChange)="store.save({ chapter: $event })"
-      />
-    </div>
-    <nav class="row" aria-label="Ansichten der Runde">
-      @for (item of views; track item.id) {
-        <button type="button" class="btn" [attr.title]="'Taste ' + ($index + 1)" [attr.aria-pressed]="view() === item.id && !battleId()" (click)="show(item.id)">
-          <app-icon [class]="item.tone ?? ''" [name]="item.icon" /> {{ item.label }}
-        </button>
-      }
-      @if (world.world()) {
-        <app-world-search #search />
-      }
-      <app-tutorial-button topic="sessions" />
-    </nav>
-  </header>
+  <!-- What the cockpit puts into the bar on top: the chapter the group is in, and the search over the world. -->
+  <ng-template #chapterPick>
+    <app-id-select
+      inputId="cockpit-chapter"
+      emptyLabel="Kapitel wählen"
+      [options]="chapterOptions()"
+      [value]="chapterId()"
+      (valueChange)="store.save({ chapter: $event })"
+    />
+  </ng-template>
+  <ng-template #searchBox>
+    @if (world.world()) {
+      <app-world-search />
+    }
+  </ng-template>
 
   @if (store.error() || error()) {
     <p class="notice notice--error" role="alert">{{ store.error() || error() }}</p>
@@ -52,8 +40,6 @@
           [section]="section()"
           [creatable]="false"
           [carriers]="carriers()"
-          [eyeOf]="isShared"
-          (eyeToggle)="toggleShared($event)"
           (carrier)="openPanel({ kind: 'sheet', characterId: $event })"
         />
       }
@@ -79,7 +65,6 @@
     }
   }
 
-  <app-tool-bar />
 </section>
 
 <!-- The popups behind the symbols of the bar that belong to the whole cockpit. -->
@@ -122,7 +107,7 @@
 <ng-template #recentPop>
   <div class="row">
     @for (item of recent(); track item.ref.kind + item.ref.id) {
-      <button type="button" [class]="'chip chip--link kind--' + item.ref.kind" (click)="world.peek.set(item.ref)">
+      <button type="button" [class]="'chip chip--link kind--' + item.ref.kind" (click)="world.look(item.ref)">
         {{ item.name }} <span class="soft">· {{ item.fresh ? 'neu' : 'geändert' }} {{ ago(item.when) }}</span>
       </button>
     } @empty {
@@ -134,7 +119,7 @@
 <ng-template #sharedPop>
   <div class="row">
     @for (item of lastShared(); track item.ref.kind + item.ref.id) {
-      <button type="button" [class]="'chip chip--link kind--' + item.ref.kind" (click)="world.peek.set(item.ref)">{{ item.name }}</button>
+      <button type="button" [class]="'chip chip--link kind--' + item.ref.kind" (click)="world.look(item.ref)">{{ item.name }}</button>
     } @empty {
       <span class="soft">Du hast den Spielern noch nichts gezeigt.</span>
     }
@@ -153,14 +138,25 @@
   </div>
 </ng-template>
 
-<app-entry-peek editLabel="In der Welt bearbeiten" [editable]="view() !== 'master'" [jump]="view() === 'master'" (jumped)="toEntry($event)" [eyes]="eyes()" (eye)="onEye($event)" (step)="onStep($event)">
+<app-table-ask />
+
+<app-entry-popup [jump]="true" (jumped)="toEntry($event)">
+  @if (world.popup(); as looked) {
+    <app-session-entry-actions part="short" [entry]="looked" />
+  }
+</app-entry-popup>
+
+<app-entry-peek [session]="true" [editable]="false" [jump]="true" (jumped)="toEntry($event)" [eyes]="eyes()" (eye)="onEye($event)" (step)="onStep($event)">
   @if (world.peek(); as looked) {
-    <app-session-entry-actions [entry]="looked" [readonly]="view() === 'master'" />
+    <app-session-entry-actions entryRound part="round" [entry]="looked" [readonly]="view() === 'master'" />
+  }
+  @if (world.peek(); as looked) {
+    <app-session-entry-actions entryNote part="note" [entry]="looked" />
   }
 </app-entry-peek>
 
 @if (panel(); as opened) {
-  <app-side-panel [title]="panelTitle()" [wide]="opened.kind === 'sheet'" (closed)="panel.set(null)">
+  <app-side-window [title]="panelTitle()" [wide]="opened.kind === 'sheet'" (closed)="panel.set(null)">
     @switch (opened.kind) {
       @case ('sheet') {
         @if (panelCharacter(); as character) {
@@ -220,5 +216,5 @@
         <app-chapter-close-form [characters]="store.characters()" (close)="closeChapter($event)" />
       }
     }
-  </app-side-panel>
+  </app-side-window>
 }

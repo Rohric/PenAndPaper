@@ -57,6 +57,17 @@ def lies_inside(location, other):
     return False
 
 
+def tag_chapter(scene):
+    """Tag everything that hangs on the scene with the chapter of the scene."""
+    chapter = scene.chapter
+    if scene.location_id:
+        chapter.locations.add(scene.location_id)
+    chapter.npcs.add(*scene.npcs.all())
+    chapter.quests.add(*scene.quests.all())
+    chapter.events.add(*scene.events.all())
+    chapter.trivia.add(*scene.trivia.all())
+
+
 def next_chapter_number(world):
     """Return the number a new chapter of the given world gets by default."""
     highest = world.chapters.aggregate(highest=Max("number"))["highest"]

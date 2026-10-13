@@ -2,16 +2,17 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 
 import { readError } from '../../core/api-error';
 import { AnyCharacter, Npc, WorldNpc } from '../../core/models';
-import { LinkPicker } from '../../shared/link-picker';
-import { CharacterEditor } from '../characters/character-editor';
-import { CharacterService } from '../characters/character.service';
+import { ChapterField } from '../../components/form/chapter-field';
+import { LinkPicker } from '../../components/form/link-picker';
+import { CharacterEditor } from '../../components/character/character-editor';
+import { CharacterService } from '../../core/character.service';
 import { EntryItems } from './entry-items';
-import { WorldStore } from './world-store';
+import { WorldStore } from '../../core/world-store';
 
 /** Edit an NPC of the world: where it can be met, and the character itself. */
 @Component({
   selector: 'app-world-npc-editor',
-  imports: [CharacterEditor, LinkPicker, EntryItems],
+  imports: [CharacterEditor, ChapterField, LinkPicker, EntryItems],
   template: `
     <div class="stack">
       <div class="panel">
@@ -30,11 +31,12 @@ import { WorldStore } from './world-store';
             (create)="createLocation($event)"
           />
         </div>
+        <app-chapter-field inputId="npc-chapters" [selected]="link().chapters" (selectedChange)="setChapters($event)" />
         <div class="field">
           <span class="label">Gegenstände der Welt bei dieser Figur</span>
           <app-entry-items kind="npcs" [entryId]="link().npc" />
         </div>
-        <p class="soft">Ort und Gegenstände werden sofort gespeichert. Was die Figur bei sich trägt, steht unten im Inventar.</p>
+        <p class="soft">Ort, Kapitel und Gegenstände werden sofort gespeichert. Was die Figur bei sich trägt, steht unten im Inventar.</p>
         @if (error()) {
           <p class="notice notice--error" role="alert">{{ error() }}</p>
         }
@@ -71,6 +73,11 @@ export class WorldNpcEditor {
   /** Save the place where the NPC can be met right away. */
   protected setLocation(location: number | null): void {
     this.store.save('world-npcs', this.link().id, { location }).subscribe({ error: (e: unknown) => this.error.set(readError(e)) });
+  }
+
+  /** Save the chapters the NPC is tagged with right away. */
+  protected setChapters(chapters: number[]): void {
+    this.store.save('world-npcs', this.link().id, { chapters }).subscribe({ error: (e: unknown) => this.error.set(readError(e)) });
   }
 
   /** Create a place with the typed name and put the NPC there. */

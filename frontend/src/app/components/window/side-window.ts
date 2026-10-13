@@ -1,65 +1,48 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, model, output } from '@angular/core';
 
-import { Icon } from './icon';
+import { WindowHead, WindowTab } from './window-head';
 
 /**
- * A window at the right side of the screen, over the page: it shows something
- * without leaving the page behind it. The page decides when it is there.
+ * A window at the right side of the screen for reading and editing; the page behind it stays in view.
+ * On the phone it fills the whole screen. The page decides when it is there.
  */
 @Component({
-  selector: 'app-side-panel',
-  imports: [Icon],
+  selector: 'app-side-window',
+  imports: [WindowHead],
   template: `
     <div class="veil" (click)="closed.emit()"></div>
-    <aside class="drawer" role="dialog" [class.drawer--wide]="wide()" [attr.aria-label]="title()">
-      <header class="drawer__head">
-        <h2 class="subtitle">{{ title() }}</h2>
-        <div class="row">
-          <ng-content select="[panelAction]" />
-          <button type="button" class="btn btn--small" (click)="closed.emit()">
-            <app-icon name="close" [size]="16" />
-            Schließen
-          </button>
-        </div>
-      </header>
-      <ng-content />
+    <aside class="side" role="dialog" [class.side--wide]="wide()" [attr.aria-label]="title()">
+      <app-window-head
+        [title]="title()"
+        [kind]="kind()"
+        [tone]="tone()"
+        [tabs]="tabs()"
+        [(tab)]="tab"
+        [canBack]="canBack()"
+        [canForward]="canForward()"
+        (back)="back.emit()"
+        (forward)="forward.emit()"
+        (closed)="closed.emit()"
+      >
+        <ng-content select="[windowAction]" />
+      </app-window-head>
+      <div class="side__body"><ng-content /></div>
+      <footer class="side__foot"><ng-content select="[windowFoot]" /></footer>
     </aside>
   `,
-  styles: `
-    // One view for both screens: a panel on the right that never gets wider than the screen.
-    .drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 41;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: min(520px, 100%);
-      padding: 16px;
-      overflow-y: auto;
-      border-left: 1px solid var(--line);
-      background: var(--bg);
-    }
-
-    .drawer--wide {
-      width: min(720px, 100%);
-    }
-
-    .drawer__head {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-    }
-  `,
-  host: { '(document:keydown.escape)': 'closed.emit()' },
+  styleUrl: './side-window.scss',
 })
-export class SidePanel {
+export class SideWindow {
   readonly title = input.required<string>();
-  /** A wider window, for a whole character sheet. */
+  readonly kind = input('');
+  readonly tone = input('');
+  /** A wider window, for a whole character sheet or a form. */
   readonly wide = input(false);
+  readonly tabs = input<WindowTab[]>([]);
+  readonly tab = model('');
+  readonly canBack = input(false);
+  readonly canForward = input(false);
+  readonly back = output<void>();
+  readonly forward = output<void>();
   readonly closed = output<void>();
 }

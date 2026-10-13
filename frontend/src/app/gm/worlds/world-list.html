@@ -1,17 +1,4 @@
 <section class="stack">
-  <header class="row row--between">
-    <div>
-      <span class="kicker">Spielleiter</span>
-      <h1 class="title">Welten</h1>
-    </div>
-    <app-tutorial-button topic="start" />
-  </header>
-
-  <form class="list-row create" (ngSubmit)="create()">
-    <input class="input" name="newName" aria-label="Name der neuen Welt" placeholder="Name der neuen Welt" [(ngModel)]="newName" />
-    <button type="submit" class="btn btn--primary" [disabled]="!newName().trim()">Welt anlegen</button>
-  </form>
-
   @if (error()) {
     <p class="notice notice--error" role="alert">{{ error() }}</p>
   }
@@ -30,7 +17,11 @@
 
   @if (!worlds().length) {
     <div class="empty">
-      <p>Noch keine Welt. Gib oben einen Namen ein und leg deine erste an.</p>
+      <p>Noch keine Welt. Mit „Neu“ unten in der Leiste legst du deine erste an.</p>
     </div>
   }
 </section>
+
+@if (creating()) {
+  <app-name-dialog title="Neue Welt" label="Name der Welt" hint="Die Welt öffnet sich danach; dort schreibst du Kapitel und Glossar." [error]="error()" (create)="create($event)" (closed)="creating.set(false)" />
+}

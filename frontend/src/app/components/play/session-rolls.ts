@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 
 import { ROLL_RESULTS, Roll } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
+import { Icon } from '../basic/icon';
 
 /** The latest rolls of a session, newest first: checks with their result, free dice with their sum. */
 @Component({
@@ -28,13 +28,7 @@ import { Icon } from '../../shared/icon';
       <p class="soft">Noch kein Wurf.</p>
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-  `,
+  styleUrl: './session-rolls.scss',
 })
 export class SessionRolls {
   readonly rolls = input.required<Roll[]>();

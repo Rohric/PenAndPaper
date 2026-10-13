@@ -1,46 +1,46 @@
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { EntryKind, EntryLink, EntryRef, Option, Scene, Trivia, itemDamage } from '../../core/models';
 import { Battle, ItemGift, Note, PlayerView, ROLL_RESULTS, SessionEntryKind } from '../../core/session-models';
-import { Icon, IconName } from '../../shared/icon';
-import { IdSelect } from '../../shared/id-select';
-import { SidePanel } from '../../shared/side-panel';
-import { timeAgo } from '../../shared/time-ago';
-import { TutorialButton } from '../../shared/tutorial-button';
-import { CharacterSheet } from '../characters/character-sheet';
-import { EntryPeek } from '../worlds/entry-peek';
-import { Eyes, isItem } from '../worlds/entry-views';
-import { GLOSSARY_SECTIONS, GlossaryTiles, SectionId } from '../worlds/glossary-tiles';
-import { Carrier } from '../worlds/item-rows';
-import { SceneThread } from '../worlds/scene-thread';
-import { SceneView } from '../worlds/scene-view';
+import { Icon, IconName } from '../../components/basic/icon';
+import { IdSelect } from '../../components/form/id-select';
+import { SideWindow } from '../../components/window/side-window';
+import { timeAgo } from '../../components/basic/time-ago';
+import { Crumb, NavItem, NavService } from '../../global/frame/nav.service';
+import { CharacterSheet } from '../../components/character/character-sheet';
+import { EntryPopup } from '../../components/entry/entry-popup';
+import { TableAsk } from '../../components/entry/table-ask';
+import { EntryPeek } from '../../components/entry/entry-window';
+import { Eyes, isItem } from '../../components/entry/entry-views';
+import { GLOSSARY_SECTIONS, GlossaryTiles, SectionId } from '../glossary/glossary-tiles';
+import { Carrier } from '../glossary/item-rows';
+import { SceneThread } from '../chapters/scene-thread';
+import { SceneView } from '../chapters/scene-view';
 import { WorldSearch } from '../worlds/world-search';
-import { WorldStore } from '../worlds/world-store';
-import { BattleView } from './battle-view';
+import { WorldStore } from '../../core/world-store';
+import { BattleView } from '../battle/battle-view';
 import { ChapterCloseForm } from './chapter-close-form';
-import { ChatThread, groupBubbles } from './chat-thread';
-import { CockpitTools, Tool } from './cockpit-tools';
-import { CharacterPanel } from './character-tile';
+import { ChatThread, groupBubbles } from '../../components/play/chat-thread';
+import { Tools, Tool } from '../../global/tool-bar/tools.service';
+import { CharacterPanel } from '../../components/character/character-tile';
 import { ItemGiftForm, ItemTemplate } from './item-gift-form';
-import { MasterTable } from './master-table';
-import { NoteDetail } from './note-detail';
-import { PlayerPanels } from './player-panels';
+import { MasterTable } from '../master/master-table';
+import { NoteDetail } from '../../components/play/note-detail';
+import { PlayerPanels } from '../../components/play/player-panels';
 import { QuestBoard } from './quest-board';
-import { RollPanel } from './roll-panel';
+import { RollPanel } from '../../components/play/roll-panel';
 import { SessionArchive } from './session-archive';
-import { SessionEntryActions } from './session-entry-actions';
+import { SessionEntryActions } from '../../components/entry/entry-session';
 import { SessionGroup } from './session-group';
-import { SessionMembers } from './session-members';
-import { SessionNotes } from './session-notes';
-import { SessionRolls } from './session-rolls';
-import { SESSION_KINDS, SessionStore } from './session-store';
+import { SessionMembers } from '../sessions/session-members';
+import { SessionNotes } from '../../components/play/session-notes';
+import { SessionRolls } from '../../components/play/session-rolls';
+import { SESSION_KINDS, SessionStore } from '../../core/session-store';
 import { SessionStory } from './session-story';
-import { SessionThread } from './session-thread';
-import { SessionService } from './session.service';
-import { ToolBar } from './tool-bar';
+import { SessionThread } from '../../components/play/session-thread';
+import { SessionService } from '../../core/session.service';
 
 const REFRESH_MS = 5000;
 const SEEN_KEY = 'pnp.notes.seen.';
@@ -116,26 +116,26 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
 @Component({
   selector: 'app-session-cockpit',
   imports: [
-    RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
+    Icon, IdSelect, SideWindow, CharacterSheet, EntryPeek, EntryPopup, TableAsk, SceneThread, BattleView,
     ChapterCloseForm, ChatThread, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
-    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch, MasterTable, ToolBar, SceneView,
+    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch, MasterTable, SceneView,
   ],
-  providers: [WorldStore, SessionStore, CockpitTools],
+  providers: [WorldStore, SessionStore],
   templateUrl: './session-cockpit.html',
   styleUrl: './session-cockpit.scss',
-  host: { '(document:keydown)': 'onKey($event)' },
 })
 export class SessionCockpit {
   protected readonly world = inject(WorldStore);
   protected readonly store = inject(SessionStore);
   private readonly api = inject(SessionService);
-  private readonly tools = inject(CockpitTools);
+  private readonly tools = inject(Tools);
 
   /** From the URL: /gm/sessions/:sessionId */
   readonly sessionId = input.required<string>();
 
   protected readonly views = VIEWS;
-  private readonly search = viewChild<WorldSearch>('search');
+  private readonly chapterPick = viewChild<TemplateRef<unknown>>('chapterPick');
+  private readonly searchBox = viewChild<TemplateRef<unknown>>('searchBox');
   protected readonly ago = timeAgo;
   protected readonly view = signal<View>('story');
   /** The entry whose connections the master mode shows. It has nothing to do with the scene of the story. */
@@ -255,6 +255,31 @@ export class SessionCockpit {
   private readonly sharedPop = viewChild<TemplateRef<unknown>>('sharedPop');
   private readonly groupNotesPop = viewChild<TemplateRef<unknown>>('groupNotesPop');
 
+  /** The views of the session as the tabs of the rail on the left; a running battle is one more. */
+  private readonly tabs = computed<NavItem[]>(() => {
+    const fighting = this.battleId() !== null;
+    const tabs = VIEWS.map((item): NavItem => ({
+      id: item.id, label: item.label, icon: item.icon, tone: item.tone, active: this.view() === item.id && !fighting,
+      count: item.id === 'notes' ? this.fresh() : null, click: () => this.show(item.id),
+    }));
+    return fighting ? [...tabs, { id: 'battle', label: 'Kampf', icon: 'sword', active: true, click: () => undefined }] : tabs;
+  });
+  /** Where the game master is: the sessions, the world and this session. */
+  private readonly crumbs = computed<Crumb[]>(() => [
+    { label: 'Runden', path: '/gm/sessions' },
+    { label: this.store.session()?.world_name ?? 'Welt' },
+    { label: this.store.session()?.name ?? 'Runde' },
+  ]);
+  /** The parts of the glossary as links on top, while the glossary is open. */
+  private readonly viewLinks = computed<NavItem[]>(() =>
+    this.view() === 'glossary' && this.battleId() === null
+      ? this.sections.map((part): NavItem => ({
+          id: part.id, label: part.label, icon: part.icon, tone: `kind--${part.id}`, active: part.id === this.sectionId(), click: () => this.sectionId.set(part.id),
+        }))
+      : [],
+  );
+  private readonly extras = computed(() => [this.chapterPick(), this.searchBox()].filter((extra): extra is TemplateRef<unknown> => !!extra));
+
   /** The symbols that are there in every view. */
   private readonly alwaysTools = computed<Tool[]>(() => [
     { id: 'group', word: 'Gruppe', icon: 'group', tone: 'kind--npcs', count: this.unreadMessages(), popup: this.groupPop(), popupTitle: 'Gruppe', wide: true },
@@ -280,12 +305,7 @@ export class SessionCockpit {
     }
     switch (this.view()) {
       case 'glossary':
-        return [
-          { id: 'glossary-recent', word: 'Zuletzt', icon: 'clock', popup: this.recentPop(), popupTitle: 'Zuletzt angelegt und bearbeitet' },
-          ...this.sections.map((part): Tool => ({
-            id: `glossary-${part.id}`, word: part.label, icon: part.icon, tone: `kind--${part.id}`, pressed: part.id === this.sectionId(), click: () => this.sectionId.set(part.id),
-          })),
-        ];
+        return [{ id: 'glossary-recent', word: 'Zuletzt', icon: 'clock', popup: this.recentPop(), popupTitle: 'Zuletzt angelegt und bearbeitet' }];
       case 'notes':
         return [
           { id: 'notes-new', word: 'Neu', title: 'Neue Notiz', icon: 'plus', click: () => this.openPanel({ kind: 'note', noteId: null }) },
@@ -320,9 +340,9 @@ export class SessionCockpit {
         this.world.load(world);
       }
     });
-    // Only one window at the side: looking an entry up closes the other one.
+    // Only one window at a time: looking an entry up closes the other ones.
     effect(() => {
-      if (this.world.peek()) {
+      if (this.world.peek() || this.world.popup()) {
         this.panel.set(null);
         this.tools.dismiss();
       }
@@ -331,6 +351,12 @@ export class SessionCockpit {
     this.tools.provide('always', this.alwaysTools);
     this.tools.provide('view', this.viewTools);
     this.tools.provide('right', this.rightTools);
+    const nav = inject(NavService);
+    nav.here.provide(this.tabs);
+    nav.crumbs.provide(this.crumbs);
+    nav.links.provide(this.viewLinks);
+    nav.extras.provide(this.extras);
+    nav.topic.provide(signal(['sessions']));
     // While the notes are open, everything in the notepad of the group counts as seen.
     effect(() => {
       if (this.view() === 'notes') {
@@ -346,20 +372,6 @@ export class SessionCockpit {
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
   }
 
-  /** Keys: "/" jumps into the search, 1 to 6 switch the view. Nothing happens while the user types somewhere. */
-  protected onKey(event: KeyboardEvent): void {
-    const target = event.target as HTMLElement | null;
-    if (event.ctrlKey || event.altKey || event.metaKey || target?.closest('input, textarea, select, [contenteditable]')) {
-      return;
-    }
-    const view = VIEWS[Number(event.key) - 1];
-    if (event.key === '/') {
-      event.preventDefault();
-      this.search()?.focus();
-    } else if (view) {
-      this.show(view.id);
-    }
-  }
 
   /** Switch to a view; a battle that is open is left. */
   protected show(view: View): void {
@@ -372,7 +384,7 @@ export class SessionCockpit {
 
   /** Open a window at the side; opening the messages of a character marks its answers as read. */
   protected openPanel(panel: Panel): void {
-    this.world.peek.set(null);
+    this.world.closeWindows();
     this.tools.dismiss();
     this.panel.set(panel);
     if (panel.kind === 'messages' && this.store.unread(panel.characterId)) {
@@ -385,7 +397,7 @@ export class SessionCockpit {
     if (ref.kind === 'scenes') {
       this.openPanel({ kind: 'scene', sceneId: ref.id });
     } else {
-      this.world.peek.set({ kind: ref.kind, id: ref.id });
+      this.world.look(ref);
     }
   }
 
@@ -401,27 +413,13 @@ export class SessionCockpit {
     if (ref.kind !== 'quests') {
       this.sectionId.set((item ? 'items' : ref.kind) as SectionId);
     }
-    this.world.peek.set({ kind: ref.kind, id: ref.id });
+    this.world.closeWindows();
   }
 
   /** The pins of one kind, for the popup behind its symbol. */
   protected pinsOf(kind: unknown): EntryLink[] {
     return this.pins().filter((pin) => pin.session === kind);
   }
-
-  /** The eye of a tile was clicked: show the entry to the players or hide it, without opening it. */
-  protected toggleShared(ref: EntryRef): void {
-    const kind = SESSION_KINDS[ref.kind];
-    if (kind) {
-      this.store.toggle(kind, ref.id, 'revealed');
-    }
-  }
-
-  /** Whether the players see an entry of the world; the eyes of the tiles ask this. */
-  protected readonly isShared = (ref: EntryRef): boolean => {
-    const kind = SESSION_KINDS[ref.kind];
-    return !!kind && !!this.store.state(kind, ref.id)?.revealed;
-  };
 
   /** An eye in the window at the side was clicked: the name, a part, a point of the checklist or a piece of knowledge. */
   protected onEye(part: string): void {
@@ -453,7 +451,7 @@ export class SessionCockpit {
       this.show('story');
       this.sceneId.set(pin.id);
     } else {
-      this.world.peek.set({ kind: pin.kind, id: pin.id });
+      this.world.look(pin);
     }
   }
 

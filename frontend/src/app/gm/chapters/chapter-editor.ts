@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Chapter } from '../../core/models';
-import { EditorBar } from '../../shared/editor-bar';
-import { EntryEditor } from './entry-editor';
+import { EditorBar } from '../../components/form/editor-bar';
+import { EntryEditor } from '../glossary/entry-editor';
 
 /** Edit what a chapter says about itself: name, number, the text of its thread and what is read aloud. */
 @Component({

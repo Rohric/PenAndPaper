@@ -42,4 +42,28 @@
   --radius: 14px;
   --radius-sm: 10px;
   --touch: 44px;
+
+  // Distances. Everything between two things is one of these five.
+  --gap-1: 4px;
+  --gap-2: 8px;
+  --gap-3: 12px;
+  --gap-4: 18px;
+  --gap-5: 28px;
+
+  // Sizes of the frame: the rail on the left closed and open, the bar on top, the widest content
+  // of the game master and the column of the players.
+  --rail: 56px;
+  --rail-open: 220px;
+  --bar: 52px;
+  --content: 1680px;
+  --column: 560px;
+
+  // Layers, from the bars up to the short messages.
+  --z-bar: 30;
+  --z-menu: 40;
+  --z-side: 41;
+  --z-dock: 44;
+  --z-popup: 45;
+  --z-dialog: 50;
+  --z-toast: 60;
 }

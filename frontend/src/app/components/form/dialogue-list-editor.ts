@@ -1,9 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Dialogue, DialogueLine, Option } from '../core/models';
+import { Dialogue, DialogueLine, Option } from '../../core/models';
 import { AutoGrow } from './auto-grow';
-import { Icon } from './icon';
+import { Icon } from '../basic/icon';
 import { LinkPicker } from './link-picker';
 
 /**
@@ -73,35 +73,7 @@ import { LinkPicker } from './link-picker';
       <button type="button" class="btn btn--small" (click)="add()"><app-icon name="speech" [size]="16" /> Neue Aussage</button>
     </div>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    // One conversation: its lines hang on a line at the left, so it reads as one block.
-    .talk {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-left: 12px;
-      border-left: 3px solid var(--line-2);
-    }
-
-    // Who speaks, what is said, and the button to take the line away.
-    .line {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr) auto;
-      gap: 8px;
-      align-items: start;
-    }
-
-    .line textarea {
-      overflow: hidden;
-      resize: none;
-    }
-  `,
+  styleUrl: './dialogue-list-editor.scss',
 })
 export class DialogueListEditor {
   readonly dialogues = input.required<Dialogue[]>();

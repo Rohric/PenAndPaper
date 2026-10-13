@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 
-import { Icon } from '../../shared/icon';
-import { SessionStore } from './session-store';
+import { Icon } from '../../components/basic/icon';
+import { SessionStore } from '../../core/session-store';
 
 /**
  * Edit the group of a running session at the side: take free characters in, take members out.
@@ -39,13 +39,7 @@ import { SessionStore } from './session-store';
       }
     </section>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-  `,
+  styleUrl: './session-members.scss',
 })
 export class SessionMembers {
   protected readonly store = inject(SessionStore);

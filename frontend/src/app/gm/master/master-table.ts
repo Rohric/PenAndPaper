@@ -1,23 +1,24 @@
-import { Component, TemplateRef, computed, effect, inject, model, output, signal, viewChild } from '@angular/core';
+import { Component, TemplateRef, computed, effect, inject, model, output, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { EntryKind, EntryRef, Scene } from '../../core/models';
 import { SessionEntryKind } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { Popup } from '../../shared/popup';
-import { Portrait } from '../../shared/portrait';
-import { KIND_LABELS, isItem, summaryOf, viewOf } from '../worlds/entry-views';
-import { WorldStore } from '../worlds/world-store';
-import { CharacterPanel, CharacterTile } from './character-tile';
-import { CockpitTools, Tool } from './cockpit-tools';
-import { SessionCard } from './session-card';
-import { SESSION_KINDS, SessionStore } from './session-store';
+import { Icon } from '../../components/basic/icon';
+import { Popup } from '../../components/window/popup';
+import { Portrait } from '../../components/basic/portrait';
+import { KIND_LABELS, isItem, summaryOf, viewOf } from '../../components/entry/entry-views';
+import { WorldStore } from '../../core/world-store';
+import { CharacterPanel, CharacterTile } from '../../components/character/character-tile';
+import { Tools, Tool } from '../../global/tool-bar/tools.service';
+import { EntryCard } from '../../components/entry/entry-card';
+import { SESSION_KINDS, SessionStore } from '../../core/session-store';
 
 /** The name of the group for what lies on the table without a group of its own. */
 const NO_GROUP = '';
 const MAX_FOUND = 30;
 const MAX_GROUP_NAME = 60;
 const DRAWER_KEY = 'pnp.master.drawer.';
+const FOLDED_KEY = 'pnp.master.folded.';
 
 /** The drawers under the table: one kind of entry each. */
 type Drawer = 'scenes' | 'quests' | 'events' | 'npcs' | 'locations' | 'items' | 'trivia';
@@ -60,7 +61,7 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
  */
 @Component({
   selector: 'app-master-table',
-  imports: [FormsModule, Icon, Popup, Portrait, CharacterTile, SessionCard],
+  imports: [FormsModule, Icon, Popup, Portrait, CharacterTile, EntryCard],
   templateUrl: './master-table.html',
   styleUrl: './master-table.scss',
 })
@@ -68,7 +69,7 @@ export class MasterTable {
   protected readonly store = inject(SessionStore);
   private readonly world = inject(WorldStore);
 
-  /** The entry whose connections are shown; the cockpit can set it, for example from a link to a scene. */
+  /** A scene the cockpit asks the master mode to show, for example from a link; it opens in the popup of the scene. */
   readonly focus = model<EntryRef | null>(null);
   /** Asks the cockpit to open the sheet, the messages or the item form of a character. */
   readonly open = output<{ kind: CharacterPanel; characterId: number }>();
@@ -89,21 +90,18 @@ export class MasterTable {
   protected readonly onlyShared = signal(false);
   protected readonly onlyPinned = signal(false);
   protected readonly onlyChapter = signal(true);
-  /** The entries looked at one after the other, so there is a way back. */
-  private readonly trail = signal<EntryRef[]>([]);
-  protected readonly canGoBack = computed(() => this.trail().length > 0);
+  /** The groups of the table that are folded shut; the device remembers them for each session. */
+  private readonly folded = signal<string[]>([]);
   /** Groups that were made but hold nothing yet; they are only kept until the page is left. */
   private readonly empty = signal<string[]>([]);
   /** The character whose popup is open, and the button it opens at. */
   protected readonly characterId = signal<number | null>(null);
-  protected readonly characterAnchor = signal<HTMLElement | null>(null);
 
   private readonly addList = viewChild<TemplateRef<unknown>>('addList');
   private readonly newGroup = viewChild<TemplateRef<unknown>>('newGroup');
 
   /** The scene whose quick view is open, and the symbol it opens at. */
   protected readonly sceneId = signal<number | null>(null);
-  protected readonly sceneAnchor = signal<HTMLElement | null>(null);
   protected readonly openScene = computed(() => this.world.scenes().find((scene) => scene.id === this.sceneId()) ?? null);
   /** The scenes of the chapter on the thread of the story, in their order. */
   protected readonly thread = computed(() => this.world.scenesOf(this.chapterId() ?? 0).filter((scene) => !scene.optional));
@@ -113,15 +111,6 @@ export class MasterTable {
   protected readonly openCharacter = computed(() => this.characters().find((character) => character.id === this.characterId()) ?? null);
   protected readonly chapterId = computed(() => this.store.session()?.chapter ?? this.world.chapters()[0]?.id ?? null);
 
-  protected readonly head = computed<Head | null>(() => {
-    const focus = this.focus();
-    return focus ? this.headOf(focus) : null;
-  });
-  /** The connections of the focused entry in groups, each a list of entries to click on. */
-  protected readonly connections = computed(() => {
-    const focus = this.focus();
-    return focus ? this.connectionsOf(focus).filter((group) => group.refs.length) : [];
-  });
   /** What the search finds, with the filters applied; empty while nothing is typed. */
   protected readonly found = computed<EntryRef[]>(() => {
     const query = this.query().trim().toLowerCase();
@@ -193,12 +182,21 @@ export class MasterTable {
   ]);
 
   constructor() {
-    inject(CockpitTools).provide('view', this.tools);
+    inject(Tools).provide('view', this.tools);
     // The open drawer is remembered for each session.
     effect(() => {
       const id = this.store.session()?.id;
       if (id !== undefined) {
         this.drawer.set(this.savedDrawer(id));
+        this.folded.set(this.savedFolds(id));
+      }
+    });
+    // The cockpit asks for a scene: show it in its popup and take the wish off again.
+    effect(() => {
+      const wish = this.focus();
+      if (wish) {
+        untracked(() => this.pick(wish));
+        this.focus.set(null);
       }
     });
   }
@@ -218,28 +216,27 @@ export class MasterTable {
     }
   }
 
-  /** Click on a card: its connections come into view. */
+  /** Click on a card: a scene opens in its own popup, everything else in the popup of the entry. */
   protected pick(ref: EntryRef): void {
-    const now = this.focus();
-    if (now && (now.kind !== ref.kind || now.id !== ref.id)) {
-      this.trail.update((trail) => [...trail, now]);
-    }
-    this.focus.set(ref);
-  }
-
-  /** Go back to the entry looked at before. */
-  protected back(): void {
-    const before = this.trail().at(-1);
-    if (before) {
-      this.trail.update((trail) => trail.slice(0, -1));
-      this.focus.set(before);
+    if (ref.kind === 'scenes') {
+      this.sceneId.set(ref.id);
+    } else {
+      this.world.look(ref);
     }
   }
 
-  /** Stop looking at the connections of an entry. */
-  protected clearFocus(): void {
-    this.trail.set([]);
-    this.focus.set(null);
+  /** Whether a group of the table is folded shut. */
+  protected isFolded(group: string): boolean {
+    return this.folded().includes(group);
+  }
+
+  /** Fold a group of the table shut or open, and remember it on this device. */
+  protected toggleFold(group: string): void {
+    this.folded.update((names) => (names.includes(group) ? names.filter((name) => name !== group) : [...names, group]));
+    const id = this.store.session()?.id;
+    if (id !== undefined) {
+      this.remember(FOLDED_KEY + id, JSON.stringify(this.folded()));
+    }
   }
 
   /** Lay an entry of the world on the table, in a group. */
@@ -263,15 +260,10 @@ export class MasterTable {
     }
   }
 
-  /** Lay the focused entry and everything connected to it on the table, in a group named like the entry. */
-  protected layAll(): void {
-    const focus = this.focus();
-    if (!focus) {
-      return;
-    }
-    const name = (this.head()?.name ?? 'Gruppe').slice(0, MAX_GROUP_NAME);
-    const refs = [focus, ...this.connections().flatMap((group) => group.refs)];
-    refs.forEach((ref) => this.lay(ref, name));
+  /** Ask into which group an entry and everything connected to it shall be laid; the popup of the scene closes. */
+  protected layAll(ref: EntryRef): void {
+    this.sceneId.set(null);
+    this.store.tableWish.set(ref);
   }
 
   /** Put an entry of the table into another group. */
@@ -296,7 +288,6 @@ export class MasterTable {
 
   /** Open the quick view of a scene at its symbol, or close it again. */
   protected toggleScene(id: number, event: MouseEvent): void {
-    this.sceneAnchor.set(event.currentTarget as HTMLElement);
     this.sceneId.set(this.sceneId() === id ? null : id);
   }
 
@@ -307,7 +298,6 @@ export class MasterTable {
 
   /** Open the popup of a character at its round button, or close it again. */
   protected toggleCharacter(id: number, event: MouseEvent): void {
-    this.characterAnchor.set(event.currentTarget as HTMLElement);
     this.characterId.set(this.characterId() === id ? null : id);
   }
 
@@ -396,35 +386,6 @@ export class MasterTable {
     }
   }
 
-  /** The connections of an entry, labelled; scenes are built here, everything else comes from the reading view. */
-  private connectionsOf(ref: EntryRef): { label: string; refs: EntryRef[] }[] {
-    if (ref.kind === 'scenes') {
-      return this.sceneConnections(ref.id);
-    }
-    return (viewOf(this.world, ref, null)?.links ?? []).map((group) => ({
-      label: group.label,
-      refs: group.items.filter((item) => item.kind !== 'chapters').map((item): EntryRef => ({ kind: item.kind, id: item.id })),
-    }));
-  }
-
-  private sceneConnections(id: number): { label: string; refs: EntryRef[] }[] {
-    const scene = this.world.scenes().find((other) => other.id === id);
-    if (!scene) {
-      return [];
-    }
-    const of = (kind: EntryKind, ids: number[]): EntryRef[] => ids.map((entry) => ({ kind, id: entry }));
-    const trivia = this.world.trivia().filter((entry) => scene.trivia.includes(entry.id));
-    const quests = this.world.quests().filter((quest) => scene.quests.includes(quest.id) || this.world.questNow(quest).scene === scene.id);
-    return [
-      { label: 'Ort', refs: of('locations', scene.location ? [scene.location] : []) },
-      { label: 'Figuren', refs: of('npcs', scene.npcs) },
-      { label: 'Quests', refs: of('quests', quests.map((quest) => quest.id)) },
-      { label: 'Ereignisse', refs: of('events', scene.events) },
-      { label: 'Gegenstände', refs: of('trivia', trivia.filter(isItem).map((entry) => entry.id)) },
-      { label: 'Wissen', refs: of('trivia', trivia.filter((entry) => !isItem(entry)).map((entry) => entry.id)) },
-      { label: 'Führt zu', refs: of('scenes', scene.leads_to) },
-    ];
-  }
 
   private savedDrawer(sessionId: number): Drawer | null {
     try {
@@ -439,10 +400,23 @@ export class MasterTable {
   }
 
   private save(sessionId: number, drawer: Drawer | null): void {
+    this.remember(DRAWER_KEY + sessionId, drawer ?? 'none');
+  }
+
+  private savedFolds(sessionId: number): string[] {
     try {
-      localStorage.setItem(DRAWER_KEY + sessionId, drawer ?? 'none');
+      const saved: unknown = JSON.parse(localStorage.getItem(FOLDED_KEY + sessionId) ?? '[]');
+      return Array.isArray(saved) ? saved.filter((name): name is string => typeof name === 'string') : [];
     } catch {
-      // The drawer is only a convenience; without storage it simply starts with the scenes next time.
+      return [];
+    }
+  }
+
+  private remember(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      // What is open and folded is only a convenience; without storage it simply starts fresh next time.
     }
   }
 }

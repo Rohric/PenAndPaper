@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError
 from battle_app.rules import FAILURE, check, roll_die
 from character_app.models import Npc
 from character_app.utils import use_inspiration
-from session_app.models import Session, SessionEntry
+from session_app.models import Note, Session, SessionEntry
 from world.world_app.models import Quest
 
 KEPT_ROLLS = 30
@@ -60,6 +60,12 @@ def session_for_member(user, session_id):
     """Return the session with the given id for its game master or one of its players, or raise a 404."""
     member = Q(owner=user) | Q(characters__owner=user)
     return get_object_or_404(Session.objects.filter(member).distinct(), pk=session_id)
+
+
+def notes_for_user(user):
+    """Return the notes the user may change: his own and the notepads of the groups he leads or plays in."""
+    member = Q(session__owner=user) | Q(session__characters__owner=user)
+    return Note.objects.filter(Q(author=user) | (Q(shared=True) & member)).distinct()
 
 
 def characters_in_other_sessions(characters, session=None):

@@ -2,8 +2,8 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Note } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { timeAgo } from '../../shared/time-ago';
+import { Icon } from '../basic/icon';
+import { timeAgo } from '../basic/time-ago';
 
 type Filter = 'all' | 'mine' | 'group';
 

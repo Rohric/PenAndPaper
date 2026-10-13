@@ -1,8 +1,8 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 
 import { QuestLog, QuestStep, logOf } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { tagColour } from '../../shared/tag-colour';
+import { Icon } from '../basic/icon';
+import { tagColour } from '../entry/tag-colour';
 
 let logs = 0;
 

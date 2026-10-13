@@ -3,7 +3,7 @@ import { map } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { EntryKind, WorldNpc } from '../../core/models';
-import { Kind, WorldStore } from './world-store';
+import { Kind, WorldStore } from '../../core/world-store';
 
 /**
  * What every editor of a world entry shares: a draft of the entry, saving and deleting.
@@ -46,7 +46,7 @@ export abstract class EntryEditor<T extends { id: number }> {
     const shown = this.store.peek();
     const openHere = shown?.kind === this.kind && shown.id === this.entry().id;
     if (!openHere || !this.dirty()) {
-      this.store.peek.set({ kind, id });
+      this.store.look({ kind, id });
     }
   }
 

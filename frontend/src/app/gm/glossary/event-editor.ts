@@ -2,19 +2,20 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { WorldEvent } from '../../core/models';
-import { EditorBar } from '../../shared/editor-bar';
-import { EntryTextsEditor } from '../../shared/entry-texts-editor';
-import { AutoGrow } from '../../shared/auto-grow';
-import { DialogueListEditor } from '../../shared/dialogue-list-editor';
-import { LinkPicker } from '../../shared/link-picker';
-import { SymbolPicker } from '../../shared/symbol-picker';
+import { ChapterField } from '../../components/form/chapter-field';
+import { EditorBar } from '../../components/form/editor-bar';
+import { EntryTextsEditor } from '../../components/form/entry-texts-editor';
+import { AutoGrow } from '../../components/form/auto-grow';
+import { DialogueListEditor } from '../../components/form/dialogue-list-editor';
+import { LinkPicker } from '../../components/form/link-picker';
+import { SymbolPicker } from '../../components/form/symbol-picker';
 import { EntryEditor } from './entry-editor';
-import { EventScenes } from './event-scenes';
+import { EventScenes } from '../chapters/event-scenes';
 
 /** Edit one event: what sets it off, what happens, what is said, where it happens and the scenes it hangs on. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, EditorBar, LinkPicker, SymbolPicker, AutoGrow, DialogueListEditor, EventScenes, EntryTextsEditor],
+  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, AutoGrow, DialogueListEditor, EventScenes, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -64,6 +65,7 @@ import { EventScenes } from './event-scenes';
             (look)="lookUp('locations', $event)"
           />
         </div>
+        <app-chapter-field inputId="event-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 

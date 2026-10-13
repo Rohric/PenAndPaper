@@ -2,7 +2,7 @@
 <ng-template #placeList>
   <div class="cards">
     @for (ref of place(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">Die Szene hat keinen Ort.</p>
     }
@@ -12,7 +12,7 @@
 <ng-template #peopleList>
   <div class="cards">
     @for (ref of people(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">In der Szene kommt keine Figur vor.</p>
     }
@@ -22,7 +22,7 @@
 <ng-template #questList>
   <div class="cards">
     @for (ref of sceneQuests(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">Keine offene Quest in dieser Szene.</p>
     }
@@ -32,7 +32,7 @@
 <ng-template #eventList>
   <div class="cards">
     @for (ref of sceneEvents(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">Alle Ereignisse dieser Szene sind erledigt oder es gibt keine. Erledigte stehen im Archiv.</p>
     }
@@ -42,7 +42,7 @@
 <ng-template #knowledgeList>
   <div class="cards">
     @for (ref of knowledge(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">Zu dieser Szene gehört kein Gegenstand und kein Wissen.</p>
     }
@@ -52,7 +52,7 @@
 <ng-template #leadsList>
   <div class="cards">
     @for (ref of leads(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">Diese Szene führt zu keiner anderen.</p>
     }
@@ -62,7 +62,7 @@
 <ng-template #mainList>
   <div class="cards">
     @for (ref of mainQuests(); track ref.id) {
-      <app-session-card [ref]="ref" />
+      <app-entry-card [ref]="ref" />
     } @empty {
       <p class="soft">Diese Welt hat noch keine Hauptquest.</p>
     }
@@ -75,7 +75,7 @@
       <span class="kicker">{{ group.label }}</span>
       <div class="cards">
         @for (ref of group.entries; track ref.id) {
-          <app-session-card [ref]="ref" />
+          <app-entry-card [ref]="ref" />
         }
       </div>
     }

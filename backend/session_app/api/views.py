@@ -19,6 +19,7 @@ from session_app.utils import (
     give_item,
     inspire,
     latest_rolls,
+    notes_for_user,
     player_view,
     reveal_from_start,
     roll_check,
@@ -228,14 +229,25 @@ class NoteList(SessionMixin, generics.ListCreateAPIView):
 
 
 class NoteDetail(generics.RetrieveUpdateDestroyAPIView):
-    """Retrieve, update or delete one of the requesting user's own notes."""
+    """
+    Retrieve, update or delete one note.
+
+    - GET, PATCH: an own note, or a note in the notepad of a group the user leads or plays in.
+    - DELETE: only the author removes a note.
+    """
 
     serializer_class = NoteSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Return only the notes the requesting user wrote."""
-        return Note.objects.filter(author=self.request.user)
+        """Return the user's own notes and the notepads of his groups."""
+        return notes_for_user(self.request.user)
+
+    def perform_destroy(self, instance):
+        """Delete the note when the requesting user wrote it."""
+        if instance.author_id != self.request.user.pk:
+            raise PermissionDenied("Nur wer die Notiz geschrieben hat, kann sie löschen.")
+        instance.delete()
 
 
 class CommentList(generics.CreateAPIView):

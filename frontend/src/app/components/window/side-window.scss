@@ -1,0 +1,39 @@
+// The width comes from the area: a column on the desktop, the whole screen on the phone.
+.side {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-side);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+  width: min(var(--side-window, 520px), 100%);
+  padding: var(--gap-4);
+  border-left: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.side--wide {
+  width: min(var(--side-window-wide, 720px), 100%);
+}
+
+.side__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--gap-3);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.side__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  justify-content: flex-end;
+}
+
+.side__foot:empty {
+  display: none;
+}

@@ -1,42 +1,21 @@
-import { Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component } from '@angular/core';
 
-import { AuthService } from '../core/auth.service';
-import { TutorialService } from '../core/tutorial.service';
-import { Mode, ShellNav } from './shell-nav.service';
+import { SideRail } from '../side-rail/side-rail';
+import { PlayerToolBar } from '../tool-bar/player-tool-bar';
 
-/** Mobile frame: bar on top with a menu that folds out, page below. */
+/**
+ * The frame of the players, built for the phone: the page as one column, nothing sticks on top, the bar of
+ * symbols stays at the bottom and the menu slides in from the left. On a large screen the column stays in the middle.
+ */
 @Component({
-  selector: 'app-shell-mobile',
-  imports: [RouterLink, RouterLinkActive],
-  templateUrl: './shell-mobile.html',
-  styleUrl: './shell-mobile.scss',
+  selector: 'app-player-frame',
+  imports: [SideRail, PlayerToolBar],
+  template: `
+    <div class="frame">
+      <main class="frame__content"><ng-content /></main>
+      <app-player-tool-bar />
+      <app-side-rail mode="menu" />
+    </div>
+  `,
 })
-export class ShellMobile {
-  protected readonly nav = inject(ShellNav);
-  protected readonly auth = inject(AuthService);
-  private readonly tutorial = inject(TutorialService);
-  protected readonly open = signal(false);
-
-  /** Open the general tutorial and close the menu. */
-  protected openHelp(): void {
-    this.tutorial.open('start');
-    this.close();
-  }
-
-  /** Open or close the menu. */
-  protected toggle(): void {
-    this.open.update((value) => !value);
-  }
-
-  /** Close the menu after a link was chosen. */
-  protected close(): void {
-    this.open.set(false);
-  }
-
-  /** Change the area and close the menu. */
-  protected switchTo(mode: Mode): void {
-    this.nav.switchTo(mode);
-    this.close();
-  }
-}
+export class PlayerFrame {}

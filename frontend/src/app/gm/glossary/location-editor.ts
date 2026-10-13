@@ -2,17 +2,18 @@ import { Component, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Location } from '../../core/models';
-import { EditorBar } from '../../shared/editor-bar';
-import { EntryTextsEditor } from '../../shared/entry-texts-editor';
-import { LinkPicker } from '../../shared/link-picker';
-import { SymbolPicker } from '../../shared/symbol-picker';
+import { ChapterField } from '../../components/form/chapter-field';
+import { EditorBar } from '../../components/form/editor-bar';
+import { EntryTextsEditor } from '../../components/form/entry-texts-editor';
+import { LinkPicker } from '../../components/form/link-picker';
+import { SymbolPicker } from '../../components/form/symbol-picker';
 import { EntryEditor } from './entry-editor';
 import { EntryItems } from './entry-items';
 
 /** Edit one location: its name, the place it lies in, what is known about it and the items found there. */
 @Component({
   selector: 'app-location-editor',
-  imports: [FormsModule, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems],
+  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems],
   template: `
     <div class="stack">
       <div class="panel">
@@ -39,6 +40,7 @@ import { EntryItems } from './entry-items';
             (look)="lookUp('locations', $event)"
           />
         </div>
+        <app-chapter-field inputId="location-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 

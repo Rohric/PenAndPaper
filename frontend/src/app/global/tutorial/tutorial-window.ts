@@ -1,7 +1,9 @@
 import { Component, ElementRef, computed, effect, inject, signal } from '@angular/core';
 
-import { AuthService } from '../core/auth.service';
-import { TutorialService } from '../core/tutorial.service';
+import { Icon } from '../../components/basic/icon';
+import { Dialog } from '../../components/window/dialog';
+import { AuthService } from '../../core/auth.service';
+import { TutorialService } from '../../core/tutorial.service';
 import { TUTORIAL_GROUPS, TutorialGroup } from './tutorial-content';
 
 /** A step in the vertical line beside the text. */
@@ -14,15 +16,15 @@ interface RailItem {
 }
 
 /**
- * The tutorial window: a popup with text only. A vertical line of steps stands on the left (numbers and titles
+ * The tutorial window: a dialog with text only. The arrow in its head leads back to where the user came from. A vertical line of steps stands on the left (numbers and titles
  * with the chapter headings between them; on the phone only the numbers), the text on the right. A menu leads to every
- * tutorial in three points: the rules, the players, the game masters. A way back leads to where the user came from.
+ * tutorial in three points: the rules, the players, the game masters.
  */
 @Component({
   selector: 'app-tutorial-window',
+  imports: [Dialog, Icon],
   templateUrl: './tutorial-window.html',
   styleUrl: './tutorial-window.scss',
-  host: { '(document:keydown.escape)': 'onEscape()' },
 })
 export class TutorialWindow {
   protected readonly tutorial = inject(TutorialService);
@@ -58,13 +60,6 @@ export class TutorialWindow {
       this.tutorial.current();
       setTimeout(() => this.host.nativeElement.querySelector('.rail__item.is-active')?.scrollIntoView({ block: 'nearest' }));
     });
-  }
-
-  /** Close the window with the escape key, when it is open. */
-  protected onEscape(): void {
-    if (this.tutorial.current()) {
-      this.tutorial.close();
-    }
   }
 
   /** Open another tutorial from the menu or from a step that leads to it; "id#step" names a step of it. */

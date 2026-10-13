@@ -1,7 +1,7 @@
 import { Component, inject, input } from '@angular/core';
 
 import { Dialogue } from '../../core/models';
-import { WorldStore } from './world-store';
+import { WorldStore } from '../../core/world-store';
 
 /** Read what is said in a scene, a quest or an event: every conversation as a block, every line with who says it. */
 @Component({
@@ -28,24 +28,7 @@ import { WorldStore } from './world-store';
       </div>
     }
   `,
-  styles: `
-    // One conversation: its lines hang on a line at the left, so it reads as one block.
-    .talk {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 4px 0 4px 12px;
-      border-left: 3px solid var(--line-2);
-    }
-
-    .speaker {
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: var(--kind-npc);
-      font-weight: 600;
-    }
-  `,
+  styleUrl: './dialogue-view.scss',
 })
 export class DialogueView {
   private readonly store = inject(WorldStore);
@@ -60,7 +43,7 @@ export class DialogueView {
   /** Look the speaker up in the window at the side. */
   protected lookUp(npc: number | null): void {
     if (npc !== null) {
-      this.store.peek.set({ kind: 'npcs', id: npc });
+      this.store.look({ kind: 'npcs', id: npc });
     }
   }
 }

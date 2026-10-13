@@ -3,17 +3,17 @@ import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { EntryLink } from '../../core/models';
-import { Icon, IconName } from '../../shared/icon';
-import { MasterDetail } from '../../shared/master-detail';
-import { TutorialButton } from '../../shared/tutorial-button';
+import { Icon, IconName } from '../../components/basic/icon';
+import { MasterDetail } from '../../components/basic/master-detail';
+import { Crumb, NavItem, NavService } from '../../global/frame/nav.service';
 import { ChapterEditor } from './chapter-editor';
 import { ChapterLinks } from './chapter-links';
-import { npcLinks } from './entry-views';
-import { LinkRow } from './link-row';
+import { npcLinks } from '../../components/entry/entry-views';
+import { LinkRow } from '../../components/entry/link-row';
 import { SceneForm } from './scene-form';
 import { SceneThread } from './scene-thread';
 import { SceneView } from './scene-view';
-import { WorldStore } from './world-store';
+import { WorldStore } from '../../core/world-store';
 
 type Tab = 'scenes' | 'quests' | 'events' | 'overview';
 
@@ -30,7 +30,7 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
  */
 @Component({
   selector: 'app-chapter-page',
-  imports: [RouterLink, Icon, MasterDetail, TutorialButton, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
+  imports: [RouterLink, Icon, MasterDetail, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
   templateUrl: './chapter-page.html',
 })
 export class ChapterPage {
@@ -42,13 +42,19 @@ export class ChapterPage {
   readonly tab = input<string>();
   readonly scene = input<string>();
 
-  protected readonly tabs = TABS;
   protected readonly currentTab = computed<Tab>(() => TABS.find((tab) => tab.id === this.tab())?.id ?? 'scenes');
   protected readonly chapter = computed(() => this.store.chapters().find((c) => c.id === Number(this.chapterId())) ?? null);
   protected readonly scenes = computed(() => this.store.scenesOf(Number(this.chapterId())));
   protected readonly sceneId = computed(() => Number(this.scene()) || null);
   protected readonly openScene = computed(() => this.scenes().find((scene) => scene.id === this.sceneId()) ?? null);
-  protected readonly topic = computed(() => (this.currentTab() === 'scenes' ? 'scenes' : 'chapters'));
+  /** The parts of the chapter as the links in the bar on top. */
+  private readonly links = computed<NavItem[]>(() =>
+    TABS.map((tab) => ({ ...tab, tone: `kind--${tab.id}`, active: tab.id === this.currentTab(), click: () => this.show(tab.id) })),
+  );
+  private readonly crumbs = computed<Crumb[]>(() => {
+    const chapter = this.chapter();
+    return [{ label: 'Kapitel', path: this.chaptersLink() }, { label: chapter ? `${chapter.number} · ${chapter.name}` : 'unbekannt' }];
+  });
   protected readonly error = signal('');
   protected readonly editingOverview = signal(false);
 
@@ -67,9 +73,21 @@ export class ChapterPage {
   });
   protected readonly npcs = computed(() => npcLinks(this.store, this.scenes().flatMap((scene) => scene.npcs)));
 
+  constructor() {
+    const nav = inject(NavService);
+    nav.crumbs.provide(this.crumbs);
+    nav.links.provide(this.links);
+    nav.topic.provide(computed(() => [this.currentTab() === 'scenes' ? 'scenes' : 'chapters']));
+  }
+
   /** Address of the list of all chapters. */
   protected chaptersLink(): unknown[] {
     return ['/gm/worlds', this.store.worldId(), 'chapters'];
+  }
+
+  /** Show a part of the chapter. */
+  protected show(tab: Tab): void {
+    void this.router.navigate([], { queryParams: { tab }, queryParamsHandling: 'merge' });
   }
 
   /** Open a scene beside the thread. */
@@ -77,7 +95,7 @@ export class ChapterPage {
     void this.router.navigate([], { queryParams: { scene: id }, queryParamsHandling: 'merge' });
   }
 
-  /** Close the opened scene; on mobile this shows the thread again. */
+  /** Close the opened scene. */
   protected closeScene(): void {
     void this.router.navigate([], { queryParams: { scene: null }, queryParamsHandling: 'merge' });
   }

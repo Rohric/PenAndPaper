@@ -1,31 +1,12 @@
 @if (chapter(); as current) {
   <div class="stack">
-    <header class="row row--between">
-      <div class="row">
-        <a class="btn btn--small" [routerLink]="chaptersLink()" aria-label="Alle Kapitel"><app-icon name="back" /></a>
-        <div>
-          <span class="kicker">Kapitel {{ current.number }}</span>
-          <h2 class="subtitle">{{ current.name }}</h2>
-        </div>
-      </div>
-      <app-tutorial-button [topic]="topic()" />
-    </header>
-
-    <nav class="tabs" aria-label="Teile des Kapitels">
-      @for (item of tabs; track item.id) {
-        <a class="tabs__tab" [routerLink]="[]" [queryParams]="{ tab: item.id }" [class.is-active]="item.id === currentTab()">
-          <app-icon [class]="'kind--' + item.id" [name]="item.icon" [size]="16" /> {{ item.label }}
-        </a>
-      }
-    </nav>
-
     @if (error()) {
       <p class="notice notice--error" role="alert">{{ error() }}</p>
     }
 
     @switch (currentTab()) {
       @case ('scenes') {
-        <app-master-detail [list]="threadTpl" [detail]="sceneTpl" [open]="!!openScene()" (back)="closeScene()" />
+        <app-master-detail [list]="threadTpl" [detail]="sceneTpl" />
       }
       @case ('quests') {
         <app-chapter-links kind="quests" [chapter]="current" />

@@ -2,9 +2,9 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { Trivia } from '../../core/models';
-import { LinkPicker } from '../../shared/link-picker';
-import { isItem } from './entry-views';
-import { WorldStore } from './world-store';
+import { LinkPicker } from '../../components/form/link-picker';
+import { isItem } from '../../components/entry/entry-views';
+import { WorldStore } from '../../core/world-store';
 
 const ITEM_CATEGORY = 'Gegenstand';
 
@@ -24,7 +24,7 @@ const ITEM_CATEGORY = 'Gegenstand';
       [selected]="selected()"
       (selectedChange)="change($event)"
       (create)="createNew($event)"
-      (look)="store.peek.set({ kind: 'trivia', id: $event })"
+      (look)="store.look({ kind: 'trivia', id: $event })"
     />
     @if (error()) {
       <p class="notice notice--error" role="alert">{{ error() }}</p>

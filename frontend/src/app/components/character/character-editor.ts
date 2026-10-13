@@ -4,15 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { readError } from '../../core/api-error';
 import { AnyCharacter } from '../../core/models';
 import { bonusPointsLeft, creditLeft, skillHints, skillProblems } from '../../core/house-rules';
-import { EntryTextsEditor } from '../../shared/entry-texts-editor';
+import { EntryTextsEditor } from '../form/entry-texts-editor';
 import { basePointsLeft } from '../../core/rules';
-import { Icon, IconName } from '../../shared/icon';
-import { Popup } from '../../shared/popup';
-import { ToastService } from '../../shared/toast.service';
-import { SymbolPicker } from '../../shared/symbol-picker';
-import { TutorialButton } from '../../shared/tutorial-button';
-import { PlayerTools } from '../player/player-tools';
-import { CharacterService, CharacterSource } from './character.service';
+import { Icon, IconName } from '../basic/icon';
+import { Popup } from '../window/popup';
+import { ToastService } from '../../global/toast/toast.service';
+import { SymbolPicker } from '../form/symbol-picker';
+import { TutorialButton } from '../../global/tutorial/tutorial-button';
+import { PlayerTools } from '../../global/tool-bar/player-tools';
+import { CharacterService, CharacterSource } from '../../core/character.service';
 import { InventoryEditor } from './inventory-editor';
 import { PhraseListEditor } from './phrase-list-editor';
 import { PointsOverview } from './points-overview';
@@ -67,7 +67,6 @@ export class CharacterEditor {
 
   /** Working copy; it starts over whenever another character is opened or the saved one comes back. */
   protected readonly draft = linkedSignal(() => structuredClone(this.character()));
-  protected readonly error = signal('');
   protected readonly busy = signal(false);
   /** The picture is saved by its own call, so it does not count as an unsaved change. */
   protected readonly dirty = computed(() => JSON.stringify({ ...this.draft(), image: null }) !== JSON.stringify({ ...this.character(), image: null }));
@@ -83,20 +82,19 @@ export class CharacterEditor {
       (problem) => problem.index === null || !!draft.skills[problem.index].name.trim(),
     );
   });
-  /** The open credit of each talent; only a player character has credit. */
-  protected readonly credit = computed(() => (this.isNpc() ? undefined : creditLeft(this.draft().skills)));
-  /** The open points of a player: base points, free bonus points and the credit of all talents together. */
+  /** The open credit of each talent; there is credit only while the character plays in an adventure. */
+  protected readonly credit = computed(() => (this.locked() ? creditLeft(this.draft().skills) : undefined));
+  /** The open points of a player: base points and, in an adventure, free bonus points and the credit of all talents. */
   protected readonly points = computed(() => {
     const { skills } = this.draft();
-    const credit = Object.values(creditLeft(skills)).reduce((sum, left) => sum + left, 0);
+    const credit = Object.values(this.credit() ?? {}).reduce((sum, left) => sum + left, 0);
     return { base: basePointsLeft(skills, this.budgets().base), bonus: bonusPointsLeft(skills, this.budgets().bonus, true), credit };
   });
   protected readonly pointsLabel = computed(() => {
     const { base, bonus, credit } = this.points();
-    return `Offene Punkte: ${base} Grundpunkte, ${bonus} Bonuspunkte, ${credit} Guthaben`;
+    return this.locked() ? `Offene Punkte: ${base} Grundpunkte, ${bonus} Bonuspunkte, ${credit} Guthaben` : `Offene Punkte: ${base} Grundpunkte`;
   });
   protected readonly pointsOpen = signal(false);
-  protected readonly pointsAnchor = signal<HTMLElement | null>(null);
   protected readonly hints = computed(() => skillHints(this.draft().skills));
   protected readonly errors = computed(() => this.shownProblems().length + (this.draft().name.trim() ? 0 : 1));
   protected readonly state = computed<'busy' | 'errors' | 'dirty' | 'saved'>(() => {
@@ -121,7 +119,6 @@ export class CharacterEditor {
 
   /** Show the big overview of the points above the dock, or hide it. */
   protected togglePoints(event: MouseEvent): void {
-    this.pointsAnchor.set(event.currentTarget as HTMLElement);
     this.pointsOpen.update((open) => !open);
   }
 
@@ -141,13 +138,17 @@ export class CharacterEditor {
     this.set(key, Math.max(0, Math.floor(value ?? 0)));
   }
 
-  /** Save, or take the user to the messages when something is wrong. */
+  /** Save, or say what is wrong and take the user to the first message. */
   protected onSave(): void {
-    if (this.errors()) {
-      this.current.set(this.draft().name.trim() ? 'skills' : 'profile');
+    if (!this.errors()) {
+      this.save();
       return;
     }
-    this.save();
+    const named = !!this.draft().name.trim();
+    this.toast.show(named ? `${this.shownProblems().length} Fehler in der Skillung` : 'Der Name fehlt.', 'danger');
+    this.current.set(named ? 'skills' : 'profile');
+    const first = '.skill--error, .notice--error, #character-name';
+    setTimeout(() => this.host.nativeElement.querySelector(first)?.scrollIntoView({ block: 'center' }));
   }
 
   /** Send the draft to the server. Entries without a name are left out. */
@@ -190,7 +191,6 @@ export class CharacterEditor {
   }
 
   private showImage(character: AnyCharacter): void {
-    this.error.set('');
     this.draft.update((draft) => ({ ...draft, image: character.image, shows_image: character.shows_image }));
   }
 
@@ -206,13 +206,13 @@ export class CharacterEditor {
 
   private done(character: AnyCharacter): void {
     this.busy.set(false);
-    this.error.set('');
     this.toast.show('Gespeichert', 'ok');
     this.saved.emit(character);
   }
 
+  /** Say why it did not work in a short message on top, wherever the user has scrolled to. */
   private fail(error: unknown): void {
     this.busy.set(false);
-    this.error.set(readError(error));
+    this.toast.show(readError(error), 'danger');
   }
 }

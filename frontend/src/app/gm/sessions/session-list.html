@@ -1,17 +1,4 @@
 <section class="stack">
-  <header class="row row--between">
-    <div>
-      <span class="kicker">Spielleiter</span>
-      <h1 class="title">Runden</h1>
-    </div>
-    <div class="row">
-      <button type="button" class="btn" [attr.aria-pressed]="qrOpen()" (click)="qrOpen.set(true)">
-        <app-icon name="expand" /> QR-Code für Spieler
-      </button>
-      <app-tutorial-button topic="sessions" />
-    </div>
-  </header>
-
   @if (error()) {
     <p class="notice notice--error" role="alert">{{ error() }}</p>
   }
@@ -31,12 +18,15 @@
 
   @if (!sessions().length) {
     <div class="empty">
-      <p>Noch keine Runde. Starte unten deine erste.</p>
+      <p>Noch keine Runde. Mit „Neu“ unten in der Leiste startest du deine erste.</p>
     </div>
   }
 
-  <form class="panel" (ngSubmit)="create()">
-    <h2 class="subtitle">Neue Runde starten</h2>
+</section>
+
+@if (creating()) {
+<app-dialog kind="Neu anlegen" title="Neue Runde" [size]="720" (closed)="creating.set(false)">
+  <form id="session-form" class="stack" (ngSubmit)="create()">
     <div class="grid-fields">
       <div class="field">
         <label for="session-name">Name</label>
@@ -55,16 +45,12 @@
       <span class="label">Charaktere der Spieler</span>
       <app-link-picker label="Charaktere" emptyText="Noch kein Charakter gewählt." [options]="characterOptions()" [selected]="chosen()" (selectedChange)="chosen.set($event)" />
     </div>
-    <div class="row">
-      <button type="submit" class="btn btn--primary" [disabled]="!name().trim() || world() === null">Runde starten</button>
-    </div>
   </form>
-</section>
-
-@if (qrOpen()) {
-  <app-side-panel title="Mit dem Handy dabei" (closed)="qrOpen.set(false)">
-    <div class="panel">
-      <app-login-qr />
-    </div>
-  </app-side-panel>
+  <button windowFoot type="button" class="btn" (click)="creating.set(false)">Abbrechen</button>
+  <button windowFoot type="submit" form="session-form" class="btn btn--primary" [disabled]="!name().trim() || world() === null">Runde starten</button>
+</app-dialog>
 }
+
+<ng-template #qrPop>
+  <app-login-qr />
+</ng-template>

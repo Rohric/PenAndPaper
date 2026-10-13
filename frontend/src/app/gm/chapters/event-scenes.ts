@@ -2,9 +2,9 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { Option, Scene } from '../../core/models';
-import { LinkPicker } from '../../shared/link-picker';
-import { sceneLinks } from './entry-views';
-import { WorldStore } from './world-store';
+import { LinkPicker } from '../../components/form/link-picker';
+import { sceneLinks } from '../../components/entry/entry-views';
+import { WorldStore } from '../../core/world-store';
 
 /**
  * Hang an event on scenes. It is optional, and it is saved right away,

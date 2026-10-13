@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ApiService } from '../../core/api.service';
+import { ApiService } from './api.service';
 
 /**
  * Where a character is read and written: the NPCs of a game master, the own characters

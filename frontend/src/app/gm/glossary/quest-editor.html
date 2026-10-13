@@ -28,6 +28,7 @@
       <span class="label">Symbol</span>
       <app-symbol-picker fallback="quest" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
     </div>
+    <app-chapter-field inputId="quest-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
     <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
   </div>
 

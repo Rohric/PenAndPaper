@@ -35,7 +35,7 @@
     }
   </div>
 
-  <app-points-overview [skills]="character().skills" [budgets]="budgets()" [leveling]="leveling()" [used]="character().inspiration_used" />
+  <app-points-overview [skills]="character().skills" [budgets]="budgets()" [leveling]="leveling()" [bonus]="bonus()" [used]="character().inspiration_used" />
 
   @if (character().description) {
     <div class="field">

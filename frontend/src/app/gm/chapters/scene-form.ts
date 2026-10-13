@@ -7,11 +7,11 @@ import { map } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { EntryKind, Option, Scene, WorldNpc } from '../../core/models';
-import { AutoGrow } from '../../shared/auto-grow';
-import { DialogueListEditor } from '../../shared/dialogue-list-editor';
-import { Icon } from '../../shared/icon';
-import { LinkPicker } from '../../shared/link-picker';
-import { WorldStore } from './world-store';
+import { AutoGrow } from '../../components/form/auto-grow';
+import { DialogueListEditor } from '../../components/form/dialogue-list-editor';
+import { Icon } from '../../components/basic/icon';
+import { LinkPicker } from '../../components/form/link-picker';
+import { WorldStore } from '../../core/world-store';
 
 type LinkField = 'npcs' | 'quests' | 'events' | 'trivia';
 type Status = 'idle' | 'unsaved' | 'saving' | 'saved' | 'failed';
@@ -124,7 +124,7 @@ export class SceneForm {
 
   /** Look a linked entry up in the window at the side. */
   protected lookUp(kind: EntryKind, id: number): void {
-    this.store.peek.set({ kind, id });
+    this.store.look({ kind, id });
   }
 
   /** Send what is typed but not saved yet. */

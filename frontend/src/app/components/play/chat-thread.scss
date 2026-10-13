@@ -1,0 +1,77 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 52vh;
+  min-height: 160px;
+  padding: 4px;
+  overflow-y: auto;
+}
+
+.day {
+  align-self: center;
+  margin: 6px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.bubble {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  max-width: 82%;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 14px 14px 14px 4px;
+  background: var(--surface);
+}
+
+.bubble--gm {
+  border-color: var(--info);
+}
+
+.bubble--mine {
+  align-self: flex-end;
+  border-color: var(--accent);
+  border-radius: 14px 14px 4px 14px;
+}
+
+.bubble__name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--info);
+}
+
+.bubble__text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.bubble__time {
+  align-self: flex-end;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.write {
+  display: flex;
+  gap: 8px;
+}
+
+.write .input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 16px;
+}
+
+.write__send {
+  min-width: 88px;
+}

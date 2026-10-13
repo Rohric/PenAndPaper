@@ -6,16 +6,16 @@ import { readError } from '../../core/api-error';
 import { AnyCharacter, Npc, Option } from '../../core/models';
 import { damageText, skillValue, talentValue } from '../../core/rules';
 import { Battle, Combatant, Status } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { IdSelect } from '../../shared/id-select';
-import { CharacterService } from '../characters/character.service';
-import { WorldStore } from '../worlds/world-store';
-import { BattleExchange } from './battle-exchange';
-import { combatantKey, recall, remember } from './battle-memory';
-import { BattleTimeline, TimelineEntry } from './battle-timeline';
-import { CockpitTools, Tool } from './cockpit-tools';
-import { SessionStore } from './session-store';
-import { SessionService } from './session.service';
+import { Icon } from '../../components/basic/icon';
+import { IdSelect } from '../../components/form/id-select';
+import { CharacterService } from '../../core/character.service';
+import { WorldStore } from '../../core/world-store';
+import { BattleExchange } from '../../components/play/battle-exchange';
+import { combatantKey, recall, remember } from '../../components/play/battle-memory';
+import { BattleTimeline, TimelineEntry } from '../../components/play/battle-timeline';
+import { Tools, Tool } from '../../global/tool-bar/tools.service';
+import { SessionStore } from '../../core/session-store';
+import { SessionService } from '../../core/session.service';
 
 const REFRESH_MS = 3000;
 const DEFAULT_VALUE = 50;
@@ -143,7 +143,7 @@ export class BattleView {
   });
 
   constructor() {
-    inject(CockpitTools).provide('view', this.tools);
+    inject(Tools).provide('view', this.tools);
     effect(() => this.run(this.api.battle(this.battleId()), (battle) => this.show(battle)));
     // The players roll on their own pages, so the fight is loaded again every few seconds.
     const timer = setInterval(() => this.reload(), REFRESH_MS);

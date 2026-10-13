@@ -1,43 +1,29 @@
-// Desktop only. The page between two bars that stay in view: tools on top, pins and the last roll below.
+// Desktop only. The frame of the game master holds the bars; this is only the page between them.
 .cockpit {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  min-height: calc(100vh - 96px);
+  gap: var(--gap-4);
 }
 
-// The bar at the bottom is pushed down when the story is short. The bar itself is styled for all pages.
-.bar--bottom {
-  bottom: 8px;
-  margin-top: auto;
-}
-
-// The thread of the story beside the scene. Breakpoints: laptop (default), large screen.
+// The thread of the story beside the scene; its width comes from the area (styles/gm.scss).
 .story {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns: var(--thread, 250px) minmax(0, 1fr);
+  gap: var(--page-gap, var(--gap-4));
   align-items: start;
 }
 
 .story__thread {
   position: sticky;
-  top: 96px;
-  max-height: calc(100vh - 200px);
-  padding-right: 4px;
+  top: var(--gap-4);
+  max-height: calc(100vh - 2 * var(--bar) - var(--gap-5));
+  padding-right: var(--gap-1);
   overflow-y: auto;
 }
 
 .story__main {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--gap-4);
   min-width: 0;
-}
-
-@media (min-width: 1600px) {
-  .story {
-    grid-template-columns: 320px minmax(0, 1fr);
-    gap: 28px;
-  }
 }

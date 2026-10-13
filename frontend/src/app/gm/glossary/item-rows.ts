@@ -1,6 +1,6 @@
 import { InventoryItem, Trivia } from '../../core/models';
 import { damageText } from '../../core/rules';
-import { isItem, summaryOf } from './entry-views';
+import { isItem, summaryOf } from '../../components/entry/entry-views';
 
 /** Somebody who carries items: an NPC of the world, or a character of a group. */
 export interface Carrier {

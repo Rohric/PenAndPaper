@@ -2,9 +2,9 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 
-import { readError } from '../../core/api-error';
-import { AuthService } from '../../core/auth.service';
-import { LoginQr } from '../../shared/login-qr';
+import { readError } from '../core/api-error';
+import { AuthService } from '../core/auth.service';
+import { LoginQr } from '../components/basic/login-qr';
 
 type AuthMode = 'login' | 'register';
 

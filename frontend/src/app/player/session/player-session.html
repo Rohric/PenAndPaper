@@ -120,20 +120,8 @@
   }
 </section>
 
-<app-player-bar />
 
 <!-- The popups behind the symbols of the bar. -->
-<ng-template #morePop>
-  @for (item of morePages; track item.id) {
-    <button type="button" class="btn" (click)="openMore(item.id)"><app-icon [name]="item.icon" [size]="16" /> {{ item.label }}</button>
-  }
-  <button type="button" class="btn" (click)="help('rules')"><app-icon name="book" [size]="16" /> Regelwerk</button>
-  <button type="button" class="btn" (click)="help('my-sessions')"><app-icon name="help" [size]="16" /> Hilfe zur App</button>
-  <a class="btn" routerLink="/player/sessions">Alle Runden</a>
-  <a class="btn" routerLink="/player/characters">Meine Charaktere</a>
-  <button type="button" class="btn" (click)="auth.logout()">Abmelden</button>
-</ng-template>
-
 <ng-template #rollsPop>
   <app-session-rolls [rolls]="recentRolls()" />
 </ng-template>
@@ -151,13 +139,13 @@
 </ng-template>
 
 @if (noteId() !== undefined) {
-  <app-side-panel title="Notiz" (closed)="noteId.set(undefined)">
+  <app-side-window title="Notiz" (closed)="noteId.set(undefined)">
     <app-note-detail [note]="openNote()" (add)="addNote($event)" (save)="saveNote($event)" (remove)="removeNote($event)" (comment)="comment($event)" />
-  </app-side-panel>
+  </app-side-window>
 }
 
 @if (editing(); as source) {
-  <app-side-panel title="Charakter bearbeiten" [wide]="true" (closed)="closeEditor()">
+  <app-side-window title="Charakter bearbeiten" [wide]="true" (closed)="closeEditor()">
     <app-character-editor
       kind="player"
       [character]="source"
@@ -166,5 +154,5 @@
       (deleted)="editDeleted()"
       (dirtyChange)="editDirty.set($event)"
     />
-  </app-side-panel>
+  </app-side-window>
 }

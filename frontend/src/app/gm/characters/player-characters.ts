@@ -1,20 +1,22 @@
-import { Component, computed, inject, linkedSignal, signal } from '@angular/core';
+import { Component, TemplateRef, computed, inject, linkedSignal, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
 import { PlayerCharacter } from '../../core/models';
-import { MasterDetail } from '../../shared/master-detail';
-import { TutorialButton } from '../../shared/tutorial-button';
-import { CharacterSheet } from '../characters/character-sheet';
-import { CharacterService } from '../characters/character.service';
+import { IconName } from '../../components/basic/icon';
+import { MasterDetail } from '../../components/basic/master-detail';
+import { NavItem, NavService } from '../../global/frame/nav.service';
+import { Tool, Tools } from '../../global/tool-bar/tools.service';
+import { CharacterSheet } from '../../components/character/character-sheet';
+import { CharacterService } from '../../core/character.service';
 
 type SortBy = 'name' | 'player' | 'changed';
 
-const SORTS: { id: SortBy; label: string }[] = [
-  { id: 'name', label: 'Name' },
-  { id: 'player', label: 'Spieler' },
-  { id: 'changed', label: 'Zuletzt geändert' },
+const SORTS: { id: SortBy; word: string; icon: IconName }[] = [
+  { id: 'name', word: 'Name', icon: 'sheet' },
+  { id: 'player', word: 'Spieler', icon: 'group' },
+  { id: 'changed', word: 'Geändert', icon: 'clock' },
 ];
 
 type LevelField = 'skill_points_total' | 'bonus_points_total' | 'life_points' | 'max_life_points';
@@ -22,7 +24,7 @@ type LevelField = 'skill_points_total' | 'bonus_points_total' | 'life_points' | 
 /** The characters of all players as the game master sees them: read the sheet, and level it. */
 @Component({
   selector: 'app-player-characters',
-  imports: [FormsModule, RouterLink, MasterDetail, TutorialButton, CharacterSheet],
+  imports: [FormsModule, RouterLink, MasterDetail, CharacterSheet],
   templateUrl: './player-characters.html',
 })
 export class PlayerCharacters {
@@ -32,7 +34,6 @@ export class PlayerCharacters {
   protected readonly selectedId = signal<number | null>(null);
   protected readonly selected = computed(() => this.characters().find((c) => c.id === this.selectedId()) ?? null);
   protected readonly error = signal('');
-  protected readonly sorts = SORTS;
   protected readonly query = signal('');
   /** "all", "free" or the id of an adventure. */
   protected readonly filter = signal('all');
@@ -72,7 +73,25 @@ export class PlayerCharacters {
     return !!character && (Object.keys(level) as LevelField[]).some((key) => level[key] !== character[key]);
   });
 
+  private readonly searchBox = viewChild<TemplateRef<unknown>>('searchBox');
+  /** The filters as the links on top: all, the free ones, and one per adventure. */
+  private readonly links = computed<NavItem[]>(() => [
+    this.link('all', 'Alle'),
+    this.link('free', 'Frei'),
+    ...this.adventures().map((adventure) => this.link(String(adventure.id), adventure.name)),
+  ]);
+  /** The order of the list as switches in the bar at the bottom. */
+  private readonly sortTools = computed<Tool[]>(() =>
+    SORTS.map((sort) => ({ ...sort, id: `sort-${sort.id}`, title: `Nach ${sort.word} ordnen`, pressed: this.sortBy() === sort.id, click: () => this.sortBy.set(sort.id) })),
+  );
+
   constructor() {
+    const nav = inject(NavService);
+    nav.crumbs.provide(signal([{ label: 'Figuren der Spieler' }]));
+    nav.links.provide(this.links);
+    nav.extras.provide(computed(() => [this.searchBox()].filter((extra): extra is TemplateRef<unknown> => !!extra)));
+    nav.topic.provide(signal(['gm-characters']));
+    inject(Tools).provide('view', this.sortTools);
     this.service.list<PlayerCharacter>('gm/player-characters').subscribe({
       next: (characters) => this.characters.set(characters),
       error: (e: unknown) => this.error.set(readError(e)),
@@ -95,6 +114,10 @@ export class PlayerCharacters {
       next: (saved) => this.done(saved),
       error: (e: unknown) => this.finish(readError(e)),
     });
+  }
+
+  private link(id: string, label: string): NavItem {
+    return { id, label, icon: id === 'all' ? 'group' : id === 'free' ? 'sheet' : 'flag', active: this.filter() === id, click: () => this.filter.set(id) };
   }
 
   private compare(a: PlayerCharacter, b: PlayerCharacter): number {

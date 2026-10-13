@@ -1,14 +1,4 @@
 <div class="stack">
-  <nav class="tabs" aria-label="Bereiche des Glossars">
-    <a class="tabs__tab" [routerLink]="linkTo('lore')" routerLinkActive="is-active"><app-icon name="book" [size]="16" /> Lore</a>
-    @for (item of sections; track item.id) {
-      <a class="tabs__tab" [routerLink]="linkTo(item.id)" routerLinkActive="is-active">
-        <app-icon [class]="'kind--' + item.id" [name]="item.icon" [size]="16" /> {{ item.label }}
-      </a>
-    }
-    <app-tutorial-button [topic]="topic()" />
-  </nav>
-
   @if (current(); as shown) {
     @if (opened(); as page) {
       <div class="row">

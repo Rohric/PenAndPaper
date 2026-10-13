@@ -1,9 +1,9 @@
 import { Component, computed, inject, viewChild } from '@angular/core';
 
 import { EntryKind, Option, isItem } from '../../core/models';
-import { LinkPicker } from '../../shared/link-picker';
-import { KIND_LABELS, allText } from './entry-views';
-import { WorldStore } from './world-store';
+import { LinkPicker } from '../../components/form/link-picker';
+import { KIND_LABELS, allText } from '../../components/entry/entry-views';
+import { WorldStore } from '../../core/world-store';
 
 const KINDS: EntryKind[] = ['locations', 'npcs', 'quests', 'events', 'trivia'];
 // Ids repeat between the kinds, so an option carries its kind in the millions of its id.
@@ -26,12 +26,7 @@ const SPAN = 1_000_000;
       (valueChange)="open($event)"
     />
   `,
-  styles: `
-    :host {
-      display: block;
-      width: 320px;
-    }
-  `,
+  styleUrl: './world-search.scss',
 })
 export class WorldSearch {
   private readonly store = inject(WorldStore);
@@ -56,7 +51,7 @@ export class WorldSearch {
   /** Look the chosen entry up at the side. */
   protected open(value: number | null): void {
     if (value !== null) {
-      this.store.peek.set({ kind: KINDS[Math.floor(value / SPAN)], id: value % SPAN });
+      this.store.look({ kind: KINDS[Math.floor(value / SPAN)], id: value % SPAN });
     }
   }
 

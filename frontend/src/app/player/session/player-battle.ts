@@ -6,13 +6,13 @@ import { readError } from '../../core/api-error';
 import { PlayerCharacter } from '../../core/models';
 import { damageText, skillValue, talentValue } from '../../core/rules';
 import { PlayerBattle } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { BattleExchange } from './battle-exchange';
-import { ownKey, recall, remember } from './battle-memory';
-import { BattleTimeline, TimelineEntry } from './battle-timeline';
-import { Tool } from './cockpit-tools';
-import { PlayerTools } from '../player/player-tools';
-import { SessionService } from './session.service';
+import { Icon } from '../../components/basic/icon';
+import { BattleExchange } from '../../components/play/battle-exchange';
+import { ownKey, recall, remember } from '../../components/play/battle-memory';
+import { BattleTimeline, TimelineEntry } from '../../components/play/battle-timeline';
+import { Tool } from '../../global/tool-bar/tools.service';
+import { PlayerTools } from '../../global/tool-bar/player-tools';
+import { SessionService } from '../../core/session.service';
 
 /**
  * The running battle of a session as a player takes part in it: the timeline with the order and

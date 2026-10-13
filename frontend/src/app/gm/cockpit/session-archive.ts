@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 
 import { SessionEntryKind } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { WorldStore } from '../worlds/world-store';
-import { SessionStore } from './session-store';
+import { Icon } from '../../components/basic/icon';
+import { WorldStore } from '../../core/world-store';
+import { SessionStore } from '../../core/session-store';
 
 interface Row {
   id: number;
@@ -20,7 +20,7 @@ interface Row {
         <h3 class="section-title">{{ group.label }}</h3>
         @for (entry of group.rows; track entry.id) {
           <div class="row row--between">
-            <button type="button" [class]="'chip chip--link kind--' + group.list" (click)="world.peek.set({ kind: group.list, id: entry.id })">
+            <button type="button" [class]="'chip chip--link kind--' + group.list" (click)="world.look({ kind: group.list, id: entry.id })">
               {{ entry.name }}
             </button>
             <button type="button" class="btn btn--small" (click)="store.toggle(group.kind, entry.id, 'done')">
@@ -33,13 +33,7 @@ interface Row {
       </div>
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-  `,
+  styleUrl: './session-archive.scss',
 })
 export class SessionArchive {
   protected readonly store = inject(SessionStore);

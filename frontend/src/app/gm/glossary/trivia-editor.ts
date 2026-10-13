@@ -2,17 +2,18 @@ import { Component, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Trivia } from '../../core/models';
-import { EditorBar } from '../../shared/editor-bar';
-import { EntryTextsEditor } from '../../shared/entry-texts-editor';
-import { LinkPicker } from '../../shared/link-picker';
-import { SymbolPicker } from '../../shared/symbol-picker';
-import { tagColour } from '../../shared/tag-colour';
+import { ChapterField } from '../../components/form/chapter-field';
+import { EditorBar } from '../../components/form/editor-bar';
+import { EntryTextsEditor } from '../../components/form/entry-texts-editor';
+import { LinkPicker } from '../../components/form/link-picker';
+import { SymbolPicker } from '../../components/form/symbol-picker';
+import { tagColour } from '../../components/entry/tag-colour';
 import { EntryEditor } from './entry-editor';
 
 /** Edit one piece of knowledge and the entries it is attached to. */
 @Component({
   selector: 'app-trivia-editor',
-  imports: [FormsModule, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor],
+  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -41,6 +42,7 @@ import { EntryEditor } from './entry-editor';
             }
           </datalist>
         </div>
+        <app-chapter-field inputId="trivia-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 

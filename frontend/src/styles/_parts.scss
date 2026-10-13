@@ -1,0 +1,645 @@
+// The shared classes of the app: one look for boxes, tiles, tags, buttons, fields and tabs.
+// Every colour and size comes from the tokens; nothing here knows a breakpoint.
+
+// Layout helpers
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.row--between {
+  justify-content: space-between;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+// Surfaces
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  text-decoration: none;
+}
+
+button.card:hover,
+a.card:hover,
+.card.is-active {
+  border-color: var(--accent);
+}
+
+.card__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 24px 22px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius);
+  color: var(--muted);
+}
+
+.notice {
+  padding: 12px 16px;
+  white-space: pre-line;
+  border: 1px dashed #3d5560;
+  border-radius: 12px;
+  color: var(--info);
+}
+
+.notice--error {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+// Controls
+.btn {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--touch);
+  padding: 8px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.btn--danger {
+  border-color: var(--danger);
+  background: transparent;
+  color: var(--danger);
+}
+
+.btn--small {
+  min-height: 36px;
+  padding: 4px 12px;
+  font-size: 14px;
+}
+
+// A button that is switched on, for example the view that is open, or the link to the page that is shown.
+.btn[aria-current='page'],
+.btn[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pill {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 8px 16px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pill[aria-pressed='true'],
+.pill.is-active {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+// A pill in the colour of what it filters, like a category.
+.pill--tone {
+  border-color: var(--kind, var(--line-2));
+  color: var(--kind, var(--text));
+}
+
+.pill--tone[aria-pressed='true'] {
+  border-color: var(--kind, var(--accent));
+  background: var(--kind, var(--accent));
+  color: var(--accent-ink);
+}
+
+// A small round mark in the colour of a category or a tag.
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--kind, var(--muted));
+}
+
+.chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border: 1px solid var(--line-2);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--soft);
+}
+
+.chip--accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.chip--info {
+  border-color: var(--info);
+  color: var(--info);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field > label,
+.field > .label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.input {
+  width: 100%;
+  min-height: 46px;
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+}
+
+textarea.input {
+  line-height: 1.55;
+  resize: vertical;
+}
+
+.input--number {
+  width: 88px;
+}
+
+// A checkbox with its text.
+.check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: var(--touch);
+}
+
+.check input {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+// A row of a list editor: one growing input and its buttons.
+.list-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.list-row .input {
+  flex: 1;
+  min-width: 0;
+}
+
+// Short fields next to each other; they wrap by themselves on narrow screens.
+.grid-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.chip--danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+// Every kind of entry has its own colour. An element with one of these classes hands the colour
+// to everything inside it: chips, tags, tiles, symbols and kickers pick it up as --kind.
+.kind--locations {
+  --kind: var(--kind-location);
+}
+
+.kind--npcs {
+  --kind: var(--kind-npc);
+}
+
+.kind--quests {
+  --kind: var(--kind-quest);
+}
+
+.kind--events {
+  --kind: var(--kind-event);
+}
+
+.kind--trivia {
+  --kind: var(--kind-trivia);
+}
+
+.kind--items {
+  --kind: var(--kind-item);
+}
+
+.kind--scenes {
+  --kind: var(--kind-scene);
+}
+
+.kind--chapters {
+  --kind: var(--kind-chapter);
+}
+
+// A chip that leads to another entry, in the colour of the kind it leads to.
+.chip--link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  border-color: var(--kind, var(--info));
+  background: color-mix(in srgb, var(--kind, var(--info)) 12%, transparent);
+  color: var(--kind, var(--info));
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.chip--link:hover {
+  background: color-mix(in srgb, var(--kind, var(--info)) 24%, transparent);
+}
+
+// A small label in the colour of the kind it stands for.
+.kicker--kind {
+  color: var(--kind, var(--muted));
+}
+
+// Reading views: written text keeps its line breaks.
+.prose {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+// Text that is read to the players, set apart from the notes of the game master.
+.read-aloud {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 16px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-2);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.4;
+}
+
+.read-aloud .kicker {
+  font-family: var(--font-body);
+}
+
+// One piece of knowledge about an entry; what only the game master knows is set apart.
+.knowledge {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.knowledge--gm {
+  border-style: dashed;
+  border-color: var(--line-2);
+  background: var(--surface-2);
+}
+
+.plain-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+// One entry or one text on a page of its own stays as wide as a page of a book.
+.page {
+  max-width: 980px;
+}
+
+// Tiles: small cards in a grid that fills the width, as many per row as fit.
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  // A tile of an entry shows the colour of its kind as a stripe on its left edge.
+  box-shadow: inset 3px 0 0 var(--kind, transparent);
+  color: var(--text);
+  position: relative;
+}
+
+// The eye of a session in the corner of a tile: whether the players see the entry.
+.tile__eye {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+// The label of a tile takes the colour of the kind of entry the tile shows.
+.tile > .kicker,
+.tile__body > .kicker,
+.tile__names > .kicker {
+  color: var(--kind, var(--muted));
+}
+
+// A chip inside a tile keeps its own width.
+.tile > .chip {
+  align-self: flex-start;
+}
+
+.tile--open {
+  border-color: var(--line-2);
+}
+
+// Something that is done but still shown, like a finished main quest.
+.tile--done {
+  border-style: dashed;
+}
+
+.tile--done .tile__title {
+  color: var(--soft);
+  text-decoration: line-through;
+}
+
+// Small cards in a popup or on the table of the game master.
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 8px;
+}
+
+// Wider tiles for texts that are read in full.
+.tiles--wide {
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+}
+
+// The part of a tile that opens what the tile stands for.
+.tile__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+// A tile that is a link as a whole, like a chapter.
+.tile--link {
+  text-decoration: none;
+}
+
+.tile--link:hover {
+  border-color: var(--accent);
+}
+
+// A tile that is a button as a whole, like a note on the board.
+button.tile {
+  gap: 6px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.tile:hover {
+  border-color: var(--accent);
+}
+
+.tile__body:hover .tile__title {
+  color: var(--accent);
+}
+
+// The top of a tile: the symbol of the entry beside its kind and its name.
+.tile__head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tile__names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+// The place where a picture will be shown once pictures can be uploaded.
+.picture-slot {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 82px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tile__title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+// A small heading with a symbol in front, above a group of tiles.
+.section-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+// The symbol of a heading or a tab shows the colour of the kind it stands for.
+.section-title app-icon,
+.tabs__tab app-icon {
+  color: var(--kind, currentColor);
+}
+
+// Tabs: the parts of a world and of a chapter.
+.tabs {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs__tab {
+  flex: 0 0 auto;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 8px 16px;
+  border-bottom: 3px solid transparent;
+  color: var(--soft);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+// A tab can also be a button, when it does not change the address.
+button.tabs__tab {
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
+}
+
+.tabs__tab.is-active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+// A part of a page that folds: closed it shows only its heading, a click on the heading opens it.
+.fold > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.fold > summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold[open] > summary {
+  margin-bottom: 14px;
+}
+
+.fold__mark {
+  transition: transform 0.15s;
+}
+
+.fold[open] > summary .fold__mark {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold__mark {
+    transition: none;
+  }
+}
+
+// Dark layer behind a panel or a window that lies over the page.
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgb(0 0 0 / 55%);
+}
+
+// The name field at the top of an editor.
+.input--title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+// A thin bar that shows how full something is, like the life points or the spent points.
+.meter {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.meter__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.meter__fill--life {
+  background: var(--ok);
+}
+
+.meter--over .meter__fill {
+  background: var(--danger);
+}
+
+// Show at most three lines of a long text on a card.
+.clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}

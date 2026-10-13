@@ -1,0 +1,81 @@
+@if (mode() === 'menu' && nav.menuOpen()) {
+  <div class="shade" (click)="nav.menuOpen.set(false)"></div>
+}
+
+@if (shown()) {
+  <aside class="rail" [class.rail--menu]="mode() === 'menu'" [class.is-open]="wide()" aria-label="Menü">
+    <nav class="rail__group" aria-label="Überall">
+      @for (item of nav.always(); track item.id) {
+        <ng-container *ngTemplateOutlet="tab; context: { $implicit: item, key: null }" />
+      }
+    </nav>
+
+    @if (nav.here.items().length) {
+      <nav class="rail__group rail__group--here" aria-label="Hier">
+        @for (item of nav.here.items(); track item.id) {
+          <ng-container *ngTemplateOutlet="tab; context: { $implicit: item, key: $index + 1 }" />
+        }
+      </nav>
+    }
+
+    <div class="rail__foot">
+      <button type="button" class="rail__tab" [attr.title]="wide() ? null : 'Hilfe'" aria-label="Hilfe" (click)="nav.help()">
+        <app-icon name="help" [size]="20" />
+        @if (wide()) {
+          <span class="rail__label">Hilfe</span>
+        }
+      </button>
+      @if (wide()) {
+        <span class="rail__account">{{ auth.account()?.username }} · {{ areaLabel() }}</span>
+        @if (nav.canSwitch()) {
+          <button type="button" class="rail__tab" (click)="nav.switchArea()">
+            <app-icon name="swap" [size]="20" />
+            <span class="rail__label">{{ otherLabel() }}</span>
+          </button>
+        }
+        <button type="button" class="rail__tab" (click)="auth.logout()">
+          <app-icon name="logout" [size]="20" />
+          <span class="rail__label">Abmelden</span>
+        </button>
+      }
+      @if (mode() === 'rail') {
+        <button
+          type="button"
+          class="rail__tab"
+          [attr.title]="wide() ? null : 'Leiste ausfahren'"
+          [attr.aria-label]="wide() ? 'Leiste einfahren' : 'Leiste ausfahren'"
+          [attr.aria-expanded]="wide()"
+          (click)="nav.toggleRail()"
+        >
+          <app-icon [name]="wide() ? 'back' : 'right'" [size]="20" />
+          @if (wide()) {
+            <span class="rail__label">Einfahren</span>
+          }
+        </button>
+      }
+    </div>
+  </aside>
+}
+
+<ng-template #tab let-item let-key="key">
+  <button
+    type="button"
+    class="rail__tab"
+    [class.is-active]="item.active"
+    [attr.title]="wide() ? null : item.label"
+    [attr.aria-label]="item.label"
+    [attr.aria-current]="item.active ? 'page' : null"
+    (click)="nav.go(item)"
+  >
+    <app-icon [class]="item.tone ?? ''" [name]="item.icon" [size]="20" />
+    @if (wide()) {
+      <span class="rail__label">{{ item.label }}</span>
+      @if (key && mode() === 'rail' && key < 10) {
+        <span class="rail__key">{{ key }}</span>
+      }
+    }
+    @if (item.count) {
+      <span class="rail__count">{{ item.count }}</span>
+    }
+  </button>
+</ng-template>

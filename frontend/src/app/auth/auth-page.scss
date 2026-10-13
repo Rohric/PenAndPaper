@@ -1,16 +1,11 @@
 // The code for phones stands beside the form, on a large screen only: a phone is already here.
 .auth__qr {
-  display: none;
+  display: var(--auth-code, none);
   width: 100%;
   max-width: 320px;
   padding: 22px 20px;
 }
 
-@media (min-width: 900px) {
-  .auth__qr {
-    display: flex;
-  }
-}
 
 .auth {
   gap: 20px;

@@ -206,6 +206,12 @@ class NoteSerializer(serializers.ModelSerializer):
         """Return True when the requesting user wrote the note."""
         return note.author_id == self.context["request"].user.pk
 
+    def update(self, instance, validated_data):
+        """Change the note; only its author decides whether it lies in the notepad of the group."""
+        if instance.author_id != self.context["request"].user.pk:
+            validated_data.pop("shared", None)
+        return super().update(instance, validated_data)
+
 
 class MessageSerializer(serializers.ModelSerializer):
     """Serialize a secret message; who wrote it is set by the server."""

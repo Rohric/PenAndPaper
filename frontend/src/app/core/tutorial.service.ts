@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { TUTORIALS } from '../shared/tutorial-content';
+import { TUTORIALS } from '../global/tutorial/tutorial-content';
 
 const SEEN_KEY = 'pnp.tutorial.seen';
 const FIRST_TUTORIAL = 'start';

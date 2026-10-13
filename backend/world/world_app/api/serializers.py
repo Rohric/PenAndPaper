@@ -66,6 +66,11 @@ class WorldScopedSerializer(serializers.ModelSerializer):
         self._check_same_world(trivia)
         return trivia
 
+    def validate_chapters(self, chapters):
+        """Accept only chapters of the same world as tags."""
+        self._check_same_world(chapters)
+        return chapters
+
     def validate_player_knowledge(self, pieces):
         """Check the knowledge pieces players can learn."""
         return clean_knowledge(pieces)
@@ -90,7 +95,7 @@ class LocationSerializer(WorldScopedSerializer):
         model = Location
         fields = [
             "id", "parent", "name", "symbol", "description", "visible_from_start", "player_knowledge", "gm_knowledge",
-            "created_at", "updated_at",
+            "chapters", "created_at", "updated_at",
         ]
 
     def validate_parent(self, parent):
@@ -111,10 +116,16 @@ class WorldNpcSerializer(WorldScopedSerializer):
     updated_at = serializers.DateTimeField(source="npc.updated_at", read_only=True)
     # Read only: the glossary lists the items of all characters; they are edited at the character.
     inventory = serializers.JSONField(source="npc.inventory", read_only=True)
+    # The chapter tags hang on the NPC itself, like the tags of every other entry.
+    chapters = serializers.PrimaryKeyRelatedField(
+        source="npc.chapters", many=True, queryset=Chapter.objects.all(), required=False
+    )
 
     class Meta:
         model = WorldNpc
-        fields = ["id", "npc", "name", "profession", "symbol", "location", "inventory", "created_at", "updated_at"]
+        fields = [
+            "id", "npc", "name", "profession", "symbol", "location", "inventory", "chapters", "created_at", "updated_at",
+        ]
         read_only_fields = ["npc"]
 
     def create(self, validated_data):
@@ -123,8 +134,10 @@ class WorldNpcSerializer(WorldScopedSerializer):
         return create_world_npc(validated_data["world"], name, validated_data.get("location"))
 
     def update(self, instance, validated_data):
-        """Change the place only; the NPC itself is edited through its own endpoint."""
-        validated_data.pop("npc", None)
+        """Change the place and the chapter tags; the NPC itself is edited through its own endpoint."""
+        chapters = validated_data.pop("npc", {}).get("chapters")
+        if chapters is not None:
+            instance.npc.chapters.set(chapters)
         return super().update(instance, validated_data)
 
 
@@ -136,7 +149,7 @@ class QuestSerializer(WorldScopedSerializer):
         fields = [
             "id", "name", "symbol", "kind", "number", "description", "goal", "checklist",
             "visible_from_start", "player_knowledge", "gm_knowledge", "dialogues", "location", "giver", "scene", "npcs",
-            "created_at", "updated_at",
+            "chapters", "created_at", "updated_at",
         ]
 
     def validate_scene(self, scene):
@@ -164,7 +177,7 @@ class EventSerializer(WorldScopedSerializer):
         model = Event
         fields = [
             "id", "name", "symbol", "trigger", "happening", "description", "visible_from_start", "player_knowledge",
-            "gm_knowledge", "dialogues", "location", "created_at", "updated_at",
+            "gm_knowledge", "dialogues", "location", "chapters", "created_at", "updated_at",
         ]
 
 
@@ -175,18 +188,21 @@ class TriviaSerializer(WorldScopedSerializer):
         model = Trivia
         fields = [
             "id", "name", "symbol", "category", "description", "visible_from_start", "player_knowledge",
-            "gm_knowledge", "locations", "npcs", "quests", "events", "created_at", "updated_at",
+            "gm_knowledge", "locations", "npcs", "quests", "events", "chapters", "created_at", "updated_at",
         ]
 
 
 class ChapterSerializer(WorldScopedSerializer):
-    """Serialize a chapter; a new chapter gets the next free number by default."""
+    """Serialize a chapter with the entries tagged with it; a new chapter gets the next free number by default."""
 
     number = serializers.IntegerField(min_value=1, required=False)
 
     class Meta:
         model = Chapter
-        fields = ["id", "number", "name", "description", "to_read", "quests", "events", "created_at", "updated_at"]
+        fields = [
+            "id", "number", "name", "description", "to_read", "locations", "npcs", "quests", "events", "trivia",
+            "created_at", "updated_at",
+        ]
 
     def validate_number(self, number):
         """Reject a number another chapter of the world already uses."""

@@ -1,0 +1,27 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// One conversation: its lines hang on a line at the left, so it reads as one block.
+.talk {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 12px;
+  border-left: 3px solid var(--line-2);
+}
+
+// Who speaks, what is said, and the button to take the line away.
+.line {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.line textarea {
+  overflow: hidden;
+  resize: none;
+}

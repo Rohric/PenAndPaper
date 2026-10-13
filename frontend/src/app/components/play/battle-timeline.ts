@@ -2,8 +2,8 @@ import { Component, computed, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Status } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { Portrait, PortraitState } from '../../shared/portrait';
+import { Icon } from '../basic/icon';
+import { Portrait, PortraitState } from '../basic/portrait';
 
 /** One combatant on the timeline of a battle. */
 export interface TimelineEntry {

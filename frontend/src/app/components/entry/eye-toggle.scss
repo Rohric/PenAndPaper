@@ -1,0 +1,28 @@
+:host {
+  display: inline-flex;
+}
+
+.eye {
+  display: inline-flex;
+  padding: 3px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.eye:hover {
+  background: var(--surface-2, var(--line));
+  opacity: 1;
+}
+
+.eye--on {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.eye--faded {
+  opacity: 0.35;
+}

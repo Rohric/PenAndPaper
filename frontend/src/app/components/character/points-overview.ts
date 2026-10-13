@@ -31,72 +31,7 @@ import { basePointsLeft, inspirationLeft, inspirationPoints, talentValue } from 
       }
     </div>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .line {
-      display: grid;
-      grid-template-columns: 96px 1fr auto;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .line__label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--soft);
-    }
-
-    .talent-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-    }
-
-    .talent-card {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-      padding: 8px 10px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius-sm);
-      background: var(--surface);
-    }
-
-    .talent-card__name {
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .talent-card__value {
-      font-family: var(--font-display);
-      font-size: 26px;
-      font-weight: 700;
-      line-height: 1;
-      color: var(--accent);
-    }
-
-    .talent-cards--compact .talent-card {
-      padding: 4px 8px;
-    }
-
-    .talent-cards--compact .talent-card__value {
-      font-size: 20px;
-    }
-
-    .talent-cards--compact .soft,
-    .talent-cards--compact .chip {
-      display: none;
-    }
-  `,
+  styleUrl: './points-overview.scss',
 })
 export class PointsOverview {
   readonly skills = input.required<Skill[]>();
@@ -105,6 +40,8 @@ export class PointsOverview {
   readonly leveling = input(false);
   /** Spent inspiration points; only a player character has them. */
   readonly used = input<Partial<Record<Talent, number>> | undefined>(undefined);
+  /** Whether the bar of the bonus points is shown; the creation of a player character knows only base points. */
+  readonly bonus = input(true);
   /** A smaller version for under a bar. */
   readonly compact = input(false);
 
@@ -112,10 +49,8 @@ export class PointsOverview {
     const { base, bonus } = this.budgets();
     const baseLeft = basePointsLeft(this.skills(), base);
     const bonusLeft = bonusPointsLeft(this.skills(), bonus, this.leveling());
-    return [
-      { label: 'Grundpunkte', left: baseLeft, percent: this.percent(base - baseLeft, base) },
-      { label: 'Bonuspunkte', left: bonusLeft, percent: this.percent(bonus - bonusLeft, bonus) },
-    ];
+    const lines = [{ label: 'Grundpunkte', left: baseLeft, percent: this.percent(base - baseLeft, base) }];
+    return this.bonus() ? [...lines, { label: 'Bonuspunkte', left: bonusLeft, percent: this.percent(bonus - bonusLeft, bonus) }] : lines;
   });
   protected readonly talents = computed(() => {
     const credit = this.leveling() ? creditLeft(this.skills()) : undefined;

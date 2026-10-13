@@ -14,21 +14,7 @@ import { Component, signal } from '@angular/core';
       <p class="soft">Mit dem Handy scannen, im selben WLAN wie dieser Rechner. Der Code führt zur Anmeldung.</p>
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: center;
-      text-align: center;
-    }
-
-    .qr {
-      width: 100%;
-      max-width: 320px;
-      border-radius: var(--radius-sm);
-    }
-  `,
+  styleUrl: './login-qr.scss',
 })
 export class LoginQr {
   /** Whether the picture could not be loaded, because it was never drawn. */

@@ -5,11 +5,11 @@ import { map, switchMap } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { Quest } from '../../core/models';
 import { QUEST_STATUSES, QuestStatus, questStatus } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { QuestTile } from '../worlds/quest-tile';
-import { WorldStore } from '../worlds/world-store';
-import { CockpitTools, Tool } from './cockpit-tools';
-import { SessionStore } from './session-store';
+import { Icon } from '../../components/basic/icon';
+import { EntryCard } from '../../components/entry/entry-card';
+import { WorldStore } from '../../core/world-store';
+import { Tools, Tool } from '../../global/tool-bar/tools.service';
+import { SessionStore } from '../../core/session-store';
 
 type Flag = 'done' | 'started' | 'revealed' | 'pinned';
 type BlockId = 'main' | 'side';
@@ -29,7 +29,7 @@ interface Block {
  */
 @Component({
   selector: 'app-quest-board',
-  imports: [FormsModule, Icon, QuestTile],
+  imports: [FormsModule, Icon, EntryCard],
   template: `
     <ng-template #newQuestForm>
       <form class="list-row" (ngSubmit)="addQuest()">
@@ -62,26 +62,7 @@ interface Block {
         </div>
         <div class="tiles tiles--wide">
           @for (quest of visible(block); track quest.id) {
-            <app-quest-tile
-              [quest]="quest"
-              [done]="is(quest.id, 'done')"
-              [marks]="marks(quest.id)"
-              [stepsDone]="stepsDone(quest.id)"
-              [eye]="is(quest.id, 'revealed')"
-              (eyeToggle)="store.toggle('quest', quest.id, 'revealed')"
-            >
-              <div class="row">
-                <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'started')" (click)="store.toggle('quest', quest.id, 'started')">
-                  <app-icon name="flag" [size]="16" /> {{ is(quest.id, 'started') ? 'Angenommen' : 'Annehmen' }}
-                </button>
-                <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'done')" (click)="store.toggle('quest', quest.id, 'done')">
-                  <app-icon name="check" [size]="16" /> Beendet
-                </button>
-                <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'pinned')" (click)="store.toggle('quest', quest.id, 'pinned')">
-                  <app-icon name="pin" [size]="16" /> Stecknadel
-                </button>
-              </div>
-            </app-quest-tile>
+            <app-entry-card size="card" [ref]="{ kind: 'quests', id: quest.id }" [marks]="marks(quest.id)" />
           } @empty {
             <p class="soft">Keine Quest mit diesem Status.</p>
           }
@@ -89,13 +70,7 @@ interface Block {
       </section>
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-  `,
+  styleUrl: './quest-board.scss',
 })
 export class QuestBoard {
   protected readonly store = inject(SessionStore);
@@ -128,7 +103,7 @@ export class QuestBoard {
   });
 
   constructor() {
-    inject(CockpitTools).provide('view', this.tools);
+    inject(Tools).provide('view', this.tools);
   }
 
   /** Whether the session set one of the marks of a quest. */
@@ -139,11 +114,6 @@ export class QuestBoard {
   /** The words behind the kind of a quest: whether it is pinned. */
   protected marks(id: number): string {
     return this.is(id, 'pinned') ? ' · angepinnt' : '';
-  }
-
-  /** How many points of a quest the session has checked. */
-  protected stepsDone(id: number): number {
-    return this.store.state('quest', id)?.steps.length ?? 0;
   }
 
   /** Show another status in one of the blocks. */

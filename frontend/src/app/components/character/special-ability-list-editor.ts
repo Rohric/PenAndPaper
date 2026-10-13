@@ -41,23 +41,7 @@ import { SpecialAbility } from '../../core/models';
     }
     <button type="button" class="btn btn--small add" (click)="add()">+ Besondere Fähigkeit</button>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .ability {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .add {
-      align-self: flex-start;
-    }
-  `,
+  styleUrl: './special-ability-list-editor.scss',
 })
 export class SpecialAbilityListEditor {
   readonly abilities = input.required<SpecialAbility[]>();

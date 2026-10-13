@@ -51,23 +51,27 @@
             />
             <button type="button" class="btn stepper__btn" aria-label="Grundpunkte mehr" (click)="stepPoints(row.index, 1)">+</button>
           </div>
-          <div class="stepper stepper--bonus">
-            <span class="stepper__label">Bonuspunkte</span>
-            <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte weniger" [disabled]="!row.skill.bonus_points" (click)="stepBonus(row.index, -1)">−</button>
-            <input
-              class="input input--number stepper__input"
-              type="number"
-              inputmode="numeric"
-              min="0"
-              [attr.aria-label]="'Bonuspunkte ' + row.skill.name"
-              [ngModel]="row.skill.bonus_points"
-              (ngModelChange)="setBonus(row.index, $event)"
-            />
-            <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte mehr" (click)="stepBonus(row.index, 1)">+</button>
-            @if (leveling()) {
-              <span class="soft skill__cost">+1 kostet {{ cost(row.skill) }} {{ cost(row.skill) === 1 ? 'Bonuspunkt' : 'Bonuspunkte' }}</span>
-            }
-          </div>
+          @if (bonus()) {
+            <div class="stepper stepper--bonus">
+              <span class="stepper__label">Bonuspunkte</span>
+              <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte weniger" [disabled]="!row.skill.bonus_points" (click)="stepBonus(row.index, -1)">−</button>
+              <input
+                class="input input--number stepper__input"
+                type="number"
+                inputmode="numeric"
+                min="0"
+                [attr.aria-label]="'Bonuspunkte ' + row.skill.name"
+                [ngModel]="row.skill.bonus_points"
+                (ngModelChange)="setBonus(row.index, $event)"
+              />
+              <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte mehr" (click)="stepBonus(row.index, 1)">+</button>
+              @if (leveling()) {
+                <span class="soft skill__cost">+1 kostet {{ cost(row.skill) }} {{ cost(row.skill) === 1 ? 'Bonuspunkt' : 'Bonuspunkte' }}</span>
+              }
+            </div>
+          } @else if (row.earned) {
+            <span class="soft skill__cost">+{{ row.earned }} aus Abenteuern</span>
+          }
           @if (row.showCredit) {
             <div class="stepper stepper--credit" [class.stepper--hot]="row.note?.usable">
               <span class="stepper__label">Guthaben</span>

@@ -6,8 +6,8 @@ import { Note } from '../../core/session-models';
 const AUTOSAVE_MS = 700;
 
 /**
- * One note in the window at the side: write a new one, change an own one, put it into the
- * notepad of the group or take it back, and read and write the comments of a shared note.
+ * One note in the window at the side: write a new one, change an own one or one of the group, put an own one
+ * into the notepad of the group or take it back, and read and write the comments of a shared note.
  */
 @Component({
   selector: 'app-note-detail',
@@ -22,8 +22,11 @@ export class NoteDetail {
   readonly remove = output<number>();
   readonly comment = output<{ id: number; text: string }>();
 
-  /** Whether the reader may change the note: it is new or his own. */
-  protected readonly writable = computed(() => this.note()?.mine ?? true);
+  /** Whether the reader may change the note: it is new, his own, or lies in the notepad of the group. */
+  protected readonly writable = computed(() => {
+    const note = this.note();
+    return !note || note.mine || note.shared;
+  });
   /** Id of the opened note. The drafts start over only when another note is opened, not on every reload. */
   private readonly noteId = computed(() => this.note()?.id ?? null);
   protected readonly title = linkedSignal({ source: this.noteId, computation: () => untracked(() => this.note()?.title ?? '') });
@@ -32,11 +35,11 @@ export class NoteDetail {
   protected readonly reply = signal('');
 
   constructor() {
-    // An own note saves itself a moment after the last change.
+    // A note the reader may change saves itself a moment after the last change.
     effect((onCleanup) => {
       const note = this.note();
       const title = this.title().trim();
-      const changed = !!note && note.mine && !!title && (title !== note.title || this.text() !== note.text);
+      const changed = !!note && (note.mine || note.shared) && !!title && (title !== note.title || this.text() !== note.text);
       if (changed) {
         const timer = setTimeout(() => this.save.emit({ id: note.id, changes: { title, text: this.text(), shared: note.shared } }), AUTOSAVE_MS);
         onCleanup(() => clearTimeout(timer));

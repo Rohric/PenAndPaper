@@ -1,12 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, forkJoin } from 'rxjs';
 
-import { readError } from '../../core/api-error';
-import { EntryKind, PlayerCharacter } from '../../core/models';
+import { readError } from './api-error';
+import { EntryKind, EntryRef, PlayerCharacter } from './models';
 import {
   ChatMessage, ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
-} from '../../core/session-models';
-import { CharacterService } from '../characters/character.service';
+} from './session-models';
+import { CharacterService } from './character.service';
 import { SessionService } from './session.service';
 
 type Flag = 'done' | 'started' | 'revealed' | 'pinned' | 'on_table';
@@ -41,6 +41,8 @@ export class SessionStore {
   readonly messages = signal<Message[]>([]);
   readonly chat = signal<ChatMessage[]>([]);
   readonly error = signal('');
+  /** The entry that shall go on the table with everything connected to it; the question for the group opens while it is set. */
+  readonly tableWish = signal<EntryRef | null>(null);
 
   private readonly states = computed(() => new Map(this.entries().map((entry) => [`${entry.kind}:${entry.entry_id}`, entry])));
   readonly pinned = computed(() => this.entries().filter((entry) => entry.pinned));

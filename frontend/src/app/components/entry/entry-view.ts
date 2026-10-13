@@ -1,14 +1,15 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { EntryRef, Npc } from '../../core/models';
-import { EyeToggle } from '../../shared/eye-toggle';
-import { Icon } from '../../shared/icon';
-import { Portrait } from '../../shared/portrait';
-import { CharacterService } from '../characters/character.service';
+import { EyeToggle } from './eye-toggle';
+import { Icon } from '../basic/icon';
+import { Portrait } from '../basic/portrait';
+import { CharacterService } from '../../core/character.service';
 import { DialogueView } from './dialogue-view';
+import { chaptersOf } from './entry-face';
 import { Eyes, viewOf } from './entry-views';
 import { LinkRow } from './link-row';
-import { WorldStore } from './world-store';
+import { WorldStore } from '../../core/world-store';
 
 /** Read one entry of the glossary: its texts, its lists and everything it is linked with. */
 @Component({
@@ -30,6 +31,13 @@ import { WorldStore } from './world-store';
               </h2>
               @if (shown.sub) {
                 <p class="soft">{{ shown.sub }}</p>
+              }
+              @if (chapters().length) {
+                <div class="row">
+                  @for (chapter of chapters(); track chapter.id) {
+                    <span class="chip kind--chapters" [attr.title]="chapter.name">Kap. {{ chapter.number }}</span>
+                  }
+                </div>
               }
             </div>
           </div>
@@ -174,6 +182,8 @@ export class EntryView {
   private readonly npc = signal<Npc | null>(null);
   private readonly npcId = computed(() => (this.entry().kind === 'npcs' ? this.entry().id : null));
   protected readonly view = computed(() => viewOf(this.store, this.entry(), this.npc()));
+  /** The chapters the entry is tagged with. */
+  protected readonly chapters = computed(() => chaptersOf(this.store, this.entry()));
   protected readonly isEmpty = computed(() => {
     const view = this.view();
     const parts = view ? [view.blocks, view.knowledge, view.lists, view.phrases, view.links, view.dialogues] : [];

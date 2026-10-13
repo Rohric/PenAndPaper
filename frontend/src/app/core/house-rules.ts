@@ -131,12 +131,16 @@ export function skillProblems(skills: Skill[], stored: Skill[], locked: boolean,
       }
     });
   }
-  problems.push(...creditProblems(skills));
   const base = basePointsLeft(skills, budgets.base);
-  const bonus = bonusPointsLeft(skills, budgets.bonus, true);
   if (base < 0) {
     problems.push({ index: null, text: `Es sind ${-base} Grundpunkte zu viel verteilt.` });
   }
+  // Bonus points and credit are house rules of the adventure; the creation of a character knows neither.
+  if (!locked) {
+    return problems;
+  }
+  problems.push(...creditProblems(skills));
+  const bonus = bonusPointsLeft(skills, budgets.bonus, true);
   if (bonus < 0) {
     problems.push({ index: null, text: `Es sind ${-bonus} Bonuspunkte zu viel ausgegeben.` });
   }

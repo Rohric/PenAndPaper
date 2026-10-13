@@ -1,0 +1,61 @@
+// The bar stays on top while the page scrolls below it.
+:host {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-bar);
+  display: block;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2) var(--gap-4);
+  align-items: center;
+  min-height: var(--bar);
+  padding: var(--gap-1) var(--page-gap);
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.top__path {
+  display: flex;
+  gap: var(--gap-2);
+  align-items: baseline;
+  min-width: 0;
+}
+
+.top__crumb {
+  overflow: hidden;
+  color: var(--muted);
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a.top__crumb:hover {
+  color: var(--accent);
+}
+
+.top__crumb--here {
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 22px;
+}
+
+.top__sep {
+  color: var(--line-2);
+}
+
+.top__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-1);
+}
+
+.top__extras {
+  display: flex;
+  gap: var(--gap-3);
+  align-items: center;
+  margin-left: auto;
+}

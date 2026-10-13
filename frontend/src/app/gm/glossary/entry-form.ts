@@ -6,7 +6,7 @@ import { LocationEditor } from './location-editor';
 import { QuestEditor } from './quest-editor';
 import { TriviaEditor } from './trivia-editor';
 import { WorldNpcEditor } from './world-npc-editor';
-import { WorldStore } from './world-store';
+import { WorldStore } from '../../core/world-store';
 
 /** The form that fits an entry, so every page and the window at the side edit entries the same way. */
 @Component({

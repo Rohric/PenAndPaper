@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { Option } from '../core/models';
+import { Option } from '../../core/models';
 
 /** Pick one entry from a list, or none. */
 @Component({

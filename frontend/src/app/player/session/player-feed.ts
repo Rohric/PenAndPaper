@@ -1,6 +1,6 @@
 import { PlayerCharacter } from '../../core/models';
 import { ChatMessage, Message, Note, PlayerView } from '../../core/session-models';
-import { IconName } from '../../shared/icon';
+import { IconName } from '../../components/basic/icon';
 
 /** Where a piece of news leads to. */
 export type FeedTarget = 'quests' | 'glossary' | 'character' | 'notes' | 'chat' | 'round';

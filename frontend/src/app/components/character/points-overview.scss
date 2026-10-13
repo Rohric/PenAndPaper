@@ -1,0 +1,64 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.line__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.talent-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.talent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.talent-card__name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.talent-card__value {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.talent-cards--compact .talent-card {
+  padding: 4px 8px;
+}
+
+.talent-cards--compact .talent-card__value {
+  font-size: 20px;
+}
+
+.talent-cards--compact .soft,
+.talent-cards--compact .chip {
+  display: none;
+}

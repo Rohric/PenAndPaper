@@ -11,12 +11,21 @@
     @if (note(); as own) {
       <div class="row">
         <button type="button" class="btn btn--primary" [disabled]="!dirty() || !title().trim()" (click)="store(own.shared)">Speichern</button>
-        <button type="button" class="btn" [disabled]="!title().trim()" (click)="store(!own.shared)">
-          {{ own.shared ? 'Zurück zu meinen Notizen' : 'In den Gruppenblock legen' }}
-        </button>
-        <button type="button" class="btn btn--danger" (click)="drop(own)">Löschen</button>
+        @if (own.mine) {
+          <button type="button" class="btn" [disabled]="!title().trim()" (click)="store(!own.shared)">
+            {{ own.shared ? 'Zurück zu meinen Notizen' : 'In den Gruppenblock legen' }}
+          </button>
+        }
+        @if (own.mine) {
+          <button type="button" class="btn btn--danger" (click)="drop(own)">Löschen</button>
+        }
       </div>
-      <p class="soft">{{ own.shared ? 'Diese Notiz liegt im Gruppenblock, alle in der Runde sehen sie.' : 'Diese Notiz siehst nur du.' }}</p>
+      <p class="soft">
+        {{ own.shared ? 'Diese Notiz liegt im Gruppenblock: alle in der Runde und der Spielleiter sehen und bearbeiten sie.' : 'Diese Notiz siehst nur du, auch der Spielleiter nicht.' }}
+        @if (!own.mine) {
+          Angelegt von {{ own.author }}.
+        }
+      </p>
     } @else {
       <div class="row">
         <button type="button" class="btn btn--primary" [disabled]="!title().trim()" (click)="store(false)">Für mich speichern</button>

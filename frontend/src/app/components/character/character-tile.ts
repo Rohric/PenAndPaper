@@ -2,7 +2,7 @@ import { Component, computed, input, output, signal } from '@angular/core';
 
 import { PlayerCharacter, TALENTS } from '../../core/models';
 import { damageText, inspirationPoints, skillValue, talentValue } from '../../core/rules';
-import { Icon } from '../../shared/icon';
+import { Icon } from '../basic/icon';
 
 const LIFE_STEPS = [-5, -1, 1, 5];
 

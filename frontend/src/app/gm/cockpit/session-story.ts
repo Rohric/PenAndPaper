@@ -2,11 +2,11 @@ import { Component, TemplateRef, computed, inject, input, output, viewChild } fr
 
 import { EntryRef, Scene, WorldEvent } from '../../core/models';
 import { questStatus } from '../../core/session-models';
-import { SceneView } from '../worlds/scene-view';
-import { WorldStore } from '../worlds/world-store';
-import { CockpitTools, Tool } from './cockpit-tools';
-import { SessionCard } from './session-card';
-import { SessionStore } from './session-store';
+import { SceneView } from '../chapters/scene-view';
+import { WorldStore } from '../../core/world-store';
+import { Tools, Tool } from '../../global/tool-bar/tools.service';
+import { EntryCard } from '../../components/entry/entry-card';
+import { SessionStore } from '../../core/session-store';
 
 /** Open events in two groups: what belongs to the chapter, and the rest of the world. */
 interface Groups<T> {
@@ -22,7 +22,7 @@ interface Groups<T> {
  */
 @Component({
   selector: 'app-session-story',
-  imports: [SceneView, SessionCard],
+  imports: [SceneView, EntryCard],
   templateUrl: './session-story.html',
 })
 export class SessionStory {
@@ -114,7 +114,7 @@ export class SessionStory {
   });
 
   constructor() {
-    inject(CockpitTools).provide('view', this.tools);
+    inject(Tools).provide('view', this.tools);
   }
 
   /** How many main quests the group is working on. */

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Skill, TALENTS, Talent } from '../../core/models';
 import { SkillProblem, nextCost, nextCreditCost, refund } from '../../core/house-rules';
 import { MAX_SKILL_VALUE, inspirationPoints, rawValue, skillValue, talentValue } from '../../core/rules';
-import { Icon } from '../../shared/icon';
+import { Icon } from '../basic/icon';
 
 const MAX_BASE_POINTS = 100;
 
@@ -25,8 +25,10 @@ export class SkillEditor {
   readonly stored = input<Skill[]>([]);
   /** Whether the character plays in an adventure, so its base points are fixed. */
   readonly locked = input(false);
-  /** Whether bonus points cost by tiers; the cost of the next point is shown then. */
+  /** Whether the house rules count: bonus points cost by tiers and a talent can have credit. Only in an adventure. */
   readonly leveling = input(false);
+  /** Whether the counter of the bonus points is shown; the creation of a player character knows only base points. */
+  readonly bonus = input(true);
   /** The open credit of each talent; only a player character has it. */
   readonly credit = input<Record<Talent, number> | undefined>(undefined);
   readonly problems = input<SkillProblem[]>([]);
@@ -136,6 +138,7 @@ export class SkillEditor {
         value: skillValue(skill, skills),
         capped: rawValue(skill, skills) > MAX_SKILL_VALUE,
         fixed: this.fixed(index),
+        earned: skill.bonus_points + (skill.credit_points ?? 0),
         problems: this.problems().filter((problem) => problem.index === index),
         hints: this.hints().filter((hint) => hint.index === index),
         note: this.active() === index ? this.creditNote(skill, label) : null,

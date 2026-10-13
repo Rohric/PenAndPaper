@@ -33,23 +33,7 @@ import { Phrase } from '../../core/models';
     }
     <button type="button" class="btn btn--small add" (click)="add()">+ Satz</button>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .phrase {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .add {
-      align-self: flex-start;
-    }
-  `,
+  styleUrl: './phrase-list-editor.scss',
 })
 export class PhraseListEditor {
   readonly phrases = input.required<Phrase[]>();

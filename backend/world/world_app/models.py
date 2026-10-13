@@ -123,8 +123,12 @@ class Chapter(BaseEntry):
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="chapters")
     number = models.PositiveIntegerField()
     to_read = models.TextField(blank=True)
+    # The entries tagged with this chapter; an entry can carry the tags of several chapters.
+    locations = models.ManyToManyField(Location, blank=True, related_name="chapters")
+    npcs = models.ManyToManyField(Npc, blank=True, related_name="chapters")
     quests = models.ManyToManyField(Quest, blank=True, related_name="chapters")
     events = models.ManyToManyField(Event, blank=True, related_name="chapters")
+    trivia = models.ManyToManyField(Trivia, blank=True, related_name="chapters")
 
     class Meta:
         ordering = ["number"]

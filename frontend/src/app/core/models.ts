@@ -106,6 +106,8 @@ export interface World {
 /** A place in a world; parent is the place it lies in. */
 export interface Location extends EntryTexts {
   id: number;
+  /** The ids of the chapters the entry is tagged with. */
+  chapters: number[];
   parent: number | null;
   name: string;
   /** Key of the symbol the entry carries; empty means the usual symbol of its kind. */
@@ -119,6 +121,8 @@ export interface Location extends EntryTexts {
 export interface WorldNpc {
   id: number;
   npc: number;
+  /** The ids of the chapters the entry is tagged with. */
+  chapters: number[];
   name: string;
   profession: string;
   symbol: string;
@@ -146,6 +150,8 @@ export function questLabel(quest: { kind: QuestKind; number: number | null }): s
 /** A quest; giver and npcs hold ids of characters. Players see description, goal and checklist. */
 export interface Quest extends EntryTexts {
   id: number;
+  /** The ids of the chapters the entry is tagged with. */
+  chapters: number[];
   name: string;
   symbol: string;
   dialogues: Dialogue[];
@@ -168,6 +174,8 @@ export interface Quest extends EntryTexts {
 /** Something that can happen in a world. */
 export interface WorldEvent extends EntryTexts {
   id: number;
+  /** The ids of the chapters the entry is tagged with. */
+  chapters: number[];
   name: string;
   symbol: string;
   /** What sets the event off. */
@@ -184,6 +192,8 @@ export interface WorldEvent extends EntryTexts {
 /** A piece of knowledge about the world, on its own or attached to other entries. */
 export interface Trivia extends EntryTexts {
   id: number;
+  /** The ids of the chapters the entry is tagged with. */
+  chapters: number[];
   name: string;
   symbol: string;
   category: string;
@@ -204,8 +214,12 @@ export interface Chapter {
   description: string;
   visible_from_start: boolean;
   to_read: string;
+  /** The entries tagged with this chapter; an entry can carry several chapters. NPCs by the id of the character. */
+  locations: number[];
+  npcs: number[];
   quests: number[];
   events: number[];
+  trivia: number[];
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;

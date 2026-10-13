@@ -1,0 +1,131 @@
+.roll {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--line-2);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+
+// The face of the die with the rolled number.
+.roll__die {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border: 2px solid currentColor;
+  border-radius: 14px;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.roll__die.is-spinning {
+  animation: tumble 0.3s linear infinite;
+}
+
+.roll__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.roll__result {
+  font-size: 18px;
+}
+
+// The colour says how the roll turned out; the word beside it says the same.
+.roll--critical {
+  border-left-color: var(--accent);
+}
+
+.roll--critical .roll__die,
+.roll--critical .roll__result {
+  color: var(--accent);
+}
+
+.roll--success {
+  border-left-color: var(--ok);
+}
+
+.roll--success .roll__die,
+.roll--success .roll__result {
+  color: var(--ok);
+}
+
+.roll--failure {
+  border-left-color: var(--soft);
+}
+
+.roll--fumble {
+  border-left-color: var(--danger);
+}
+
+.roll--fumble .roll__die,
+.roll--fumble .roll__result {
+  color: var(--danger);
+}
+
+// The W100 from 1 to 100 in its four zones, with a mark where the roll landed.
+.scale {
+  position: relative;
+  display: flex;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 999px;
+  background: var(--bg);
+}
+
+.scale__zone--critical {
+  border-radius: 999px 0 0 999px;
+  background: var(--accent);
+}
+
+.scale__zone--success {
+  background: var(--ok);
+}
+
+.scale__zone--failure {
+  background: var(--line-2);
+}
+
+.scale__zone--fumble {
+  border-radius: 0 999px 999px 0;
+  background: var(--danger);
+}
+
+.scale__mark {
+  position: absolute;
+  top: -5px;
+  width: 4px;
+  height: 18px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--text);
+  box-shadow: 0 0 0 2px var(--surface-2);
+}
+
+@keyframes tumble {
+  0% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  100% {
+    transform: rotate(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll__die.is-spinning {
+    animation: none;
+  }
+}

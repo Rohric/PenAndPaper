@@ -2,10 +2,10 @@ import { Component, computed, inject, output } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { EntryRef, isItem } from '../../core/models';
-import { Icon, IconName } from '../../shared/icon';
-import { timeAgo } from '../../shared/time-ago';
-import { KIND_LABELS, openEntry } from './entry-views';
-import { WorldStore } from './world-store';
+import { Icon, IconName } from '../../components/basic/icon';
+import { timeAgo } from '../../components/basic/time-ago';
+import { KIND_LABELS, openEntry } from '../../components/entry/entry-views';
+import { WorldStore } from '../../core/world-store';
 
 const SHOWN = 8;
 // An entry counts as changed when it was saved again later than a moment after it was written.
@@ -54,13 +54,7 @@ interface RecentList {
       </section>
     }
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-  `,
+  styleUrl: './recent-entries.scss',
 })
 export class RecentEntries {
   private readonly store = inject(WorldStore);

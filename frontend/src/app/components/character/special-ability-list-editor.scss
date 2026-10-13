@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ability {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add {
+  align-self: flex-start;
+}

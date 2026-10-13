@@ -1,6 +1,6 @@
 import { Component, computed, input } from '@angular/core';
 
-import { SYMBOLS, Shape } from './symbols';
+import { SYMBOLS, Shape } from '../form/symbols';
 
 /** The line symbols of the user interface, each drawn from one or more paths on a 24 by 24 grid. */
 const ICONS = {
@@ -36,6 +36,10 @@ const ICONS = {
   trash: ['M3 6h18', 'M8 6V4h8v2', 'M19 6l-1 14H6L5 6', 'M10 11v6', 'M14 11v6'],
   speech: ['M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z'],
   clock: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M12 6v6l4 2'],
+  menu: ['M4 7h16', 'M4 12h16', 'M4 17h16'],
+  world: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M2 12h20', 'M12 2a15 15 0 0 1 0 20', 'M12 2a15 15 0 0 0 0 20'],
+  swap: ['M17 2l4 4-4 4', 'M3 11V9a3 3 0 0 1 3-3h15', 'M7 22l-4-4 4-4', 'M21 13v2a3 3 0 0 1-3 3H3'],
+  logout: ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   image: ['M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z', 'M7 9a2 2 0 1 0 4 0a2 2 0 1 0-4 0', 'M21 15l-5-5L5 21'],
   lock: ['M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z', 'M7 11V7a5 5 0 0 1 10 0v4'],
 } satisfies Record<string, string[]>;
@@ -95,12 +99,7 @@ export type IconName = keyof typeof ICONS;
       }
     </svg>
   `,
-  styles: `
-    :host {
-      display: inline-flex;
-      flex: 0 0 auto;
-    }
-  `,
+  styleUrl: './icon.scss',
 })
 export class Icon {
   readonly name = input.required<IconName>();

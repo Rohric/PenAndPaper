@@ -1,0 +1,68 @@
+// The area of the game master, built for the desktop from 1024px on. Together with player.scss this is
+// the only place with media queries: a breakpoint changes the sizes below, components only read them.
+.area-gm {
+  --page-gap: var(--gap-4);
+  --tile-min: 300px;
+  --side-window: 520px;
+  --side-window-wide: 720px;
+  --popup-max: 880px;
+  --dialog: 860px;
+  --thread: 250px;
+  --list: 300px;
+  // The names in the line of a fight have room on the desktop.
+  --who-width: 132px;
+  --who-font: 14px;
+}
+
+@media (min-width: 1280px) {
+  .area-gm {
+    --tile-min: 320px;
+    --list: 340px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .area-gm {
+    --page-gap: var(--gap-5);
+    --side-window: 600px;
+    --thread: 320px;
+    --list: 380px;
+  }
+}
+
+// The frame: the rail on the left, on its right the bar on top, the page and the toolbar at the bottom.
+.area-gm .frame {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  min-height: 100vh;
+  transition: grid-template-columns 0.15s ease;
+}
+
+.area-gm .frame.is-open {
+  grid-template-columns: var(--rail-open) minmax(0, 1fr);
+}
+
+.area-gm .frame__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+// The page never gets wider than the widest content and then stands in the middle.
+.area-gm .frame__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--page-gap);
+  width: 100%;
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: var(--gap-4) var(--page-gap);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .area-gm .frame {
+    transition: none;
+  }
+}

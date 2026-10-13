@@ -4,19 +4,18 @@ import { Router } from '@angular/router';
 import { readError } from '../../core/api-error';
 import { Leavable } from '../../core/leave.guard';
 import { AnyCharacter, PlayerCharacter } from '../../core/models';
-import { CharacterEditor, EditorSection } from '../characters/character-editor';
-import { CharacterSheet } from '../characters/character-sheet';
-import { CharacterService } from '../characters/character.service';
-import { Tool } from '../sessions/cockpit-tools';
-import { PlayerBar } from './player-bar';
-import { PlayerTools } from './player-tools';
+import { CharacterEditor, EditorSection } from '../../components/character/character-editor';
+import { CharacterSheet } from '../../components/character/character-sheet';
+import { CharacterService } from '../../core/character.service';
+import { Tool } from '../../global/tool-bar/tools.service';
+import { PlayerTools } from '../../global/tool-bar/player-tools';
 
 const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'];
 
 /** One character of the player: the sheet to read, and the form to write it. The pencils on the sheet open the form at their part. */
 @Component({
   selector: 'app-character-page',
-  imports: [CharacterSheet, CharacterEditor, PlayerBar],
+  imports: [CharacterSheet, CharacterEditor],
   template: `
     <section class="stack">
       @if (error()) {
@@ -39,13 +38,8 @@ const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'
         }
       }
     </section>
-    <app-player-bar />
   `,
-  styles: `
-    .back {
-      align-self: flex-start;
-    }
-  `,
+  styleUrl: './character-page.scss',
 })
 export class CharacterPage implements Leavable {
   private readonly service = inject(CharacterService);

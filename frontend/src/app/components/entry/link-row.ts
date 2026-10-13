@@ -2,9 +2,9 @@ import { Component, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { EntryLink } from '../../core/models';
-import { EyeToggle } from '../../shared/eye-toggle';
+import { EyeToggle } from './eye-toggle';
 import { openEntry } from './entry-views';
-import { WorldStore } from './world-store';
+import { WorldStore } from '../../core/world-store';
 
 /** A labelled row of names that lead to other entries; it shows nothing when the list is empty. */
 @Component({

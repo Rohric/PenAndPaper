@@ -3,9 +3,9 @@ import { Component, computed, effect, inject, input, output, signal } from '@ang
 import { AnyCharacter, Npc, Option, PlayerCharacter, TALENTS } from '../../core/models';
 import { skillValue, talentValue } from '../../core/rules';
 import { Roll, RollOrder } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { LinkPicker } from '../../shared/link-picker';
-import { CharacterService } from '../characters/character.service';
+import { Icon } from '../basic/icon';
+import { LinkPicker } from '../form/link-picker';
+import { CharacterService } from '../../core/character.service';
 import { DiceRoll } from './dice-roll';
 import { SessionRolls } from './session-rolls';
 
@@ -95,13 +95,7 @@ interface Value {
       <app-session-rolls [rolls]="rolls()" />
     </div>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-  `,
+  styleUrl: './roll-panel.scss',
 })
 export class RollPanel {
   private readonly characterApi = inject(CharacterService);

@@ -1,7 +1,7 @@
 import { Component, inject, output } from '@angular/core';
 
-import { CharacterPanel, CharacterTile } from './character-tile';
-import { SessionStore } from './session-store';
+import { CharacterPanel, CharacterTile } from '../../components/character/character-tile';
+import { SessionStore } from '../../core/session-store';
 
 /** The group of a session as a row of tiles, one per character. */
 @Component({

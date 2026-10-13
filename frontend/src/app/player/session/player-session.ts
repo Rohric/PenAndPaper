@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { Observable, forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
@@ -9,35 +8,33 @@ import { inspirationLeft, inspirationPoints } from '../../core/rules';
 import {
   ChatMessage, Message, Note, PlayerBattle, PlayerView, QuestLog, QuestStatus, Roll, RollOrder, Session,
 } from '../../core/session-models';
-import { AuthService } from '../../core/auth.service';
-import { TutorialService } from '../../core/tutorial.service';
-import { Icon, IconName } from '../../shared/icon';
-import { Portrait } from '../../shared/portrait';
-import { SidePanel } from '../../shared/side-panel';
-import { ToastService } from '../../shared/toast.service';
-import { CharacterEditor, EditorSection } from '../characters/character-editor';
-import { CharacterSheet, RollWish } from '../characters/character-sheet';
-import { CharacterService } from '../characters/character.service';
-import { PlayerBar } from '../player/player-bar';
-import { PlayerTools } from '../player/player-tools';
-import { Tool } from './cockpit-tools';
-import { ChatThread, groupBubbles } from './chat-thread';
-import { DiceRoll } from './dice-roll';
-import { NoteDetail } from './note-detail';
+import { Icon, IconName } from '../../components/basic/icon';
+import { Portrait } from '../../components/basic/portrait';
+import { SideWindow } from '../../components/window/side-window';
+import { NavService } from '../../global/frame/nav.service';
+import { ToastService } from '../../global/toast/toast.service';
+import { CharacterEditor, EditorSection } from '../../components/character/character-editor';
+import { CharacterSheet, RollWish } from '../../components/character/character-sheet';
+import { CharacterService } from '../../core/character.service';
+import { PlayerTools } from '../../global/tool-bar/player-tools';
+import { Tool } from '../../global/tool-bar/tools.service';
+import { ChatThread, groupBubbles } from '../../components/play/chat-thread';
+import { DiceRoll } from '../../components/play/dice-roll';
+import { NoteDetail } from '../../components/play/note-detail';
 import { FeedItem, FeedTarget, Snapshot, feedOf, snapshotOf } from './player-feed';
 import { PlayerBattlePanel } from './player-battle';
-import { PlayerPanels } from './player-panels';
-import { RollPanel } from './roll-panel';
-import { SessionNotes } from './session-notes';
-import { SessionRolls } from './session-rolls';
-import { SessionThread } from './session-thread';
-import { SessionService } from './session.service';
+import { PlayerPanels } from '../../components/play/player-panels';
+import { RollPanel } from '../../components/play/roll-panel';
+import { SessionNotes } from '../../components/play/session-notes';
+import { SessionRolls } from '../../components/play/session-rolls';
+import { SessionThread } from '../../components/play/session-thread';
+import { SessionService } from '../../core/session.service';
 
-/** Every page of the session. The bar leads to six; "Mehr" is a popup with the others. */
+/** Every page of the session. The main row of the bar leads to the main ones; the round has three side pages in the row above. */
 type Page = 'round' | 'character' | 'roll' | 'quests' | 'chat' | 'glossary' | 'notes' | 'group' | 'battle';
 
-/** The pages that "Mehr" opens. */
-const MORE_PAGES: { id: Page; label: string; icon: IconName }[] = [
+/** The side pages of the round: they stand in the row above the main row while the round is open. */
+const ROUND_PAGES: { id: Page; label: string; icon: IconName }[] = [
   { id: 'glossary', label: 'Glossar', icon: 'book' },
   { id: 'notes', label: 'Notizen', icon: 'note' },
   { id: 'group', label: 'Gruppe', icon: 'group' },
@@ -49,14 +46,14 @@ const TOASTED = 3;
 
 /**
  * A session as a player sees it, built for the phone: the round with what is new, the own character
- * with its rolls, the quest log, the chat, and under "Mehr" the glossary, the notes, the group and the battle.
- * A bar with five symbols stays at the bottom. Short messages tell what changed while the group plays.
+ * with its rolls, the quest log and the chat in the bar at the bottom; the glossary, the notes and the group
+ * belong to the round and stand in the row above. Short messages tell what changed while the group plays.
  */
 @Component({
   selector: 'app-player-session',
   imports: [
-    NgTemplateOutlet, RouterLink, Icon, Portrait, SidePanel, CharacterEditor, CharacterSheet, ChatThread, DiceRoll,
-    NoteDetail, PlayerBar, PlayerBattlePanel, PlayerPanels, RollPanel, SessionNotes, SessionRolls, SessionThread,
+    NgTemplateOutlet, Icon, Portrait, SideWindow, CharacterEditor, CharacterSheet, ChatThread, DiceRoll,
+    NoteDetail, PlayerBattlePanel, PlayerPanels, RollPanel, SessionNotes, SessionRolls, SessionThread,
   ],
   templateUrl: './player-session.html',
   styleUrl: './player-session.scss',
@@ -65,14 +62,11 @@ export class PlayerSession {
   private readonly api = inject(SessionService);
   private readonly characterApi = inject(CharacterService);
   private readonly toast = inject(ToastService);
-  private readonly tutorial = inject(TutorialService);
   private readonly tools = inject(PlayerTools);
-  protected readonly auth = inject(AuthService);
 
   /** From the URL: /player/sessions/:sessionId */
   readonly sessionId = input.required<string>();
 
-  protected readonly morePages = MORE_PAGES;
   protected readonly page = signal<Page>('round');
   protected readonly channel = signal<'group' | 'gm'>('group');
   protected readonly data = signal<PlayerView | null>(null);
@@ -110,12 +104,14 @@ export class PlayerSession {
   protected readonly battleHint = computed(() => this.hintFor(this.battle()));
   /** The status of the quests that the bar of the quest page chose. */
   protected readonly questStatus = signal<'all' | QuestStatus>('all');
-  /** The place of a page in the bar: the pages behind "Mehr" count as "more". */
+  /** The place of a page in the main row: rolling belongs to the character, the side pages to the round. */
   private readonly barPage = computed(() => {
     const page = this.page();
+    if (ROUND_PAGES.some((item) => item.id === page)) {
+      return 'round';
+    }
     return page === 'roll' ? 'character' : page;
   });
-  private readonly morePop = viewChild<TemplateRef<unknown>>('morePop');
   private readonly rollsPop = viewChild<TemplateRef<unknown>>('rollsPop');
   private readonly sparkPop = viewChild<TemplateRef<unknown>>('sparkPop');
   private readonly logPop = viewChild<TemplateRef<unknown>>('logPop');
@@ -161,19 +157,28 @@ export class PlayerSession {
     if (this.battle()) {
       items.push({ id: 'battle', word: 'Kampf', icon: 'sword', alert: !!hint && hint !== 'läuft', pressed: here === 'battle', click: () => this.open('battle') });
     }
-    const behind = MORE_PAGES.some((item) => item.id === here);
-    return [...items, { id: 'more', word: 'Mehr', icon: 'expand', pressed: behind, popup: this.morePop(), popupTitle: 'Mehr' }];
+    return items;
   });
-  /** The row of the open page above the main row. */
+  /** The tutorial that explains the open page. */
+  private readonly topic = computed(() => [this.page() === 'character' || this.page() === 'roll' || this.page() === 'battle' ? 'rules' : 'my-sessions']);
+  /** The side pages of the round as switches in the row above the main row. */
+  private readonly roundPages = computed<Tool[]>(() =>
+    ROUND_PAGES.map((item) => ({ id: item.id, word: item.label, icon: item.icon, pressed: this.page() === item.id, click: () => this.open(item.id) })),
+  );
+  /** The row of the open page above the main row. The help for every page is in the menu on the left. */
   private readonly pageTools = computed<Tool[]>(() => {
-    const help = (topic: string, step: number | string = 0) => this.tools.help(topic, step);
     switch (this.page()) {
       case 'round':
         return [
           { id: 'seen', word: 'Gesehen', icon: 'check', disabled: !this.feed().length, click: () => this.markSeen() },
           { id: 'rolls', word: 'Würfe', icon: 'dice', popup: this.rollsPop(), popupTitle: 'Letzte Würfe' },
-          help('my-sessions'),
+          ...this.roundPages(),
         ];
+      case 'notes':
+        return [{ id: 'note-new', word: 'Neu', icon: 'plus', click: () => this.noteId.set(null) }, ...this.roundPages()];
+      case 'glossary':
+      case 'group':
+        return this.roundPages();
       case 'character':
       case 'roll':
         return [
@@ -181,7 +186,6 @@ export class PlayerSession {
           { id: 'roll', word: 'Würfeln', icon: 'dice', pressed: this.page() === 'roll', click: () => this.page.set('roll') },
           { id: 'edit', word: 'Bearbeiten', icon: 'edit', disabled: !this.character(), click: () => this.startEdit('profile') },
           { id: 'spark', word: 'Blitz', icon: 'flag', count: this.sparksLeft(), popup: this.sparkPop(), popupTitle: 'Geistesblitz' },
-          help('rules', 'check'),
         ];
       case 'quests':
         return [
@@ -189,26 +193,22 @@ export class PlayerSession {
           { id: 'status-running', word: 'Laufend', icon: 'flag', pressed: this.questStatus() === 'running', click: () => this.questStatus.set('running') },
           { id: 'status-open', word: 'Offen', icon: 'pin', pressed: this.questStatus() === 'open', click: () => this.questStatus.set('open') },
           { id: 'status-done', word: 'Beendet', icon: 'check', pressed: this.questStatus() === 'done', click: () => this.questStatus.set('done') },
-          help('my-sessions', 4),
         ];
       case 'chat':
         return [
           { id: 'channel-group', word: 'Gruppe', icon: 'group', count: this.chatUnread(), pressed: this.channel() === 'group', click: () => this.open('chat', 'group') },
           { id: 'channel-gm', word: 'Spielleiter', icon: 'mail', count: this.unread(), pressed: this.channel() === 'gm', click: () => this.open('chat', 'gm') },
-          help('my-sessions', 7),
         ];
-      case 'notes':
-        return [{ id: 'note-new', word: 'Neu', icon: 'plus', click: () => this.noteId.set(null) }, help('my-sessions', 6)];
-      case 'battle':
-        return [];
       default:
-        return [help('my-sessions')];
+        return [];
     }
   });
 
   constructor() {
     this.tools.provide('always', this.mainTools);
     this.tools.provide('view', this.pageTools);
+    const nav = inject(NavService);
+    nav.topic.provide(this.topic);
     // When the fight is over the page of the fight has nothing left to show.
     effect(() => {
       if (!this.battle() && this.page() === 'battle') {
@@ -244,18 +244,6 @@ export class PlayerSession {
   /** Go to the place a piece of news is about. */
   protected go(target: FeedTarget): void {
     this.open(target);
-  }
-
-  /** Open a help topic and close the popup. */
-  protected help(topic: string): void {
-    this.tutorial.open(topic);
-    this.tools.dismiss();
-  }
-
-  /** Open a page from the popup "Mehr". */
-  protected openMore(page: Page): void {
-    this.open(page);
-    this.tools.dismiss();
   }
 
   /** Remember that the player has seen all that is new. */

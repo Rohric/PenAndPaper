@@ -1,29 +1,14 @@
 @if (tutorial.current(); as current) {
-  <div class="veil" (click)="tutorial.close()"></div>
-  <section class="window" role="dialog" aria-modal="true" [attr.aria-label]="'Tutorial: ' + current.title">
-    <header class="window__head">
-      <button
-        type="button"
-        class="menu-btn"
-        aria-label="Alle Themen"
-        [attr.aria-expanded]="menuOpen()"
-        (click)="menuOpen.set(!menuOpen())"
-      >
-        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M4 7h16" />
-          <path d="M4 12h16" />
-          <path d="M4 17h16" />
-        </svg>
-        <span class="menu-btn__word">Alle Themen</span>
-      </button>
-      <div class="window__titles">
-        @if (tutorial.previous(); as previous) {
-          <button type="button" class="back-link" (click)="tutorial.returnToPrevious()">← {{ previous.title }}</button>
-        }
-        <span class="kicker">Tutorial</span>
-        <h2 class="subtitle">{{ current.title }}</h2>
-      </div>
-    </header>
+  <app-dialog
+    kind="Tutorial"
+    [title]="current.title"
+    [canBack]="!!tutorial.previous()"
+    (back)="tutorial.returnToPrevious()"
+    (closed)="tutorial.close()"
+  >
+    <button windowAction type="button" class="btn btn--small" [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())">
+      <app-icon name="menu" [size]="16" /> Alle Themen
+    </button>
 
     @if (menuOpen()) {
       <nav class="window__menu" aria-label="Alle Themen">
@@ -102,11 +87,9 @@
       }
     </div>
 
-    <footer class="window__foot">
-      <button type="button" class="btn" (click)="tutorial.close()">Überspringen</button>
-      <span class="window__gap"></span>
-      <button type="button" class="btn" [disabled]="tutorial.step() === 0" (click)="tutorial.back()">Zurück</button>
-      <button type="button" class="btn btn--primary" (click)="tutorial.next()">{{ isLast() ? 'Fertig' : 'Weiter' }}</button>
-    </footer>
-  </section>
+    <button windowFoot type="button" class="btn" (click)="tutorial.close()">Überspringen</button>
+    <span windowFoot class="gap"></span>
+    <button windowFoot type="button" class="btn" [disabled]="tutorial.step() === 0" (click)="tutorial.back()">Zurück</button>
+    <button windowFoot type="button" class="btn btn--primary" (click)="tutorial.next()">{{ isLast() ? 'Fertig' : 'Weiter' }}</button>
+  </app-dialog>
 }

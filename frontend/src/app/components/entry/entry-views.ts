@@ -4,9 +4,9 @@ import {
   Dialogue, EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, isItem, questLabel,
 } from '../../core/models';
 import { damageText, skillValue } from '../../core/rules';
-import { IconName } from '../../shared/icon';
-import { tagColour } from '../../shared/tag-colour';
-import { WorldStore } from './world-store';
+import { IconName } from '../basic/icon';
+import { tagColour } from './tag-colour';
+import { WorldStore } from '../../core/world-store';
 
 /**
  * What the reading view of an entry shows: built here for every kind of entry,
@@ -291,13 +291,13 @@ export function entryAddress(store: WorldStore, ref: EntryRef): { commands: unkn
   return { commands: [...base, 'glossary', item ? 'items' : ref.kind], queryParams: { entry: ref.id } };
 }
 
-/** Follow a link: scenes and chapters are opened, everything else is looked up in the side panel. */
+/** Follow a link: scenes and chapters are opened, everything else is looked up by the rule of the windows. */
 export function openEntry(store: WorldStore, router: Router, ref: EntryRef): void {
   if (ref.kind !== 'chapters' && ref.kind !== 'scenes') {
-    store.peek.set({ kind: ref.kind, id: ref.id });
+    store.look(ref);
     return;
   }
-  store.peek.set(null);
+  store.closeWindows();
   if (ref.kind === 'scenes' && store.openScene) {
     store.openScene(ref.id);
     return;

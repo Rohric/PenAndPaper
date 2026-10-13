@@ -38,10 +38,6 @@
   </div>
   }
 
-  @if (error()) {
-    <p class="notice notice--error" role="alert">{{ error() }}</p>
-  }
-
   @switch (current()) {
     @case ('profile') {
       <div class="panel">
@@ -155,7 +151,9 @@
     @case ('skills') {
       <div class="row">
         <app-tutorial-button topic="rules" step="points" label="? So skillst du" />
-        <app-tutorial-button topic="rules" step="leveling" label="? Leveln" />
+        @if (locked()) {
+          <app-tutorial-button topic="rules" step="leveling" label="? Leveln" />
+        }
         @if (!isNpc()) {
           <app-tutorial-button topic="rules" label="? Regelwerk" />
         }
@@ -169,7 +167,8 @@
         [skills]="draft().skills"
         [stored]="character().skills"
         [locked]="locked()"
-        [leveling]="!isNpc()"
+        [leveling]="locked()"
+        [bonus]="isNpc() || locked()"
         [credit]="credit()"
         [problems]="shownProblems()"
         [hints]="hints()"
@@ -206,11 +205,13 @@
           <span class="count__num">{{ points().base }}</span>
           <span class="count__word">Grund</span>
         </span>
-        <span class="count count--bonus" [class.count--zero]="!points().bonus" [class.count--over]="points().bonus < 0">
-          <span class="count__num">{{ points().bonus }}</span>
-          <span class="count__word">Bonus</span>
-        </span>
-        @if (points().credit) {
+        @if (locked()) {
+          <span class="count count--bonus" [class.count--zero]="!points().bonus" [class.count--over]="points().bonus < 0">
+            <span class="count__num">{{ points().bonus }}</span>
+            <span class="count__word">Bonus</span>
+          </span>
+        }
+        @if (locked() && points().credit) {
           <span class="count count--credit" [class.count--over]="points().credit < 0">
             <span class="count__num">{{ points().credit }}</span>
             <span class="count__word">Guthaben</span>
@@ -245,8 +246,8 @@
     </div>
   </nav>
   @if (pointsOpen()) {
-    <app-popup title="Punkte" [anchor]="pointsAnchor()" [size]="360" (closed)="pointsOpen.set(false)">
-      <app-points-overview [skills]="draft().skills" [budgets]="budgets()" [leveling]="true" [used]="draft().inspiration_used" />
+    <app-popup title="Punkte" [size]="360" (closed)="pointsOpen.set(false)">
+      <app-points-overview [skills]="draft().skills" [budgets]="budgets()" [leveling]="locked()" [bonus]="locked()" [used]="draft().inspiration_used" />
     </app-popup>
   }
 }

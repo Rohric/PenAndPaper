@@ -1,0 +1,138 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+:host(.is-tag) {
+  display: inline-flex;
+}
+
+// Tile and card share one build: stripe, symbol, kind and name, text, switches on the right.
+.entry {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--gap-1) var(--gap-3);
+  align-items: start;
+  padding: var(--gap-2) var(--gap-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: inset 3px 0 0 var(--kind, transparent);
+}
+
+.entry--card {
+  padding: var(--gap-3);
+  border-radius: var(--radius);
+}
+
+.entry--done {
+  border-style: dashed;
+}
+
+.entry--done .entry__title {
+  color: var(--soft);
+  text-decoration: line-through;
+}
+
+.entry__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-1);
+  min-width: 0;
+}
+
+.entry__name {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.entry__name .kicker {
+  color: var(--kind, var(--muted));
+}
+
+.entry__name:hover .entry__title {
+  color: var(--accent);
+}
+
+.entry__title {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// A tile shows two lines of its text, a card four.
+.entry__text {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--soft);
+  font-size: 13px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.entry--card .entry__text {
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+}
+
+.entry .entry__text--whole {
+  display: block;
+  color: var(--text);
+  font-size: inherit;
+  white-space: pre-line;
+}
+
+.entry__note {
+  margin: 0;
+  overflow: hidden;
+  color: var(--accent);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry__small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.entry__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-1);
+  align-items: center;
+}
+
+.entry__tools {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.entry__btn {
+  display: inline-flex;
+  padding: 3px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.entry__btn:hover,
+.entry__btn.is-on {
+  color: var(--accent);
+}

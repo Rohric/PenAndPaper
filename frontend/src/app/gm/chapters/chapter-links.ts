@@ -2,12 +2,11 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { Chapter, Quest, WorldEvent } from '../../core/models';
-import { Icon } from '../../shared/icon';
-import { LinkPicker } from '../../shared/link-picker';
+import { Icon } from '../../components/basic/icon';
+import { LinkPicker } from '../../components/form/link-picker';
 import { EventScenes } from './event-scenes';
-import { EventTile } from './event-tile';
-import { QuestTile } from './quest-tile';
-import { WorldStore } from './world-store';
+import { EntryCard } from '../../components/entry/entry-card';
+import { WorldStore } from '../../core/world-store';
 
 /** An event that plays a part in the chapter. */
 interface ChapterEvent {
@@ -22,7 +21,7 @@ interface ChapterEvent {
  */
 @Component({
   selector: 'app-chapter-links',
-  imports: [Icon, LinkPicker, EventScenes, EventTile, QuestTile],
+  imports: [Icon, LinkPicker, EventScenes, EntryCard],
   template: `
     <div class="stack">
       <app-link-picker
@@ -43,7 +42,7 @@ interface ChapterEvent {
       <div class="tiles tiles--wide">
         @if (kind() === 'quests') {
           @for (quest of quests(); track quest.id) {
-            <app-quest-tile [quest]="quest">
+            <app-entry-card size="card" [ref]="{ kind: 'quests', id: quest.id }">
               <div class="row">
                 <button type="button" class="btn btn--small" (click)="edit(quest.id)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
                 @if (ids().includes(quest.id)) {
@@ -52,11 +51,11 @@ interface ChapterEvent {
                   </button>
                 }
               </div>
-            </app-quest-tile>
+            </app-entry-card>
           }
         } @else {
           @for (item of events(); track item.event.id) {
-            <app-event-tile [event]="item.event">
+            <app-entry-card size="card" [ref]="{ kind: 'events', id: item.event.id }">
               <div class="field">
                 <span class="label">Hängt an Szenen (freiwillig)</span>
                 <app-event-scenes [eventId]="item.event.id" [chapterId]="chapter().id" />
@@ -69,7 +68,7 @@ interface ChapterEvent {
                   </button>
                 }
               </div>
-            </app-event-tile>
+            </app-entry-card>
           }
         }
       </div>
@@ -111,7 +110,7 @@ export class ChapterLinks {
 
   /** Open the form of the entry in the window at the side. */
   protected edit(id: number): void {
-    this.store.peek.set({ kind: this.kind(), id, edit: true });
+    this.store.read({ kind: this.kind(), id }, true);
   }
 
   /** Take the entry out of the chapter; it stays in the glossary. */

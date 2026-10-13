@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+.head {
+  display: flex;
+  gap: var(--gap-3);
+  align-items: center;
+}
+
+.head__arrows,
+.head__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--gap-1);
+  align-items: center;
+}
+
+.head__title {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.head__name {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.head__tabs .tabs__tab {
+  min-height: 36px;
+  padding: var(--gap-1) var(--gap-3);
+  font-size: 14px;
+}

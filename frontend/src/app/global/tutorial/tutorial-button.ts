@@ -1,6 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 
-import { TutorialService } from '../core/tutorial.service';
+import { TutorialService } from '../../core/tutorial.service';
 
 /** The help button of a page: it opens the tutorial for the part of the app the user is in. */
 @Component({

@@ -1,30 +1,35 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
-import { AuthService } from '../core/auth.service';
-import { LayoutService } from '../core/layout.service';
-import { TutorialService } from '../core/tutorial.service';
-import { ToastOutlet } from '../shared/toast-outlet';
-import { TutorialWindow } from '../shared/tutorial-window';
-import { ShellDesktop } from './shell-desktop';
-import { ShellMobile } from './shell-mobile';
+import { AuthService } from '../../core/auth.service';
+import { TutorialService } from '../../core/tutorial.service';
+import { ToastOutlet } from '../toast/toast-outlet';
+import { TutorialWindow } from '../tutorial/tutorial-window';
+import { GmFrame } from './gm-frame';
+import { NavService } from './nav.service';
+import { PlayerFrame } from './player-frame';
 
-/** Pick the frame that fits the screen and render the current page inside it. */
+/**
+ * Pick the frame of the area and render the current page inside it: the pages of the game master are built
+ * for the desktop, the pages of the players for the phone. The area decides, not the width of the window.
+ */
 @Component({
-  selector: 'app-shell',
-  imports: [RouterOutlet, ShellDesktop, ShellMobile, ToastOutlet, TutorialWindow],
+  selector: 'app-frame',
+  imports: [RouterOutlet, GmFrame, PlayerFrame, ToastOutlet, TutorialWindow],
   template: `
-    @if (layout.isMobile()) {
-      <app-shell-mobile><router-outlet /></app-shell-mobile>
+    @if (nav.area() === 'gm') {
+      <app-gm-frame><router-outlet /></app-gm-frame>
     } @else {
-      <app-shell-desktop><router-outlet /></app-shell-desktop>
+      <app-player-frame><router-outlet /></app-player-frame>
     }
     <app-toast-outlet />
     <app-tutorial-window />
   `,
+  host: { '[class.area-gm]': "nav.area() === 'gm'", '[class.area-player]': "nav.area() === 'player'" },
+  styleUrl: './frame.scss',
 })
-export class Shell {
-  protected readonly layout = inject(LayoutService);
+export class Frame {
+  protected readonly nav = inject(NavService);
 
   constructor() {
     // Pick up a game master switch the admin set since the last login.

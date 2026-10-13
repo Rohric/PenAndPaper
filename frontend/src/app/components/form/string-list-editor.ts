@@ -22,17 +22,7 @@ import { FormsModule } from '@angular/forms';
     }
     <button type="button" class="btn btn--small add" (click)="add()">+ {{ label() }}</button>
   `,
-  styles: `
-    :host {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .add {
-      align-self: flex-start;
-    }
-  `,
+  styleUrl: './string-list-editor.scss',
 })
 export class StringListEditor {
   readonly items = input.required<string[]>();

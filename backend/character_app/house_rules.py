@@ -95,11 +95,12 @@ def skill_problems(skills, stored, locked):
     """Return what is wrong with the skills of a player character, as texts.
 
     stored are the skills before the change. While the character plays in an adventure (locked)
-    its base points stay, and a skill above the maximum stays at it instead of being refused.
+    its base points stay, a skill above the maximum stays at it instead of being refused, and the
+    credit is checked. The creation of a character knows only the official rules.
     """
     old = {skill["id"]: skill for skill in stored}
     problems = []
     for skill in skills:
         problems += skill_rule_problems(skill, skills, capped=locked)
         problems += _locked_problems(skill, skills, old.get(skill["id"])) if locked else []
-    return problems + (_removed_problems(skills, stored) if locked else []) + _credit_problems(skills)
+    return problems + (_removed_problems(skills, stored) + _credit_problems(skills) if locked else [])
