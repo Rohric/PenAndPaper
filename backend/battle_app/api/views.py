@@ -29,6 +29,7 @@ GAME_MASTER_ONLY = [IsAuthenticated, IsGameMaster]
 TURN_OPEN = "Erst muss der offene Wurf abgeschlossen oder verworfen werden."
 NOTHING_WAITS = "Es wartet kein Treffer auf eine Parade."
 NOTHING_OPEN = "Es ist kein Wurf offen, der abgeschlossen werden kann."
+NOT_YOUR_TURN = "Diesen Zug schließt der Spielleiter ab."
 
 
 class BattleMixin:
@@ -302,4 +303,18 @@ class PlayerBattleParry(PlayerBattleMixin, APIView):
             raise ValidationError(NOTHING_WAITS)
         value = utils.attack_value(own.player_character, data["skill"]) if data["parry"] else None
         utils.resolve(self.battle, value)
+        return self.answer()
+
+
+class PlayerBattleClose(PlayerBattleMixin, APIView):
+    """Let a player close the turn of the own character, so its roll counts and the next one is on."""
+
+    def post(self, request, session_id):
+        """Close the open exchange when the own character is on turn and rolled it."""
+        own = self.own
+        if utils.stage_of(self.battle) != utils.CLOSE:
+            raise ValidationError(NOTHING_OPEN)
+        if self.battle.current_id != own.pk or self.battle.pending["attacker"] != own.pk:
+            raise PermissionDenied(NOT_YOUR_TURN)
+        utils.close_turn(self.battle)
         return self.answer()

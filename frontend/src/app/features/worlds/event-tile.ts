@@ -1,6 +1,7 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 
 import { WorldEvent } from '../../core/models';
+import { EyeToggle } from '../../shared/eye-toggle';
 import { Portrait } from '../../shared/portrait';
 import { summaryOf } from './entry-views';
 import { WorldStore } from './world-store';
@@ -11,7 +12,7 @@ import { WorldStore } from './world-store';
  */
 @Component({
   selector: 'app-event-tile',
-  imports: [Portrait],
+  imports: [Portrait, EyeToggle],
   template: `
     <article class="tile kind--events">
       <button type="button" class="tile__body" (click)="store.peek.set({ kind: 'events', id: event().id })">
@@ -29,6 +30,9 @@ import { WorldStore } from './world-store';
           <span [class.clamp]="!whole()" [class.prose]="whole()">{{ text() }}</span>
         }
       </button>
+      @if (eye() !== null) {
+        <app-eye class="tile__eye" [shown]="eye() === true" label="Für Spieler sichtbar" (toggle)="eyeToggle.emit()" />
+      }
       <ng-content />
     </article>
   `,
@@ -41,6 +45,9 @@ export class EventTile {
   readonly whole = input(false);
   /** More words behind the kind, like " · hängt an einer Szene". */
   readonly marks = input('');
+  /** Whether the players see the event, when a session decides it; null shows no eye. */
+  readonly eye = input<boolean | null>(null);
+  readonly eyeToggle = output<void>();
 
   /** What happens; an event without that text shows how its description begins. */
   protected readonly text = computed(() => this.event().happening || summaryOf(this.event()));

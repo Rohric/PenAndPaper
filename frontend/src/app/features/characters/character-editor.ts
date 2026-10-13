@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 
 import { readError } from '../../core/api-error';
 import { AnyCharacter } from '../../core/models';
-import { skillHints, skillProblems } from '../../core/rules';
+import { creditLeft, skillHints, skillProblems } from '../../core/house-rules';
 import { EntryTextsEditor } from '../../shared/entry-texts-editor';
 import { Icon } from '../../shared/icon';
 import { SymbolPicker } from '../../shared/symbol-picker';
@@ -77,6 +77,8 @@ export class CharacterEditor {
       (problem) => problem.index === null || !!draft.skills[problem.index].name.trim(),
     );
   });
+  /** The free bonus points and the credit of each talent; only a player character has credit. */
+  protected readonly credit = computed(() => (this.isNpc() ? undefined : creditLeft(this.draft().skills, this.draft().bonus_points_total)));
   protected readonly hints = computed(() => skillHints(this.draft().skills));
   protected readonly errors = computed(() => this.shownProblems().length + (this.draft().name.trim() ? 0 : 1));
   protected readonly state = computed<'busy' | 'errors' | 'dirty' | 'saved'>(() => {

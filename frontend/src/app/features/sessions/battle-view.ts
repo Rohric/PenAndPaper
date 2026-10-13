@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 
@@ -13,6 +13,7 @@ import { WorldStore } from '../worlds/world-store';
 import { BattleExchange } from './battle-exchange';
 import { combatantKey, recall, remember } from './battle-memory';
 import { BattleTimeline, TimelineEntry } from './battle-timeline';
+import { CockpitTools, Tool } from './cockpit-tools';
 import { SessionStore } from './session-store';
 import { SessionService } from './session.service';
 
@@ -120,7 +121,29 @@ export class BattleView {
   protected readonly shownWeapon = computed(() => (this.weapons().some((w) => w.name === this.weapon()) ? this.weapon() : ''));
   protected readonly shownParry = computed(() => (this.parryChoices().some((c) => c.label === this.parrySkill()) ? this.parrySkill() : ''));
 
+  private readonly peoplePop = viewChild<TemplateRef<unknown>>('peoplePop');
+  private readonly addPop = viewChild<TemplateRef<unknown>>('addPop');
+  private readonly logPop = viewChild<TemplateRef<unknown>>('logPop');
+  /** The symbols of the bar while the fight runs; the ones that cannot be used right now are greyed out. */
+  protected readonly tools = computed<Tool[]>(() => {
+    const battle = this.battle();
+    const over = !battle || battle.finished;
+    const exchange = this.open();
+    return [
+      { id: 'battle-people', word: 'Teilnehmer', icon: 'group', tone: 'kind--npcs', count: this.combatants().length, popup: this.peoplePop(), popupTitle: 'Teilnehmer', wide: true },
+      { id: 'battle-log', word: 'Verlauf', icon: 'book', popup: this.logPop(), popupTitle: 'Verlauf' },
+      battle?.round === 0
+        ? { id: 'battle-start', word: 'Initiative würfeln', icon: 'dice', disabled: over || !this.combatants().length, click: () => this.step('start') }
+        : { id: 'battle-next', word: 'Nächster ist dran', icon: 'right', disabled: over || !!battle?.pending, click: () => this.step('next') },
+      { id: 'battle-close', word: 'Zug abschließen', icon: 'check', disabled: !exchange || exchange.stage === 'parry', click: () => this.step('close') },
+      { id: 'battle-discard', word: 'Wurf verwerfen', icon: 'undo', disabled: !exchange, click: () => this.step('discard') },
+      { id: 'battle-add', word: 'Teilnehmer dazu', icon: 'plus', disabled: over, popup: this.addPop(), popupTitle: 'Teilnehmer dazunehmen' },
+      { id: 'battle-finish', word: 'Kampf beenden', icon: 'flag', disabled: over, click: () => this.step('finish') },
+    ];
+  });
+
   constructor() {
+    inject(CockpitTools).provide('view', this.tools);
     effect(() => this.run(this.api.battle(this.battleId()), (battle) => this.show(battle)));
     // The players roll on their own pages, so the fight is loaded again every few seconds.
     const timer = setInterval(() => this.reload(), REFRESH_MS);

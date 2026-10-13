@@ -21,4 +21,5 @@ urlpatterns = [
     path("sessions/<int:session_id>/battle/attack/", views.PlayerBattleAttack.as_view(), name="player-battle-attack"),
     path("sessions/<int:session_id>/battle/action/", views.PlayerBattleAction.as_view(), name="player-battle-action"),
     path("sessions/<int:session_id>/battle/parry/", views.PlayerBattleParry.as_view(), name="player-battle-parry"),
+    path("sessions/<int:session_id>/battle/close/", views.PlayerBattleClose.as_view(), name="player-battle-close"),
 ]

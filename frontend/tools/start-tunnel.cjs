@@ -7,7 +7,7 @@ const PORT = 4200;
 const TUNNEL = path.join(__dirname, 'cloudflared.exe');
 const ADDRESS = /https:\/\/[a-z0-9-]+\.trycloudflare\.com/;
 
-const frontend = spawn('npx', ['ng', 'serve', '--port', String(PORT), '--allowed-hosts', '.trycloudflare.com'], { shell: true, stdio: 'inherit' });
+const frontend = spawn(`npx ng serve --port ${PORT}`, { shell: true, stdio: 'inherit' });
 const tunnel = spawn(TUNNEL, ['tunnel', '--url', `http://localhost:${PORT}`], { stdio: ['ignore', 'ignore', 'pipe'] });
 
 let announced = false;

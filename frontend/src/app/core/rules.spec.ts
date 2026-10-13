@@ -1,5 +1,6 @@
 import { Skill } from './models';
-import { basePointsLeft, bonusPointsLeft, damageText, inspirationPoints, roundHalfUp, skillValue, talentValue } from './rules';
+import { bonusPointsLeft } from './house-rules';
+import { basePointsLeft, damageText, inspirationPoints, roundHalfUp, skillValue, talentValue } from './rules';
 
 function skill(name: string, talent: Skill['talent'], points: number, bonus = 0): Skill {
   return { name, talent, points, bonus_points: bonus, description: '' };

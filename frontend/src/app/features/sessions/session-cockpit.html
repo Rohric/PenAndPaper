@@ -14,32 +14,12 @@
         (valueChange)="store.save({ chapter: $event })"
       />
     </div>
-    <nav class="row" aria-label="Werkzeuge der Runde">
-      <button type="button" class="btn" [attr.aria-pressed]="view() === 'players'" (click)="show('players')">
-        <app-icon name="eye" /> Spieleransicht
-      </button>
-      <button type="button" class="btn" [attr.aria-pressed]="view() === 'quests'" (click)="show('quests')">
-        <app-icon class="kind--quests" name="quest" /> Quests
-      </button>
-      <button type="button" class="btn" [attr.aria-pressed]="view() === 'glossary'" (click)="show('glossary')">
-        <app-icon name="book" /> Glossar
-      </button>
-      <button type="button" class="btn" (click)="openPanel({ kind: 'roll' })"><app-icon name="dice" /> Würfeln</button>
-      <button type="button" class="btn btn--primary" (click)="openBattle()"><app-icon name="sword" /> Kampf</button>
-      <button type="button" class="btn" [attr.aria-pressed]="view() === 'notes'" (click)="show('notes')">
-        <app-icon name="note" /> Notizen
-        @if (fresh()) {
-          <span class="chip chip--accent">{{ fresh() }} neu</span>
-        }
-      </button>
-      <button type="button" class="btn" (click)="openPanel({ kind: 'chat' })">
-        <app-icon name="speech" /> Chat
-        @if (chatUnread()) {
-          <span class="chip chip--accent">{{ chatUnread() }} neu</span>
-        }
-      </button>
-      <button type="button" class="btn" (click)="openPanel({ kind: 'archive' })"><app-icon name="archive" /> Archiv</button>
-      <button type="button" class="btn" (click)="openPanel({ kind: 'level' })"><app-icon name="flag" /> Kapitel abschließen</button>
+    <nav class="row" aria-label="Ansichten der Runde">
+      @for (item of views; track item.id) {
+        <button type="button" class="btn" [attr.aria-pressed]="view() === item.id && !battleId()" (click)="show(item.id)">
+          <app-icon [class]="item.tone ?? ''" [name]="item.icon" /> {{ item.label }}
+        </button>
+      }
       @if (world.world()) {
         <app-world-search />
       }
@@ -68,75 +48,106 @@
         <app-quest-board [chapterId]="chapterId()" />
       }
       @case ('glossary') {
-        <nav class="tabs" aria-label="Bereiche des Glossars">
-          @for (part of sections; track part.id) {
-            <button type="button" class="tabs__tab" [class.is-active]="part.id === sectionId()" (click)="sectionId.set(part.id)">
-              <app-icon [class]="'kind--' + part.id" [name]="part.icon" [size]="16" /> {{ part.label }}
-            </button>
-          }
-        </nav>
         <app-glossary-tiles
           [section]="section()"
           [creatable]="false"
           [carriers]="carriers()"
+          [eyeOf]="isShared"
+          (eyeToggle)="toggleShared($event)"
           (carrier)="openPanel({ kind: 'sheet', characterId: $event })"
         />
       }
+      @case ('master') {
+        <app-master-table [(sceneId)]="sceneId" (open)="openPanel($event)" />
+      }
       @default {
-        <section class="stack">
-          <div class="row row--between">
-            <h2 class="section-title kind--npcs"><app-icon name="group" /> Gruppe</h2>
-            <div class="row">
-              <button type="button" class="btn btn--small" (click)="newEvening()"><app-icon name="clock" [size]="16" /> Neuer Abend</button>
-              <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'members' })">
-                <app-icon name="edit" [size]="16" /> Gruppe bearbeiten
-              </button>
-            </div>
-          </div>
-          <app-session-group (open)="openPanel($event)" />
-        </section>
-
         <div class="story">
           <div class="story__thread">
             <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" [editable]="false" [done]="playedScenes()" (open)="sceneId.set($event)" />
           </div>
           <div class="story__main">
-            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" (quests)="view.set('quests')" />
+            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" />
           </div>
         </div>
       }
     }
   }
 
-  <footer class="bar bar--bottom">
-    <div class="row">
-      <app-icon name="pin" />
-      @for (pin of pins(); track pin.kind + pin.id) {
-        <button type="button" [class]="'chip chip--link kind--' + pin.kind" (click)="openPin(pin)">{{ pin.label }}</button>
-      } @empty {
-        <span class="soft">Noch nichts angeheftet.</span>
-      }
-    </div>
-    <div class="row">
-      <app-icon name="dice" />
-      @if (lastRoll(); as roll) {
-        <span><strong>{{ roll.who }}</strong> · {{ roll.label }}{{ roll.result ? ' ' + roll.value : '' }}</span>
-        @if (roll.result; as result) {
-          <span class="chip" [class.chip--accent]="result === 'critical'" [class.chip--danger]="result === 'fumble'">
-            {{ roll.rolled }} · {{ results[result] }}
-          </span>
-        } @else {
-          <span class="chip">{{ roll.total }}</span>
-        }
-      } @else {
-        <span class="soft">Noch kein Wurf.</span>
-      }
-      <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'rolls' })">Alle Würfe</button>
-    </div>
-  </footer>
+  <app-tool-bar />
 </section>
 
-<app-entry-peek editLabel="In der Welt bearbeiten">
+<!-- The popups behind the symbols of the bar that belong to the whole cockpit. -->
+<ng-template #groupPop>
+  <div class="row">
+    <button type="button" class="btn btn--small" (click)="newEvening()"><app-icon name="clock" [size]="16" /> Neuer Abend</button>
+    <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'members' })"><app-icon name="edit" [size]="16" /> Gruppe bearbeiten</button>
+  </div>
+  <app-session-group (open)="openPanel($event)" />
+</ng-template>
+
+<ng-template #pinPop let-tool>
+  <div class="row">
+    @for (pin of pinsOf(tool.data); track pin.kind + pin.id) {
+      <button type="button" [class]="'chip chip--link kind--' + pin.kind" (click)="openPin(pin)">{{ pin.label }}</button>
+    }
+  </div>
+</ng-template>
+
+<ng-template #rollPop>
+  @if (lastRoll(); as roll) {
+    <p>
+      <strong>{{ roll.who }}</strong> · {{ roll.label }}{{ roll.result ? ' ' + roll.value : '' }}
+      @if (roll.result; as result) {
+        <span class="chip" [class.chip--accent]="result === 'critical'" [class.chip--danger]="result === 'fumble'">
+          {{ roll.rolled }} · {{ results[result] }}
+        </span>
+      } @else {
+        <span class="chip">{{ roll.total }}</span>
+      }
+    </p>
+  } @else {
+    <p class="soft">Noch kein Wurf.</p>
+  }
+  <div class="row">
+    <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'rolls' })">Alle Würfe</button>
+  </div>
+</ng-template>
+
+<ng-template #recentPop>
+  <div class="row">
+    @for (item of recent(); track item.ref.kind + item.ref.id) {
+      <button type="button" [class]="'chip chip--link kind--' + item.ref.kind" (click)="world.peek.set(item.ref)">
+        {{ item.name }} <span class="soft">· {{ item.fresh ? 'neu' : 'geändert' }} {{ ago(item.when) }}</span>
+      </button>
+    } @empty {
+      <span class="soft">Noch nichts angelegt.</span>
+    }
+  </div>
+</ng-template>
+
+<ng-template #sharedPop>
+  <div class="row">
+    @for (item of lastShared(); track item.ref.kind + item.ref.id) {
+      <button type="button" [class]="'chip chip--link kind--' + item.ref.kind" (click)="world.peek.set(item.ref)">{{ item.name }}</button>
+    } @empty {
+      <span class="soft">Du hast den Spielern noch nichts gezeigt.</span>
+    }
+  </div>
+</ng-template>
+
+<ng-template #groupNotesPop>
+  <div class="stack">
+    @for (note of groupNotes(); track note.id) {
+      <button type="button" class="chip chip--link" (click)="openPanel({ kind: 'note', noteId: note.id })">
+        {{ note.title || 'Ohne Titel' }} <span class="soft">· {{ note.author }} · {{ note.comments.length }} Kommentare</span>
+      </button>
+    } @empty {
+      <span class="soft">Im Gruppenblock steht noch nichts.</span>
+    }
+  </div>
+</ng-template>
+
+<app-entry-peek editLabel="In der Welt bearbeiten" [eyes]="eyes()" (eye)="onEye($event)" (step)="onStep($event)">
   @if (world.peek(); as looked) {
     <app-session-entry-actions [entry]="looked" />
   }

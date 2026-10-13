@@ -1,21 +1,4 @@
-// Desktop only. The fight on the left, what happened so far beside it.
+// Desktop only. The fight in one column; participants and log are popups of the bar below.
 .fight {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 20px;
-  align-items: start;
-}
-
-.fight__log {
-  position: sticky;
-  top: 96px;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-}
-
-@media (min-width: 1600px) {
-  .fight {
-    grid-template-columns: minmax(0, 1fr) 420px;
-    gap: 28px;
-  }
+  display: block;
 }

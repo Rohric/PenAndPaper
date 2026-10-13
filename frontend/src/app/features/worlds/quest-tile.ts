@@ -1,7 +1,8 @@
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, output } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { EntryLink, Quest, questLabel } from '../../core/models';
+import { EyeToggle } from '../../shared/eye-toggle';
 import { Portrait } from '../../shared/portrait';
 import { isItem, npcLinks, openEntry, sceneLinks, summaryOf } from './entry-views';
 import { WorldStore } from './world-store';
@@ -19,7 +20,7 @@ interface Tag extends EntryLink {
  */
 @Component({
   selector: 'app-quest-tile',
-  imports: [Portrait],
+  imports: [Portrait, EyeToggle],
   template: `
     <article class="tile kind--quests" [class.tile--done]="done()">
       <button type="button" class="tile__body" (click)="lookUp()">
@@ -36,6 +37,9 @@ interface Tag extends EntryLink {
           <span class="soft clamp">{{ summary() }}</span>
         }
       </button>
+      @if (eye() !== null) {
+        <app-eye class="tile__eye" [shown]="eye() === true" label="Für Spieler sichtbar" (toggle)="eyeToggle.emit()" />
+      }
       @if (now().checklist.length) {
         <span class="soft">Checkliste: {{ stepsDone() === null ? '' : stepsDone() + ' von ' }}{{ now().checklist.length }} Schritte</span>
       }
@@ -61,6 +65,9 @@ export class QuestTile {
   readonly done = input(false);
   /** More words behind the kind, like " · geteilt". */
   readonly marks = input('');
+  /** Whether the players see the quest, when a session decides it; null shows no eye. */
+  readonly eye = input<boolean | null>(null);
+  readonly eyeToggle = output<void>();
   /** How many steps of the checklist a session has checked; outside a session nothing is counted. */
   readonly stepsDone = input<number | null>(null);
 

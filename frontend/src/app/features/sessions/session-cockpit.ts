@@ -1,17 +1,18 @@
-import { Component, DestroyRef, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
-import { EntryKind, EntryLink, Option, Scene, Trivia, itemDamage } from '../../core/models';
-import { Battle, ItemGift, PlayerView, ROLL_RESULTS, SessionEntryKind } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
+import { EntryKind, EntryLink, EntryRef, Option, Scene, Trivia, itemDamage } from '../../core/models';
+import { Battle, ItemGift, Note, PlayerView, ROLL_RESULTS, SessionEntryKind } from '../../core/session-models';
+import { Icon, IconName } from '../../shared/icon';
 import { IdSelect } from '../../shared/id-select';
 import { SidePanel } from '../../shared/side-panel';
+import { timeAgo } from '../../shared/time-ago';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterSheet } from '../characters/character-sheet';
 import { EntryPeek } from '../worlds/entry-peek';
-import { isItem } from '../worlds/entry-views';
+import { Eyes, isItem } from '../worlds/entry-views';
 import { GLOSSARY_SECTIONS, GlossaryTiles, SectionId } from '../worlds/glossary-tiles';
 import { Carrier } from '../worlds/item-rows';
 import { SceneThread } from '../worlds/scene-thread';
@@ -20,8 +21,10 @@ import { WorldStore } from '../worlds/world-store';
 import { BattleView } from './battle-view';
 import { ChapterCloseForm } from './chapter-close-form';
 import { ChatThread, groupBubbles } from './chat-thread';
+import { CockpitTools, Tool } from './cockpit-tools';
 import { CharacterPanel } from './character-tile';
 import { ItemGiftForm, ItemTemplate } from './item-gift-form';
+import { MasterTable } from './master-table';
 import { NoteDetail } from './note-detail';
 import { PlayerPanels } from './player-panels';
 import { QuestBoard } from './quest-board';
@@ -32,10 +35,11 @@ import { SessionGroup } from './session-group';
 import { SessionMembers } from './session-members';
 import { SessionNotes } from './session-notes';
 import { SessionRolls } from './session-rolls';
-import { SessionStore } from './session-store';
+import { SESSION_KINDS, SessionStore } from './session-store';
 import { SessionStory } from './session-story';
 import { SessionThread } from './session-thread';
 import { SessionService } from './session.service';
+import { ToolBar } from './tool-bar';
 
 const REFRESH_MS = 5000;
 const SEEN_KEY = 'pnp.notes.seen.';
@@ -53,7 +57,29 @@ type Panel =
   | { kind: 'chat' };
 
 /** What fills the page between the two bars. */
-type View = 'story' | 'quests' | 'notes' | 'players' | 'glossary';
+type View = 'story' | 'master' | 'quests' | 'glossary' | 'notes' | 'players';
+
+/** The views in the bar on top. */
+const VIEWS: { id: View; label: string; icon: IconName; tone?: string }[] = [
+  { id: 'story', label: 'Story', icon: 'book', tone: 'kind--scenes' },
+  { id: 'master', label: 'Master', icon: 'flag' },
+  { id: 'quests', label: 'Quests', icon: 'quest', tone: 'kind--quests' },
+  { id: 'glossary', label: 'Glossar', icon: 'search' },
+  { id: 'notes', label: 'Notizen', icon: 'note' },
+  { id: 'players', label: 'Spieleransicht', icon: 'eye' },
+];
+
+/** The kinds of pins in the bar at the bottom, in this order. */
+const PIN_KINDS: { kind: SessionEntryKind; word: string; icon: IconName }[] = [
+  { kind: 'scene', word: 'Szenen', icon: 'book' },
+  { kind: 'quest', word: 'Quests', icon: 'quest' },
+  { kind: 'event', word: 'Ereignisse', icon: 'flag' },
+  { kind: 'location', word: 'Orte', icon: 'pin' },
+  { kind: 'npc', word: 'Figuren', icon: 'sheet' },
+  { kind: 'trivia', word: 'Wissen', icon: 'note' },
+];
+
+const RECENT = 12;
 
 const PANEL_TITLES: Record<Panel['kind'], string> = {
   sheet: 'Charakterbogen',
@@ -79,20 +105,19 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
 };
 
 /**
- * The cockpit of the game master for a running session. A bar with the tools and a search on top,
- * the group as a row of tiles, below it the thread of the story beside the scene with its quests and
- * events, and a bar with pins and the last roll at the bottom. The glossary of the world, the notes
- * and the view of the players fill the page instead; everything else opens in a window at the side.
- * It is built for the desktop only.
+ * The cockpit of the game master for a running session. Two bars: on top the views (story, master mode,
+ * quests, glossary, notes, view of the players) with the search; at the bottom the tools as symbols with word
+ * and number, which open popups above themselves. The middle of the bottom bar changes with the view.
+ * Everything else opens in a window at the side. It is built for the desktop only.
  */
 @Component({
   selector: 'app-session-cockpit',
   imports: [
     RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
     ChapterCloseForm, ChatThread, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
-    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch,
+    SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch, MasterTable, ToolBar,
   ],
-  providers: [WorldStore, SessionStore],
+  providers: [WorldStore, SessionStore, CockpitTools],
   templateUrl: './session-cockpit.html',
   styleUrl: './session-cockpit.scss',
 })
@@ -100,10 +125,13 @@ export class SessionCockpit {
   protected readonly world = inject(WorldStore);
   protected readonly store = inject(SessionStore);
   private readonly api = inject(SessionService);
+  private readonly tools = inject(CockpitTools);
 
   /** From the URL: /gm/sessions/:sessionId */
   readonly sessionId = input.required<string>();
 
+  protected readonly views = VIEWS;
+  protected readonly ago = timeAgo;
   protected readonly view = signal<View>('story');
   protected readonly panel = signal<Panel | null>(null);
   protected readonly sceneId = signal<number | null>(null);
@@ -130,9 +158,19 @@ export class SessionCockpit {
   protected readonly playedScenes = computed(() =>
     this.store.entries().filter((entry) => entry.kind === 'scene' && entry.done).map((entry) => entry.entry_id),
   );
-  protected readonly pins = computed<EntryLink[]>(() =>
-    this.store.pinned().map((pin) => ({ kind: WORLD_KINDS[pin.kind], id: pin.entry_id, label: this.nameOf(pin.kind, pin.entry_id) })),
+  protected readonly pins = computed(() =>
+    this.store.pinned().map((pin) => ({ session: pin.kind, kind: WORLD_KINDS[pin.kind], id: pin.entry_id, label: this.nameOf(pin.kind, pin.entry_id) })),
   );
+  /** What the players see of the entry in the window at the side; null for an entry a session does not track. */
+  protected readonly eyes = computed<Eyes | null>(() => {
+    const peek = this.world.peek();
+    const kind = peek && SESSION_KINDS[peek.kind];
+    if (!peek || !kind) {
+      return null;
+    }
+    const state = this.store.state(kind, peek.id);
+    return { revealed: !!state?.revealed, shown: state?.shown ?? [], known: state?.known ?? [], steps: state?.steps ?? [] };
+  });
   protected readonly lastRoll = computed(() => this.store.rolls()[0] ?? null);
 
   // What the window at the side needs.
@@ -169,6 +207,88 @@ export class SessionCockpit {
   private readonly chatSeen = signal(0);
   protected readonly chatUnread = computed(() => this.store.chat().filter((m) => !m.mine && m.id > this.chatSeen()).length);
   protected readonly chatBubbles = computed(() => groupBubbles(this.store.chat()));
+  /** The notes of the notepad of the group. */
+  protected readonly groupNotes = computed<Note[]>(() => this.store.notes().filter((note) => note.shared));
+  /** The secret messages of the players that nobody has read yet. */
+  private readonly unreadMessages = computed(() => this.store.characters().reduce((sum, character) => sum + this.store.unread(character.id), 0));
+  /** Entries of the world that were written or changed last, newest first. */
+  protected readonly recent = computed(() => {
+    const world = this.world;
+    const items: { ref: EntryRef; name: string; created: string; when: string }[] = [
+      ...world.locations().map((entry) => ({ ref: { kind: 'locations', id: entry.id } as EntryRef, name: entry.name, created: entry.created_at, when: entry.updated_at })),
+      ...world.npcs().map((entry) => ({ ref: { kind: 'npcs', id: entry.npc } as EntryRef, name: entry.name, created: entry.created_at, when: entry.updated_at })),
+      ...world.quests().map((entry) => ({ ref: { kind: 'quests', id: entry.id } as EntryRef, name: entry.name, created: entry.created_at, when: entry.updated_at })),
+      ...world.events().map((entry) => ({ ref: { kind: 'events', id: entry.id } as EntryRef, name: entry.name, created: entry.created_at, when: entry.updated_at })),
+      ...world.trivia().map((entry) => ({ ref: { kind: 'trivia', id: entry.id } as EntryRef, name: entry.name, created: entry.created_at, when: entry.updated_at })),
+    ];
+    return items
+      .sort((a, b) => b.when.localeCompare(a.when))
+      .slice(0, RECENT)
+      .map((item) => ({ ...item, fresh: item.created === item.when }));
+  });
+  /** What the players were shown last: the entries that are revealed, the newest marks first. */
+  protected readonly lastShared = computed(() =>
+    this.store
+      .entries()
+      .filter((entry) => entry.revealed)
+      .sort((a, b) => b.id - a.id)
+      .slice(0, RECENT)
+      .map((entry) => ({ ref: { kind: WORLD_KINDS[entry.kind], id: entry.entry_id } as EntryRef, name: this.nameOf(entry.kind, entry.entry_id) })),
+  );
+
+  // The popups behind the symbols that belong to the whole cockpit.
+  private readonly groupPop = viewChild<TemplateRef<unknown>>('groupPop');
+  private readonly pinPop = viewChild<TemplateRef<unknown>>('pinPop');
+  private readonly rollPop = viewChild<TemplateRef<unknown>>('rollPop');
+  private readonly recentPop = viewChild<TemplateRef<unknown>>('recentPop');
+  private readonly sharedPop = viewChild<TemplateRef<unknown>>('sharedPop');
+  private readonly groupNotesPop = viewChild<TemplateRef<unknown>>('groupNotesPop');
+
+  /** The symbols that are there in every view. */
+  private readonly alwaysTools = computed<Tool[]>(() => [
+    { id: 'group', word: 'Gruppe', icon: 'group', tone: 'kind--npcs', count: this.unreadMessages(), popup: this.groupPop(), popupTitle: 'Gruppe', wide: true },
+    { id: 'roll', word: 'Würfeln', icon: 'dice', click: () => this.openPanel({ kind: 'roll' }) },
+    { id: 'chat', word: 'Chat', icon: 'speech', count: this.chatUnread(), click: () => this.openPanel({ kind: 'chat' }) },
+    { id: 'fight', word: 'Kampf', icon: 'sword', pressed: this.battleId() !== null, click: () => this.openBattle() },
+    { id: 'archive', word: 'Archiv', icon: 'archive', click: () => this.openPanel({ kind: 'archive' }) },
+    { id: 'level', word: 'Kapitel abschließen', icon: 'flag', click: () => this.openPanel({ kind: 'level' }) },
+  ]);
+  /** The symbols on the right: one for every kind of pin that exists, and the last roll. */
+  private readonly rightTools = computed<Tool[]>(() => {
+    const pins: Tool[] = PIN_KINDS.map((part) => ({
+      id: `pins-${part.kind}`, word: part.word, icon: part.icon, tone: `kind--${WORLD_KINDS[part.kind]}`,
+      count: this.pins().filter((pin) => pin.session === part.kind).length, data: part.kind, popup: this.pinPop(), popupTitle: `Stecknadeln · ${part.word}`,
+    })).filter((tool) => tool.count);
+    const roll = this.lastRoll();
+    return [...pins, { id: 'last-roll', word: 'Letzter Wurf', icon: 'dice', count: roll?.rolled ?? roll?.total ?? null, popup: this.rollPop(), popupTitle: 'Letzter Wurf' }];
+  });
+  /** The symbols of the views the cockpit draws itself; the other views and the battle report their own. */
+  private readonly viewTools = computed<Tool[]>(() => {
+    if (this.battleId() !== null) {
+      return [];
+    }
+    switch (this.view()) {
+      case 'glossary':
+        return [
+          { id: 'glossary-recent', word: 'Zuletzt', icon: 'clock', popup: this.recentPop(), popupTitle: 'Zuletzt angelegt und bearbeitet' },
+          ...this.sections.map((part): Tool => ({
+            id: `glossary-${part.id}`, word: part.label, icon: part.icon, tone: `kind--${part.id}`, pressed: part.id === this.sectionId(), click: () => this.sectionId.set(part.id),
+          })),
+        ];
+      case 'notes':
+        return [
+          { id: 'notes-new', word: 'Neue Notiz', icon: 'plus', click: () => this.openPanel({ kind: 'note', noteId: null }) },
+          { id: 'notes-group', word: 'Gruppenblock', icon: 'group', count: this.fresh(), popup: this.groupNotesPop(), popupTitle: 'Gruppenblock' },
+        ];
+      case 'players':
+        return [
+          { id: 'players-reload', word: 'Neu laden', icon: 'undo', click: () => this.loadPlayerView() },
+          { id: 'players-shared', word: 'Zuletzt geteilt', icon: 'eye', popup: this.sharedPop(), popupTitle: 'Zuletzt geteilt' },
+        ];
+      default:
+        return [];
+    }
+  });
 
   constructor() {
     effect(() => this.store.load(Number(this.sessionId())));
@@ -193,8 +313,12 @@ export class SessionCockpit {
     effect(() => {
       if (this.world.peek()) {
         this.panel.set(null);
+        this.tools.dismiss();
       }
     });
+    this.tools.provide('always', this.alwaysTools);
+    this.tools.provide('view', this.viewTools);
+    this.tools.provide('right', this.rightTools);
     // While the notes are open, everything in the notepad of the group counts as seen.
     effect(() => {
       if (this.view() === 'notes') {
@@ -209,10 +333,11 @@ export class SessionCockpit {
     inject(DestroyRef).onDestroy(() => clearInterval(timer));
   }
 
-  /** Switch between the story, the notes and the view of the players; the same button leads back. */
+  /** Switch to a view; a battle that is open is left. */
   protected show(view: View): void {
-    this.view.set(this.view() === view ? 'story' : view);
-    if (this.view() === 'players') {
+    this.battleId.set(null);
+    this.view.set(view);
+    if (view === 'players') {
       this.loadPlayerView();
     }
   }
@@ -220,16 +345,60 @@ export class SessionCockpit {
   /** Open a window at the side; opening the messages of a character marks its answers as read. */
   protected openPanel(panel: Panel): void {
     this.world.peek.set(null);
+    this.tools.dismiss();
     this.panel.set(panel);
     if (panel.kind === 'messages' && this.store.unread(panel.characterId)) {
       this.store.markRead(panel.characterId);
     }
   }
 
+  /** The pins of one kind, for the popup behind its symbol. */
+  protected pinsOf(kind: unknown): EntryLink[] {
+    return this.pins().filter((pin) => pin.session === kind);
+  }
+
+  /** The eye of a tile was clicked: show the entry to the players or hide it, without opening it. */
+  protected toggleShared(ref: EntryRef): void {
+    const kind = SESSION_KINDS[ref.kind];
+    if (kind) {
+      this.store.toggle(kind, ref.id, 'revealed');
+    }
+  }
+
+  /** Whether the players see an entry of the world; the eyes of the tiles ask this. */
+  protected readonly isShared = (ref: EntryRef): boolean => {
+    const kind = SESSION_KINDS[ref.kind];
+    return !!kind && !!this.store.state(kind, ref.id)?.revealed;
+  };
+
+  /** An eye in the window at the side was clicked: the name, a part, a point of the checklist or a piece of knowledge. */
+  protected onEye(part: string): void {
+    const peek = this.world.peek();
+    const kind = peek && SESSION_KINDS[peek.kind];
+    if (!peek || !kind) {
+      return;
+    }
+    if (part === 'name') {
+      this.store.toggle(kind, peek.id, 'revealed');
+    } else if (part.startsWith('known:')) {
+      this.store.toggleIn(kind, peek.id, 'known', Number(part.slice('known:'.length)));
+    } else {
+      this.store.toggleShown(kind, peek.id, part);
+    }
+  }
+
+  /** A point of the checklist in the window at the side was ticked. */
+  protected onStep(position: number): void {
+    const peek = this.world.peek();
+    if (peek?.kind === 'quests') {
+      this.store.toggleIn('quest', peek.id, 'steps', position);
+    }
+  }
+
   /** Open a pinned entry: a scene in the story, everything else in the window at the side. */
   protected openPin(pin: EntryLink): void {
     if (pin.kind === 'scenes') {
-      this.view.set('story');
+      this.show('story');
       this.sceneId.set(pin.id);
     } else {
       this.world.peek.set({ kind: pin.kind, id: pin.id });

@@ -36,6 +36,11 @@
           </div>
         } @else if (exchange.stage === 'parry') {
           <p class="soft">Es wird entschieden, ob {{ exchange.defender_name }} pariert.</p>
+        } @else if (canClose()) {
+          <div class="row">
+            <button type="button" class="btn btn--primary" (click)="close()"><app-icon name="check" /> Zug abschließen</button>
+          </div>
+          <p class="soft">Damit zählt der Wurf und der Nächste ist dran. Der Spielleiter kann ihn vorher noch verwerfen.</p>
         } @else {
           <p class="soft">Der Spielleiter schließt den Zug ab. Erst dann zählt der Wurf.</p>
         }
@@ -109,7 +114,7 @@
             </button>
           }
         </div>
-        <p class="soft">Angriff oder Aktion zählen erst, wenn der Spielleiter den Zug abschließt.</p>
+        <p class="soft">Angriff oder Aktion zählen erst, wenn du oder der Spielleiter den Zug abschließt.</p>
       </div>
     }
 

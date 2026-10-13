@@ -106,7 +106,7 @@
           <button type="button" class="pill" aria-pressed="false" (click)="page.set('character')">Bogen</button>
           <button type="button" class="pill" aria-pressed="true">Würfeln</button>
         </div>
-        <app-tutorial-button topic="rules-checks" label="? Proben und Würfe" />
+        <app-tutorial-button topic="rules" step="check" label="? Proben und Würfe" />
         <ng-container *ngTemplateOutlet="inspirationTpl" />
         <div class="panel">
           <app-roll-panel [characters]="own()" [last]="lastRoll()" [rolls]="rolls()" (roll)="order($event)" />
@@ -157,7 +157,7 @@
             <span class="tile__head"><app-icon name="flag" /> <span class="tile__title">Hilfe zur App</span></span>
             <span class="soft">Wie diese Seite funktioniert.</span>
           </button>
-          <button type="button" class="tile" (click)="help('rules-basics')">
+          <button type="button" class="tile" (click)="help('rules')">
             <span class="tile__head"><app-icon name="book" /> <span class="tile__title">Regelwerk</span></span>
             <span class="soft">Proben, Skillung, Kampf und Leveln erklärt.</span>
           </button>
@@ -174,7 +174,7 @@
         <app-player-panels [view]="shown" part="group" />
       }
       @case ('battle') {
-        <app-tutorial-button topic="rules-combat" label="? Kampfregeln" />
+        <app-tutorial-button topic="rules" step="initiative" label="? Kampfregeln" />
         <app-player-battle [sessionId]="id()" [battle]="battle()" [character]="character()" (changed)="battle.set($event)" />
       }
     }

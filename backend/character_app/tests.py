@@ -7,9 +7,9 @@ from rest_framework.test import APITestCase
 
 from auth_app.models import User
 from character_app.models import Npc
+from character_app.house_rules import bonus_points_left
 from character_app.utils import (
     base_points_left,
-    bonus_points_left,
     inspiration_points,
     round_half_up,
     skill_value,

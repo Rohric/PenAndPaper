@@ -1,18 +1,19 @@
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 
 import { EntryRef, Npc } from '../../core/models';
+import { EyeToggle } from '../../shared/eye-toggle';
 import { Icon } from '../../shared/icon';
 import { Portrait } from '../../shared/portrait';
 import { CharacterService } from '../characters/character.service';
 import { DialogueView } from './dialogue-view';
-import { viewOf } from './entry-views';
+import { Eyes, viewOf } from './entry-views';
 import { LinkRow } from './link-row';
 import { WorldStore } from './world-store';
 
 /** Read one entry of the glossary: its texts, its lists and everything it is linked with. */
 @Component({
   selector: 'app-entry-view',
-  imports: [Icon, Portrait, LinkRow, DialogueView],
+  imports: [Icon, Portrait, LinkRow, DialogueView, EyeToggle],
   template: `
     @if (view(); as shown) {
       <article [class]="'panel kind--' + shown.tone" [style.--kind]="shown.colour || null">
@@ -21,7 +22,12 @@ import { WorldStore } from './world-store';
             <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="52" />
             <div>
               <span class="kicker kicker--kind">{{ shown.kicker }}</span>
-              <h2 class="subtitle">{{ shown.title }}</h2>
+              <h2 class="subtitle">
+                @if (eyes(); as seen) {
+                  <app-eye [shown]="seen.revealed" label="Name" (toggle)="eye.emit('name')" />
+                }
+                {{ shown.title }}
+              </h2>
               @if (shown.sub) {
                 <p class="soft">{{ shown.sub }}</p>
               }
@@ -34,16 +40,33 @@ import { WorldStore } from './world-store';
 
         @for (block of shown.blocks; track block.label) {
           <div class="field">
-            <span class="label">{{ block.label }}</span>
+            <span class="label">
+              @if (eyes(); as seen) {
+                @if (block.key) {
+                  <app-eye [shown]="seen.shown.includes(block.key)" [label]="block.label" [faded]="!seen.revealed" (toggle)="eye.emit(block.key)" />
+                }
+              }
+              {{ block.label }}
+            </span>
             <p class="prose">{{ block.text }}</p>
           </div>
         }
 
         @for (group of shown.knowledge; track group.label) {
           <div class="field">
-            <span class="label">{{ group.label }}</span>
+            <span class="label">
+              @if (eyes() && group.gmOnly) {
+                <app-icon name="lock" [size]="14" />
+              }
+              {{ group.label }}
+            </span>
             @for (piece of group.pieces; track $index) {
               <div class="knowledge" [class.knowledge--gm]="group.gmOnly">
+                @if (eyes(); as seen) {
+                  @if (!group.gmOnly) {
+                    <app-eye [shown]="seen.known.includes($index)" label="Herausgefunden" [faded]="!seen.revealed" (toggle)="eye.emit('known:' + $index)" />
+                  }
+                }
                 @if (piece.title) {
                   <span class="kicker">{{ piece.title }}</span>
                 }
@@ -58,11 +81,31 @@ import { WorldStore } from './world-store';
         @for (list of shown.lists; track list.label) {
           <div class="field">
             <span class="label">{{ list.label }}</span>
-            <ul class="plain-list">
-              @for (item of list.items; track $index) {
-                <li>{{ item }}</li>
+            @if (eyes(); as seen) {
+              @if (list.key === 'checklist') {
+                @for (item of list.items; track $index) {
+                  <div class="row">
+                    <app-eye [shown]="seen.shown.includes('step:' + $index)" [label]="item" [faded]="!seen.revealed" (toggle)="eye.emit('step:' + $index)" />
+                    <label class="check">
+                      <input type="checkbox" [checked]="seen.steps.includes($index)" (change)="step.emit($index)" />
+                      {{ item }}
+                    </label>
+                  </div>
+                }
+              } @else {
+                <ul class="plain-list">
+                  @for (item of list.items; track $index) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
               }
-            </ul>
+            } @else {
+              <ul class="plain-list">
+                @for (item of list.items; track $index) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            }
           </div>
         }
 
@@ -81,7 +124,13 @@ import { WorldStore } from './world-store';
         }
 
         @for (group of shown.links; track group.label) {
-          <app-link-row [label]="group.label" [items]="group.items" />
+          <app-link-row
+            [label]="group.label"
+            [items]="group.items"
+            [eye]="eyes() && group.key ? eyes()!.shown.includes(group.key) : null"
+            [faded]="!eyes()?.revealed"
+            (eyeToggle)="eye.emit(group.key!)"
+          />
         }
 
         @if (shown.pictures) {
@@ -114,6 +163,12 @@ export class EntryView {
   /** Whether the edit button is shown. */
   readonly editable = input(false);
   readonly edit = output<void>();
+  /** What the players see, when a session decides it; each part then gets an eye. Writing the world has none. */
+  readonly eyes = input<Eyes | null>(null);
+  /** The eye of a part was clicked: its key, like "name", "goal", "step:2" or "known:0". */
+  readonly eye = output<string>();
+  /** A point of the checklist was ticked: its position. */
+  readonly step = output<number>();
 
   /** The character itself; the world only knows name, profession and place of an NPC. */
   private readonly npc = signal<Npc | null>(null);

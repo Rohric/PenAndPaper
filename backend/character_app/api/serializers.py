@@ -7,12 +7,11 @@ from character_app.utils import (
     MAX_DAMAGE_DICE,
     MAX_SKILL_POINTS,
     base_points_left,
-    bonus_points_left,
     inspiration_left,
-    skill_problems,
     talent_summary,
     with_ids,
 )
+from character_app.house_rules import bonus_points_left, credit_left, skill_problems
 from core.knowledge import clean_knowledge
 
 MAX_AMOUNT = 9999
@@ -139,11 +138,11 @@ class CharacterSerializer(serializers.ModelSerializer):
         return summary
 
     def get_points_left(self, character):
-        """Return the unspent points of both budgets."""
-        return {
-            "base": base_points_left(character.skills, character.skill_points_total),
-            "bonus": bonus_points_left(character.skills, character.bonus_points_total, self.leveling),
-        }
+        """Return the unspent points of both budgets; with leveling the bonus points are the free ones and credit is split off."""
+        left = {"base": base_points_left(character.skills, character.skill_points_total)}
+        if self.leveling:
+            return {**left, **dict(zip(("bonus", "credit"), credit_left(character.skills, character.bonus_points_total).values()))}
+        return {**left, "bonus": bonus_points_left(character.skills, character.bonus_points_total), "credit": {}}
 
     def validate_skills(self, skills):
         """Check and complete every skill entry."""

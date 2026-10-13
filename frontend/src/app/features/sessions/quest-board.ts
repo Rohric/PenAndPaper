@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, TemplateRef, computed, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { map, switchMap } from 'rxjs';
 
@@ -8,6 +8,7 @@ import { QUEST_STATUSES, QuestStatus, questStatus } from '../../core/session-mod
 import { Icon } from '../../shared/icon';
 import { QuestTile } from '../worlds/quest-tile';
 import { WorldStore } from '../worlds/world-store';
+import { CockpitTools, Tool } from './cockpit-tools';
 import { SessionStore } from './session-store';
 
 type Flag = 'done' | 'started' | 'revealed' | 'pinned';
@@ -24,13 +25,13 @@ interface Block {
  * All quests of the world as a session has them, in two blocks: main quests and side quests.
  * Each block shows one status at a time: running (accepted), open (not accepted yet) or finished.
  * Shared and pinned are marks of their own and can narrow both blocks down.
- * A new quest can be created here from its title alone.
+ * A new quest can be created from its title alone; that and the two narrowing switches are symbols in the bar.
  */
 @Component({
   selector: 'app-quest-board',
   imports: [FormsModule, Icon, QuestTile],
   template: `
-    <div class="row row--between">
+    <ng-template #newQuestForm>
       <form class="list-row" (ngSubmit)="addQuest()">
         <input
           class="input"
@@ -42,18 +43,10 @@ interface Block {
         />
         <button type="submit" class="btn btn--small" [disabled]="!newQuest().trim() || !chapter()"><app-icon name="plus" [size]="16" /> Quest</button>
       </form>
-      <div class="row" role="group" aria-label="Quests eingrenzen">
-        <button type="button" class="pill" [attr.aria-pressed]="onlyShared()" (click)="onlyShared.set(!onlyShared())">
-          <app-icon name="eye" [size]="16" /> nur geteilte
-        </button>
-        <button type="button" class="pill" [attr.aria-pressed]="onlyPinned()" (click)="onlyPinned.set(!onlyPinned())">
-          <app-icon name="pin" [size]="16" /> nur angepinnte
-        </button>
-      </div>
-    </div>
-    <p class="soft">
-      {{ chapter() ? 'Eine neue Quest kommt als Nebenquest in die Welt, hängt am Kapitel der Runde, ist angenommen und mit den Spielern geteilt.' : 'Wähle oben ein Kapitel, dann kannst du hier schnell eine Quest anlegen.' }}
-    </p>
+      <p class="soft">
+        {{ chapter() ? 'Eine neue Quest kommt als Nebenquest in die Welt, hängt am Kapitel der Runde, ist angenommen und mit den Spielern geteilt.' : 'Wähle oben ein Kapitel, dann kannst du hier schnell eine Quest anlegen.' }}
+      </p>
+    </ng-template>
 
     @for (block of blocks(); track block.id) {
       <section class="stack">
@@ -69,16 +62,20 @@ interface Block {
         </div>
         <div class="tiles tiles--wide">
           @for (quest of visible(block); track quest.id) {
-            <app-quest-tile [quest]="quest" [done]="is(quest.id, 'done')" [marks]="marks(quest.id)" [stepsDone]="stepsDone(quest.id)">
+            <app-quest-tile
+              [quest]="quest"
+              [done]="is(quest.id, 'done')"
+              [marks]="marks(quest.id)"
+              [stepsDone]="stepsDone(quest.id)"
+              [eye]="is(quest.id, 'revealed')"
+              (eyeToggle)="store.toggle('quest', quest.id, 'revealed')"
+            >
               <div class="row">
                 <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'started')" (click)="store.toggle('quest', quest.id, 'started')">
                   <app-icon name="flag" [size]="16" /> {{ is(quest.id, 'started') ? 'Angenommen' : 'Annehmen' }}
                 </button>
                 <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'done')" (click)="store.toggle('quest', quest.id, 'done')">
                   <app-icon name="check" [size]="16" /> Beendet
-                </button>
-                <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'revealed')" (click)="store.toggle('quest', quest.id, 'revealed')">
-                  <app-icon name="eye" [size]="16" /> {{ is(quest.id, 'revealed') ? 'Geteilt' : 'Teilen' }}
                 </button>
                 <button type="button" class="btn btn--small" [attr.aria-pressed]="is(quest.id, 'pinned')" (click)="store.toggle('quest', quest.id, 'pinned')">
                   <app-icon name="pin" [size]="16" /> Stecknadel
@@ -113,6 +110,12 @@ export class QuestBoard {
   protected readonly onlyShared = signal(false);
   protected readonly onlyPinned = signal(false);
   protected readonly newQuest = signal('');
+  private readonly newQuestForm = viewChild<TemplateRef<unknown>>('newQuestForm');
+  protected readonly tools = computed<Tool[]>(() => [
+    { id: 'quests-new', word: 'Neue Quest', icon: 'plus', tone: 'kind--quests', popup: this.newQuestForm(), popupTitle: 'Neue Quest' },
+    { id: 'quests-shared', word: 'Nur geteilte', icon: 'eye', pressed: this.onlyShared(), click: () => this.onlyShared.set(!this.onlyShared()) },
+    { id: 'quests-pinned', word: 'Nur angepinnte', icon: 'pin', pressed: this.onlyPinned(), click: () => this.onlyPinned.set(!this.onlyPinned()) },
+  ]);
   protected readonly chapter = computed(() => this.world.chapters().find((chapter) => chapter.id === this.chapterId()) ?? null);
   /** Main quests in the order of their number, side quests in the order of the alphabet. */
   protected readonly blocks = computed<Block[]>(() => {
@@ -124,14 +127,18 @@ export class QuestBoard {
     ];
   });
 
+  constructor() {
+    inject(CockpitTools).provide('view', this.tools);
+  }
+
   /** Whether the session set one of the marks of a quest. */
   protected is(id: number, flag: Flag): boolean {
     return !!this.store.state('quest', id)?.[flag];
   }
 
-  /** The words behind the kind of a quest: whether it is shared, and whether it is pinned. */
+  /** The words behind the kind of a quest: whether it is pinned. */
   protected marks(id: number): string {
-    return (this.is(id, 'revealed') ? ' · geteilt' : '') + (this.is(id, 'pinned') ? ' · angepinnt' : '');
+    return this.is(id, 'pinned') ? ' · angepinnt' : '';
   }
 
   /** How many points of a quest the session has checked. */

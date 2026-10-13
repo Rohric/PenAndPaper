@@ -34,6 +34,11 @@
         <button type="button" class="tabs__tab" [class.is-active]="item.id === current()" (click)="current.set(item.id)">{{ item.label }}</button>
       }
     </nav>
+    @if (!isNpc()) {
+      <div class="row">
+        <app-tutorial-button topic="rules" label="? Regelwerk" />
+      </div>
+    }
   </div>
 
   @if (error()) {
@@ -144,8 +149,8 @@
     }
     @case ('skills') {
       <div class="row">
-        <app-tutorial-button topic="rules-creation" label="? So skillst du" />
-        <app-tutorial-button topic="rules-leveling" label="? Leveln" />
+        <app-tutorial-button topic="rules" step="points" label="? So skillst du" />
+        <app-tutorial-button topic="rules" step="leveling" label="? Leveln" />
       </div>
       @if (locked()) {
         <p class="notice">
@@ -157,6 +162,7 @@
         [stored]="character().skills"
         [locked]="locked()"
         [leveling]="!isNpc()"
+        [credit]="credit()"
         [problems]="shownProblems()"
         [hints]="hints()"
         (skillsChange)="set('skills', $event)"

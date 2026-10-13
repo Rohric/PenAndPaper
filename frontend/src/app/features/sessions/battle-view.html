@@ -1,3 +1,81 @@
+<!-- The popups behind the symbols of the bar. -->
+<ng-template #peoplePop>
+          @for (combatant of combatants(); track combatant.id) {
+            <div class="knowledge" [class.knowledge--gm]="combatant.life_points <= 0">
+              <div class="row row--between">
+                <span>
+                  @if (combatant.id === battle()!.current) {
+                    <span class="chip chip--accent">ist dran</span>
+                  }
+                  <strong>{{ combatant.name }}</strong>
+                  <span class="soft">Initiative {{ combatant.initiative || '–' }} · Handeln {{ combatant.action_value }}</span>
+                  @if (combatant.has_parried) {
+                    <span class="chip">hat pariert</span>
+                  }
+                  @if (combatant.life_points <= 0) {
+                    <span class="chip chip--danger">kampfunfähig</span>
+                  }
+                </span>
+                <div class="row">
+                  <label class="row">
+                    <span class="soft">LP</span>
+                    <input
+                      class="input input--number"
+                      type="number"
+                      [attr.aria-label]="'Lebenspunkte von ' + combatant.name"
+                      [value]="combatant.life_points"
+                      (change)="change(combatant, { life_points: +$any($event.target).value })"
+                    />
+                  </label>
+                  @if (battle()!.round === 0) {
+                    <label class="check">
+                      <input type="checkbox" [checked]="combatant.surprised" (change)="change(combatant, { surprised: !combatant.surprised })" />
+                      überrascht
+                    </label>
+                  }
+                  <button type="button" class="btn btn--small" [attr.aria-label]="combatant.name + ' entfernen'" (click)="remove(combatant)">Entfernen</button>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <p class="soft">Noch kein Teilnehmer.</p>
+          }
+          <p class="soft">Die Lebenspunkte kannst du jederzeit von Hand setzen. Bei Spielercharakteren steht der neue Wert sofort auf dem Bogen.</p>
+</ng-template>
+
+<ng-template #addPop>
+          @if (!battle()!.finished) {
+            <div class="grid-fields">
+              <div class="field">
+                <label for="battle-npc">Figur der Welt dazunehmen</label>
+                <div class="list-row">
+                  <app-id-select inputId="battle-npc" emptyLabel="Figur wählen" [options]="npcOptions()" [value]="newNpc()" (valueChange)="newNpc.set($event)" />
+                  <button type="button" class="btn btn--small" [disabled]="newNpc() === null" (click)="addNpc()">Dazu</button>
+                </div>
+              </div>
+              <form class="field" (ngSubmit)="addFree()">
+                <label for="battle-free">Freier Teilnehmer (Name, Handeln, Lebenspunkte)</label>
+                <div class="list-row">
+                  <input id="battle-free" class="input" name="name" placeholder="z. B. Wirt 2" [(ngModel)]="newName" />
+                  <input class="input input--number" name="action" type="number" min="0" aria-label="Handeln-Wert" [(ngModel)]="newAction" />
+                  <input class="input input--number" name="life" type="number" min="1" aria-label="Lebenspunkte" [(ngModel)]="newLife" />
+                  <button type="submit" class="btn btn--small" [disabled]="!newName().trim()">Dazu</button>
+                </div>
+              </form>
+            </div>
+          }
+</ng-template>
+
+<ng-template #logPop>
+        <ul class="plain-list">
+          @for (line of battle()!.log; track $index) {
+            <li>{{ line }}</li>
+          } @empty {
+            <li class="soft">Noch nichts passiert.</li>
+          }
+        </ul>
+</ng-template>
+
 @if (battle(); as fight) {
   <div class="stack">
     <div class="panel">
@@ -7,16 +85,6 @@
           <h2 class="subtitle">{{ fight.name }}</h2>
         </div>
         <div class="row">
-          @if (!fight.finished) {
-            @if (fight.round === 0) {
-              <button type="button" class="btn btn--primary" [disabled]="!combatants().length" (click)="step('start')">
-                <app-icon name="dice" /> Initiative würfeln
-              </button>
-            } @else {
-              <button type="button" class="btn" [disabled]="!!fight.pending" (click)="step('next')">Nächster ist dran</button>
-            }
-            <button type="button" class="btn btn--danger" (click)="step('finish')">Kampf beenden</button>
-          }
           <button type="button" class="btn" (click)="closed.emit()"><app-icon name="back" /> Zurück zur Runde</button>
         </div>
       </div>
@@ -65,17 +133,13 @@
               <div class="row">
                 <button type="button" class="btn btn--primary" (click)="parry(true)"><app-icon name="dice" /> Parade würfeln</button>
                 <button type="button" class="btn" (click)="parry(false)">Keine Parade</button>
-                <button type="button" class="btn" (click)="step('discard')"><app-icon name="undo" /> Wurf verwerfen</button>
               </div>
             } @else {
               <p class="soft">
-                Noch zählt nichts davon. „Zug abschließen“ zieht den Schaden ab, überträgt ihn auf den Charakter, schreibt den Wurf
-                in den Verlauf und gibt an den Nächsten weiter. „Wurf verwerfen“ lässt alles, wie es war.
+                Noch zählt nichts davon. „Zug abschließen“ in der Leiste zieht den Schaden ab, überträgt ihn auf den Charakter, schreibt den Wurf
+                in den Verlauf und gibt an den Nächsten weiter. „Wurf verwerfen“ lässt alles, wie es war. Seinen eigenen Zug kann
+                ein Spieler auch selbst abschließen.
               </p>
-              <div class="row">
-                <button type="button" class="btn btn--primary" (click)="step('close')"><app-icon name="check" /> Zug abschließen</button>
-                <button type="button" class="btn" (click)="step('discard')"><app-icon name="undo" /> Wurf verwerfen</button>
-              </div>
             }
           </div>
         } @else if (fight.round > 0 && !fight.finished) {
@@ -160,88 +224,13 @@
                   <app-icon [name]="actionRolls() ? 'dice' : 'check'" /> {{ actionRolls() ? 'Probe würfeln' : 'Aktion festhalten' }}
                 </button>
               }
-              <span class="soft">Ist ein Spieler dran, kann er auf seiner Seite selbst würfeln. Die letzte Auswahl jedes Teilnehmers bleibt gemerkt.</span>
+              <span class="soft">Ist ein Spieler dran, kann er auf seiner Seite selbst würfeln und seinen Zug abschließen. Die letzte Auswahl jedes Teilnehmers bleibt gemerkt.</span>
             </div>
           </div>
         }
 
-        <div class="panel">
-          <h3 class="subtitle">Teilnehmer</h3>
-          @for (combatant of combatants(); track combatant.id) {
-            <div class="knowledge" [class.knowledge--gm]="combatant.life_points <= 0">
-              <div class="row row--between">
-                <span>
-                  @if (combatant.id === fight.current) {
-                    <span class="chip chip--accent">ist dran</span>
-                  }
-                  <strong>{{ combatant.name }}</strong>
-                  <span class="soft">Initiative {{ combatant.initiative || '–' }} · Handeln {{ combatant.action_value }}</span>
-                  @if (combatant.has_parried) {
-                    <span class="chip">hat pariert</span>
-                  }
-                  @if (combatant.life_points <= 0) {
-                    <span class="chip chip--danger">kampfunfähig</span>
-                  }
-                </span>
-                <div class="row">
-                  <label class="row">
-                    <span class="soft">LP</span>
-                    <input
-                      class="input input--number"
-                      type="number"
-                      [attr.aria-label]="'Lebenspunkte von ' + combatant.name"
-                      [value]="combatant.life_points"
-                      (change)="change(combatant, { life_points: +$any($event.target).value })"
-                    />
-                  </label>
-                  @if (fight.round === 0) {
-                    <label class="check">
-                      <input type="checkbox" [checked]="combatant.surprised" (change)="change(combatant, { surprised: !combatant.surprised })" />
-                      überrascht
-                    </label>
-                  }
-                  <button type="button" class="btn btn--small" [attr.aria-label]="combatant.name + ' entfernen'" (click)="remove(combatant)">Entfernen</button>
-                </div>
-              </div>
-            </div>
-          } @empty {
-            <p class="soft">Noch kein Teilnehmer.</p>
-          }
-          <p class="soft">Die Lebenspunkte kannst du jederzeit von Hand setzen. Bei Spielercharakteren steht der neue Wert sofort auf dem Bogen.</p>
-
-          @if (!fight.finished) {
-            <div class="grid-fields">
-              <div class="field">
-                <label for="battle-npc">Figur der Welt dazunehmen</label>
-                <div class="list-row">
-                  <app-id-select inputId="battle-npc" emptyLabel="Figur wählen" [options]="npcOptions()" [value]="newNpc()" (valueChange)="newNpc.set($event)" />
-                  <button type="button" class="btn btn--small" [disabled]="newNpc() === null" (click)="addNpc()">Dazu</button>
-                </div>
-              </div>
-              <form class="field" (ngSubmit)="addFree()">
-                <label for="battle-free">Freier Teilnehmer (Name, Handeln, Lebenspunkte)</label>
-                <div class="list-row">
-                  <input id="battle-free" class="input" name="name" placeholder="z. B. Wirt 2" [(ngModel)]="newName" />
-                  <input class="input input--number" name="action" type="number" min="0" aria-label="Handeln-Wert" [(ngModel)]="newAction" />
-                  <input class="input input--number" name="life" type="number" min="1" aria-label="Lebenspunkte" [(ngModel)]="newLife" />
-                  <button type="submit" class="btn btn--small" [disabled]="!newName().trim()">Dazu</button>
-                </div>
-              </form>
-            </div>
-          }
-        </div>
       </div>
 
-      <aside class="panel fight__log">
-        <h3 class="subtitle">Verlauf</h3>
-        <ul class="plain-list">
-          @for (line of fight.log; track $index) {
-            <li>{{ line }}</li>
-          } @empty {
-            <li class="soft">Noch nichts passiert.</li>
-          }
-        </ul>
-      </aside>
     </div>
   </div>
 } @else if (error()) {

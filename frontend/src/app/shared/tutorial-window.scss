@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  width: min(560px, calc(100% - 24px));
+  width: min(880px, calc(100% - 24px));
   max-height: calc(100% - 24px);
   padding: 20px;
   overflow-y: auto;
@@ -111,47 +111,150 @@
   color: var(--accent);
 }
 
-// The line of steps: numbered dots joined by a line.
-.steps {
+// Text on the right, the vertical line of steps on the left.
+.window__main {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 16px;
+  min-height: 0;
+}
+
+.rail {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px 0;
+  flex-direction: column;
+  gap: 2px;
+  max-height: min(60vh, 520px);
   margin: 0;
-  padding: 0;
+  padding: 0 4px 0 0;
+  overflow-y: auto;
   list-style: none;
 }
 
-.steps__item {
+.rail__chapter {
+  margin: 10px 0 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rail__item {
   display: flex;
+  gap: 8px;
   align-items: center;
+  width: 100%;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--soft);
+  text-align: left;
 }
 
-.steps__item:not(:last-child)::after {
-  width: 14px;
-  height: 2px;
-  background: var(--line-2);
-  content: '';
-}
-
-.steps__dot {
-  width: 34px;
-  height: 34px;
+.rail__number {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   border: 2px solid var(--line-2);
   border-radius: 50%;
-  background: var(--bg);
-  color: var(--soft);
+  font-size: 13px;
   font-weight: 600;
 }
 
-.steps__dot.is-done {
+.rail__item.is-done .rail__number {
   border-color: var(--accent);
   color: var(--accent);
 }
 
-.steps__dot.is-active {
+.rail__item.is-active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.rail__item.is-active .rail__number {
   border-color: var(--accent);
   background: var(--accent);
   color: var(--accent-ink);
+}
+
+.rail__title {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.window__titles {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.back-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.menu-btn {
+  gap: 8px;
+  width: auto;
+  padding: 0 12px;
+}
+
+.menu-btn__word {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.window__point {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  text-align: left;
+}
+
+// On the phone the line shrinks to a narrow column of numbers; the chapters become a thin rule.
+@media (max-width: 767px) {
+  .window__main {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .rail {
+    max-height: none;
+    padding-right: 0;
+  }
+
+  .rail__title,
+  .rail__chapter span {
+    display: none;
+  }
+
+  .rail__chapter {
+    height: 1px;
+    margin: 6px 4px;
+    background: var(--line-2);
+  }
+
+  .rail__item {
+    justify-content: center;
+    padding: 2px;
+  }
+
+  .menu-btn__word {
+    display: none;
+  }
 }
 
 .window__body {

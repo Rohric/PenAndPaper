@@ -194,4 +194,9 @@ export class SessionService {
   playerParry(sessionId: number, parry: { parry: boolean; skill: string }): Observable<PlayerBattle> {
     return this.api.post<PlayerBattle>(`sessions/${sessionId}/battle/parry/`, parry);
   }
+
+  /** Close the turn of the own character: only now its open roll counts and the next one is on. */
+  playerClose(sessionId: number): Observable<PlayerBattle> {
+    return this.api.post<PlayerBattle>(`sessions/${sessionId}/battle/close/`, {});
+  }
 }

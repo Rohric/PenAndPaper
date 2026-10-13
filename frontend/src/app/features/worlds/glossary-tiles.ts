@@ -1,8 +1,10 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { readError } from '../../core/api-error';
 import { EntryRef, Location } from '../../core/models';
+import { EyeToggle } from '../../shared/eye-toggle';
 import { Icon, IconName } from '../../shared/icon';
 import { Portrait } from '../../shared/portrait';
 import { tagColour } from '../../shared/tag-colour';
@@ -58,7 +60,7 @@ interface Tile {
  */
 @Component({
   selector: 'app-glossary-tiles',
-  imports: [FormsModule, Icon, Portrait, QuestTile, EventTile],
+  imports: [FormsModule, NgTemplateOutlet, Icon, Portrait, QuestTile, EventTile, EyeToggle],
   template: `
     @if (creatable()) {
       <form class="list-row" (ngSubmit)="create()">
@@ -87,31 +89,44 @@ interface Tile {
       </div>
     }
 
+    <ng-template #tileContent let-tile>
+      <span class="tile__head">
+        <app-portrait [symbol]="tile.symbol" [fallback]="tile.fallback" [size]="36" />
+        <span class="tile__names">
+          @if (tile.kicker) {
+            <span class="kicker">{{ tile.kicker }}</span>
+          }
+          <span class="tile__title">{{ tile.title }}</span>
+        </span>
+      </span>
+      @if (tile.text) {
+        <span class="soft clamp">{{ tile.text }}</span>
+      }
+    </ng-template>
+
     <div class="tiles">
       @if (section().id === 'quests') {
         @for (quest of store.quests(); track quest.id) {
-          <app-quest-tile [quest]="quest" />
+          <app-quest-tile [quest]="quest" [eye]="seen({ kind: 'quests', id: quest.id })" (eyeToggle)="eyeToggle.emit({ kind: 'quests', id: quest.id })" />
         }
       } @else if (section().id === 'events') {
         @for (event of store.events(); track event.id) {
-          <app-event-tile [event]="event" />
+          <app-event-tile [event]="event" [eye]="seen({ kind: 'events', id: event.id })" (eyeToggle)="eyeToggle.emit({ kind: 'events', id: event.id })" />
         }
       } @else {
         @for (tile of tiles(); track $index) {
-          <button type="button" [class]="'tile kind--' + section().id" [style.--kind]="tile.colour || null" (click)="open(tile)">
-            <span class="tile__head">
-              <app-portrait [symbol]="tile.symbol" [fallback]="tile.fallback" [size]="36" />
-              <span class="tile__names">
-                @if (tile.kicker) {
-                  <span class="kicker">{{ tile.kicker }}</span>
-                }
-                <span class="tile__title">{{ tile.title }}</span>
-              </span>
-            </span>
-            @if (tile.text) {
-              <span class="soft clamp">{{ tile.text }}</span>
-            }
-          </button>
+          @if (eyeOf() && tile.ref) {
+            <article [class]="'tile kind--' + section().id" [style.--kind]="tile.colour || null">
+              <button type="button" class="tile__body" (click)="open(tile)">
+                <ng-container *ngTemplateOutlet="tileContent; context: { $implicit: tile }" />
+              </button>
+              <app-eye class="tile__eye" [shown]="seen(tile.ref) === true" label="Für Spieler sichtbar" (toggle)="eyeToggle.emit(tile.ref)" />
+            </article>
+          } @else {
+            <button type="button" [class]="'tile kind--' + section().id" [style.--kind]="tile.colour || null" (click)="open(tile)">
+              <ng-container *ngTemplateOutlet="tileContent; context: { $implicit: tile }" />
+            </button>
+          }
         }
       }
     </div>
@@ -140,6 +155,10 @@ export class GlossaryTiles {
   readonly carriers = input<Carrier[]>([]);
   /** Fired with the id of a player character, when an item is clicked that only this character carries. */
   readonly carrier = output<number>();
+  /** Whether the players see an entry, when a session decides it; with it every tile gets an eye. */
+  readonly eyeOf = input<((ref: EntryRef) => boolean) | null>(null);
+  /** The eye of a tile was clicked. */
+  readonly eyeToggle = output<EntryRef>();
 
   protected readonly newName = signal('');
   protected readonly error = signal('');
@@ -157,6 +176,12 @@ export class GlossaryTiles {
     const section = this.section().id;
     return section === 'quests' || section === 'events' ? !own[section].length : !this.tiles().length;
   });
+
+  /** Whether the players see an entry; false while no session decides it. */
+  protected seen(ref: EntryRef): boolean | null {
+    const of = this.eyeOf();
+    return of ? of(ref) : null;
+  }
 
   /** Look the entry of a tile up at the side, or ask for the sheet of the character that carries the item. */
   protected open(tile: Tile): void {

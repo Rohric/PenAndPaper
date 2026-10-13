@@ -12,7 +12,7 @@ export class TutorialButton {
 
   /** Id of the tutorial to open. */
   readonly topic = input.required<string>();
-  /** The step the tutorial opens at. */
-  readonly step = input(0);
+  /** The step the tutorial opens at: a number, or the name of a step like "leveling". */
+  readonly step = input<number | string>(0);
   readonly label = input('? Hilfe');
 }

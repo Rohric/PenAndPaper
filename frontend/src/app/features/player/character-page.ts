@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { readError } from '../../core/api-error';
 import { Leavable } from '../../core/leave.guard';
 import { AnyCharacter, PlayerCharacter } from '../../core/models';
+import { Icon } from '../../shared/icon';
 import { TutorialButton } from '../../shared/tutorial-button';
 import { CharacterEditor, EditorSection } from '../characters/character-editor';
 import { CharacterSheet } from '../characters/character-sheet';
@@ -14,7 +15,7 @@ const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'
 /** One character of the player: the sheet to read, and the form to write it. The pencils on the sheet open the form at their part. */
 @Component({
   selector: 'app-character-page',
-  imports: [RouterLink, TutorialButton, CharacterSheet, CharacterEditor],
+  imports: [RouterLink, Icon, TutorialButton, CharacterSheet, CharacterEditor],
   template: `
     <section class="stack">
       <div class="row row--between">
@@ -38,6 +39,11 @@ const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'
             (dirtyChange)="dirty.set($event)"
           />
         } @else {
+          @if (shown.adventure; as adventure) {
+            <a class="btn btn--primary" [routerLink]="['/player/sessions', adventure.id]">
+              <app-icon name="flag" /> Zur Runde: {{ adventure.name }}
+            </a>
+          }
           <app-character-sheet [character]="shown" [editable]="true" (edit)="open($event)">
             <button type="button" class="btn btn--small" (click)="open('profile')">Bearbeiten</button>
           </app-character-sheet>

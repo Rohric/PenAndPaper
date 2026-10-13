@@ -2,7 +2,7 @@
 export interface TutorialStep {
   title: string;
   text: string;
-  /** Id of another tutorial this step leads to. */
+  /** Id of another tutorial this step leads to, or "id#step" for a named step of it. */
   more?: string;
   /** Points that are shown as a list under the text. */
   list?: string[];
@@ -10,10 +10,20 @@ export interface TutorialStep {
   example?: string;
   /** A tip, set apart from the text. */
   tip?: string;
+  /** A heading for a chapter of the tutorial; it stands before this step. */
+  chapter?: string;
+  /** Name to jump to this step from elsewhere. */
+  id?: string;
+  /** The step explains a house rule, which the official rules do not know. */
+  house?: boolean;
 }
+
+/** The three points of the menu. */
+export type TutorialGroup = 'rules' | 'player' | 'gm';
 
 export interface Tutorial {
   id: string;
+  group: TutorialGroup;
   title: string;
   steps: TutorialStep[];
 }
@@ -22,6 +32,7 @@ export interface Tutorial {
 export const TUTORIALS: Tutorial[] = [
   {
     id: 'start',
+    group: 'gm',
     title: 'Erste Schritte',
     steps: [
       {
@@ -68,6 +79,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'chapters',
+    group: 'gm',
     title: 'Kapitel',
     steps: [
       {
@@ -91,6 +103,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'scenes',
+    group: 'gm',
     title: 'Szenen und roter Faden',
     steps: [
       {
@@ -125,6 +138,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'glossary',
+    group: 'gm',
     title: 'Glossar',
     steps: [
       {
@@ -164,6 +178,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'locations',
+    group: 'gm',
     title: 'Orte',
     steps: [
       {
@@ -182,6 +197,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'npcs',
+    group: 'gm',
     title: 'Figuren',
     steps: [
       {
@@ -208,6 +224,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'my-characters',
+    group: 'player',
     title: 'Meine Charaktere',
     steps: [
       {
@@ -240,8 +257,9 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Im Abenteuer ist vieles fest',
+        house: true,
         text: 'Sobald dich der Spielleiter in eine Runde aufnimmt, sind deine Grundpunkte und die Begabung jeder Fähigkeit fest. Du kannst keine Grundpunkte senken und keine Fähigkeit löschen, die Grundpunkte hat. Offene Grundpunkte darfst du noch vergeben.\n\nWeiterkommen kannst du nur über Bonuspunkte beim Leveln. Dein Charakter ist erst wieder frei, wenn die Runde beendet ist.',
-        more: 'rules-leveling',
+        more: 'rules#leveling',
       },
       {
         title: 'Der Bogen',
@@ -251,6 +269,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'gm-characters',
+    group: 'gm',
     title: 'Figuren der Spieler',
     steps: [
       {
@@ -265,6 +284,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'sessions',
+    group: 'gm',
     title: 'Runden',
     steps: [
       {
@@ -273,6 +293,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Ein Charakter, ein Abenteuer',
+        house: true,
         text: 'Ein Charakter spielt immer nur in einem laufenden Abenteuer. Beendest du die Runde, ist er wieder frei und kann in ein neues Abenteuer. Fähigkeiten, Inventar und Punkte behält er so, wie die Runde sie hinterlassen hat. Notizen, Chat und Würfe bleiben als Archiv bei der beendeten Runde.\n\nIm Cockpit nimmst du mit „Gruppe bearbeiten“ freie Charaktere auch in eine laufende Runde auf oder nimmst Mitglieder heraus. Herausgenommene Charaktere sind wieder frei. Unter „Figuren der Spieler“ siehst du, wer frei ist und wer in welchem Abenteuer spielt.',
       },
       {
@@ -281,11 +302,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Chat und neuer Abend',
-        text: 'Im Cockpit öffnet „Chat“ den Chat der ganzen Gruppe. Die geheimen Nachrichten an einen Charakter schreibst du weiter in dessen Fenster.\n\n„Neuer Abend“ bei der Gruppe füllt die Geistesblitzpunkte aller Charaktere wieder auf. Einsetzen darf sie nur der Spieler selbst, direkt nach einer misslungenen Probe.',
+        text: 'Unten in der Leiste öffnet „Chat“ den Chat der ganzen Gruppe, die Zahl darauf zeigt neue Nachrichten. Die geheimen Nachrichten an einen Charakter schreibst du weiter in dessen Fenster.\n\n„Neuer Abend“ im Popup der Gruppe füllt die Geistesblitzpunkte aller Charaktere wieder auf. Einsetzen darf sie nur der Spieler selbst, direkt nach einer misslungenen Probe.',
       },
       {
         title: 'Das Cockpit',
-        text: 'Oben liegt die Leiste mit den Werkzeugen: Kapitel wählen, Spieleransicht, Glossar, Würfeln, Kampf, Notizen, Archiv, Kapitel abschließen und die Suche über die ganze Welt.\n\nDarunter steht die Gruppe als Reihe von Kacheln, dann links der rote Faden und rechts die gewählte Szene mit ihren Ereignissen und Dialogen, darunter die Hauptquests. „Nebenquests“ und „Freie Ereignisse“ stehen immer darunter, sind aber zugeklappt: Ein Klick auf die Überschrift öffnet sie. Unten bleiben die Stecknadeln und der letzte Wurf stehen.',
+        text: 'Das Cockpit hat zwei Leisten. Oben stehen nur die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht, dazu Kapitel, Suche und Hilfe. Auf dem Schirm steht nur, was du gerade liest.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und Kapitel abschließen. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet über sich ein Popup. Es ist immer nur eines offen. Esc, ein Klick daneben oder ein zweiter Klick auf das Symbol schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt.',
+      },
+      {
+        title: 'Master-Modus: der Tisch',
+        text: 'Die Ansicht „Master“ ist dein Tisch. Oben steht schmal die offene Szene, „Vorlesen“ klappt den Text auf. Darunter liegt „Hier am Ort“: kleine Kacheln für alles, was zur Szene und ihrem Ort gehört, also Figuren, offene Quests und Ereignisse, Gegenstände und Wissen.\n\nUnter „Meine Gruppen“ liegt, was du selbst auf den Tisch gelegt hast, nach dem Namen der Gruppe sortiert. In der Leiste legt „Auf den Tisch“ einen Eintrag der Welt in eine Gruppe, „Gruppe anlegen“ macht eine neue, „Szene wechseln“ wählt eine andere Szene. Im Seitenfenster eines Eintrags gibt es dasselbe als Knopf „Auf den Tisch“. An jeder Kachel wählst du eine andere Gruppe oder nimmst sie „Vom Tisch“.\n\nGanz unten stehen die Charaktere der Gruppe. Was auf dem Tisch liegt, bleibt bei der Runde gespeichert und ist auch nach dem Neuladen noch da. Die Welt ändert sich dadurch nicht.',
       },
       {
         title: 'Das Seitenfenster',
@@ -293,19 +318,19 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Abhaken und Stecknadeln',
-        text: 'Szenen markierst du als gespielt, sie bleiben im Faden stehen. Erledigte Ereignisse verschwinden aus dem Cockpit und stehen im Archiv. Von dort holst du sie mit „Zurückholen“ wieder.\n\nEine Quest hat einen Status: Offen (noch nicht angenommen), Laufend (angenommen) und Beendet. Ob sie mit den Spielern geteilt oder angepinnt ist, sind eigene Haken und hat mit dem Status nichts zu tun.\n\nMit der Stecknadel heftest du an, was du schnell wiederfinden willst. Die Stecknadeln stehen in der Leiste unten.',
+        text: 'Szenen markierst du als gespielt, sie bleiben im Faden stehen. Erledigte Ereignisse verschwinden aus den Popups und stehen im Archiv. Von dort holst du sie mit „Zurückholen“ wieder. Die Karten in den Popups haben dafür einen Haken.\n\nEine Quest hat einen Status: Offen (noch nicht angenommen), Laufend (angenommen) und Beendet. Ob sie mit den Spielern geteilt (Auge) oder angepinnt ist, sind eigene Schalter und hat mit dem Status nichts zu tun.\n\nMit der Stecknadel heftest du an, was du schnell wiederfinden willst. Die Nadeln liegen rechts in der Symbolleiste, ein Symbol je Art mit Zahl.',
       },
       {
         title: 'Was die Spieler sehen',
-        text: 'Öffne einen Eintrag: Im Seitenfenster steht der Block „Das sehen die Spieler“. Mit dem Haken dort erscheint der Eintrag bei den Spielern, zuerst nur mit seinem Namen.\n\nDarunter hat jede Information ihr eigenes Auge: Beschreibung, bei Quests Ziel, Questgeber, Startgebiet und jeder Punkt der Checkliste für sich, bei Ereignissen Auslöser und „Was passiert“. Die Spieler sehen genau das, was auf „sichtbar“ steht. Neben jedem Auge liest du, was sie dort lesen würden.\n\n„Wissen für Spieler“ hakst du Stück für Stück an, sobald sie es herausfinden. „Wissen nur für dich“ sehen sie nie. „Alles zeigen“ und „Alles verbergen“ schalten alle Augen auf einmal.',
+        text: 'Jede Information hat ein kleines Auge. Ist es offen und farbig, sehen die Spieler sie. Ist es durchgestrichen und blass, bleibt sie bei dir. Das Auge ist zugleich dein Nachweis: Was du siehst, sehen sie.\n\nÖffne einen Eintrag. Das Auge vor dem Namen zeigt ihn den Spielern, zuerst nur mit dem Namen. Die kleinen Augen davor wirken erst, wenn der Name offen ist, bis dahin sind sie blass. Danach schaltest du einzeln: die Beschreibung, bei Quests Ziel, Questgeber, Startgebiet und jeden Punkt der Checkliste (der Haken daneben heißt „erledigt“), bei Ereignissen Auslöser und „Was passiert“.\n\nBei „Wissen für Spieler“ gehört das Auge zu jedem Stück: offen heißt, sie haben es herausgefunden. „Wissen nur für dich“ trägt ein Schloss, das sehen die Spieler nie. Steckbrief, Fähigkeiten und Inventar haben kein Auge, die sehen sie ohnehin nicht.\n\nAuch die Kacheln haben ein Auge oben rechts. Damit teilst du einen Eintrag, ohne ihn zu öffnen. „Alles zeigen“ und „Alles verbergen“ im Seitenfenster schalten alle Augen auf einmal.',
       },
       {
         title: 'Quests im Überblick',
-        text: '„Quests“ in der Leiste zeigt alle Quests der Welt in zwei Blöcken, Hauptquests und Nebenquests. Jeder Block zeigt einen Status: Laufend, Offen oder Beendet, mit der Zahl dahinter. „nur geteilte“ und „nur angepinnte“ grenzen beide Blöcke ein.\n\nAn jeder Kachel nimmst du die Quest an, beendest sie, teilst sie oder heftest sie an. Oben legst du eine Quest nur mit ihrem Titel an.\n\nIm Seitenfenster einer Quest steht das Questlog der Gruppe: die gezeigten Punkte in der Reihenfolge der Spieler, ihre eigenen Punkte, Tags und Notizen. Du kannst mitschreiben.',
+        text: 'Die Ansicht „Quests“ zeigt alle Quests der Welt in zwei Blöcken, Hauptquests und Nebenquests. Jeder Block zeigt einen Status: Laufend, Offen oder Beendet, mit der Zahl dahinter.\n\nIn der Symbolleiste legt „Neue Quest“ eine Quest nur mit ihrem Titel an. „Nur geteilte“ und „Nur angepinnte“ grenzen beide Blöcke ein. An jeder Kachel nimmst du die Quest an, beendest sie, heftest sie an oder teilst sie mit dem Auge oben rechts.\n\nIm Seitenfenster einer Quest steht das Questlog der Gruppe: die gezeigten Punkte in der Reihenfolge der Spieler, ihre eigenen Punkte, Tags und Notizen. Du kannst mitschreiben.',
       },
       {
         title: 'Glossar und Suche',
-        text: '„Glossar“ zeigt dir die ganze Welt als Kacheln: Orte, Figuren, Quests, Ereignisse, Gegenstände und Wissen. Unter „Gegenstände“ steht auch, was die Charaktere der Gruppe und die Figuren tragen.\n\nMit der Suche in der Leiste findest du jeden Eintrag, ohne die Ansicht zu wechseln.',
+        text: 'Die Ansicht „Glossar“ zeigt dir die ganze Welt als Kacheln. In der Symbolleiste wechselst du zwischen den sechs Bereichen: Orte, Figuren, Quests, Ereignisse, Gegenstände und Wissen. Unter „Gegenstände“ steht auch, was die Charaktere der Gruppe und die Figuren tragen. „Zuletzt“ zeigt, was zuletzt angelegt oder geändert wurde.\n\nMit der Suche oben findest du jeden Eintrag, ohne die Ansicht zu wechseln.',
       },
       {
         title: 'Ändern: in der Runde oder in der Welt',
@@ -317,19 +342,19 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Spieleransicht',
-        text: 'Mit „Spieleransicht“ schaust du dir an, was die Spieler gerade sehen: ihre Quests, ihr Glossar und die Gruppe. So prüfst du, ob du nichts zu viel freigegeben hast.',
+        text: 'Mit „Spieleransicht“ schaust du dir an, was die Spieler gerade sehen: ihre Quests, ihr Glossar und die Gruppe. So prüfst du, ob du nichts zu viel freigegeben hast.\n\nIn der Symbolleiste lädt „Neu laden“ die Ansicht neu, und „Zuletzt geteilt“ zeigt, was die Spieler zuletzt neu zu sehen bekamen.',
       },
       {
         title: 'Die Gruppe',
-        text: 'Jeder Charakter ist eine Kachel zum Auf- und Zuklappen. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters. Aufgeklappt änderst du die Lebenspunkte, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Gegenstände der Welt; die der offenen Szene stehen in der Auswahl oben. Mit „Versteckt“ sehen nur dieser Spieler und du den Gegenstand im Glossar.',
+        text: 'Das Symbol „Gruppe“ in der Symbolleiste öffnet die Charaktere als Kacheln zum Auf- und Zuklappen. Die Zahl darauf zählt ungelesene geheime Nachrichten. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters. Aufgeklappt änderst du die Lebenspunkte, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Gegenstände der Welt; die der offenen Szene stehen in der Auswahl oben. Mit „Versteckt“ sehen nur dieser Spieler und du den Gegenstand im Glossar. „Neuer Abend“ und „Gruppe bearbeiten“ stehen im selben Popup.',
       },
       {
         title: 'Notizen und Würfe',
-        text: 'Der Knopf „Notizen“ zeigt eine Tafel: links deine eigenen Notizen, rechts der Gruppenblock der Spieler. Ein Klick öffnet eine Notiz im Seitenfenster, dort schreibst und kommentierst du. Der Knopf zeigt an, wenn im Gruppenblock etwas Neues steht.\n\nWürfelt ein Spieler in der App, erscheint der Wurf unten in der Leiste. „Alle Würfe“ zeigt die letzten 30, nach einem Neustart des Servers ist die Liste leer.',
+        text: 'Die Ansicht „Notizen“ zeigt eine Tafel: links deine eigenen Notizen, rechts der Gruppenblock der Spieler. Ein Klick öffnet eine Notiz im Seitenfenster, dort schreibst und kommentierst du. In der Symbolleiste legt „Neue Notiz“ eine an, und „Gruppenblock“ zeigt mit einer Zahl, wenn dort etwas Neues steht.\n\nWürfelt ein Spieler in der App, steht der Wurf rechts in der Symbolleiste als „Letzter Wurf“. Dort gibt es auch „Alle Würfe“, die letzten 30. Nach einem Neustart des Servers ist die Liste leer.',
       },
       {
         title: 'Kampf',
-        text: 'Nur du startest einen Kampf. „Kampf“ oben in der Leiste nimmt alle Charaktere der Runde. „Kampf in dieser Szene“ an der Szene nimmt zusätzlich alle Figuren der Szene mit. Läuft schon ein Kampf, kommen sie dazu.\n\nErst würfelst du die Initiative (1W10 plus Handeln), dann ist jeder der Reihe nach dran. Spieler würfeln ihren Angriff auf ihrer eigenen Seite, du kannst es auch für sie tun. Ihre Lebenspunkte sehen sie, die der Gegner nicht.',
+        text: 'Nur du startest einen Kampf. „Kampf“ unten in der Symbolleiste nimmt alle Charaktere der Runde. „Kampf hier“ in der Story nimmt zusätzlich alle Figuren der Szene mit. Läuft schon ein Kampf, kommen sie dazu.\n\nIm Kampf wechselt die Mitte der Symbolleiste: Teilnehmer, Verlauf, Nächster ist dran, Zug abschließen, Wurf verwerfen, Teilnehmer dazu und Kampf beenden. Was gerade nicht geht, ist ausgegraut. Der Schirm zeigt die Zeitleiste, den offenen Wurf und den Angriff.\n\nErst würfelst du die Initiative (1W10 plus Handeln), dann ist jeder der Reihe nach dran. Spieler würfeln ihren Angriff auf ihrer eigenen Seite, du kannst es auch für sie tun.',
       },
       {
         title: 'Zeitleiste und Zustände',
@@ -341,20 +366,23 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Wurf, Parade, Zug abschließen',
-        text: 'Ein gewürfelter Angriff bleibt zuerst offen. Trifft er normal, entscheidet das Ziel, ob es pariert: ein Spieler auf seiner Seite, für alle anderen du. Kritische Treffer lassen sich nicht parieren.\n\nDanach entscheidest du: „Zug abschließen“ zieht den Schaden ab, überträgt ihn sofort auf den Charakter, schreibt alles in den Verlauf und gibt an den Nächsten weiter. „Wurf verwerfen“ lässt alles, wie es war, zum Beispiel wenn neu gewürfelt wird.\n\nLebenspunkte kannst du jederzeit von Hand setzen. Die letzte Auswahl jedes Teilnehmers (Ziel, Fähigkeit, Waffe) merkt sich der Browser.',
+        text: 'Ein gewürfelter Angriff bleibt zuerst offen. Trifft er normal, entscheidet das Ziel, ob es pariert: ein Spieler auf seiner Seite, für alle anderen du. Kritische Treffer lassen sich nicht parieren.\n\nDanach entscheidest du in der Symbolleiste: „Zug abschließen“ zieht den Schaden ab, überträgt ihn sofort auf den Charakter, schreibt alles in den Verlauf und gibt an den Nächsten weiter. „Wurf verwerfen“ lässt alles, wie es war. Seinen eigenen Zug kann ein Spieler auch selbst abschließen.',
       },
       {
         title: 'Kapitel abschließen',
+        house: true,
         text: 'Am Ende eines Kapitels gibst du den Charakteren Bonuspunkte. Im Seitenfenster steht jeder Charakter mit den üblichen 10 Punkten, du kannst jedem eine eigene Zahl geben.\n\nDie Spieler verteilen die Punkte selbst auf ihre Fähigkeiten, und die Runde rückt ins nächste Kapitel.',
       },
     ],
   },
   {
     id: 'my-sessions',
+    group: 'player',
     title: 'Meine Runden',
     steps: [
       {
         title: 'In einer Runde spielen',
+        house: true,
         text: 'Der Spielleiter nimmt einen deiner Charaktere in eine Runde auf, auch mitten im Spiel. Sie erscheint dann unter „Meine Runden“. Ein Charakter spielt immer nur in einer laufenden Runde. Ist sie beendet, ist er wieder frei, mit allem, was er in der Runde gewonnen hat.\n\nUnten steht eine Leiste mit fünf Symbolen: Runde, Charakter, Quests, Chat und Mehr.',
       },
       {
@@ -365,12 +393,12 @@ export const TUTORIALS: Tutorial[] = [
       {
         title: 'Charakter und Würfeln',
         text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf, die Gruppe auch.\n\nMit „Würfeln“ oben wechselst du zu deinen Werten als Knöpfen und zu freien Würfeln ohne Wert (W100 oder 1 bis 10 W10). Mit „Bearbeiten“ änderst du deinen Charakter, auch in der Runde.',
-        more: 'rules-checks',
+        more: 'rules#check',
       },
       {
         title: 'Geistesblitz',
         text: 'Misslingt eine Probe, aber kein Patzer, erscheint „Geistesblitz einsetzen“. Ein Tipp würfelt dieselbe Probe noch einmal. Der Punkt gehört zur Begabung der Probe und ist dann verbraucht. Der Spielleiter füllt die Punkte für einen neuen Abend wieder auf.',
-        more: 'rules-inspiration',
+        more: 'rules#inspiration',
       },
       {
         title: 'Quests und Questlog',
@@ -390,13 +418,14 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Kampf',
-        text: 'Startet der Spielleiter einen Kampf, erscheint oben ein Band „Kampf läuft“, bei deinem Zug mit dem Hinweis „du bist dran“. Die Zeitleiste zeigt, wer in welcher Reihenfolge dran ist, wer aussetzt und wer kampfunfähig ist. Von deiner Gruppe siehst du die Lebenspunkte, von Gegnern nicht.\n\nBist du dran, greifst du an oder machst eine andere Aktion. Wirst du getroffen, entscheidest du, ob du parierst. Nichts zählt, bevor der Spielleiter den Zug abschließt.',
-        more: 'rules-combat',
+        text: 'Startet der Spielleiter einen Kampf, erscheint oben ein Band „Kampf läuft“, bei deinem Zug mit dem Hinweis „du bist dran“. Die Zeitleiste zeigt, wer in welcher Reihenfolge dran ist, wer aussetzt und wer kampfunfähig ist. Von deiner Gruppe siehst du die Lebenspunkte, von Gegnern nicht.\n\nBist du dran, greifst du an oder machst eine andere Aktion. Wirst du getroffen, entscheidest du, ob du parierst. Nichts zählt, bevor der Zug abgeschlossen ist: Deinen eigenen Zug schließt du mit „Zug abschließen“ selbst ab, alle anderen der Spielleiter.',
+        more: 'rules#initiative',
       },
     ],
   },
   {
     id: 'quests',
+    group: 'gm',
     title: 'Quests',
     steps: [
       {
@@ -415,6 +444,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'events',
+    group: 'gm',
     title: 'Ereignisse',
     steps: [
       {
@@ -433,6 +463,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'trivia',
+    group: 'gm',
     title: 'Wissen',
     steps: [
       {
@@ -451,6 +482,7 @@ export const TUTORIALS: Tutorial[] = [
   },
   {
     id: 'start-player',
+    group: 'player',
     title: 'Willkommen, Spieler',
     steps: [
       {
@@ -474,185 +506,191 @@ export const TUTORIALS: Tutorial[] = [
       {
         title: 'Das Regelwerk',
         text: 'Du musst das Regelwerk nicht auswendig kennen. Die App rechnet für dich. Wenn du es verstehen willst, erklären die Tutorials unter „Das Regelwerk“ alles in kurzen Schritten, mit Beispielen.',
-        more: 'rules-basics',
+        more: 'rules',
       },
     ],
   },
   {
-    id: 'rules-basics',
-    title: 'Das Spiel in Kürze',
+    id: 'rules',
+    group: 'rules',
+    title: 'Regelwerk How to be a Hero',
     steps: [
+      // Kapitel 1
       {
-        title: 'Pen and Paper',
-        text: 'Ein Spielleiter erzählt eine Geschichte, ihr spielt Helden darin. Was euer Charakter kann, steht auf seinem Bogen. Ob etwas gelingt, entscheiden Würfel.\n\nNach dem offiziellen Regelwerk von How to be a Hero (howtobeahero.de, CC BY-NC-SA 4.0), in eigenen Worten.',
+        chapter: 'Was ist How to be a Hero?',
+        title: 'Erzählen und Würfeln',
+        text: 'How to be a Hero ist ein freies Pen-and-Paper-Regelwerk. Man kann es sich vorstellen als halb Gesellschaftsspiel, halb Improvisationstheater: Ihr sitzt zusammen und erzählt gemeinsam eine Geschichte, und wo der Ausgang offen ist, entscheiden Würfel.\n\nEs gibt kein Brett, keinen Gewinner und keine feste Welt. Eure Geschichte kann im Mittelalter spielen, im Weltraum oder in der Schule nebenan.\n\nQuelle: das offizielle Wiki howtobeahero.de (CC BY-NC-SA 4.0), hier in eigenen Worten.',
       },
       {
-        title: 'Der Bogen',
-        text: 'Dein Charakter besteht aus:',
-        list: ['Drei Begabungen: Handeln, Wissen, Soziales.', 'Fähigkeiten, jede einer Begabung zugeordnet, mit Punkten.', 'Lebenspunkten, am Anfang 100.', 'Inventar, Waffen und Besonderem.'],
+        title: 'Wer am Tisch sitzt',
+        text: 'Einer von euch ist der Spielleiter. Er beschreibt die Welt, spielt alle Figuren, die kein Spieler spielt, und sagt, was aus euren Taten folgt.\n\nJeder andere Spieler hat genau einen Charakter. Ihr sagt, was euer Charakter tut, und der Spielleiter erzählt, was daraufhin passiert.',
       },
       {
-        title: 'Eine Probe',
-        text: 'Will dein Charakter etwas, das unsicher ist, würfelst du einen W100 (Prozentwürfel). Liegt der Wurf beim Wert der Fähigkeit oder darunter, gelingt es. Der Wert ist also deine Erfolgschance in Prozent.',
-        more: 'rules-checks',
+        title: 'So läuft ein Abend',
+        text: 'Ein Abend ist ein Kreislauf: Der Spielleiter beschreibt die Lage, ihr antwortet mit dem, was eure Charaktere tun, der Spielleiter erzählt die Folgen, und daraus entsteht die nächste Lage.',
+        example: 'Spielleiter: „Die Brücke über die Schlucht ist eingestürzt. Auf der anderen Seite seht ihr Rauch.“\nSpielerin: „Mara mustert die Bäume. Kann sie einen fällen, sodass er als Steg über die Schlucht liegt?“\nSpielleiter: „Möglich, aber nicht sicher. Würfle auf Holzfällen.“',
       },
       {
-        title: 'Wer was macht',
-        text: 'Der Spielleiter beschreibt die Welt und verlangt Proben. Du sagst, was dein Charakter tut. Die App würfelt für dich, der Spielleiter sieht jeden Wurf.',
+        title: 'Wann gewürfelt wird',
+        text: 'Gewürfelt wird nur, wenn der Ausgang offen ist und etwas davon abhängt. Eine offene Tür zu öffnen braucht keinen Wurf. Eine verschlossene Tür einzutreten schon: Es kann klappen oder nicht, und beides ändert die Geschichte.\n\nFast immer gibt es mehrere Wege zum Ziel. Wer klug erzählt, braucht manchmal gar keinen Wurf.',
       },
-    ],
-  },
-  {
-    id: 'rules-talents',
-    title: 'Begabungen und Fähigkeiten',
-    steps: [
+      {
+        title: 'Was auf deinem Bogen steht',
+        text: 'Dein Charakterbogen hat vier Teile:',
+        list: [
+          'Drei Begabungen: Handeln, Wissen und Soziales.',
+          'Fähigkeiten, die du selbst erfindest. Es gibt keine feste Liste.',
+          '100 Lebenspunkte.',
+          'Ein Inventar mit allem, was dein Charakter bei sich trägt.',
+        ],
+      },
+      {
+        title: 'Was die App übernimmt',
+        text: 'Die App würfelt für dich und rechnet alle Werte aus. Sie zeigt Quests, Glossar, Notizen und den Chat der Runde.\n\nAm Tisch ohne App würfelst du einen W100 mit zwei zehnseitigen Würfeln: einer für die Zehner, einer für die Einer.',
+      },
+      {
+        title: 'Für den ersten Abend',
+        text: 'Fehler sind normal, auch für den Spielleiter. Eine vergessene Regel schlägst du unter „Alle Themen“ nach. Was unklar bleibt, klärt ihr gemeinsam, und der Spielleiter hat das letzte Wort.\n\nDas Wichtigste: Habt Spaß an der Geschichte.',
+      },
+      // Kapitel 2
+      {
+        chapter: 'Dein Charakter',
+        title: 'Erst die Figur, dann die Zahlen',
+        text: 'Bevor du Punkte verteilst, überlege dir, wer dein Charakter ist: Was kann er richtig gut, was gar nicht, was treibt ihn an? Die Zahlen folgen danach von selbst.\n\nQuelle: das offizielle Wiki howtobeahero.de (CC BY-NC-SA 4.0), hier in eigenen Worten.',
+        example: 'Mara ist Holzfällerin. Sie ist stark und geschickt, aber im Lesen und Schreiben unsicher. Sie feilscht gern auf dem Markt und traut keinem Fremden sofort.',
+      },
       {
         title: 'Drei Begabungen',
-        text: 'Jede Fähigkeit gehört zu einer von drei Begabungen:',
-        list: ['Handeln: körperliche Tätigkeiten, zum Beispiel Bäume fällen oder reiten.', 'Wissen: Kenntnisse, zum Beispiel Sprachen, Pflanzen, Politik.', 'Soziales: Umgang mit anderen, zum Beispiel feilschen, überzeugen, Lügen erkennen.'],
+        text: 'Jeder Charakter hat drei Begabungen, in die alle Fähigkeiten einsortiert sind:',
+        list: [
+          'Handeln: alles Körperliche, zum Beispiel Klettern, Kämpfen, Schleichen.',
+          'Wissen: alles, was man lernen kann, zum Beispiel Pflanzenkunde, Heilkunst, Geschichte.',
+          'Soziales: alles im Umgang mit anderen, zum Beispiel Feilschen, Überreden, Menschenkenntnis.',
+        ],
+      },
+      {
+        title: 'Fähigkeiten erfindest du selbst',
+        text: 'Eine Fähigkeit nennst du, wie du willst. Sie sollte nicht zu breit sein („Kämpfen“ deckt zu viel ab) und nicht zu eng („Eichen fällen bei Regen“ kommt kaum vor). Im Zweifel entscheidet der Spielleiter, was zu einer Fähigkeit passt.',
+        example: 'Maras neun Fähigkeiten: Holzfällen, Axtkampf, Klettern, Schleichen (Handeln), Pflanzenkunde, Spurenlesen (Wissen), Feilschen, Menschenkenntnis, Einschüchtern (Soziales).',
+      },
+      {
+        id: 'points',
+        title: '400 Punkte verteilen',
+        text: 'Zur Erstellung bekommst du 400 Punkte. Die verteilst du frei auf deine Fähigkeiten. Maras Verteilung:',
+        list: [
+          'Handeln: Holzfällen 60, Axtkampf 50, Klettern 38, Schleichen 28 (zusammen 176)',
+          'Wissen: Pflanzenkunde 45, Spurenlesen 38 (zusammen 83)',
+          'Soziales: Feilschen 50, Menschenkenntnis 46, Einschüchtern 45 (zusammen 141)',
+        ],
+        tip: 'In der App siehst du oben, wie viele Grundpunkte noch frei sind. Die Punkte müssen nicht ganz aufgebraucht werden, aber es wäre schade um jeden, der übrig bleibt.',
       },
       {
         title: 'Der Begabungswert',
-        text: 'Zähle alle Punkte der Fähigkeiten einer Begabung zusammen und teile durch 10, kaufmännisch gerundet.',
-        example: '129 Punkte in Handeln ergeben Handeln 13. 123 Punkte ergeben 12.',
+        text: 'Die Punkte aller Fähigkeiten einer Begabung zählst du zusammen, teilst sie durch 10 und rundest kaufmännisch. Das ist der Begabungswert. Er kommt jeder Fähigkeit dieser Begabung zugute.',
+        example: 'Handeln: 176 Punkte, geteilt durch 10 sind 17,6, gerundet 18.\nWissen: 83 Punkte ergeben 8.\nSoziales: 141 Punkte ergeben 14.',
       },
       {
-        title: 'Der Wert einer Fähigkeit',
-        text: 'Der Begabungswert wird auf jede Fähigkeit seiner Begabung addiert. Mit diesem Wert würfelst du.',
-        example: 'Holzfällen 50 + Handeln 13 = 63.',
+        title: 'Der Wert, auf den du würfelst',
+        text: 'Der Wert einer Fähigkeit ist ihre Punktzahl plus der Begabungswert. Auf diesen Wert wird gewürfelt.',
+        example: 'Holzfällen: 60 Punkte plus Begabungswert 18 ergibt 78.\nFeilschen: 50 plus 14 ergibt 64.',
       },
       {
-        title: 'Etwas Ungelerntes',
-        text: 'Willst du etwas, das keine deiner Fähigkeiten abdeckt, würfelst du auf den Wert der passenden Begabung. Auch die Begabungswerte stehen als Knöpfe im Würfeln-Reiter.',
-      },
-    ],
-  },
-  {
-    id: 'rules-creation',
-    title: 'Charakter erstellen',
-    steps: [
-      {
-        title: '400 Punkte',
-        text: 'Du hast 400 Punkte und verteilst alle auf Fähigkeiten. Nur so ist dein Charakter fertig.\n\nNach dem offiziellen Regelwerk von How to be a Hero (howtobeahero.de, CC BY-NC-SA 4.0), in eigenen Worten.',
+        title: 'Grenzen und Tipps',
+        text: 'Jede Fähigkeit braucht mindestens 1 Punkt, und kein Wert darf über 100 liegen. Sehr kleine Werte bringen im Spiel wenig, weil sie fast nie gelingen.\n\nHast du keine passende Fähigkeit, würfelst du auf die Begabung selbst.',
+        example: 'Mara kann nicht schwimmen. Verlangt der Spielleiter eine Probe, würfelt sie auf ihren Begabungswert Handeln, also 18.',
       },
       {
-        title: 'Erst verteilen, dann rechnen',
-        text: 'Verteile die Punkte auf Fähigkeiten in den drei Begabungen. Die App rechnet den Begabungswert und den Wert jeder Fähigkeit sofort aus.',
-        example: 'Handeln 70 Punkte → 7. Wissen 170 → 17. Soziales 160 → 16.\nSchauspielern 68 + Soziales 16 = 84.',
+        title: 'Leben und Inventar',
+        text: 'Jeder Charakter startet mit 100 Lebenspunkten. Das Inventar listet alles, was dein Charakter trägt. Ein Gegenstand mit Schadenswürfeln ist eine Waffe, zum Beispiel Maras Axt mit 4W10.\n\nIm Feld „Besonderes“ hältst du alles fest, was in keine Fähigkeit passt.',
+      },
+      // Kapitel 3
+      {
+        chapter: 'Die Probe',
+        id: 'check',
+        title: 'Ein W100 gegen deinen Wert',
+        text: 'Willst du etwas tun, dessen Ausgang offen ist, würfelst du eine Probe: einen W100 (ein Wurf von 1 bis 100) gegen den Wert deiner Fähigkeit. Wirfst du den Wert oder weniger, gelingt es. Der Wert ist also deine Chance in Prozent.\n\nQuelle: das offizielle Wiki howtobeahero.de (CC BY-NC-SA 4.0), hier in eigenen Worten.',
       },
       {
-        title: 'Die Grenzen',
-        text: 'Keine Fähigkeit darf 0 Punkte haben, und kein Wert darf über 100 liegen, mit dem Begabungswert zusammen. Wäre es mehr, setzt du die Punkte anders ein, in einer anderen Fähigkeit derselben Begabung.',
-        tip: 'Einen Punkt auf jede Fähigkeit zu streuen ist wenig sinnvoll. Gib deinen Stärken mehr.',
-      },
-      {
-        title: 'Geistesblitzpunkte',
-        text: 'Aus dem Begabungswert ergeben sich die Geistesblitzpunkte: Begabungswert geteilt durch 10, kaufmännisch gerundet.',
-        more: 'rules-inspiration',
-      },
-    ],
-  },
-  {
-    id: 'rules-checks',
-    title: 'Proben und Würfe',
-    steps: [
-      {
-        title: 'Der Wurf',
-        text: 'Alle Proben sind ein W100. Würfelst du den Wert der Fähigkeit oder weniger, gelingt die Probe. Der Wert in Prozent ist deine Erfolgschance.\n\nNach dem offiziellen Regelwerk von How to be a Hero (howtobeahero.de, CC BY-NC-SA 4.0), in eigenen Worten.',
+        title: 'Eine Probe am Tisch',
+        text: 'Mara klettert über die Palisade. Ihr Wert in Klettern ist 56.',
+        example: 'Mara wirft eine 41. Das ist weniger als 56, die Probe gelingt. Der Spielleiter erzählt, wie sie oben ankommt.',
       },
       {
         title: 'Kritischer Erfolg',
-        text: 'Liegt der Wurf im ersten Zehntel deines Werts, ist der Erfolg kritisch. Eine 1 ist immer ein kritischer Erfolg.',
-        example: 'Wert 70: Die Würfe 1 bis 7 sind kritisch.',
+        text: 'Das erste Zehntel deines Werts ist ein kritischer Erfolg, eine 1 immer. Der Spielleiter macht daraus etwas Besonderes, das über das bloße Gelingen hinausgeht.',
+        example: 'Bei Wert 56 sind die Würfe 1 bis 5 kritisch.',
       },
       {
         title: 'Patzer',
-        text: 'Misslingt die Probe und liegt der Wurf im letzten Zehntel dessen, was dir zu 100 fehlt, ist es ein kritischer Fehlschlag, ein Patzer. Eine 100 ist immer ein Patzer.',
-        example: 'Wert 70: 1–7 kritisch, 8–70 gelungen, 71–96 misslungen, 97–100 Patzer.',
+        text: 'Du patzt, wenn du im letzten Zehntel dessen würfelst, was dir bis 100 fehlt. Eine 100 ist immer ein Patzer. Auch der Patzer verändert die Geschichte, aber zu deinem Nachteil.',
+        example: 'Bei Wert 56 fehlen 44 bis 100. Ein Zehntel davon gerundet ergibt 4, also sind die Würfe 96 bis 100 ein Patzer.',
       },
       {
-        title: 'Über 100 geht nicht',
-        text: 'Der Wert einer Fähigkeit wird zum Würfeln bei 100 gedeckelt. Eine 100 würfeln bleibt auch bei Wert 100 ein Patzer.',
+        title: 'Die ganze Skala',
+        text: 'Für Wert 56 sieht die Skala so aus:',
+        list: ['1 bis 5: kritischer Erfolg', '6 bis 56: gelungen', '57 bis 95: misslungen', '96 bis 100: Patzer'],
+        tip: 'Über 100 geht kein Wert. Was darüber läge, verfällt.',
+      },
+      {
+        id: 'inspiration',
+        title: 'Geistesblitz',
+        text: 'Mit einem Geistesblitzpunkt würfelst du eine misslungene Probe neu. Du hast je Begabung so viele Punkte, wie ein Zehntel ihres Begabungswerts ergibt.\n\nDie Regeln: nicht nach einem Patzer, nur mit Punkten der Begabung, zu der die Fähigkeit gehört, und am nächsten Abend sind alle Punkte wieder da.',
+        example: 'Handeln 18 ergibt 2 Geistesblitzpunkte, Wissen 8 und Soziales 14 je 1.\nMara feilscht auf 64 und würfelt eine 81: misslungen. Sie setzt einen Punkt aus Soziales ein und würfelt neu: eine 22, gelungen.',
       },
       {
         title: 'In der App',
-        text: 'Tippe auf eine Fähigkeit oder auf „Würfeln“ unten. Die Würfel rollen kurz, dann steht das Ergebnis da, mit einer Skala, wo dein Wurf lag.',
+        text: 'Tippe auf die Fähigkeit, die du würfeln willst. Alle in der Runde sehen den Wurf. Nach einem Fehlschlag erscheint der Knopf „Geistesblitz einsetzen“ von selbst, solange du Punkte der passenden Begabung hast.',
       },
-    ],
-  },
-  {
-    id: 'rules-inspiration',
-    title: 'Geistesblitzpunkte',
-    steps: [
+      // Kapitel 4
       {
-        title: 'Was sie sind',
-        text: 'Geistesblitzpunkte hat jede Begabung: ihr Wert geteilt durch 10, kaufmännisch gerundet.',
-        example: 'Handeln 13 ergibt 1 Punkt, Handeln 18 ergibt 2.',
-      },
-      {
-        title: 'Einsetzen',
-        text: 'Misslingt eine Probe, darfst du sie mit einem Punkt derselben Begabung noch einmal würfeln. Das geht nicht nach einem Patzer und nicht für Proben anderer Begabungen. Der Punkt ist danach verbraucht.',
-      },
-      {
-        title: 'Wieder aufladen',
-        text: 'Die Punkte gelten für ein Abenteuer oder einen Abend. Beginnt ein neuer Abend, füllt der Spielleiter sie mit „Neuer Abend“ wieder auf.',
-        tip: 'In der App erscheint „Geistesblitz einsetzen“ direkt unter einer misslungenen Probe, mit der Zahl der übrigen Punkte.',
-      },
-    ],
-  },
-  {
-    id: 'rules-life',
-    title: 'Lebenspunkte',
-    steps: [
-      {
-        title: '100 am Anfang',
-        text: 'Jeder Charakter beginnt mit 100 Lebenspunkten.',
-      },
-      {
-        title: 'Schwere Treffer',
-        text: 'Verlierst du mit einem einzigen Angriff mehr als 60 Lebenspunkte, wirst du bewusstlos und kannst weder parieren noch angreifen. Sinken die Lebenspunkte unter 10, wirst du auch bewusstlos und brauchst Hilfe.',
-      },
-      {
-        title: 'Tod',
-        text: 'Bei 0 Lebenspunkten stirbt der Charakter. Der Spielleiter kann dir Lebenspunkte geben oder nehmen, das siehst du im Lebensbalken.',
-      },
-    ],
-  },
-  {
-    id: 'rules-combat',
-    title: 'Kampf',
-    steps: [
-      {
+        chapter: 'Der Kampf',
+        id: 'initiative',
         title: 'Initiative',
-        text: 'Vor jedem Kampf würfelt jeder einen W10 und addiert seinen Handeln-Wert. Wer am meisten hat, ist zuerst dran. Wer überrascht wird, setzt die erste Runde aus.',
+        text: 'Vor jedem Kampf wird neu ausgewürfelt, wer wann dran ist. Jeder wirft einen W10 und addiert seinen Begabungswert in Handeln. Wer die höchste Summe hat, beginnt, dann geht es absteigend weiter.\n\nQuelle: das offizielle Wiki howtobeahero.de (CC BY-NC-SA 4.0), hier in eigenen Worten.',
+        example: 'Mara: 6 plus 18 ergibt 24. Ein Räuber: 9 plus 11 ergibt 20. Ben: 3 plus 9 ergibt 12. Reihenfolge: Mara, Räuber, Ben.',
       },
       {
-        title: 'Angriff',
-        text: 'Du würfelst eine Probe auf die passende Fähigkeit. Ein Erfolg trifft. Dann wird der Schaden gewürfelt: die Waffe hat xW10 Schaden, dazu kommt ein Bonus.',
-        example: 'Ein Schwert macht 5W10, ein Messer 2W10, ein Stock 1W10 + 5.',
+        title: 'Überraschung',
+        text: 'Wer den Gegner nicht bemerkt hat, ist überrascht und setzt die erste Runde aus.',
+      },
+      {
+        title: 'Dein Zug',
+        text: 'In deinem Zug machst du einen Angriff oder eine andere Aktion, zum Beispiel eine Bombe mischen oder jemanden verbinden. Je nachdem, ob der Ausgang offen ist, mit oder ohne Wurf.',
+      },
+      {
+        title: 'Angriff und Schaden',
+        text: 'Ein Angriff ist eine Probe auf die passende Fähigkeit. Gelingt sie, würfelst du den Schaden deiner Waffe: so viele W10, wie die Waffe hat, dazu ein möglicher Bonus. Bei einem kritischen Treffer zählen die Würfel doppelt.',
+        list: ['Faust: 1W10', 'Messer: 2W10', 'Axt: 4W10', 'Schwert: 5W10', 'Bogen: 6W10'],
+        tip: 'Das sind Richtwerte. Die genauen Werte deiner Waffen stehen im Inventar.',
       },
       {
         title: 'Parade',
-        text: 'Einmal pro Runde kannst du einen Angriff parieren, mit einer Probe auf Handeln oder eine passende Fähigkeit. Gelingt sie, entsteht kein Schaden. Kritische Angriffe und Schusswaffen kannst du nicht parieren.',
+        text: 'Wer getroffen wird, kann einmal pro Runde parieren, mit einer Probe auf Handeln oder eine passende Fähigkeit. Gelingt sie, nimmt er keinen Schaden. Gegen kritische Treffer und gegen Schusswaffen kann man nicht parieren.\n\nWer ohne Waffe eine Waffe pariert, erleidet trotzdem den halben Schaden. Das rechnet die App nicht: Der Spielleiter zieht es von Hand ab.',
       },
       {
-        title: 'Kritischer Treffer',
-        text: 'Ein kritischer Treffer verdoppelt die gewürfelten Schadenswürfel. Der Bonus der Waffe wird danach addiert.',
+        title: 'Eine Runde durchgespielt',
+        text: 'Mara greift einen Räuber mit der Axt an. Ihr Wert im Axtkampf ist 68.',
+        list: [
+          'Mara würfelt 35 gegen 68: Treffer.',
+          'Der Räuber pariert nicht (77 gegen seine 45).',
+          'Schaden: 4W10 ergeben 7 + 3 + 9 + 5 = 24.',
+          'Der Räuber schlägt zurück und würfelt 12 gegen 60: Treffer. Mara pariert mit 50 gegen 68: gelungen, kein Schaden.',
+        ],
+        example: 'Hätte Mara statt der 35 eine 4 gewürfelt, wäre das ein kritischer Treffer gewesen: nicht parierbar, und der Schaden zählt doppelt, also 48.',
+      },
+      {
+        title: 'Lebenspunkte im Kampf',
+        text: 'Wer mit einem einzigen Schlag mehr als 60 Schaden nimmt oder insgesamt unter 10 Lebenspunkte fällt, wird bewusstlos. Das sagt der Spielleiter an, die App setzt erst bei 0 Lebenspunkten auf „kampfunfähig“. Bei 0 ist der Charakter tot.',
       },
       {
         title: 'In der App',
-        text: 'Die Zeitleiste zeigt die Reihenfolge. Bist du dran, greifst du an oder machst eine andere Aktion. Nichts zählt, bevor der Spielleiter den Zug abschließt.',
-        more: 'my-sessions',
+        text: 'Läuft ein Kampf, steht oben ein Band „Kampf läuft“. Du siehst die Zeitleiste mit der Reihenfolge, und wenn du dran bist, würfelst du selbst. Den eigenen Zug schließt du auch selbst ab.',
       },
-    ],
-  },
-  {
-    id: 'rules-traits',
-    title: 'Vor- und Nachteile',
-    steps: [
+      // Kapitel 5
       {
+        chapter: 'Vor- und Nachteile',
         title: 'Ein freies Zusatzmodul',
-        text: 'Vor- und Nachteile sind ein optionales Modul für erfahrene Gruppen. Die App rechnet sie nicht aus, ihr haltet sie am Tisch fest, zum Beispiel unter „Besonderes“ oder in der Beschreibung.',
+        text: 'Vor- und Nachteile sind ein optionales Modul für erfahrene Gruppen. Die App rechnet sie nicht aus, ihr haltet sie am Tisch fest, zum Beispiel unter „Besonderes“ oder in der Beschreibung.\n\nQuelle: das offizielle Wiki howtobeahero.de (CC BY-NC-SA 4.0), hier in eigenen Worten.',
       },
       {
         title: 'Nachteile',
@@ -666,51 +704,49 @@ export const TUTORIALS: Tutorial[] = [
         title: 'Charakteristika',
         text: 'Ein Charakteristikum ist eine breite Eigenart mit Vor- und Nachteilen zugleich. Es kostet keine Punkte. Ein Charakter hat höchstens zwei, am besten eines, das du spielen magst.',
       },
-    ],
-  },
-  {
-    id: 'rules-leveling',
-    title: 'Leveln: unsere Hausregel',
-    steps: [
+      // Kapitel 6
       {
-        title: 'Bonuspunkte',
-        text: 'Das offizielle Regelwerk kennt kein Leveln. In unserer Runde gibt der Spielleiter am Ende eines Kapitels Bonuspunkte, meist 10 für jeden Charakter. Die verteilst du selbst auf Fähigkeiten.',
-        tip: 'Hausregel, nicht aus dem offiziellen Regelwerk.',
+        chapter: 'Unsere Hausregeln',
+        house: true,
+        title: 'Was eine Hausregel ist',
+        text: 'Eine Hausregel gilt in unserer Runde und steht nicht im offiziellen Regelwerk. Die App kennzeichnet jede mit der Marke „Hausregel“, damit du immer weißt, was offiziell ist und was wir uns ausgedacht haben.',
       },
       {
+        id: 'leveling',
+        house: true,
+        title: 'Leveln mit Bonuspunkten',
+        text: 'Das offizielle Regelwerk kennt kein Leveln. Bei uns bekommst du am Ende eines Kapitels meist 10 Bonuspunkte. Damit kaufst du neue Punkte für deine Fähigkeiten, auch in einer, die du noch nicht hast.',
+      },
+      {
+        house: true,
         title: 'Je besser, desto teurer',
-        text: 'Ein Punkt, den du beim Leveln gewinnst, kostet Bonuspunkte nach den Punkten, die die Fähigkeit danach hat.',
+        text: 'Ein Punkt, den du beim Leveln gewinnst, kostet Bonuspunkte nach den Punkten, die die Fähigkeit danach hat:',
         list: ['Bis 30 Punkte: 1 Bonuspunkt je Punkt.', '31 bis 50: 2 Bonuspunkte.', '51 bis 70: 3 Bonuspunkte.', 'Ab 71: 4 Bonuspunkte.'],
-        example: 'Schmieden 40 auf 45 kostet 5 mal 2, also 10 Bonuspunkte. Schwert 69 auf 71 kostet 3 + 4 = 7.',
+        example: 'Klettern von 38 auf 43 kostet 5 mal 2, also 10 Bonuspunkte. Holzfällen von 60 auf 61 kostet 3.',
       },
       {
-        title: 'Die 400 Grundpunkte bleiben fest',
-        text: 'Die Punkte aus der Erstellung zählen 1:1 und sind fest, sobald du in einer Runde spielst. Du kannst sie nicht mehr umschichten. Neues kommt nur über Bonuspunkte. Die App zeigt an jeder Fähigkeit, was der nächste Punkt kostet.',
+        house: true,
+        title: 'Grundpunkte sind im Abenteuer fest',
+        text: 'Die 400 Punkte aus der Erstellung sind fest, sobald dein Charakter in einer laufenden Runde spielt. Du kannst sie nicht mehr umschichten. Neues kommt nur noch über Bonuspunkte. Die App zeigt an jeder Fähigkeit, was der nächste Punkt kostet.',
       },
       {
-        title: 'Über 100 und Guthaben',
-        text: 'Du kannst keine Fähigkeit über Wert 100 kaufen. Schiebt dein Begabungswert eine Fähigkeit später über 100, bleibt sie bei 100. Je 2 Punkte darüber ergeben 1 Punkt Guthaben, den du in einer Fähigkeit derselben Begabung einsetzen kannst.',
-        example: 'Schwert 87 + Handeln 15 = 102. Die 2 Punkte darüber geben 1 Punkt Guthaben in Handeln.',
+        house: true,
+        title: 'Über 100: Guthaben',
+        text: 'Du kannst keine Fähigkeit über Wert 100 kaufen. Schiebt dein Begabungswert eine Fähigkeit später über 100, bleibt sie bei 100. Je 2 Punkte darüber ergeben 1 Punkt Guthaben, den du in einer Fähigkeit derselben Begabung einsetzen kannst.\n\nDas Guthaben siehst du als roten Tag an der Begabung. Tippst du eine Fähigkeit an, sagt dir die App, ob du das Guthaben dort einsetzen kannst.',
+        example: 'Schwert 87 plus Handeln 15 ergibt 102. Die 2 Punkte darüber geben 1 Punkt Guthaben in Handeln.',
+      },
+      {
+        house: true,
+        title: 'Ein Charakter, ein Abenteuer',
+        text: 'Ein Charakter spielt immer nur in einer laufenden Runde. Ist sie zu Ende, ist er wieder frei, mit allem, was er gewonnen hat, und kann in ein neues Abenteuer ziehen.',
       },
     ],
   },
 ];
 
-/** The three groups of the tutorial menu. */
-export type TutorialGroup = 'app' | 'rules' | 'gm';
-
+/** The points of the menu with their names. */
 export const TUTORIAL_GROUPS: { id: TutorialGroup; label: string }[] = [
-  { id: 'app', label: 'Die App' },
-  { id: 'rules', label: 'Das Regelwerk' },
-  { id: 'gm', label: 'Für Spielleiter' },
+  { id: 'rules', label: 'Regelwerk How to be a Hero' },
+  { id: 'player', label: 'Spieler' },
+  { id: 'gm', label: 'Spielleiter' },
 ];
-
-const PLAYER_APP = ['start-player', 'my-characters', 'my-sessions'];
-
-/** The group a tutorial belongs to in the menu. */
-export function groupOf(id: string): TutorialGroup {
-  if (id.startsWith('rules-')) {
-    return 'rules';
-  }
-  return PLAYER_APP.includes(id) ? 'app' : 'gm';
-}

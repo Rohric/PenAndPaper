@@ -1,16 +1,12 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input, output } from '@angular/core';
+import { Component, TemplateRef, computed, inject, input, output, viewChild } from '@angular/core';
 
-import { Quest, Scene, WorldEvent } from '../../core/models';
-import { QUEST_STATUSES, SessionEntryKind, questStatus } from '../../core/session-models';
-import { Icon } from '../../shared/icon';
-import { EventTile } from '../worlds/event-tile';
-import { QuestTile } from '../worlds/quest-tile';
+import { EntryRef, Scene, WorldEvent } from '../../core/models';
+import { questStatus } from '../../core/session-models';
 import { SceneView } from '../worlds/scene-view';
 import { WorldStore } from '../worlds/world-store';
+import { CockpitTools, Tool } from './cockpit-tools';
+import { SessionCard } from './session-card';
 import { SessionStore } from './session-store';
-
-type Flag = 'done' | 'started' | 'revealed' | 'pinned';
 
 /** Open events in two groups: what belongs to the chapter, and the rest of the world. */
 interface Groups<T> {
@@ -19,13 +15,14 @@ interface Groups<T> {
 }
 
 /**
- * The story part of a session: the opened scene to read aloud with the events and quests that hang
- * on it, the main quests of the world as one line that is always there, and the open free events
- * as a part that folds. All quests with their status are on the quest board.
+ * The story part of a session: only the opened scene to read aloud. Everything around it is a symbol in the bar
+ * at the bottom with a number: the place, the characters, quests, events, items and knowledge of the scene, where it
+ * leads, the main quests and the free events. A click opens small cards above the symbol. Played, pin and
+ * the fight in this scene switch at once.
  */
 @Component({
   selector: 'app-session-story',
-  imports: [NgTemplateOutlet, Icon, SceneView, QuestTile, EventTile],
+  imports: [SceneView, SessionCard],
   templateUrl: './session-story.html',
 })
 export class SessionStory {
@@ -36,61 +33,92 @@ export class SessionStory {
   readonly chapterId = input<number | null>(null);
   /** Asks to fight in the opened scene, with its characters. */
   readonly fight = output<Scene>();
-  /** Asks to open the board with all quests. */
-  readonly quests = output<void>();
 
   private readonly chapter = computed(() => this.world.chapters().find((chapter) => chapter.id === this.chapterId()) ?? null);
   private readonly scenes = computed(() => this.world.scenesOf(this.chapterId() ?? 0));
   /** Every main quest of the world in the order of its number, whether it is done or not. */
-  protected readonly mainQuests = computed(() => {
+  protected readonly mainQuests = computed<EntryRef[]>(() => {
     const main = this.world.quests().filter((quest) => quest.kind === 'main');
-    return main.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity) || a.name.localeCompare(b.name));
+    main.sort((a, b) => (a.number ?? Infinity) - (b.number ?? Infinity) || a.name.localeCompare(b.name));
+    return main.map((quest) => ({ kind: 'quests', id: quest.id }));
   });
   /** The quests of the opened scene that are not over: those it points to, and those that come up in it. */
-  protected readonly sceneQuests = computed<Quest[]>(() => {
+  protected readonly sceneQuests = computed<EntryRef[]>(() => {
     const scene = this.scene();
-    const here = (quest: Quest) => !!scene && (scene.quests.includes(quest.id) || this.world.questNow(quest).scene === scene.id);
-    return this.world.quests().filter((quest) => here(quest) && !this.is('quest', quest.id, 'done'));
+    const here = (id: number, comesUp: number | null) => !!scene && (scene.quests.includes(id) || comesUp === scene.id);
+    return this.world
+      .quests()
+      .filter((quest) => here(quest.id, this.world.questNow(quest).scene) && !this.store.state('quest', quest.id)?.done)
+      .map((quest) => ({ kind: 'quests', id: quest.id }));
   });
   /** The open events that hang on the opened scene. */
-  protected readonly sceneEvents = computed(() => this.openEvents().filter((event) => this.scene()?.events.includes(event.id)));
-  protected readonly hasSceneEvents = computed(() => !!this.scene()?.events.length);
+  protected readonly sceneEvents = computed<EntryRef[]>(() =>
+    this.openEvents().filter((event) => this.scene()?.events.includes(event.id)).map((event) => ({ kind: 'events', id: event.id })),
+  );
   /** The other open events: those of the chapter and its scenes, then all others. */
-  protected readonly freeEvents = computed<Groups<WorldEvent>[]>(() => {
+  protected readonly freeEvents = computed<Groups<EntryRef>[]>(() => {
     const free = this.openEvents().filter((event) => !this.scene()?.events.includes(event.id));
     const ids = [...(this.chapter()?.events ?? []), ...this.scenes().flatMap((scene) => scene.events)];
+    const refs = (events: WorldEvent[]): EntryRef[] => events.map((event) => ({ kind: 'events', id: event.id }));
     return [
-      { label: 'In diesem Kapitel', entries: free.filter((event) => ids.includes(event.id)) },
-      { label: 'Übrige Welt', entries: free.filter((event) => !ids.includes(event.id)) },
+      { label: 'In diesem Kapitel', entries: refs(free.filter((event) => ids.includes(event.id))) },
+      { label: 'Übrige Welt', entries: refs(free.filter((event) => !ids.includes(event.id))) },
     ];
   });
   protected readonly freeCount = computed(() => this.freeEvents().reduce((sum, group) => sum + group.entries.length, 0));
+  private readonly openEvents = computed(() => this.world.events().filter((event) => !this.store.state('event', event.id)?.done));
 
-  private readonly openEvents = computed(() => this.world.events().filter((event) => !this.is('event', event.id, 'done')));
+  // What the scene is linked with.
+  protected readonly place = computed<EntryRef[]>(() => {
+    const location = this.scene()?.location;
+    return location ? [{ kind: 'locations', id: location }] : [];
+  });
+  protected readonly people = computed<EntryRef[]>(() => (this.scene()?.npcs ?? []).map((id) => ({ kind: 'npcs', id })));
+  protected readonly knowledge = computed<EntryRef[]>(() => (this.scene()?.trivia ?? []).map((id) => ({ kind: 'trivia', id })));
+  protected readonly leads = computed<EntryRef[]>(() => (this.scene()?.leads_to ?? []).map((id) => ({ kind: 'scenes', id })));
 
-  /** Whether the session set one of the marks of an entry. */
-  protected is(kind: SessionEntryKind, id: number, flag: Flag): boolean {
-    return !!this.store.state(kind, id)?.[flag];
+  // The popups behind the symbols.
+  private readonly placeList = viewChild<TemplateRef<unknown>>('placeList');
+  private readonly peopleList = viewChild<TemplateRef<unknown>>('peopleList');
+  private readonly questList = viewChild<TemplateRef<unknown>>('questList');
+  private readonly eventList = viewChild<TemplateRef<unknown>>('eventList');
+  private readonly knowledgeList = viewChild<TemplateRef<unknown>>('knowledgeList');
+  private readonly leadsList = viewChild<TemplateRef<unknown>>('leadsList');
+  private readonly mainList = viewChild<TemplateRef<unknown>>('mainList');
+  private readonly freeList = viewChild<TemplateRef<unknown>>('freeList');
+
+  protected readonly tools = computed<Tool[]>(() => {
+    const scene = this.scene();
+    const here: Tool[] = scene
+      ? [
+          { id: 'story-place', word: 'Ort', icon: 'pin', tone: 'kind--locations', count: this.place().length, popup: this.placeList(), popupTitle: 'Ort der Szene' },
+          { id: 'story-people', word: 'Figuren', icon: 'sheet', tone: 'kind--npcs', count: this.people().length, popup: this.peopleList(), popupTitle: 'Figuren der Szene' },
+          { id: 'story-quests', word: 'Quests', icon: 'quest', tone: 'kind--quests', count: this.sceneQuests().length, popup: this.questList(), popupTitle: 'Quests dieser Szene', wide: true },
+          { id: 'story-events', word: 'Ereignisse', icon: 'flag', tone: 'kind--events', count: this.sceneEvents().length, popup: this.eventList(), popupTitle: 'Ereignisse dieser Szene', wide: true },
+          { id: 'story-knowledge', word: 'Wissen', icon: 'gift', tone: 'kind--trivia', count: this.knowledge().length, popup: this.knowledgeList(), popupTitle: 'Gegenstände und Wissen der Szene' },
+          { id: 'story-leads', word: 'Führt zu', icon: 'right', tone: 'kind--scenes', count: this.leads().length, popup: this.leadsList(), popupTitle: 'Führt zu' },
+        ]
+      : [];
+    const world: Tool[] = [
+      { id: 'story-main', word: 'Hauptquests', icon: 'quest', tone: 'kind--quests', count: this.runningMain(), popup: this.mainList(), popupTitle: 'Hauptquests', wide: true },
+      { id: 'story-free', word: 'Freie Ereignisse', icon: 'flag', tone: 'kind--events', count: this.freeCount(), popup: this.freeList(), popupTitle: 'Freie Ereignisse', wide: true },
+    ];
+    const switches: Tool[] = scene
+      ? [
+          { id: 'story-played', word: 'Gespielt', icon: 'check', pressed: !!this.store.state('scene', scene.id)?.done, click: () => this.store.toggle('scene', scene.id, 'done') },
+          { id: 'story-pin', word: 'Stecknadel', icon: 'pin', pressed: !!this.store.state('scene', scene.id)?.pinned, click: () => this.store.toggle('scene', scene.id, 'pinned') },
+          { id: 'story-fight', word: 'Kampf hier', icon: 'sword', click: () => this.fight.emit(scene) },
+        ]
+      : [];
+    return [...here, ...world, ...switches];
+  });
+
+  constructor() {
+    inject(CockpitTools).provide('view', this.tools);
   }
 
-  /** The words behind the kind of a quest: its status and whether it is shared. */
-  protected marks(id: number): string {
-    return ` · ${this.statusOf(id)}` + (this.is('quest', id, 'revealed') ? ' · geteilt' : '');
-  }
-
-  /** The status of a quest in words: running, open or finished. */
-  protected statusOf(id: number): string {
-    const status = questStatus(this.store.state('quest', id));
-    return QUEST_STATUSES.find((other) => other.id === status)?.label.toLowerCase() ?? '';
-  }
-
-  /** How many points of a quest the session has checked. */
-  protected stepsDone(id: number): number {
-    return this.store.state('quest', id)?.steps.length ?? 0;
-  }
-
-  /** Look a quest up in the window at the side. */
-  protected lookUp(id: number): void {
-    this.world.peek.set({ kind: 'quests', id });
+  /** How many main quests the group is working on. */
+  private runningMain(): number {
+    return this.mainQuests().filter((ref) => questStatus(this.store.state('quest', ref.id)) === 'running').length;
   }
 }

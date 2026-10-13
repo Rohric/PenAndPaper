@@ -31,8 +31,10 @@ interface Named {
         }
       </header>
 
-      <app-link-row label="Ort" [items]="place()" />
-      <app-link-row label="Figuren" [items]="npcs()" />
+      @if (!compact()) {
+        <app-link-row label="Ort" [items]="place()" />
+        <app-link-row label="Figuren" [items]="npcs()" />
+      }
 
       @if (scene().to_read) {
         <div class="read-aloud">
@@ -57,10 +59,12 @@ interface Named {
         </div>
       }
 
-      <app-link-row label="Führt zu" [items]="leadsTo()" />
-      <app-link-row label="Kommt von" [items]="comesFrom()" />
-      <app-link-row label="Quests" [items]="quests()" />
-      <app-link-row label="Wissen" [items]="trivia()" />
+      @if (!compact()) {
+        <app-link-row label="Führt zu" [items]="leadsTo()" />
+        <app-link-row label="Kommt von" [items]="comesFrom()" />
+        <app-link-row label="Quests" [items]="quests()" />
+        <app-link-row label="Wissen" [items]="trivia()" />
+      }
 
       @if (!scene().to_read && !scene().text) {
         <p class="soft">Zu dieser Szene ist noch nichts geschrieben.</p>
@@ -76,6 +80,8 @@ export class SceneView {
   readonly editable = input(true);
   /** Whether the events of the scene are listed; a session shows them itself to check them off. */
   readonly showEvents = input(true);
+  /** Only the texts: a session shows place, characters, quests and the rest as symbols in its bar. */
+  readonly compact = input(false);
   readonly edit = output<void>();
 
   protected readonly place = computed(() => this.links('locations', this.store.locations(), [this.scene().location]));

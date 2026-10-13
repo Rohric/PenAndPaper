@@ -493,6 +493,14 @@ textarea.input {
   // A tile of an entry shows the colour of its kind as a stripe on its left edge.
   box-shadow: inset 3px 0 0 var(--kind, transparent);
   color: var(--text);
+  position: relative;
+}
+
+// The eye of a session in the corner of a tile: whether the players see the entry.
+.tile__eye {
+  position: absolute;
+  top: 8px;
+  right: 8px;
 }
 
 // The label of a tile takes the colour of the kind of entry the tile shows.
@@ -519,6 +527,13 @@ textarea.input {
 .tile--done .tile__title {
   color: var(--soft);
   text-decoration: line-through;
+}
+
+// Small cards in a popup or on the table of the game master.
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 8px;
 }
 
 // Wider tiles for texts that are read in full.

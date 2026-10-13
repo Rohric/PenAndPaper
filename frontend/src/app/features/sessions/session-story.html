@@ -1,102 +1,94 @@
-<!-- An event as a tile; "whole" shows all of what happens instead of the beginning. -->
-<ng-template #eventTile let-event let-whole="whole">
-  <app-event-tile [event]="event" [whole]="whole" [marks]="is('event', event.id, 'revealed') ? ' · für Spieler sichtbar' : ''">
-    <div class="row">
-      <button type="button" class="btn btn--small" (click)="store.toggle('event', event.id, 'done')">
-        <app-icon name="check" [size]="16" /> Erledigt
-      </button>
-    </div>
-  </app-event-tile>
+<!-- The popups behind the symbols of the bar; the bar draws them above the symbol that was clicked. -->
+<ng-template #placeList>
+  <div class="cards">
+    @for (ref of place(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">Die Szene hat keinen Ort.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #peopleList>
+  <div class="cards">
+    @for (ref of people(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">In der Szene kommt keine Figur vor.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #questList>
+  <div class="cards">
+    @for (ref of sceneQuests(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">Keine offene Quest in dieser Szene.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #eventList>
+  <div class="cards">
+    @for (ref of sceneEvents(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">Alle Ereignisse dieser Szene sind erledigt oder es gibt keine. Erledigte stehen im Archiv.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #knowledgeList>
+  <div class="cards">
+    @for (ref of knowledge(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">Zu dieser Szene gehört kein Gegenstand und kein Wissen.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #leadsList>
+  <div class="cards">
+    @for (ref of leads(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">Diese Szene führt zu keiner anderen.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #mainList>
+  <div class="cards">
+    @for (ref of mainQuests(); track ref.id) {
+      <app-session-card [ref]="ref" />
+    } @empty {
+      <p class="soft">Diese Welt hat noch keine Hauptquest.</p>
+    }
+  </div>
+</ng-template>
+
+<ng-template #freeList>
+  @for (group of freeEvents(); track group.label) {
+    @if (group.entries.length) {
+      <span class="kicker">{{ group.label }}</span>
+      <div class="cards">
+        @for (ref of group.entries; track ref.id) {
+          <app-session-card [ref]="ref" />
+        }
+      </div>
+    }
+  }
+  @if (!freeCount()) {
+    <p class="soft">Kein offenes Ereignis.</p>
+  }
 </ng-template>
 
 @if (scene(); as shown) {
-  <app-scene-view [scene]="shown" [editable]="false" [showEvents]="false">
-    <div class="row">
-      <button type="button" class="pill" [attr.aria-pressed]="is('scene', shown.id, 'done')" (click)="store.toggle('scene', shown.id, 'done')">
-        <app-icon name="check" [size]="16" /> Gespielt
-      </button>
-      <button type="button" class="pill" [attr.aria-pressed]="is('scene', shown.id, 'pinned')" (click)="store.toggle('scene', shown.id, 'pinned')">
-        <app-icon name="pin" [size]="16" /> Stecknadel
-      </button>
-      <button type="button" class="btn btn--small btn--primary" (click)="fight.emit(shown)">
-        <app-icon name="sword" [size]="16" /> Kampf in dieser Szene
-      </button>
-    </div>
-  </app-scene-view>
-
-  @if (hasSceneEvents()) {
-    <section class="stack">
-      <h3 class="section-title kind--events"><app-icon name="flag" /> Ereignisse dieser Szene</h3>
-      <div class="tiles tiles--wide">
-        @for (event of sceneEvents(); track event.id) {
-          <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: true }" />
-        } @empty {
-          <p class="soft">Alle Ereignisse dieser Szene sind erledigt. Sie stehen im Archiv.</p>
-        }
-      </div>
-    </section>
-  }
-
-  @if (sceneQuests().length) {
-    <section class="stack">
-      <h3 class="section-title kind--quests"><app-icon name="quest" /> Quests dieser Szene</h3>
-      <div class="tiles tiles--wide">
-        @for (quest of sceneQuests(); track quest.id) {
-          <app-quest-tile [quest]="quest" [marks]="marks(quest.id)" [stepsDone]="stepsDone(quest.id)">
-            <div class="row">
-              <button type="button" class="btn btn--small" [attr.aria-pressed]="is('quest', quest.id, 'started')" (click)="store.toggle('quest', quest.id, 'started')">
-                <app-icon name="flag" [size]="16" /> {{ is('quest', quest.id, 'started') ? 'Angenommen' : 'Annehmen' }}
-              </button>
-              <button type="button" class="btn btn--small" (click)="store.toggle('quest', quest.id, 'done')">
-                <app-icon name="check" [size]="16" /> Beendet
-              </button>
-              <button type="button" class="btn btn--small" [attr.aria-pressed]="is('quest', quest.id, 'revealed')" (click)="store.toggle('quest', quest.id, 'revealed')">
-                <app-icon name="eye" [size]="16" /> {{ is('quest', quest.id, 'revealed') ? 'Geteilt' : 'Teilen' }}
-              </button>
-            </div>
-          </app-quest-tile>
-        }
-      </div>
-    </section>
-  }
+  <app-scene-view [scene]="shown" [editable]="false" [showEvents]="false" [compact]="true" />
 } @else {
   <div class="empty">
     <p>Wähle links eine Szene.</p>
   </div>
 }
-
-<section class="stack">
-  <h3 class="section-title kind--quests"><app-icon name="quest" /> Hauptquests</h3>
-  <div class="row">
-    @for (quest of mainQuests(); track quest.id) {
-      <button type="button" class="chip chip--link kind--quests" (click)="lookUp(quest.id)">
-        {{ quest.number ? quest.number + ' · ' : '' }}{{ quest.name }} · {{ statusOf(quest.id) }}
-      </button>
-    } @empty {
-      <span class="soft">Diese Welt hat noch keine Hauptquest.</span>
-    }
-    <button type="button" class="btn btn--small" (click)="quests.emit()"><app-icon name="quest" [size]="16" /> Alle Quests</button>
-  </div>
-</section>
-
-<details class="fold">
-  <summary class="section-title">
-    <app-icon class="fold__mark" name="right" /> <app-icon class="kind--events" name="flag" /> Freie Ereignisse
-    <span class="chip">{{ freeCount() }} offen</span>
-  </summary>
-  <div class="stack">
-    @for (group of freeEvents(); track group.label) {
-      @if (group.entries.length) {
-        <span class="kicker">{{ group.label }}</span>
-        <div class="tiles tiles--wide">
-          @for (event of group.entries; track event.id) {
-            <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: false }" />
-          }
-        </div>
-      }
-    }
-    @if (!freeCount()) {
-      <p class="soft">Kein offenes Ereignis.</p>
-    }
-  </div>
-</details>

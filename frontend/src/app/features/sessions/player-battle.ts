@@ -59,6 +59,8 @@ export class PlayerBattlePanel {
   });
   /** Whether a hit on the own character waits for the decision to parry. */
   protected readonly mustParry = computed(() => this.open()?.stage === 'parry' && this.open()?.defender === this.own()?.id);
+  /** Whether the open roll is the one of the own turn and settled, so the player can close the turn himself. */
+  protected readonly canClose = computed(() => this.myTurn() && this.open()?.stage === 'close' && this.open()?.attacker === this.own()?.id);
   protected readonly targets = computed(() => (this.battle()?.combatants ?? []).filter((c) => !c.out && !c.mine));
   /** The target that is picked, as long as it still fights. */
   protected readonly target = computed(() => this.targets().find((combatant) => combatant.id === this.defenderId())?.id ?? null);
@@ -99,6 +101,11 @@ export class PlayerBattlePanel {
   protected parry(parries: boolean): void {
     this.keep({ parrySkill: this.parrySkill() });
     this.run(this.api.playerParry(this.sessionId(), { parry: parries, skill: this.parrySkill() }));
+  }
+
+  /** Close the own turn: the open roll counts and the next one is on. */
+  protected close(): void {
+    this.run(this.api.playerClose(this.sessionId()));
   }
 
   private recallChoice(characterId: number | null): void {

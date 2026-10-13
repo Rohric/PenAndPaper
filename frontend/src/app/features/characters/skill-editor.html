@@ -9,11 +9,14 @@
       <div class="row">
         <span class="chip chip--accent">Begabungswert {{ group.value }}</span>
         <span class="chip">Geistesblitz {{ group.inspiration }}</span>
+        @if (group.credit) {
+          <span class="chip chip--danger">Guthaben {{ group.credit }} {{ group.credit === 1 ? 'Punkt' : 'Punkte' }}</span>
+        }
       </div>
     </div>
 
     @for (row of group.rows; track row.index) {
-      <div class="skill" [class.skill--error]="row.problems.length">
+      <div class="skill" [class.skill--error]="row.problems.length" [class.skill--active]="active() === row.index" (click)="active.set(row.index)" (focusin)="active.set(row.index)">
         <div class="skill__top">
           <input
             class="input skill__name"
@@ -48,7 +51,7 @@
             />
             <button type="button" class="btn stepper__btn" aria-label="Grundpunkte mehr" (click)="stepPoints(row.index, 1)">+</button>
           </div>
-          <div class="stepper">
+          <div class="stepper" [class.stepper--credit]="row.note?.usable">
             <span class="stepper__label">Dazu</span>
             <button type="button" class="btn stepper__btn" aria-label="Bonuspunkte weniger" [disabled]="!row.skill.bonus_points" (click)="stepBonus(row.index, -1)">−</button>
             <input
@@ -66,6 +69,14 @@
 
         @if (leveling()) {
           <span class="soft skill__cost">+1 kostet {{ cost(row.skill) }} {{ cost(row.skill) === 1 ? 'Bonuspunkt' : 'Bonuspunkte' }}</span>
+        }
+        @if (row.note) {
+          <p class="skill__message skill__message--credit">{{ row.note.text }}</p>
+          @if (row.note.usable) {
+            <button type="button" class="btn btn--small skill__spend" (click)="stepBonus(row.index, 1); $event.stopPropagation()">
+              <app-icon name="plus" [size]="14" /> Guthaben einsetzen: +1 Punkt
+            </button>
+          }
         }
         @for (problem of row.problems; track $index) {
           <p class="skill__message skill__message--error" role="alert">{{ problem.text }}</p>

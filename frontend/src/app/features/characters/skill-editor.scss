@@ -92,6 +92,24 @@
   font-weight: 600;
 }
 
+.skill__message--credit {
+  color: var(--danger);
+}
+
+.stepper--credit .stepper__label {
+  color: var(--danger);
+}
+
+.stepper--credit .stepper__input {
+  border-color: var(--danger);
+}
+
+.skill__spend {
+  align-self: flex-start;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 .add {
   align-self: flex-start;
 }

@@ -26,12 +26,24 @@ export interface EntryViewModel {
   /** How many pictures the entry can show; places and items have room for three. */
   pictures: number;
   dialogues: Dialogue[];
-  blocks: { label: string; text: string }[];
+  /** key names the part for the eye of the session, like "goal". */
+  blocks: { key?: string; label: string; text: string }[];
   /** Knowledge pieces in two groups: what players can learn, and what only the game master knows. */
   knowledge: { label: string; gmOnly: boolean; pieces: Knowledge[] }[];
-  lists: { label: string; items: string[] }[];
+  lists: { key?: string; label: string; items: string[] }[];
   phrases: Phrase[];
-  links: { label: string; items: EntryLink[] }[];
+  links: { key?: string; label: string; items: EntryLink[] }[];
+}
+
+/** What a session lets the players see of an entry: the name, single parts, found knowledge, checked steps. */
+export interface Eyes {
+  revealed: boolean;
+  /** Parts shown by key, like "goal" or "step:2". */
+  shown: string[];
+  /** Positions of the knowledge pieces the players found out. */
+  known: number[];
+  /** Positions of the checklist points that are done. */
+  steps: number[];
 }
 
 interface Named {
@@ -133,7 +145,7 @@ function locationView(store: WorldStore, id: number): EntryViewModel | null {
   return tidy({
     kicker: 'Ort', title: place.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(place),
     tone: 'locations', symbol: place.symbol, fallback: 'pin', pictures: 3, dialogues: [],
-    blocks: [{ label: 'Beschreibung', text: place.description }],
+    blocks: [{ key: 'description', label: 'Beschreibung', text: place.description }],
     links: [
       { label: 'Liegt in', items: links('locations', among(store.locations(), [place.parent])) },
       { label: 'Orte darin', items: links('locations', store.locations().filter((l) => l.parent === id)) },
@@ -157,7 +169,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
     tone: 'npcs', symbol: loaded?.symbol ?? link.symbol, fallback: 'sheet', pictures: 0, dialogues: [],
     knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
-      { label: 'Beschreibung', text: loaded?.description ?? '' },
+      { key: 'description', label: 'Beschreibung', text: loaded?.description ?? '' },
       { label: 'Steckbrief', text: loaded ? facts(loaded) : '' },
     ],
     lists: [
@@ -202,11 +214,11 @@ function questView(store: WorldStore, id: number): EntryViewModel | null {
     kicker: questLabel(quest), title: quest.name, sub: '', phrases: [],
     tone: 'quests', symbol: quest.symbol, fallback: 'quest', pictures: 0, dialogues: quest.dialogues,
     knowledge: knowledgeOf(quest),
-    blocks: [{ label: 'Beschreibung', text: quest.description }, { label: 'Ziel', text: quest.goal }],
-    lists: [{ label: 'Checkliste', items: quest.checklist }],
+    blocks: [{ key: 'description', label: 'Beschreibung', text: quest.description }, { key: 'goal', label: 'Ziel', text: quest.goal }],
+    lists: [{ key: 'checklist', label: 'Checkliste', items: quest.checklist }],
     links: [
-      { label: 'Startgebiet', items: links('locations', among(store.locations(), [quest.location])) },
-      { label: 'Questgeber', items: npcLinks(store, [quest.giver]) },
+      { key: 'location', label: 'Startgebiet', items: links('locations', among(store.locations(), [quest.location])) },
+      { key: 'giver', label: 'Questgeber', items: npcLinks(store, [quest.giver]) },
       { label: 'Entsteht in Szene', items: sceneLinks(store, among(store.scenes(), [quest.scene])) },
       { label: 'Beteiligte Figuren', items: npcLinks(store, quest.npcs) },
       ...usedIn(store, 'quests', id),
@@ -223,9 +235,9 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
     kicker: 'Ereignis', title: event.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(event),
     tone: 'events', symbol: event.symbol, fallback: 'flag', pictures: 0, dialogues: event.dialogues,
     blocks: [
-      { label: 'Auslöser', text: event.trigger },
-      { label: 'Was passiert', text: event.happening },
-      { label: 'Beschreibung', text: event.description },
+      { key: 'trigger', label: 'Auslöser', text: event.trigger },
+      { key: 'happening', label: 'Was passiert', text: event.happening },
+      { key: 'description', label: 'Beschreibung', text: event.description },
     ],
     links: [
       { label: 'Ort', items: links('locations', among(store.locations(), [event.location])) },
@@ -254,7 +266,7 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
     tone: isItem(trivia) ? 'items' : 'trivia', colour: trivia.category.trim() ? tagColour(trivia.category) : '',
     symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note',
     pictures: isItem(trivia) ? 3 : 0, dialogues: [],
-    blocks: [{ label: 'Beschreibung', text: trivia.description }],
+    blocks: [{ key: 'description', label: 'Beschreibung', text: trivia.description }],
     links: [
       { label: 'Orte', items: links('locations', among(store.locations(), trivia.locations)) },
       { label: 'Figuren', items: npcLinks(store, trivia.npcs) },

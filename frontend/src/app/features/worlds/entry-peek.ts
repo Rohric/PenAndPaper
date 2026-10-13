@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, linkedSignal, signal, untracked } from '@angular/core';
+import { Component, effect, inject, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { EntryRef } from '../../core/models';
@@ -6,7 +6,7 @@ import { Icon } from '../../shared/icon';
 import { SidePanel } from '../../shared/side-panel';
 import { EntryForm } from './entry-form';
 import { EntryView } from './entry-view';
-import { entryAddress } from './entry-views';
+import { Eyes, entryAddress } from './entry-views';
 import { WorldStore } from './world-store';
 
 const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
@@ -36,7 +36,7 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
           <app-entry-form [entry]="shown" (saved)="editing.set(false)" (closed)="close()" />
         } @else {
           <ng-content />
-          <app-entry-view [entry]="shown" />
+          <app-entry-view [entry]="shown" [eyes]="eyes()" (eye)="eye.emit($event)" (step)="step.emit($event)" />
         }
       </app-side-panel>
     }
@@ -50,6 +50,10 @@ export class EntryPeek {
   readonly editable = input(true);
   /** What the edit button says; a session names the world, because it can also change things for itself only. */
   readonly editLabel = input('Bearbeiten');
+  /** What the players see of the entry, when a session decides it; handed on to the reading view. */
+  readonly eyes = input<Eyes | null>(null);
+  readonly eye = output<string>();
+  readonly step = output<number>();
 
   /** Every newly opened entry starts in the reading view, unless it was asked for with its form. */
   protected readonly editing = linkedSignal({ source: this.store.peek, computation: (shown) => !!shown?.edit });

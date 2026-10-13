@@ -1,7 +1,8 @@
 import { Component, computed, input } from '@angular/core';
 
 import { Skill, TALENTS, Talent } from '../../core/models';
-import { Budgets, basePointsLeft, bonusPointsLeft, inspirationLeft, inspirationPoints, refund, talentValue } from '../../core/rules';
+import { Budgets, bonusPointsLeft, creditLeft } from '../../core/house-rules';
+import { basePointsLeft, inspirationLeft, inspirationPoints, talentValue } from '../../core/rules';
 
 /**
  * The points of a character at a glance: how much of the base points and the bonus points is spent,
@@ -23,8 +24,8 @@ import { Budgets, basePointsLeft, bonusPointsLeft, inspirationLeft, inspirationP
           <span class="talent-card__name">{{ talent.label }}</span>
           <span class="talent-card__value">{{ talent.value }}</span>
           <span class="soft">Geistesblitz {{ talent.left }}/{{ talent.inspiration }}</span>
-          @if (talent.refund) {
-            <span class="chip chip--accent">Guthaben {{ talent.refund }}</span>
+          @if (talent.credit) {
+            <span class="chip chip--danger">Guthaben {{ talent.credit }}</span>
           }
         </div>
       }
@@ -110,22 +111,23 @@ export class PointsOverview {
   protected readonly lines = computed(() => {
     const { base, bonus } = this.budgets();
     const baseLeft = basePointsLeft(this.skills(), base);
-    const bonusLeft = bonusPointsLeft(this.skills(), bonus, this.leveling());
+    const bonusLeft = this.leveling() ? creditLeft(this.skills(), bonus).free : bonusPointsLeft(this.skills(), bonus);
     return [
       { label: 'Grundpunkte', left: baseLeft, percent: this.percent(base - baseLeft, base) },
       { label: 'Bonuspunkte', left: bonusLeft, percent: this.percent(bonus - bonusLeft, bonus) },
     ];
   });
-  protected readonly talents = computed(() =>
-    TALENTS.map((talent) => ({
+  protected readonly talents = computed(() => {
+    const credit = this.leveling() ? creditLeft(this.skills(), this.budgets().bonus).credit : undefined;
+    return TALENTS.map((talent) => ({
       id: talent.id,
       label: talent.label,
       value: talentValue(this.skills(), talent.id),
       inspiration: inspirationPoints(this.skills(), talent.id),
       left: inspirationLeft(this.skills(), talent.id, this.used()),
-      refund: refund(this.skills(), talent.id),
-    })),
-  );
+      credit: credit?.[talent.id] ?? 0,
+    }));
+  });
 
   private percent(spent: number, total: number): number {
     return total > 0 ? Math.min(100, Math.max(0, (spent / total) * 100)) : 0;

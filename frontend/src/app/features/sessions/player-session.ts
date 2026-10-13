@@ -386,8 +386,11 @@ export class PlayerSession {
     if (!battle || !own) {
       return battle ? 'läuft' : '';
     }
+    if (battle.pending?.stage === 'close') {
+      return battle.pending.attacker === own.id && battle.current === own.id && !own.out ? 'Zug abschließen' : 'läuft';
+    }
     if (battle.pending) {
-      return battle.pending.stage === 'parry' && battle.pending.defender === own.id ? 'Parade?' : 'läuft';
+      return battle.pending.defender === own.id ? 'Parade?' : 'läuft';
     }
     return battle.current === own.id && !own.out ? 'du bist dran' : 'läuft';
   }
