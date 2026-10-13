@@ -234,6 +234,17 @@ export interface EntryLink extends EntryRef {
   tone?: string;
 }
 
+/** Title of the game master knowledge piece of an item that holds its damage, written like "2W10+1". */
+const DAMAGE_TITLE = 'schaden';
+const DAMAGE_PATTERN = /(\d+)\s*W10\s*(?:\+\s*(\d+))?/i;
+
+/** Read the damage of an item from its game master knowledge: the number of W10 and the bonus, 0 and 0 without one. */
+export function itemDamage(item: EntryTexts): { dice: number; bonus: number } {
+  const piece = item.gm_knowledge.find((knowledge) => knowledge.title.trim().toLowerCase() === DAMAGE_TITLE);
+  const match = piece?.text.match(DAMAGE_PATTERN);
+  return { dice: Number(match?.[1] ?? 0), bonus: Number(match?.[2] ?? 0) };
+}
+
 /** Whether a knowledge entry is an item: its category is "Gegenstand". */
 export function isItem(trivia: { category: string }): boolean {
   return trivia.category.trim().toLowerCase() === 'gegenstand';

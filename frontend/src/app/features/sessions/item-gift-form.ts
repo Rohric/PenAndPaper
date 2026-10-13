@@ -11,6 +11,9 @@ export interface ItemTemplate {
   description: string;
   /** Whether the item belongs to the scene that is open: to its place, its characters or its quests. */
   here: boolean;
+  /** Damage of a weapon in W10 and its bonus; 0 for an item that is no weapon. */
+  dice: number;
+  bonus: number;
 }
 
 /**
@@ -79,12 +82,14 @@ export class ItemGiftForm {
   /** Id of the item of the world that was picked; null for an item typed freely. */
   private readonly item = signal<number | null>(null);
 
-  /** Fill name and description from a prepared item, and remember which item of the world it is. */
+  /** Fill name, description and damage from a prepared item, and remember which item of the world it is. */
   protected use(index: number): void {
     const template = this.templates()[index];
     this.item.set(template?.id ?? null);
     this.name.set(template?.name ?? '');
     this.description.set(template?.description ?? '');
+    this.dice.set(template?.dice ?? 0);
+    this.bonus.set(template?.bonus ?? 0);
   }
 
   /** Hand the item over and clear the form. */

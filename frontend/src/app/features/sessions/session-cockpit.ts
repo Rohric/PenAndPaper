@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
-import { EntryKind, EntryLink, Option, Scene, Trivia } from '../../core/models';
+import { EntryKind, EntryLink, Option, Scene, Trivia, itemDamage } from '../../core/models';
 import { Battle, ItemGift, PlayerView, ROLL_RESULTS, SessionEntryKind } from '../../core/session-models';
 import { Icon } from '../../shared/icon';
 import { IdSelect } from '../../shared/id-select';
@@ -145,7 +145,9 @@ export class SessionCockpit {
     this.world
       .trivia()
       .filter(isItem)
-      .map((entry) => ({ id: entry.id, name: entry.name, description: entry.description, here: this.inScene(entry) }))
+      .map((entry) => ({
+        id: entry.id, name: entry.name, description: entry.description, here: this.inScene(entry), ...itemDamage(entry),
+      }))
       .sort((a, b) => Number(b.here) - Number(a.here)),
   );
 
