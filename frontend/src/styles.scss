@@ -226,6 +226,27 @@ a.card:hover,
   color: var(--accent-ink);
 }
 
+// A pill in the colour of what it filters, like a category.
+.pill--tone {
+  border-color: var(--kind, var(--line-2));
+  color: var(--kind, var(--text));
+}
+
+.pill--tone[aria-pressed='true'] {
+  border-color: var(--kind, var(--accent));
+  background: var(--kind, var(--accent));
+  color: var(--accent-ink);
+}
+
+// A small round mark in the colour of a category or a tag.
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--kind, var(--muted));
+}
+
 .chip {
   display: inline-block;
   padding: 3px 10px;

@@ -14,6 +14,7 @@ urlpatterns = [
         views.SessionEntryDetail.as_view(),
         name="session-entry-detail",
     ),
+    path("sessions/<int:session_id>/quest-log/<int:quest_id>/", views.QuestLog.as_view(), name="quest-log"),
     path("sessions/<int:session_id>/level/", views.SessionLevel.as_view(), name="session-level"),
     path("sessions/<int:session_id>/items/", views.SessionItems.as_view(), name="session-items"),
     path("sessions/<int:session_id>/player-view/", views.PlayerView.as_view(), name="session-player-view"),

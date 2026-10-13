@@ -105,7 +105,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Verknüpfen durch Tippen',
-        text: 'In einem Verknüpfungsfeld tippst du einfach los. Darunter erscheint, was passt. Mit den Pfeiltasten wählst du, Enter verknüpft, die Rücktaste im leeren Feld nimmt den letzten Eintrag wieder weg.\n\nGibt es den Eintrag noch nicht, steht unten „neu anlegen“. Ein Klick auf einen verknüpften Eintrag öffnet ihn rechts im Seitenfenster.',
+        text: 'In einem Verknüpfungsfeld tippst du einfach los. Darunter erscheint, was passt. Mit den Pfeiltasten wählst du, Enter verknüpft, die Rücktaste im leeren Feld nimmt den letzten Eintrag wieder weg.\n\nGibt es den Eintrag noch nicht, steht unten „neu anlegen“. Das geht in jedem Formular: Der neue Eintrag wird sofort mit seinem Namen angelegt, und mit dem Speichern sind beide verknüpft. Ein Klick auf einen verknüpften Eintrag öffnet ihn rechts im Seitenfenster.',
       },
       {
         title: 'Verknüpfungen',
@@ -128,6 +128,10 @@ export const TUTORIALS: Tutorial[] = [
       {
         title: 'Kacheln und Seitenfenster',
         text: 'Jeder Bereich zeigt seine Einträge als Kacheln. Ein Klick öffnet den Eintrag rechts im Seitenfenster, ohne dass du die Seite verlässt.\n\nIm Seitenfenster liest du, mit „Bearbeiten“ änderst du den Eintrag gleich dort, mit „Zurück“ gehst du den Weg durch verlinkte Einträge zurück, und „Ganze Seite“ öffnet den Eintrag groß.',
+      },
+      {
+        title: 'Zuletzt',
+        text: '„Zuletzt“ oben in der Leiste zeigt, was in dieser Welt zuletzt hinzugefügt und zuletzt bearbeitet wurde, über alle Bereiche, Kapitel und Szenen hinweg. Dieselben Listen stehen unter den Kapiteln.\n\nEin Klick öffnet den Eintrag im Seitenfenster oder führt zur Szene.',
       },
       {
         title: 'Farben',
@@ -250,11 +254,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Abhaken und Stecknadeln',
-        text: 'Szenen markierst du als gespielt, sie bleiben im Faden stehen. Erledigte Nebenquests und Ereignisse verschwinden aus dem Cockpit und stehen im Archiv. Von dort holst du sie mit „Zurückholen“ wieder.\n\nHauptquests bleiben immer stehen, in der Reihenfolge ihrer Nummer, auch wenn sie erledigt sind oder zu einem anderen Kapitel gehören.\n\nMit der Stecknadel heftest du an, was du schnell wiederfinden willst. Die Stecknadeln stehen in der Leiste unten.',
+        text: 'Szenen markierst du als gespielt, sie bleiben im Faden stehen. Erledigte Ereignisse verschwinden aus dem Cockpit und stehen im Archiv. Von dort holst du sie mit „Zurückholen“ wieder.\n\nEine Quest hat einen Status: Offen (noch nicht angenommen), Laufend (angenommen) und Beendet. Ob sie mit den Spielern geteilt oder angepinnt ist, sind eigene Haken und hat mit dem Status nichts zu tun.\n\nMit der Stecknadel heftest du an, was du schnell wiederfinden willst. Die Stecknadeln stehen in der Leiste unten.',
       },
       {
         title: 'Was die Spieler sehen',
-        text: 'Öffne einen Eintrag: Im Seitenfenster steht der Block „Das sehen die Spieler“. Mit dem Haken dort erscheint der Eintrag im Glossar der Spieler. Darunter steht in Worten, was sie gerade davon haben: den Namen, die Beschreibung (falls eine geschrieben ist) und wie viele Stücke „Wissen für Spieler“.\n\nJedes Stück hakst du einzeln an, sobald sie es herausfinden. Hat ein Eintrag keine Beschreibung und kein angehaktes Wissen, sehen die Spieler nur den Namen; das Fenster warnt dich dann. „Wissen nur für dich“ sehen sie nie.\n\nEine Quest teilst du genauso. Die Spieler sehen dann Beschreibung, Ziel, Checkliste und Questgeber.',
+        text: 'Öffne einen Eintrag: Im Seitenfenster steht der Block „Das sehen die Spieler“. Mit dem Haken dort erscheint der Eintrag bei den Spielern, zuerst nur mit seinem Namen.\n\nDarunter hat jede Information ihr eigenes Auge: Beschreibung, bei Quests Ziel, Questgeber, Startgebiet und jeder Punkt der Checkliste für sich, bei Ereignissen Auslöser und „Was passiert“. Die Spieler sehen genau das, was auf „sichtbar“ steht. Neben jedem Auge liest du, was sie dort lesen würden.\n\n„Wissen für Spieler“ hakst du Stück für Stück an, sobald sie es herausfinden. „Wissen nur für dich“ sehen sie nie. „Alles zeigen“ und „Alles verbergen“ schalten alle Augen auf einmal.',
+      },
+      {
+        title: 'Quests im Überblick',
+        text: '„Quests“ in der Leiste zeigt alle Quests der Welt in zwei Blöcken, Hauptquests und Nebenquests. Jeder Block zeigt einen Status: Laufend, Offen oder Beendet, mit der Zahl dahinter. „nur geteilte“ und „nur angepinnte“ grenzen beide Blöcke ein.\n\nAn jeder Kachel nimmst du die Quest an, beendest sie, teilst sie oder heftest sie an. Oben legst du eine Quest nur mit ihrem Titel an.\n\nIm Seitenfenster einer Quest steht das Questlog der Gruppe: die gezeigten Punkte in der Reihenfolge der Spieler, ihre eigenen Punkte, Tags und Notizen. Du kannst mitschreiben.',
       },
       {
         title: 'Glossar und Suche',
@@ -316,7 +324,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Quests und Glossar',
-        text: 'Hier steht nur, was der Spielleiter mit euch geteilt hat. Das Glossar wächst, während ihr spielt: Orte, Figuren und Wissen kommen dazu, sobald ihr sie entdeckt. Ein Klick auf eine Kachel öffnet alles, was ihr dazu wisst.\n\nUnter „Gegenstände“ steht auch die Ausrüstung der Gruppe mit „Getragen von“. Einen Gegenstand, den du in deinem Charakterbogen als versteckt markierst, sehen nur du und der Spielleiter.',
+        text: 'Hier steht nur, was der Spielleiter mit euch geteilt hat. Das Glossar wächst, während ihr spielt: Orte, Figuren und Wissen kommen dazu, sobald ihr sie entdeckt. Ein Klick auf eine Kachel öffnet alles, was ihr dazu wisst.\n\nEure Quests stehen nach Status sortiert: laufende, offene und beendete. In einer Quest führt ihr gemeinsam ein Questlog: Punkte vom Spielleiter könnt ihr abhaken und verschieben, eigene Punkte hinzufügen, ändern und löschen. Eigene Punkte erkennt ihr an ihrer Marke und Farbe. Dazu kommen Tags und Notizen. Das Log gehört der ganzen Gruppe, und der Spielleiter sieht es auch.\n\nUnter „Gegenstände“ steht auch die Ausrüstung der Gruppe mit „Getragen von“. Einen Gegenstand, den du in deinem Charakterbogen als versteckt markierst, sehen nur du und der Spielleiter.',
       },
       {
         title: 'Notizen',
@@ -378,7 +386,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Kategorie',
-        text: 'Die Kategorie ist freier Text. Schreib „Tier“, „Volk“ oder was dir hilft. Einträge mit derselben Kategorie stehen zusammen.\n\nDie Kategorie „Gegenstand“ ist besonders: Solche Einträge stehen im Glossar unter „Gegenstände“ und lassen sich in einer Runde an Charaktere übergeben.',
+        text: 'Die Kategorie ist freier Text. Schreib „Tier“, „Volk“ oder was dir hilft. Einträge mit derselben Kategorie stehen zusammen.\n\nÜber den Kacheln im Bereich „Wissen“ filterst du nach der Kategorie. Jede Kategorie hat ihre eigene Farbe, am Filter, an der Kachel und im Eintrag.\n\nDie Kategorie „Gegenstand“ ist besonders: Solche Einträge stehen im Glossar unter „Gegenstände“ und lassen sich in einer Runde an Charaktere übergeben.',
       },
       {
         title: 'Allein oder angehängt',

@@ -33,7 +33,9 @@ import { EntryItems } from './entry-items';
             emptyText="In keinem anderen Ort"
             [options]="parents()"
             [value]="draft().parent"
+            [creatable]="true"
             (valueChange)="set('parent', $event)"
+            (create)="createLinked('parent', 'locations', $event)"
             (look)="lookUp('locations', $event)"
           />
         </div>

@@ -18,7 +18,7 @@ CHARACTER_FIELDS = [
     "id", "name", "age", "gender", "profession", "description",
     "life_points", "max_life_points", "skill_points_total", "bonus_points_total",
     "skills", "inventory", "special_abilities", "talents", "points_left",
-    "symbol", "image", "shows_image",
+    "symbol", "image", "shows_image", "created_at", "updated_at",
 ]
 # What only the game master changes on a player character.
 LEVEL_FIELDS = ["life_points", "max_life_points", "skill_points_total", "bonus_points_total"]

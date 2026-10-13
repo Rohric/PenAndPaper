@@ -88,17 +88,40 @@ def latest_rolls(session, with_secret):
     return [roll for roll in ROLLS[session.pk] if with_secret or not roll["secret"]]
 
 
+def shown_text(entry, state, part):
+    """Return a text of an entry when the session shows this part to the players, otherwise an empty text."""
+    return getattr(entry, part, "") if part in state.shown else ""
+
+
 def known_pieces(entry, state):
     """Return the pieces of player knowledge the group knows about an entry."""
     return [piece for index, piece in enumerate(entry.player_knowledge) if index in state.known]
 
 
 def shared_entry(kind, entry, state):
-    """Return what players see of one revealed entry: name, description and what they found out."""
+    """Return what players see of one revealed entry: its name, the parts shown to them and what they found out."""
     return {
         "kind": kind, "id": entry.pk, "name": entry.name, "category": getattr(entry, "category", ""),
-        "symbol": entry.symbol, "description": entry.description, "knowledge": known_pieces(entry, state),
+        "symbol": entry.symbol, "description": shown_text(entry, state, "description"),
+        "trigger": shown_text(entry, state, "trigger"), "happening": shown_text(entry, state, "happening"),
+        "knowledge": known_pieces(entry, state),
     }
+
+
+def shown_steps(quest, state):
+    """Return the points of a quest's checklist the players see, each with its position and whether it is checked."""
+    return [
+        {"position": position, "text": text, "done": position in state.steps}
+        for position, text in enumerate(quest.checklist) if f"step:{position}" in state.shown
+    ]
+
+
+def place_name(quest, state):
+    """Return the name of the place a quest starts at as the session has it; empty when hidden or unknown."""
+    place = quest.location
+    if "location" in state.changes:
+        place = quest.world.locations.filter(pk=state.changes["location"]).first()
+    return place.name if place and "location" in state.shown else ""
 
 
 def giver_name(quest, changes):
@@ -110,16 +133,17 @@ def giver_name(quest, changes):
 
 
 def shared_quest(quest, state):
-    """Return what players see of a quest shared with them: also goal, checklist and giver.
+    """Return what players see of a quest shared with them: the parts and points shown to them, its state and its log.
 
     What the session has different about the quest counts before what the world says.
     """
-    changes = state.changes
-    steps = [{"text": text, "done": index in state.steps} for index, text in enumerate(quest.checklist)]
+    changes, shown = state.changes, state.shown
     return {
         **shared_entry("quest", quest, state), "name": changes.get("name") or quest.name,
-        "main": quest.kind == Quest.Kind.MAIN, "number": quest.number, "goal": changes.get("goal", quest.goal),
-        "checklist": steps, "giver": giver_name(quest, changes), "done": state.done,
+        "main": quest.kind == Quest.Kind.MAIN, "number": quest.number,
+        "goal": changes.get("goal", quest.goal) if "goal" in shown else "",
+        "giver": giver_name(quest, changes) if "giver" in shown else "", "location": place_name(quest, state),
+        "checklist": shown_steps(quest, state), "started": state.started, "done": state.done, "log": state.log,
     }
 
 
@@ -170,7 +194,8 @@ def equipment_of(session, user):
 def player_view(session, user):
     """Return everything the given user may see of a session as one of its players."""
     states = {(state.kind, state.entry_id): state for state in session.entries.filter(revealed=True)}
-    quests = session.world.quests.filter(pk__in=[pk for kind, pk in states if kind == "quest"]).select_related("giver")
+    shared = [pk for kind, pk in states if kind == "quest"]
+    quests = session.world.quests.filter(pk__in=shared).select_related("giver", "location", "world")
     return {
         "id": session.pk, "name": session.name, "world": session.world.name, "date": session.date,
         "chapter": str(session.chapter) if session.chapter else "", "finished": session.finished,

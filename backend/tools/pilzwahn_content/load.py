@@ -201,11 +201,18 @@ def link_quests(db, all_scenes, ids):
             _relink(db, "world_app_quest_npcs", "quest_id", quest_id, "npc_id", [_resolve(ids["npcs"], name, "Figur") for name in entry["npcs"]])
 
 
+def _add_links(db, table, chapter_id, column, other_ids):
+    """Add missing links of a chapter; links the game master made himself stay."""
+    for other_id in other_ids:
+        if not db.execute(f'SELECT 1 FROM "{table}" WHERE chapter_id = ? AND "{column}" = ?', (chapter_id, other_id)).fetchone():
+            db.execute(f'INSERT INTO "{table}" (chapter_id, "{column}") VALUES (?, ?)', (chapter_id, other_id))
+
+
 def link_chapters(db, chapter_ids, ids):
-    """Link every chapter with its quests and events."""
+    """Link every chapter with its quests and events, keeping links to entries of the game master."""
     for module, chapter_id in zip(CHAPTERS, chapter_ids):
-        _relink(db, "world_app_chapter_quests", "chapter_id", chapter_id, "quest_id", [ids["quests"][entry["name"]] for entry in module.QUESTS])
-        _relink(db, "world_app_chapter_events", "chapter_id", chapter_id, "event_id", [ids["events"][entry["name"]] for entry in module.EVENTS])
+        _add_links(db, "world_app_chapter_quests", chapter_id, "quest_id", [ids["quests"][entry["name"]] for entry in module.QUESTS])
+        _add_links(db, "world_app_chapter_events", chapter_id, "event_id", [ids["events"][entry["name"]] for entry in module.EVENTS])
 
 
 def link_trivia(db, ids):

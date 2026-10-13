@@ -34,7 +34,11 @@ class Session(models.Model):
 
 
 class SessionEntry(models.Model):
-    """Store what a session did with one entry of the world: done, shown to the players, pinned, changed."""
+    """Store what a session did with one entry of the world.
+
+    Whether it is done, started, shown to the players and how much of it, pinned, on the table of
+    the master mode, changed for this session, and what the group wrote down about it.
+    """
 
     class Kind(models.TextChoices):
         """Name the kinds of world entries a session keeps a state for."""
@@ -60,6 +64,17 @@ class SessionEntry(models.Model):
     known = models.JSONField(default=list, blank=True)
     # What this session has different about the entry than the world, like {"giver": 12, "location": 4} for a quest.
     changes = models.JSONField(default=dict, blank=True)
+    # A quest the group has accepted and is working on. Open: neither started nor done. Finished: done.
+    started = models.BooleanField(default=False)
+    # Whether the entry lies on the table of the master mode, and in which group of the game master's own.
+    on_table = models.BooleanField(default=False)
+    table_group = models.CharField(max_length=60, blank=True)
+    # What the players see of a revealed entry, piece by piece: "description", "goal", "giver", "location",
+    # "trigger", "happening", and "step:0", "step:3" for single points of a quest's checklist.
+    shown = models.JSONField(default=list, blank=True)
+    # What the group itself adds to a quest: notes (text), tags (list of words), points (each: text, done)
+    # and order (keys of all points in the order of the group: "g0" is a given point, "p0" one of its own).
+    log = models.JSONField(default=dict, blank=True)
 
     class Meta:
         constraints = [

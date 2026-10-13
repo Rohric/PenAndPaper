@@ -128,7 +128,7 @@ LOCATIONS = [
     dict(
         name="Drakkarheim", parent="Skaldingen", symbol="mountain",
         description="Die Hauptstadt der Hamarlinge, in die Klippe gebaut. Minen, Schmieden und Werften, von denen die Schiffe durch Schächte im Fels ins Meer gelassen werden. Wer die Kräne von Drakkarheim einmal gesehen hat, vergisst sie nicht.",
-        pk=K(("Was man sieht", "Rauch über den Klippen, Stille statt Hämmern. Türen sind von innen eingeschlagen, und manche Leichen sind nicht nur getötet, sondern angefressen."),
+        pk=K(("Was man sieht", "Rauch über den Klippen, Stille statt Hämmern. Türen sind von innen eingeschlagen, und manche Leichen sind nicht nur getötet, sondern angefressen. Zwischen den Toten wachsen bleiche Pilze, die grünlich glimmen."),
              ("Die Werften", "Alle Schiffe in den Schächten sind zerstört. Ein Kran ist leer.")),
         gm=K(("Hintergrund", "Der Alchemist hat die Brunnen schon mit Pilzsud vergiftet, als Drakkarheim seine Krieger nach Björnsvig schickte. In den Tagen vor dem Bierfest hat sich die Stadt selbst zerfleischt."),
              ("Gefahren", "Die Zurückgelassenen und am Waldrand der letzte Krieger.")),
@@ -316,7 +316,7 @@ TRIVIA = [
     ),
     dict(
         name="Der Pilz", category="Lore & Mächte", symbol="plague",
-        description="Ein Pilz von den Nebelinseln, weiß, prall und süßlich nach Kraft riechend. Wer ihn isst, bekommt unmenschliche Stärke. Er macht süchtig und verändert einen für immer. Die Krieger Helheims essen ihn seit jeher in kleinen Mengen.",
+        description="Ein Pilz von den Nebelinseln, bleich und fast durchscheinend, mit einem grünlichen Schimmer, der im Dunkeln glimmt. Er riecht süßlich nach Kraft. Wer ihn isst, bekommt unmenschliche Stärke. Er macht süchtig und verändert einen für immer. Die Krieger Helheims essen ihn seit jeher in kleinen Mengen.",
         pk=K(("Der Rausch", "Stärke und Hochgefühl. Man sieht sich selbst wie von außen, behält aber die Kontrolle."),
              ("Die Sucht", "Wer einmal stark war, will es wieder sein."),
              ("Pilzsud", "Ausgekocht und in Wasser gelöst, wirkt der Pilz auf alle, die davon trinken.")),
@@ -359,7 +359,8 @@ TRIVIA = [
         name="Die Traumwelt", category="Lore & Mächte", symbol="night",
         description="Ein Ort, in den der Pilz Menschen holt. Süchtige berichten im Rausch von einem Mann, der schreit und dasselbe Gesicht hat wie der Alchemist.",
         pk=K(("Was Süchtige erzählen", "Im Traum ist es still und weiß wie Nebel. Irgendwo schreit einer, und keiner hört ihn."),),
-        gm=K(("Hintergrund", "Dort ist Sölvi gefangen, der Zwilling des Alchemisten. Was die Traumwelt genau ist, wird später ausgearbeitet. In Kapitel 2 ist sie nur ein Echo: Ylvas Flüstern und Ulfrs letzte Worte."),),
+        gm=K(("Hintergrund", "Dort ist Sölvi gefangen, der Zwilling des Alchemisten. Was die Traumwelt genau ist, wird später ausgearbeitet. In Kapitel 2 ist sie ein Echo: Ylvas Flüstern, Sölvis Brief und Ulfrs letzte Worte."),
+             ("Der Traum der Zwillinge", "Aus Sölvis Brief: Die Zwillinge wollten einst einen Ort erschaffen, an dem die Ahnen weiterleben, nicht nur in Erinnerungen, sondern wirklich, um sie zu sehen, mit ihnen zu sprechen und von ihnen zu lernen. Sölvi hält das heute für einen Frevel, denn der Tod gehört zum Gleichgewicht. Die Traumwelt könnte das sein, was aus diesem Traum geworden ist.")),
         npcs=["Sölvi, der Träumer", "Ylva", "König Ulfr"], events=["Das Flüstern"],
     ),
     dict(
@@ -522,7 +523,7 @@ TRIVIA = [
     ),
     dict(
         name="Notizen zur Dosierung", category="Gegenstand", symbol="book",
-        description="Ein Bündel Aufzeichnungen über Rausch, Tausendfüßler und Bestie, mit Mengen, Zeiten und Namen. Unter einer Seite steht: „Der Rausch schenkt Stärke. Der Tausendfüßler schenkt Gehorsam. Beides zusammen schenkt mir eine Insel.“",
+        description="Ein Bündel Aufzeichnungen über Rausch, Tausendfüßler und Bestie, mit Mengen, Zeiten und Namen, geschrieben in denselben fremden Zeichen wie Sölvis Brief. Nur eine Zeile steht in gewöhnlichen Runen: „Der Rausch schenkt Stärke. Der Tausendfüßler schenkt Gehorsam. Beides zusammen schenkt mir eine Insel.“",
         pk=K(("Was man versteht", "Wie viel Pilz einen Menschen stark macht, und wie viel ihn zur Bestie."),),
         gm=K(("Bedeutung", "Für Alchemisten unbezahlbar, und die Grundlage für die Pilz-Regeln (Rausch, Sucht, Bestie). Wer die Notizen liest, weiß auch, dass der Alchemist selbst nie vom Pilz gegessen hat."),),
         locations=["Die Wolfshalle"], npcs=["Svafnir, der Alchemist"], quests=["Dem Alchemisten auf der Spur"],
@@ -537,11 +538,23 @@ TRIVIA = [
     ),
     dict(
         name="Pilzknolle", category="Gegenstand", symbol="plague",
-        description="Ein getrockneter Pilz, weiß und runzlig, nicht größer als eine Walnuss. Er riecht süßlich nach Kraft.",
+        description="Frisch ist der Pilz bleich, fast durchscheinend und glimmt im Dunkeln grünlich. Getrocknet wird er zu einer runzligen Knolle, nicht größer als eine Walnuss, die nur noch schwach schimmert. Er riecht süßlich nach Kraft.",
         pk=K(("Preis", "Auf dem Schwarzmarkt der Hafenstadt kostet eine Knolle so viel Silber wie ein Monat Brot."),),
         gm=K(("Wirkung", "Eine Dosis: eine Szene lang +20 auf alle Proben des Talents Handeln und kein Schmerz, danach eine Suchtprobe (Regeln beim Eintrag Der Pilz)."),),
         locations=["Die Hafenstadt", "Die Senke"], npcs=["Ketill Krummnase", "Ylva"], quests=["Der Schwarzmarkt"],
         events=["Knolle gegen Silber", "Pilz am Wegesrand"],
+    ),
+    dict(
+        name="Sölvis Brief", category="Gegenstand", symbol="scroll",
+        description="Ein vergilbtes Pergament, eng beschrieben in fremden Zeichen, die niemand in Tvíborg lesen kann. Ein Zweig ist an den Rand gemalt, unten steht ein Mondzeichen. Ylva hat es im Schlaf geschrieben, und Ylva kann nicht schreiben.",
+        pk=K(("Die Anrede", "Der Brief beginnt mit „Mein Bruder …“ und richtet sich an die Helden von Skalde."),
+             ("Die Bitte", "Wenn noch etwas von dem Mann übrig ist, den der Schreiber einst seinen Bruder nannte, liegt es in den Händen der Helden, ihn zu finden und aufzuhalten."),
+             ("Die Unterschrift", "„In Hoffnung und Schuld. Sein Bruder.“")),
+        gm=K(("Klartext", "Mein Bruder … Er ist schon lange fort. Und doch glaube ich, dass er bereits verloren war, lange bevor er überhaupt aufbrach. Wir waren uns einst so nah. Verbunden durch denselben Traum. Wir wollten einen Ort erschaffen, an dem unsere Ahnen weiterleben … nicht nur in Erinnerungen, sondern wirklich. Wir wollten sie sehen. Mit ihnen sprechen. Von ihnen lernen. Doch ich habe mich geirrt. Was er erschaffen hat … ist kein Leben. Es ist ein Frevel. Ein Eingriff in etwas, das unberührt bleiben muss. Der Tod ist kein Feind. Er ist ein Teil des Gleichgewichts. Und mein Bruder hat dieses Gleichgewicht gebrochen. Ich verstehe es jetzt. Zu spät. Ich kann ihn nicht aufhalten. Nicht mehr. Vielleicht konnte ich es nie. Aber ihr … ihr habt noch eine Chance. Ihr Helden von Skalde … Wenn noch etwas von dem Mann übrig ist, den ich einst meinen Bruder nannte, dann liegt es nun in euren Händen, ihn zu finden … und ihn aufzuhalten. In Hoffnung und Schuld, sein Bruder."),
+             ("Hintergrund", "Sölvi hat Ylva im Pilztraum erreicht und den Brief durch ihre Hand geschrieben. Die Zeichen sind die Geheimschrift der Zwillinge, dieselbe, in der die Notizen im Labor der Wolfshalle stehen."),
+             ("Spielhinweis", "Gib den Spielern das Bild des Briefs als Handout. Wer ihn entziffert, weiß zum ersten Mal, dass der Alchemist einen Bruder hat und dass dieser Bruder auf ihrer Seite steht.")),
+        locations=["Taverne Halbes Horn"], npcs=["Sölvi, der Träumer", "Ylva", "Svafnir, der Alchemist"],
+        quests=["Dem Alchemisten auf der Spur"], events=["Das Flüstern"],
     ),
     dict(
         name="Kalles Pilzknolle", category="Gegenstand", symbol="plague",

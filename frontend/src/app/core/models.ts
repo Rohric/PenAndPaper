@@ -104,6 +104,9 @@ export interface Location extends EntryTexts {
   name: string;
   /** Key of the symbol the entry carries; empty means the usual symbol of its kind. */
   symbol: string;
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 /** The link between a world and one of its NPCs. `npc` is the id of the character itself. */
@@ -116,6 +119,9 @@ export interface WorldNpc {
   location: number | null;
   /** What the character carries. Read only here; it is changed at the character itself. */
   inventory: InventoryItem[];
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 export type QuestKind = 'main' | 'side';
@@ -148,6 +154,9 @@ export interface Quest extends EntryTexts {
   /** The scene in which the quest comes up. */
   scene: number | null;
   npcs: number[];
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 /** Something that can happen in a world. */
@@ -161,6 +170,9 @@ export interface WorldEvent extends EntryTexts {
   happening: string;
   dialogues: Dialogue[];
   location: number | null;
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 /** A piece of knowledge about the world, on its own or attached to other entries. */
@@ -173,6 +185,9 @@ export interface Trivia extends EntryTexts {
   npcs: number[];
   quests: number[];
   events: number[];
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 /** A chapter of the story with its quests and events; its scenes form the thread of the story. */
@@ -184,6 +199,9 @@ export interface Chapter {
   to_read: string;
   quests: number[];
   events: number[];
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 /**
@@ -205,6 +223,9 @@ export interface Scene {
   quests: number[];
   events: number[];
   trivia: number[];
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
 }
 
 /** Something an NPC might say, with what makes the NPC say it. */
@@ -270,6 +291,9 @@ export interface Character {
   /** Address of the picture of the character, and whether it is shown instead of the symbol. */
   image: string | null;
   shows_image: boolean;
+  /** When it was written and when it was changed last. */
+  created_at: string;
+  updated_at: string;
   /** The life points right now, and the most the character can have. */
   life_points: number;
   max_life_points: number;

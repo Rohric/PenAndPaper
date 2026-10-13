@@ -1,6 +1,6 @@
 @if (shows().group) {
   <div class="panel">
-    <h3 class="section-title"><app-icon name="group" /> Gruppe</h3>
+    <h3 class="section-title kind--npcs"><app-icon name="group" /> Gruppe</h3>
     @for (member of view().group; track member.id) {
       <div class="row row--between">
         <span><strong>{{ member.name }}</strong> <span class="soft">({{ member.player }})</span></span>
@@ -13,35 +13,45 @@
 }
 
 @if (shows().quests) {
-  <section class="stack">
-    <h3 class="section-title kind--quests"><app-icon name="quest" /> Quests</h3>
-    <div class="tiles tiles--wide">
-      @for (quest of quests(); track quest.id) {
-        <button type="button" class="tile kind--quests" [class.tile--done]="quest.done" (click)="openKey.set('quest:' + quest.id)">
-          <span class="tile__head">
-            <app-portrait fallback="quest" [symbol]="quest.symbol" [size]="36" />
-            <span class="tile__names">
-              <span class="kicker">{{ kicker(quest) }}</span>
-              <span class="tile__title">{{ quest.name }}</span>
+  @for (group of questGroups(); track group.id) {
+    <section class="stack">
+      <h3 class="section-title kind--quests"><app-icon name="quest" /> {{ group.label }}e Quests · {{ group.quests.length }}</h3>
+      <div class="tiles tiles--wide">
+        @for (quest of group.quests; track quest.id) {
+          <button type="button" class="tile kind--quests" [class.tile--done]="quest.done" (click)="openKey.set('quest:' + quest.id)">
+            <span class="tile__head">
+              <app-portrait fallback="quest" [symbol]="quest.symbol" [size]="36" />
+              <span class="tile__names">
+                <span class="kicker">{{ kicker(quest) }}</span>
+                <span class="tile__title">{{ quest.name }}</span>
+              </span>
             </span>
-          </span>
-          @if (quest.goal) {
-            <span class="soft clamp"><strong>Ziel:</strong> {{ quest.goal }}</span>
-          }
-          <span class="row">
-            @if (quest.giver) {
-              <span class="chip">Questgeber · {{ quest.giver }}</span>
+            @if (quest.goal) {
+              <span class="soft clamp"><strong>Ziel:</strong> {{ quest.goal }}</span>
             }
-            @if (quest.checklist.length) {
-              <span class="chip">{{ stepsDone(quest) }} von {{ quest.checklist.length }} Schritten</span>
-            }
-          </span>
-        </button>
-      } @empty {
-        <p class="soft">Noch keine Quest geteilt.</p>
-      }
+            <span class="row">
+              @if (quest.giver) {
+                <span class="chip">Questgeber · {{ quest.giver }}</span>
+              }
+              @if (quest.location) {
+                <span class="chip">Startgebiet · {{ quest.location }}</span>
+              }
+              @if (quest.checklist.length) {
+                <span class="chip">{{ stepsDone(quest) }} von {{ quest.checklist.length }} Punkten</span>
+              }
+              @for (tag of quest.log.tags ?? []; track tag) {
+                <span class="chip" [style.border-color]="colourOf(tag)" [style.color]="colourOf(tag)">{{ tag }}</span>
+              }
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+  } @empty {
+    <div class="empty">
+      <p>Noch keine Quest geteilt.</p>
     </div>
-  </section>
+  }
 }
 
 @if (shows().glossary) {
@@ -77,9 +87,14 @@
     <article class="panel kind--quests">
       <span class="kicker kicker--kind">{{ kicker(quest) }}</span>
       <h2 class="subtitle">{{ quest.name }}</h2>
-      @if (quest.giver) {
-        <p class="soft">Questgeber: {{ quest.giver }}</p>
-      }
+      <div class="row">
+        @if (quest.giver) {
+          <span class="chip">Questgeber · {{ quest.giver }}</span>
+        }
+        @if (quest.location) {
+          <span class="chip">Startgebiet · {{ quest.location }}</span>
+        }
+      </div>
       @if (quest.description) {
         <p class="prose">{{ quest.description }}</p>
       }
@@ -87,16 +102,6 @@
         <div class="field">
           <span class="label">Ziel</span>
           <p class="prose">{{ quest.goal }}</p>
-        </div>
-      }
-      @if (quest.checklist.length) {
-        <div class="field">
-          <span class="label">Schritte</span>
-          <ul class="plain-list">
-            @for (step of quest.checklist; track $index) {
-              <li>{{ step.done ? '☑' : '☐' }} {{ step.text }}</li>
-            }
-          </ul>
         </div>
       }
       @for (piece of quest.knowledge; track $index) {
@@ -108,6 +113,19 @@
         </div>
       }
     </article>
+    <div class="panel">
+      <h3 class="section-title kind--quests"><app-icon name="quest" /> Euer Questlog</h3>
+      @if (editable()) {
+        <p class="soft">Punkte vom Spielleiter könnt ihr abhaken und verschieben. Eigene Punkte, Tags und Notizen gehören der ganzen Gruppe.</p>
+      }
+      <app-quest-log
+        [steps]="quest.checklist"
+        [log]="quest.log"
+        [editable]="editable()"
+        (logChange)="logChange.emit({ quest: quest.id, log: $event })"
+        (stepToggle)="toggleStep(quest, $event)"
+      />
+    </div>
   </app-side-panel>
 }
 
@@ -132,6 +150,18 @@
         }
       }
       @if (card.entry; as entry) {
+        @if (entry.trigger) {
+          <div class="field">
+            <span class="label">Auslöser</span>
+            <p class="prose">{{ entry.trigger }}</p>
+          </div>
+        }
+        @if (entry.happening) {
+          <div class="field">
+            <span class="label">Was passiert</span>
+            <p class="prose">{{ entry.happening }}</p>
+          </div>
+        }
         @if (entry.description && entry.description !== card.item?.text) {
           <p class="prose">{{ entry.description }}</p>
         }

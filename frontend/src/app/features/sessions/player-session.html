@@ -56,7 +56,7 @@
         <app-player-battle [sessionId]="id()" [battle]="battle()" [character]="character()" (changed)="battle.set($event)" />
       }
       @case ('quests') {
-        <app-player-panels [view]="shown" part="quests" />
+        <app-player-panels [view]="shown" part="quests" [editable]="true" (logChange)="saveLog($event)" (stepsChange)="saveSteps($event)" />
       }
       @case ('glossary') {
         <app-player-panels [view]="shown" part="glossary" />

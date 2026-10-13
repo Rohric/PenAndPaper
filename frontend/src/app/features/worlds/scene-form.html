@@ -85,6 +85,7 @@
     <app-dialogue-list-editor
       [dialogues]="draft().dialogues"
       [speakers]="store.npcOptions()"
+      [newSpeaker]="newSpeaker"
       (dialoguesChange)="set('dialogues', $event)"
       (look)="lookUp('npcs', $event)"
     />

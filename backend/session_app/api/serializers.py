@@ -1,5 +1,7 @@
 """Serializers for sessions and everything that happens while a group plays."""
 
+import re
+
 from rest_framework import serializers
 
 from character_app.models import PlayerCharacter
@@ -11,6 +13,42 @@ MAX_AMOUNT = 9999
 MAX_CHECK_VALUE = 300
 # What a session may have different about a quest, and the type of each value. None takes a link away.
 QUEST_CHANGES = {"name": str, "goal": str, "giver": int, "location": int, "scene": int}
+# What can be shown to the players piece by piece: a part of the entry, or one point of a checklist.
+SHOWN_PART = re.compile(r"^(description|goal|giver|location|trigger|happening|step:\d+)$")
+# The key of a point in the order of the group: a given point by its position, or a point of its own.
+POINT_KEY = re.compile(r"^[gp]\d+$")
+MAX_TAGS = 20
+
+
+def _texts(values, pattern=None):
+    """Return a list of trimmed, different texts; with a pattern every text has to match it."""
+    if not isinstance(values, list) or not all(isinstance(value, str) for value in values):
+        raise serializers.ValidationError("Hier wird eine Liste von Texten erwartet.")
+    cleaned = list(dict.fromkeys(value.strip() for value in values if value.strip()))
+    if pattern and not all(pattern.match(value) for value in cleaned):
+        raise serializers.ValidationError("Einer der Einträge ist nicht bekannt.")
+    return cleaned
+
+
+def _clean_point(point):
+    """Return one point the group added to a checklist: its text and whether it is done."""
+    text = point.get("text") if isinstance(point, dict) else None
+    if not isinstance(text, str):
+        raise serializers.ValidationError("Jeder eigene Punkt braucht einen Text.")
+    return {"text": text.strip(), "done": point.get("done") is True}
+
+
+def clean_log(log):
+    """Return what a group wrote about a quest: notes, tags, points of its own and the order of all points."""
+    if not isinstance(log, dict) or not isinstance(log.get("notes", ""), str):
+        raise serializers.ValidationError("Das Questlog braucht Notizen, Tags, Punkte und eine Reihenfolge.")
+    points = log.get("points", [])
+    if not isinstance(points, list):
+        raise serializers.ValidationError("Die eigenen Punkte müssen eine Liste sein.")
+    return {
+        "notes": log.get("notes", "").strip(), "tags": _texts(log.get("tags", []))[:MAX_TAGS],
+        "points": [_clean_point(point) for point in points], "order": _texts(log.get("order", []), POINT_KEY),
+    }
 
 
 class SessionSerializer(serializers.ModelSerializer):
@@ -50,7 +88,10 @@ class SessionEntrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SessionEntry
-        fields = ["id", "kind", "entry_id", "done", "revealed", "pinned", "steps", "known", "changes"]
+        fields = [
+            "id", "kind", "entry_id", "done", "started", "revealed", "shown", "pinned", "on_table", "table_group",
+            "steps", "known", "changes", "log",
+        ]
         read_only_fields = ["kind", "entry_id"]
 
     def _positions(self, value):
@@ -67,6 +108,14 @@ class SessionEntrySerializer(serializers.ModelSerializer):
         """Check the positions of the known pieces of player knowledge."""
         return self._positions(known)
 
+    def validate_shown(self, shown):
+        """Check what the players see of the entry piece by piece."""
+        return _texts(shown, SHOWN_PART)
+
+    def validate_log(self, log):
+        """Check what the group wrote about the quest."""
+        return clean_log(log)
+
     def validate_changes(self, changes):
         """Accept what a session may have different about a quest: name, goal, giver, place and scene."""
         fits = isinstance(changes, dict) and all(
@@ -76,6 +125,28 @@ class SessionEntrySerializer(serializers.ModelSerializer):
         if not fits:
             raise serializers.ValidationError("Erlaubt sind name, goal, giver, location und scene.")
         return changes
+
+
+class QuestLogSerializer(serializers.ModelSerializer):
+    """Serialize what the players of a session may change about a shared quest: its log and its checked points.
+
+    A player can only check the points of the game master that are shown to the group.
+    """
+
+    class Meta:
+        model = SessionEntry
+        fields = ["steps", "log"]
+
+    def validate_log(self, log):
+        """Check what the group wrote about the quest."""
+        return clean_log(log)
+
+    def validate_steps(self, steps):
+        """Take over the checks of the shown points; the checks of hidden points stay as they are."""
+        if not isinstance(steps, list) or not all(isinstance(step, int) for step in steps):
+            raise serializers.ValidationError("Hier wird eine Liste von Positionen erwartet.")
+        visible = {int(part.split(":")[1]) for part in self.instance.shown if part.startswith("step:")}
+        return sorted((set(steps) & visible) | (set(self.instance.steps) - visible))
 
 
 class CommentSerializer(serializers.ModelSerializer):

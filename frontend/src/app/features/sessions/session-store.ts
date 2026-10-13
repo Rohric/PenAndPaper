@@ -4,12 +4,12 @@ import { Observable, forkJoin } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { EntryKind, PlayerCharacter } from '../../core/models';
 import {
-  ItemGift, Message, Note, QuestChanges, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
+  ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
 } from '../../core/session-models';
 import { CharacterService } from '../characters/character.service';
 import { SessionService } from './session.service';
 
-type Flag = 'done' | 'revealed' | 'pinned';
+type Flag = 'done' | 'started' | 'revealed' | 'pinned' | 'on_table';
 type PositionList = 'steps' | 'known';
 
 /** How the kinds of world entries are called in a session. */
@@ -71,7 +71,7 @@ export class SessionStore {
     return this.states().get(`${kind}:${entryId}`);
   }
 
-  /** Switch one of the three marks of an entry: done, revealed for the players, pinned. */
+  /** Switch one of the marks of an entry: done, started, revealed for the players, pinned, on the table. */
   toggle(kind: SessionEntryKind, entryId: number, flag: Flag): void {
     this.setEntry(kind, entryId, { [flag]: !this.state(kind, entryId)?.[flag] } as Partial<SessionEntry>);
   }
@@ -81,6 +81,22 @@ export class SessionStore {
     const positions = this.state(kind, entryId)?.[list] ?? [];
     const next = positions.includes(position) ? positions.filter((p) => p !== position) : [...positions, position];
     this.setEntry(kind, entryId, { [list]: next } as Partial<SessionEntry>);
+  }
+
+  /** Show a part of an entry to the players or hide it again, like "goal" or "step:2". */
+  toggleShown(kind: SessionEntryKind, entryId: number, part: string): void {
+    const shown = this.state(kind, entryId)?.shown ?? [];
+    this.patch(kind, entryId, { shown: shown.includes(part) ? shown.filter((other) => other !== part) : [...shown, part] });
+  }
+
+  /** Save what the group wrote about a quest. */
+  setLog(kind: SessionEntryKind, entryId: number, log: QuestLog): void {
+    this.patch(kind, entryId, { log });
+  }
+
+  /** Change several things a session knows about an entry at once. */
+  patch(kind: SessionEntryKind, entryId: number, changes: Partial<SessionEntry>): void {
+    this.setEntry(kind, entryId, changes);
   }
 
   /** Change the session itself: its chapter, its characters, whether it is finished. */

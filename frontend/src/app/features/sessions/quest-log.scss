@@ -1,0 +1,70 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+// One view for both screens: a point is a row that wraps on a narrow screen.
+// A point of the game master carries the colour of quests, a point of the group its own.
+.point {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  border-left: 3px solid var(--kind-quest);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-2);
+}
+
+.point--own {
+  border-left-color: var(--kind-npc);
+  border-left-style: dashed;
+}
+
+.point__check {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+.point__text {
+  flex: 1;
+  min-width: 140px;
+}
+
+.point__text--done {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.point__mark {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  border-color: var(--kind-quest);
+  color: var(--kind-quest);
+}
+
+.point--own .point__mark {
+  border-color: var(--kind-npc);
+  color: var(--kind-npc);
+}
+
+// A tag in its own colour, with a small button to take it away.
+.tag {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border-color: var(--kind);
+  color: var(--kind);
+}
+
+.tag__x {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+}

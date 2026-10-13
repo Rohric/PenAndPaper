@@ -25,7 +25,9 @@ import { WorldStore } from './world-store';
             emptyText="Kein fester Ort"
             [options]="store.locationOptions()"
             [value]="link().location"
+            [creatable]="true"
             (valueChange)="setLocation($event)"
+            (create)="createLocation($event)"
           />
         </div>
         <div class="field">
@@ -71,11 +73,21 @@ export class WorldNpcEditor {
     this.store.save('world-npcs', this.link().id, { location }).subscribe({ error: (e: unknown) => this.error.set(readError(e)) });
   }
 
+  /** Create a place with the typed name and put the NPC there. */
+  protected createLocation(name: string): void {
+    this.store.add<{ id: number }>('locations', { name }).subscribe({
+      next: (place) => this.setLocation(place.id),
+      error: (e: unknown) => this.error.set(readError(e)),
+    });
+  }
+
   /** Keep the list of the world in step with the saved character. */
   protected onSaved(saved: AnyCharacter): void {
     const npc = saved as Npc;
     this.npc.set(npc);
-    this.store.patchLocal('world-npcs', this.link().id, { name: npc.name, profession: npc.profession, inventory: npc.inventory });
+    this.store.patchLocal('world-npcs', this.link().id, {
+      name: npc.name, profession: npc.profession, inventory: npc.inventory, symbol: npc.symbol, updated_at: npc.updated_at,
+    });
     this.saved.emit();
   }
 

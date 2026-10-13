@@ -1,4 +1,5 @@
 import { Component, input, output } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { Dialogue, DialogueLine, Option } from '../core/models';
 import { AutoGrow } from './auto-grow';
@@ -40,7 +41,9 @@ import { LinkPicker } from './link-picker';
               [label]="'Wer in Zeile ' + (row + 1) + ' spricht'"
               [options]="speakers()"
               [value]="line.npc"
+              [creatable]="!!newSpeaker()"
               (valueChange)="setLine(at, row, { npc: $event })"
+              (create)="createSpeaker(at, row, $event)"
               (look)="look.emit($event)"
             />
             <textarea
@@ -107,6 +110,13 @@ export class DialogueListEditor {
   readonly dialoguesChange = output<Dialogue[]>();
   /** Fired with the id of a speaker that was clicked, to look the character up. */
   readonly look = output<number>();
+  /** How a new character is created from a typed name; it answers with the id. Without it only known characters speak. */
+  readonly newSpeaker = input<((name: string) => Observable<number>) | null>(null);
+
+  /** Create a character with the typed name and let it speak the line. */
+  protected createSpeaker(at: number, row: number, name: string): void {
+    this.newSpeaker()?.(name).subscribe((npc) => this.setLine(at, row, { npc }));
+  }
 
   /** Add a statement that stands for itself. */
   protected add(): void {

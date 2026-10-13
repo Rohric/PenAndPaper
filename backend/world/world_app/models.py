@@ -34,6 +34,9 @@ class Entry(models.Model):
     gm_knowledge = models.JSONField(default=list, blank=True)
     # Name of the symbol shown for the entry; empty means the usual symbol of its kind.
     symbol = models.CharField(max_length=40, blank=True)
+    # When it was written and when it was changed last; Django fills both.
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True
@@ -129,6 +132,9 @@ class Chapter(models.Model):
     to_read = models.TextField(blank=True)
     quests = models.ManyToManyField(Quest, blank=True, related_name="chapters")
     events = models.ManyToManyField(Event, blank=True, related_name="chapters")
+    # When it was written and when it was changed last; Django fills both.
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["number"]
@@ -161,6 +167,9 @@ class Scene(models.Model):
     trivia = models.ManyToManyField(Trivia, blank=True, related_name="scenes")
     # Each dialogue: title, lines. Each line: npc (id of the speaking character, or None) and text.
     dialogues = models.JSONField(default=list, blank=True)
+    # When it was written and when it was changed last; Django fills both.
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["position", "id"]

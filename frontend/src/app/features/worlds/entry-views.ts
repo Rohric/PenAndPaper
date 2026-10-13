@@ -5,6 +5,7 @@ import {
 } from '../../core/models';
 import { damageText, skillValue } from '../../core/rules';
 import { IconName } from '../../shared/icon';
+import { tagColour } from '../../shared/tag-colour';
 import { WorldStore } from './world-store';
 
 /**
@@ -17,6 +18,8 @@ export interface EntryViewModel {
   sub: string;
   /** The kind whose colour the entry shows, like "npcs" or "items". */
   tone: string;
+  /** A colour of its own instead: knowledge shows the colour of its category. */
+  colour?: string;
   /** The symbol the entry carries, and the usual symbol of its kind. */
   symbol: string;
   fallback: IconName;
@@ -248,7 +251,8 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
   }
   return tidy({
     kicker: trivia.category || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(trivia),
-    tone: isItem(trivia) ? 'items' : 'trivia', symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note',
+    tone: isItem(trivia) ? 'items' : 'trivia', colour: trivia.category.trim() ? tagColour(trivia.category) : '',
+    symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note',
     pictures: isItem(trivia) ? 3 : 0, dialogues: [],
     blocks: [{ label: 'Beschreibung', text: trivia.description }],
     links: [

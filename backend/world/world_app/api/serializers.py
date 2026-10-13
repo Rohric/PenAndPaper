@@ -88,7 +88,7 @@ class LocationSerializer(WorldScopedSerializer):
 
     class Meta:
         model = Location
-        fields = ["id", "parent", "name", "symbol", "description", "player_knowledge", "gm_knowledge"]
+        fields = ["id", "parent", "name", "symbol", "description", "player_knowledge", "gm_knowledge", "created_at", "updated_at"]
 
     def validate_parent(self, parent):
         """Reject a parent from another world and a place that would contain itself."""
@@ -104,12 +104,14 @@ class WorldNpcSerializer(WorldScopedSerializer):
     name = serializers.CharField(source="npc.name", max_length=200)
     profession = serializers.CharField(source="npc.profession", read_only=True)
     symbol = serializers.CharField(source="npc.symbol", read_only=True)
+    created_at = serializers.DateTimeField(source="npc.created_at", read_only=True)
+    updated_at = serializers.DateTimeField(source="npc.updated_at", read_only=True)
     # Read only: the glossary lists the items of all characters; they are edited at the character.
     inventory = serializers.JSONField(source="npc.inventory", read_only=True)
 
     class Meta:
         model = WorldNpc
-        fields = ["id", "npc", "name", "profession", "symbol", "location", "inventory"]
+        fields = ["id", "npc", "name", "profession", "symbol", "location", "inventory", "created_at", "updated_at"]
         read_only_fields = ["npc"]
 
     def create(self, validated_data):
@@ -131,6 +133,7 @@ class QuestSerializer(WorldScopedSerializer):
         fields = [
             "id", "name", "symbol", "kind", "number", "description", "goal", "checklist",
             "player_knowledge", "gm_knowledge", "dialogues", "location", "giver", "scene", "npcs",
+            "created_at", "updated_at",
         ]
 
     def validate_scene(self, scene):
@@ -158,7 +161,7 @@ class EventSerializer(WorldScopedSerializer):
         model = Event
         fields = [
             "id", "name", "symbol", "trigger", "happening", "description", "player_knowledge", "gm_knowledge",
-            "dialogues", "location",
+            "dialogues", "location", "created_at", "updated_at",
         ]
 
 
@@ -169,7 +172,7 @@ class TriviaSerializer(WorldScopedSerializer):
         model = Trivia
         fields = [
             "id", "name", "symbol", "category", "description", "player_knowledge", "gm_knowledge",
-            "locations", "npcs", "quests", "events",
+            "locations", "npcs", "quests", "events", "created_at", "updated_at",
         ]
 
 
@@ -180,7 +183,7 @@ class ChapterSerializer(WorldScopedSerializer):
 
     class Meta:
         model = Chapter
-        fields = ["id", "number", "name", "text", "to_read", "quests", "events"]
+        fields = ["id", "number", "name", "text", "to_read", "quests", "events", "created_at", "updated_at"]
 
     def validate_number(self, number):
         """Reject a number another chapter of the world already uses."""
@@ -202,7 +205,7 @@ class SceneSerializer(WorldScopedSerializer):
         model = Scene
         fields = [
             "id", "chapter", "position", "optional", "name", "text", "to_read", "dialogues",
-            "location", "npcs", "leads_to", "quests", "events", "trivia",
+            "location", "npcs", "leads_to", "quests", "events", "trivia", "created_at", "updated_at",
         ]
         read_only_fields = ["chapter"]
 

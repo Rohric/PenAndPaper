@@ -40,6 +40,9 @@ class BaseCharacter(models.Model):
     # A picture of the character, and whether it is shown instead of the symbol.
     image = models.ImageField(upload_to="characters/", blank=True)
     shows_image = models.BooleanField(default=False)
+    # When it was written and when it was changed last; Django fills both.
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         abstract = True

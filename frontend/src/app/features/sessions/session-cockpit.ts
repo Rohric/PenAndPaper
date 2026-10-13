@@ -23,6 +23,7 @@ import { CharacterPanel } from './character-tile';
 import { ItemGiftForm, ItemTemplate } from './item-gift-form';
 import { NoteDetail } from './note-detail';
 import { PlayerPanels } from './player-panels';
+import { QuestBoard } from './quest-board';
 import { RollPanel } from './roll-panel';
 import { SessionArchive } from './session-archive';
 import { SessionEntryActions } from './session-entry-actions';
@@ -47,7 +48,7 @@ type Panel =
   | { kind: 'level' };
 
 /** What fills the page between the two bars. */
-type View = 'story' | 'notes' | 'players' | 'glossary';
+type View = 'story' | 'quests' | 'notes' | 'players' | 'glossary';
 
 const PANEL_TITLES: Record<Panel['kind'], string> = {
   sheet: 'Charakterbogen',
@@ -81,7 +82,7 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
   selector: 'app-session-cockpit',
   imports: [
     RouterLink, Icon, IdSelect, SidePanel, TutorialButton, CharacterSheet, EntryPeek, SceneThread, BattleView,
-    ChapterCloseForm, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, RollPanel, SessionArchive, SessionEntryActions,
+    ChapterCloseForm, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
     SessionGroup, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch,
   ],
   providers: [WorldStore, SessionStore],

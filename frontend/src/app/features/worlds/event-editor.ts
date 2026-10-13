@@ -58,7 +58,9 @@ import { EventScenes } from './event-scenes';
             emptyText="Wo passiert es?"
             [options]="store.locationOptions()"
             [value]="draft().location"
+            [creatable]="true"
             (valueChange)="set('location', $event)"
+            (create)="createLinked('location', 'locations', $event)"
             (look)="lookUp('locations', $event)"
           />
         </div>
@@ -81,6 +83,7 @@ import { EventScenes } from './event-scenes';
         <app-dialogue-list-editor
           [dialogues]="draft().dialogues"
           [speakers]="store.npcOptions()"
+          [newSpeaker]="newSpeaker"
           (dialoguesChange)="set('dialogues', $event)"
           (look)="lookUp('npcs', $event)"
         />

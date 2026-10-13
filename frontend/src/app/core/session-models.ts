@@ -32,6 +32,53 @@ export interface SessionEntry {
   known: number[];
   /** What this session has different about the entry than the world; used for quests. */
   changes: QuestChanges;
+  /** A quest the group has accepted and is working on. */
+  started: boolean;
+  /** Whether the entry lies on the table of the master mode, and in which group of the game master's own. */
+  on_table: boolean;
+  table_group: string;
+  /** What the players see of the entry piece by piece, like "description", "goal" or "step:2". */
+  shown: string[];
+  /** What the group wrote about a quest. */
+  log: Partial<QuestLog>;
+}
+
+/** What a group writes about a quest: notes, tags, points of its own, and the order of all points. */
+export interface QuestLog {
+  notes: string;
+  tags: string[];
+  points: { text: string; done: boolean }[];
+  /** Keys of all points in the order of the group: "g0" is a point of the game master, "p0" one of its own. */
+  order: string[];
+}
+
+/** A log with every part filled, also when nothing was written yet. */
+export function logOf(log: Partial<QuestLog> | undefined): QuestLog {
+  return { notes: log?.notes ?? '', tags: log?.tags ?? [], points: log?.points ?? [], order: log?.order ?? [] };
+}
+
+/** One point of a quest's checklist as it is shown: its place in the list of the game master, its text, its check. */
+export interface QuestStep {
+  position: number;
+  text: string;
+  done: boolean;
+}
+
+/** Where a quest stands: not accepted yet, accepted and running, or over. */
+export type QuestStatus = 'running' | 'open' | 'done';
+
+export const QUEST_STATUSES: { id: QuestStatus; label: string }[] = [
+  { id: 'running', label: 'Laufend' },
+  { id: 'open', label: 'Offen' },
+  { id: 'done', label: 'Beendet' },
+];
+
+/** Read the status of a quest from what a session knows about it. */
+export function questStatus(state: { started?: boolean; done?: boolean } | undefined): QuestStatus {
+  if (state?.done) {
+    return 'done';
+  }
+  return state?.started ? 'running' : 'open';
 }
 
 /** What a session can have different about a quest, without changing the world. */
@@ -128,6 +175,9 @@ export interface SharedEntry {
   category: string;
   symbol: string;
   description: string;
+  /** What sets an event off and what happens then, when the game master shows it. */
+  trigger: string;
+  happening: string;
   /** The pieces of knowledge the group has found out. */
   knowledge: Knowledge[];
 }
@@ -138,9 +188,14 @@ export interface SharedQuest extends SharedEntry {
   /** The number of a main quest. */
   number: number | null;
   goal: string;
-  checklist: { text: string; done: boolean }[];
+  /** The points of the checklist the game master shows. */
+  checklist: QuestStep[];
   giver: string;
+  /** The place where the quest starts. */
+  location: string;
+  started: boolean;
   done: boolean;
+  log: Partial<QuestLog>;
 }
 
 /** Everything the players of a session may see. */

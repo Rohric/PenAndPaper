@@ -1,0 +1,88 @@
+<div class="field">
+  <span class="label">Checkliste</span>
+  @for (line of lines(); track line.key) {
+    <div class="point" [class.point--own]="line.own">
+      <input
+        type="checkbox"
+        class="point__check"
+        [checked]="line.done"
+        [disabled]="!editable()"
+        [attr.aria-label]="(line.text || 'Punkt') + ' abhaken'"
+        (change)="check(line)"
+      />
+      @if (line.own && editable()) {
+        <input
+          class="input point__text"
+          [value]="line.text"
+          [attr.aria-label]="'Eigener Punkt: ' + line.text"
+          (change)="rename(line, $any($event.target).value)"
+        />
+      } @else {
+        <span class="point__text" [class.point__text--done]="line.done">{{ line.text }}</span>
+      }
+      <span class="chip point__mark">
+        <app-icon [name]="line.own ? 'edit' : 'lock'" [size]="12" /> {{ line.own ? 'eigener Punkt' : 'vom Spielleiter' }}
+      </span>
+      @if (editable()) {
+        <button type="button" class="btn btn--small" [attr.aria-label]="line.text + ' nach oben schieben'" [disabled]="$first" (click)="move(line, -1)">
+          ↑
+        </button>
+        <button type="button" class="btn btn--small" [attr.aria-label]="line.text + ' nach unten schieben'" [disabled]="$last" (click)="move(line, 1)">
+          ↓
+        </button>
+        @if (line.own) {
+          <button type="button" class="btn btn--small" [attr.aria-label]="line.text + ' löschen'" (click)="remove(line)">
+            <app-icon name="trash" [size]="16" />
+          </button>
+        }
+      }
+    </div>
+  } @empty {
+    <p class="soft">Noch kein Punkt.</p>
+  }
+  @if (editable()) {
+    <form class="list-row" (submit)="add(); $event.preventDefault()">
+      <input
+        class="input"
+        aria-label="Eigenen Punkt hinzufügen"
+        placeholder="Eigenen Punkt hinzufügen"
+        [value]="newPoint()"
+        (input)="newPoint.set($any($event.target).value)"
+      />
+      <button type="submit" class="btn btn--small" [disabled]="!newPoint().trim()"><app-icon name="plus" [size]="16" /> Punkt</button>
+    </form>
+  }
+</div>
+
+<div class="field">
+  <span class="label">Tags</span>
+  <div class="row">
+    @for (tag of full().tags; track tag) {
+      <span class="chip tag" [style.--kind]="colourOf(tag)">
+        <span class="dot"></span> {{ tag }}
+        @if (editable()) {
+          <button type="button" class="tag__x" [attr.aria-label]="'Tag ' + tag + ' entfernen'" (click)="removeTag(tag)">
+            <app-icon name="close" [size]="12" />
+          </button>
+        }
+      </span>
+    } @empty {
+      <span class="soft">Noch kein Tag.</span>
+    }
+  </div>
+  @if (editable()) {
+    <form class="list-row" (submit)="addTag(); $event.preventDefault()">
+      <input class="input" aria-label="Tag hinzufügen" placeholder="Tag hinzufügen, z. B. dringend" [value]="newTag()" (input)="newTag.set($any($event.target).value)" />
+      <button type="submit" class="btn btn--small" [disabled]="!newTag().trim()"><app-icon name="plus" [size]="16" /> Tag</button>
+    </form>
+  }
+</div>
+
+<div class="field">
+  <label [for]="notesId">Notizen der Gruppe</label>
+  @if (editable()) {
+    <textarea [id]="notesId" class="input" rows="3" placeholder="Was ihr euch merken wollt …" [value]="full().notes" (change)="setNotes($any($event.target).value)"></textarea>
+  } @else {
+    <p [id]="notesId" class="prose">{{ full().notes || 'Noch keine Notiz.' }}</p>
+  }
+</div>

@@ -3,8 +3,10 @@ import {
   viewChild,
 } from '@angular/core';
 
+import { map } from 'rxjs';
+
 import { readError } from '../../core/api-error';
-import { EntryKind, Option, Scene } from '../../core/models';
+import { EntryKind, Option, Scene, WorldNpc } from '../../core/models';
 import { AutoGrow } from '../../shared/auto-grow';
 import { DialogueListEditor } from '../../shared/dialogue-list-editor';
 import { Icon } from '../../shared/icon';
@@ -65,6 +67,9 @@ export class SceneForm {
       .filter((scene) => scene.id !== this.entry().id)
       .map((scene) => ({ id: scene.id, label: scene.name, hint: scene.optional ? 'optionale Szene' : 'am roten Faden', tone: 'scenes' })),
   );
+
+  /** Create a character of the world from a typed name, for a line of a dialogue. */
+  protected readonly newSpeaker = (name: string) => this.store.add<WorldNpc>('world-npcs', { name }).pipe(map((link) => link.npc));
 
   private readonly title = viewChild.required<ElementRef<HTMLInputElement>>('title');
   private unsent: Unsent | null = null;

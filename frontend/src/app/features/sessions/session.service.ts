@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 
 import { ApiService } from '../../core/api.service';
 import {
-  Attack, Battle, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, Roll, RollOrder, Session,
-  SessionEntry, SessionEntryKind,
+  Attack, Battle, Combatant, ItemGift, Message, Note, NoteComment, PlayerBattle, PlayerView, QuestLog, Roll, RollOrder,
+  Session, SessionEntry, SessionEntryKind,
 } from '../../core/session-models';
 
 /** Backend calls for sessions and for the battles fought in them. */
@@ -46,6 +46,11 @@ export class SessionService {
   /** Set the state of one world entry in the session. */
   setEntry(id: number, kind: SessionEntryKind, entryId: number, changes: Partial<SessionEntry>): Observable<SessionEntry> {
     return this.api.patch<SessionEntry>(`sessions/${id}/entries/${kind}/${entryId}/`, changes);
+  }
+
+  /** Keep the log of a shared quest as one of the group: what was written, or which shown points are checked. */
+  questLog(id: number, questId: number, changes: { log?: QuestLog; steps?: number[] }): Observable<unknown> {
+    return this.api.patch(`sessions/${id}/quest-log/${questId}/`, changes);
   }
 
   /** Close the chapter: every character gets its bonus points, named by character id; the next chapter begins. */

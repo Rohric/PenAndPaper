@@ -6,12 +6,13 @@ import { readError } from '../../core/api-error';
 import { Chapter } from '../../core/models';
 import { Icon } from '../../shared/icon';
 import { TutorialButton } from '../../shared/tutorial-button';
+import { RecentEntries } from './recent-entries';
 import { WorldStore } from './world-store';
 
-/** The chapters of a world as tiles, with a form to start a new one. */
+/** The chapters of a world as tiles, with a form to start a new one, and below what was written and changed last. */
 @Component({
   selector: 'app-chapter-list',
-  imports: [FormsModule, RouterLink, Icon, TutorialButton],
+  imports: [FormsModule, RouterLink, Icon, TutorialButton, RecentEntries],
   template: `
     <div class="stack">
       <div class="row row--between">
@@ -50,6 +51,8 @@ import { WorldStore } from './world-store';
           <p>Noch kein Kapitel. Gib oben einen Namen ein und leg das erste an.</p>
         </div>
       }
+
+      <app-recent-entries />
     </div>
   `,
 })

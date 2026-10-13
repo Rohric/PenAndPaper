@@ -1,11 +1,15 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, input, output, signal } from '@angular/core';
 
 import { questLabel } from '../../core/models';
 import { damageText } from '../../core/rules';
-import { EquipmentLine, PlayerView, SessionEntryKind, SharedEntry, SharedQuest } from '../../core/session-models';
+import {
+  EquipmentLine, PlayerView, QUEST_STATUSES, QuestLog, SessionEntryKind, SharedEntry, SharedQuest, questStatus,
+} from '../../core/session-models';
 import { Icon, IconName } from '../../shared/icon';
 import { Portrait } from '../../shared/portrait';
 import { SidePanel } from '../../shared/side-panel';
+import { tagColour } from '../../shared/tag-colour';
+import { QuestLogView } from './quest-log';
 
 /** Something the group carries: who has it, what is known about it, and its entry of the world if that is revealed. */
 interface CarriedItem {
@@ -43,21 +47,29 @@ const PARTS: { kind: SessionEntryKind; label: string; icon: IconName; tone: stri
 const isItem = (entry: SharedEntry) => entry.kind === 'trivia' && entry.category.trim().toLowerCase() === ITEM_CATEGORY;
 
 /**
- * What the players of a session see: the quests shared with them, their glossary with what the
- * group carries, and the group. Everything is a tile; a click opens it in a window at the side
- * with all the group knows. The game master shows the same to check what he has revealed.
+ * What the players of a session see: their quest log, their glossary with what the group carries,
+ * and the group. Everything is a tile; a click opens it in a window at the side with all the group
+ * knows. In the quest log the group writes its own notes, tags and points. The game master shows
+ * the same page, read only, to check what he has revealed.
  */
 @Component({
   selector: 'app-player-panels',
-  imports: [Icon, Portrait, SidePanel],
+  imports: [Icon, Portrait, SidePanel, QuestLogView],
   templateUrl: './player-panels.html',
 })
 export class PlayerPanels {
   readonly view = input.required<PlayerView>();
   /** Which part is shown; the game master looks at all of them at once. */
   readonly part = input<'quests' | 'glossary' | 'group' | 'all'>('all');
+  /** Whether the reader can write into the quest log; the game master only looks here. */
+  readonly editable = input(false);
+  /** Fired with the log of a quest after the group changed it. */
+  readonly logChange = output<{ quest: number; log: QuestLog }>();
+  /** Fired with all checked points of a quest after one was checked or unchecked. */
+  readonly stepsChange = output<{ quest: number; steps: number[] }>();
 
   protected readonly nothingMore = NOTHING_MORE;
+  protected readonly colourOf = tagColour;
   /** Key of the tile that is open at the side; the tile is looked up again with every reload. */
   protected readonly openKey = signal<string | null>(null);
   protected readonly shows = computed(() => ({
@@ -66,8 +78,14 @@ export class PlayerPanels {
     group: this.part() === 'all' || this.part() === 'group',
   }));
   /** Main quests first, in the order of their numbers, then the side quests. */
-  protected readonly quests = computed(() =>
+  private readonly quests = computed(() =>
     [...this.view().quests].sort((a, b) => Number(b.main) - Number(a.main) || (a.number ?? Infinity) - (b.number ?? Infinity)),
+  );
+  /** The quest log in its three parts: running, open and finished; an empty part is left out. */
+  protected readonly questGroups = computed(() =>
+    QUEST_STATUSES.map((status) => ({ ...status, quests: this.quests().filter((quest) => questStatus(quest) === status.id) })).filter(
+      (group) => group.quests.length,
+    ),
   );
   /** The parts of the glossary that have something in them, each with its tiles. */
   protected readonly sections = computed(() => {
@@ -87,21 +105,28 @@ export class PlayerPanels {
     return [...carried, ...loose.map((entry) => ({ name: entry.name, text: entry.description, owners: [], hidden: false, entry }))];
   });
 
-  /** How a quest is called: its kind with its number, and whether it is done. */
+  /** How a quest is called: its kind with its number. */
   protected kicker(quest: SharedQuest): string {
-    return questLabel({ kind: quest.main ? 'main' : 'side', number: quest.number }) + (quest.done ? ' · erledigt' : '');
+    return questLabel({ kind: quest.main ? 'main' : 'side', number: quest.number });
   }
 
-  /** How many steps of a quest are checked. */
+  /** How many of the shown points of a quest are checked. */
   protected stepsDone(quest: SharedQuest): number {
     return quest.checklist.filter((step) => step.done).length;
+  }
+
+  /** Check or uncheck a point of the game master and hand on all checked points of the quest. */
+  protected toggleStep(quest: SharedQuest, position: number): void {
+    const done = quest.checklist.filter((step) => step.done).map((step) => step.position);
+    const steps = done.includes(position) ? done.filter((other) => other !== position) : [...done, position];
+    this.stepsChange.emit({ quest: quest.id, steps });
   }
 }
 
 function entryCard(entry: SharedEntry): Card {
   const part = PARTS.find((other) => other.kind === entry.kind);
   return {
-    key: `${entry.kind}:${entry.id}`, kicker: entry.category, title: entry.name, text: entry.description,
+    key: `${entry.kind}:${entry.id}`, kicker: entry.category, title: entry.name, text: entry.happening || entry.description,
     symbol: entry.symbol, fallback: part?.icon ?? 'note', tone: part?.tone ?? 'trivia', entry, item: null,
   };
 }

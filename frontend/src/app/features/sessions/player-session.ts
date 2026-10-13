@@ -4,7 +4,7 @@ import { Observable, forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
 import { PlayerCharacter } from '../../core/models';
-import { Message, Note, PlayerBattle, PlayerView, Roll, RollOrder, Session } from '../../core/session-models';
+import { Message, Note, PlayerBattle, PlayerView, QuestLog, Roll, RollOrder, Session } from '../../core/session-models';
 import { Icon, IconName } from '../../shared/icon';
 import { SidePanel } from '../../shared/side-panel';
 import { TutorialButton } from '../../shared/tutorial-button';
@@ -104,6 +104,16 @@ export class PlayerSession {
       this.lastRoll.set(roll);
       this.refresh(this.id());
     });
+  }
+
+  /** Save what the group wrote into the log of a quest. */
+  protected saveLog(change: { quest: number; log: QuestLog }): void {
+    this.run(this.api.questLog(this.id(), change.quest, { log: change.log }), () => this.refresh(this.id()));
+  }
+
+  /** Save which points of a quest are checked. */
+  protected saveSteps(change: { quest: number; steps: number[] }): void {
+    this.run(this.api.questLog(this.id(), change.quest, { steps: change.steps }), () => this.refresh(this.id()));
   }
 
   /** Answer the game master in the secret thread. */

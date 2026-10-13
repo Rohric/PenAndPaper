@@ -32,6 +32,7 @@ from .serializers import (
     LevelSerializer,
     MessageSerializer,
     NoteSerializer,
+    QuestLogSerializer,
     RollSerializer,
     SessionEntrySerializer,
     SessionSerializer,
@@ -137,6 +138,23 @@ class SessionEntryDetail(GameMasterSessionMixin, generics.UpdateAPIView):
             raise Http404
         state, _ = self.session.entries.get_or_create(kind=self.kwargs["kind"], entry_id=self.kwargs["entry_id"])
         return state
+
+
+class QuestLog(SessionMixin, generics.UpdateAPIView):
+    """
+    Let everybody in a session keep the log of a quest that is shared with the players.
+
+    - PATCH: notes, tags, own points and their order ("log"), and the checked points ("steps").
+    """
+
+    serializer_class = QuestLogSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        """Return what the session knows about the quest, or raise a 404 when it is not shared."""
+        return get_object_or_404(
+            self.session.entries, kind=SessionEntry.Kind.QUEST, entry_id=self.kwargs["quest_id"], revealed=True
+        )
 
 
 class SessionLevel(GameMasterSessionMixin, APIView):

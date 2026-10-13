@@ -18,6 +18,9 @@
       <button type="button" class="btn" [attr.aria-pressed]="view() === 'players'" (click)="show('players')">
         <app-icon name="eye" /> Spieleransicht
       </button>
+      <button type="button" class="btn" [attr.aria-pressed]="view() === 'quests'" (click)="show('quests')">
+        <app-icon class="kind--quests" name="quest" /> Quests
+      </button>
       <button type="button" class="btn" [attr.aria-pressed]="view() === 'glossary'" (click)="show('glossary')">
         <app-icon name="book" /> Glossar
       </button>
@@ -55,6 +58,9 @@
       @case ('notes') {
         <app-session-notes [notes]="store.notes()" (open)="openPanel({ kind: 'note', noteId: $event })" />
       }
+      @case ('quests') {
+        <app-quest-board [chapterId]="chapterId()" />
+      }
       @case ('glossary') {
         <nav class="tabs" aria-label="Bereiche des Glossars">
           @for (part of sections; track part.id) {
@@ -81,7 +87,7 @@
             <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" [editable]="false" [done]="playedScenes()" (open)="sceneId.set($event)" />
           </div>
           <div class="story__main">
-            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" />
+            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" (quests)="view.set('quests')" />
           </div>
         </div>
       }

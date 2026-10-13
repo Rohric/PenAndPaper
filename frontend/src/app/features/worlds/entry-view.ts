@@ -15,7 +15,7 @@ import { WorldStore } from './world-store';
   imports: [Icon, Portrait, LinkRow, DialogueView],
   template: `
     @if (view(); as shown) {
-      <article [class]="'panel kind--' + shown.tone">
+      <article [class]="'panel kind--' + shown.tone" [style.--kind]="shown.colour || null">
         <header class="row row--between">
           <div class="tile__head">
             <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="52" />

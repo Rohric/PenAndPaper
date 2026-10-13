@@ -1,10 +1,11 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { readError } from '../../core/api-error';
 import { EntryRef, Location } from '../../core/models';
 import { Icon, IconName } from '../../shared/icon';
 import { Portrait } from '../../shared/portrait';
+import { tagColour } from '../../shared/tag-colour';
 import { isItem, summaryOf } from './entry-views';
 import { EventTile } from './event-tile';
 import { Carrier, ItemRow, itemRows } from './item-rows';
@@ -46,11 +47,14 @@ interface Tile {
   text: string;
   symbol: string;
   fallback: IconName;
+  /** A colour of its own instead of the colour of the part: knowledge shows the colour of its category. */
+  colour?: string;
 }
 
 /**
  * One part of the glossary as a wall of tiles. A click looks the entry up in the window at the side.
  * The same wall is used while writing a world and while playing it.
+ * Knowledge can be filtered by its category; every category has its own colour.
  */
 @Component({
   selector: 'app-glossary-tiles',
@@ -66,6 +70,23 @@ interface Tile {
       <p class="notice notice--error" role="alert">{{ error() }}</p>
     }
 
+    @if (section().id === 'trivia' && categories().length) {
+      <div class="row" role="group" aria-label="Nach Kategorie filtern">
+        <button type="button" class="pill" [attr.aria-pressed]="category() === null" (click)="category.set(null)">Alle</button>
+        @for (name of categories(); track name) {
+          <button
+            type="button"
+            class="pill pill--tone"
+            [style.--kind]="colourOf(name)"
+            [attr.aria-pressed]="category() === name"
+            (click)="category.set(name)"
+          >
+            {{ name || 'Ohne Kategorie' }}
+          </button>
+        }
+      </div>
+    }
+
     <div class="tiles">
       @if (section().id === 'quests') {
         @for (quest of store.quests(); track quest.id) {
@@ -77,7 +98,7 @@ interface Tile {
         }
       } @else {
         @for (tile of tiles(); track $index) {
-          <button type="button" [class]="'tile kind--' + section().id" (click)="open(tile)">
+          <button type="button" [class]="'tile kind--' + section().id" [style.--kind]="tile.colour || null" (click)="open(tile)">
             <span class="tile__head">
               <app-portrait [symbol]="tile.symbol" [fallback]="tile.fallback" [size]="36" />
               <span class="tile__names">
@@ -122,6 +143,14 @@ export class GlossaryTiles {
 
   protected readonly newName = signal('');
   protected readonly error = signal('');
+  /** The categories of the knowledge of the world, in the order of the alphabet; knowledge without one comes last. */
+  protected readonly categories = computed(() => {
+    const names = new Set(this.store.trivia().filter((trivia) => !isItem(trivia)).map((trivia) => trivia.category.trim()));
+    return [...names].sort((a, b) => Number(!a) - Number(!b) || a.localeCompare(b));
+  });
+  /** The category the knowledge is filtered by; null shows all. Another part of the glossary starts without a filter. */
+  protected readonly category = linkedSignal<SectionId, string | null>({ source: () => this.section().id, computation: () => null });
+  protected readonly colourOf = tagColour;
   protected readonly tiles = computed(() => this.tilesOf(this.section().id));
   protected readonly isEmpty = computed(() => {
     const own = { quests: this.store.quests(), events: this.store.events() };
@@ -188,16 +217,17 @@ export class GlossaryTiles {
       });
   }
 
-  /** Knowledge without the items, grouped by its category; entries without one come last. */
+  /** Knowledge without the items, grouped by its category and filtered by the chosen one; entries without one come last. */
   private knowledgeTiles(): Tile[] {
     const rank = (category: string) => (category ? `0${category.toLowerCase()}` : '1');
+    const chosen = this.category();
     return this.store
       .trivia()
-      .filter((trivia) => !isItem(trivia))
+      .filter((trivia) => !isItem(trivia) && (chosen === null || trivia.category.trim() === chosen))
       .sort((a, b) => rank(a.category).localeCompare(rank(b.category)))
       .map((trivia) => ({
         ref: { kind: 'trivia', id: trivia.id }, player: null, kicker: trivia.category, title: trivia.name, text: summaryOf(trivia),
-        symbol: trivia.symbol, fallback: 'note',
+        symbol: trivia.symbol, fallback: 'note', colour: trivia.category.trim() ? tagColour(trivia.category) : '',
       }));
   }
 

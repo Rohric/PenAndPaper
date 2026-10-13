@@ -60,6 +60,7 @@
     <app-dialogue-list-editor
       [dialogues]="draft().dialogues"
       [speakers]="store.npcOptions()"
+      [newSpeaker]="newSpeaker"
       (dialoguesChange)="set('dialogues', $event)"
       (look)="lookUp('npcs', $event)"
     />
@@ -77,7 +78,9 @@
         emptyText="Wer vergibt die Quest?"
         [options]="store.npcOptions()"
         [value]="draft().giver"
+        [creatable]="true"
         (valueChange)="set('giver', $event)"
+        (create)="createLinked('giver', 'world-npcs', $event)"
         (look)="lookUp('npcs', $event)"
       />
     </div>
@@ -90,7 +93,9 @@
         emptyText="Wo beginnt die Quest?"
         [options]="store.locationOptions()"
         [value]="draft().location"
+        [creatable]="true"
         (valueChange)="set('location', $event)"
+        (create)="createLinked('location', 'locations', $event)"
         (look)="lookUp('locations', $event)"
       />
     </div>
@@ -114,7 +119,9 @@
         emptyText="Wer spielt noch eine Rolle?"
         [options]="store.npcOptions()"
         [selected]="draft().npcs"
+        [creatable]="true"
         (selectedChange)="set('npcs', $event)"
+        (create)="createLinked('npcs', 'world-npcs', $event)"
         (look)="lookUp('npcs', $event)"
       />
     </div>

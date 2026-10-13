@@ -10,6 +10,9 @@
     <nav class="row" aria-label="Teile der Welt">
       <a class="btn" routerLink="chapters" routerLinkActive ariaCurrentWhenActive="page"><app-icon name="book" /> Kapitel</a>
       <a class="btn" routerLink="glossary" routerLinkActive ariaCurrentWhenActive="page"><app-icon name="archive" /> Glossar</a>
+      <button type="button" class="btn" [attr.aria-pressed]="recentOpen()" (click)="recentOpen.set(!recentOpen())">
+        <app-icon name="clock" /> Zuletzt
+      </button>
       @if (store.world()) {
         <app-world-search />
       }
@@ -24,5 +27,11 @@
     <router-outlet />
   }
 </section>
+
+@if (recentOpen()) {
+  <app-side-panel title="Zuletzt in dieser Welt" (closed)="recentOpen.set(false)">
+    <app-recent-entries (opened)="recentOpen.set(false)" />
+  </app-side-panel>
+}
 
 <app-entry-peek />
