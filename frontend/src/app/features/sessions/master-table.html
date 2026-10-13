@@ -71,6 +71,42 @@
   </aside>
 
   <section class="master__main">
+    <div class="timeline" role="group" aria-label="Szenen des Kapitels">
+      <app-icon name="book" [size]="16" />
+      @for (scene of thread(); track scene.id; let index = $index) {
+        <button
+          type="button"
+          class="stop"
+          [class.is-done]="played(scene.id)"
+          [class.is-open]="sceneId() === scene.id"
+          [attr.title]="scene.name"
+          [attr.aria-label]="'Szene ' + (index + 1) + ': ' + scene.name"
+          (click)="toggleScene(scene.id, $event)"
+        >
+          {{ index + 1 }}
+        </button>
+      } @empty {
+        <span class="soft">Das Kapitel hat noch keine Szene am roten Faden.</span>
+      }
+      @if (loose().length) {
+        <span class="timeline__rule" aria-hidden="true"></span>
+        <span class="soft">Frei</span>
+        @for (scene of loose(); track scene.id) {
+          <button
+            type="button"
+            class="stop stop--free"
+            [class.is-done]="played(scene.id)"
+            [class.is-open]="sceneId() === scene.id"
+            [attr.title]="scene.name"
+            [attr.aria-label]="'Freie Szene: ' + scene.name"
+            (click)="toggleScene(scene.id, $event)"
+          >
+            <app-icon name="plus" [size]="14" />
+          </button>
+        }
+      }
+    </div>
+
     <div class="field">
       <input class="input" type="search" aria-label="Suche in allem" placeholder="Suche in allem" [ngModel]="query()" (ngModelChange)="query.set($event)" />
     </div>
@@ -181,6 +217,27 @@
     }
   </aside>
 </div>
+
+@if (openScene(); as scene) {
+  <app-popup [title]="scene.name" side="auto" [anchor]="sceneAnchor()" [size]="460" (closed)="sceneId.set(null)">
+    @if (scene.to_read) {
+      <div class="read-aloud"><span class="kicker">Vorlesen</span><p class="prose">{{ scene.to_read }}</p></div>
+    }
+    @if (scene.description) {
+      <p class="prose">{{ scene.description }}</p>
+    }
+    @if (!scene.to_read && !scene.description) {
+      <p class="soft">Zu dieser Szene ist noch nichts geschrieben.</p>
+    }
+    <div class="row">
+      <button type="button" class="btn btn--small btn--primary" (click)="lay({ kind: 'scenes', id: scene.id }, target())">
+        <app-icon name="plus" [size]="14" /> Auf den Tisch
+      </button>
+      <button type="button" class="btn btn--small" (click)="pick({ kind: 'scenes', id: scene.id }); sceneId.set(null)">Dazu gehört</button>
+      <button type="button" class="btn btn--small" (click)="look.emit({ kind: 'scenes', id: scene.id })">Ansehen</button>
+    </div>
+  </app-popup>
+}
 
 @if (openCharacter(); as character) {
   <app-popup [title]="character.name" side="left" [anchor]="characterAnchor()" [size]="380" (closed)="characterId.set(null)">

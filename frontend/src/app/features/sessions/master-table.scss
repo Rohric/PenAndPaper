@@ -164,3 +164,51 @@
   font-weight: 700;
   line-height: 18px;
 }
+
+// A small time line of the scenes of the chapter: numbered stops on the thread, then the free scenes.
+.timeline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.timeline__rule {
+  width: 1px;
+  height: 22px;
+  margin: 0 6px;
+  background: var(--line-2);
+}
+
+.stop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: 2px solid var(--line-2);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stop:hover,
+.stop.is-open {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+// A scene that was played in this session.
+.stop.is-done {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.stop--free {
+  border-style: dashed;
+}

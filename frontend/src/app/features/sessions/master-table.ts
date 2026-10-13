@@ -101,6 +101,14 @@ export class MasterTable {
   private readonly addList = viewChild<TemplateRef<unknown>>('addList');
   private readonly newGroup = viewChild<TemplateRef<unknown>>('newGroup');
 
+  /** The scene whose quick view is open, and the symbol it opens at. */
+  protected readonly sceneId = signal<number | null>(null);
+  protected readonly sceneAnchor = signal<HTMLElement | null>(null);
+  protected readonly openScene = computed(() => this.world.scenes().find((scene) => scene.id === this.sceneId()) ?? null);
+  /** The scenes of the chapter on the thread of the story, in their order. */
+  protected readonly thread = computed(() => this.world.scenesOf(this.chapterId() ?? 0).filter((scene) => !scene.optional));
+  /** The scenes of the chapter that belong to no place on the thread; the game master sets them in where they fit. */
+  protected readonly loose = computed(() => this.world.scenesOf(this.chapterId() ?? 0).filter((scene) => scene.optional));
   protected readonly characters = computed(() => this.store.characters());
   protected readonly openCharacter = computed(() => this.characters().find((character) => character.id === this.characterId()) ?? null);
   protected readonly chapterId = computed(() => this.store.session()?.chapter ?? this.world.chapters()[0]?.id ?? null);
@@ -284,6 +292,17 @@ export class MasterTable {
       this.target.set(name);
       this.draft.set('');
     }
+  }
+
+  /** Open the quick view of a scene at its symbol, or close it again. */
+  protected toggleScene(id: number, event: MouseEvent): void {
+    this.sceneAnchor.set(event.currentTarget as HTMLElement);
+    this.sceneId.set(this.sceneId() === id ? null : id);
+  }
+
+  /** Whether a scene was played in this session. */
+  protected played(id: number): boolean {
+    return !!this.store.state('scene', id)?.done;
   }
 
   /** Open the popup of a character at its round button, or close it again. */
