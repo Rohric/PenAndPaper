@@ -40,7 +40,7 @@
 
   @if (hasSceneEvents()) {
     <section class="stack">
-      <h3 class="section-title"><app-icon name="flag" /> Ereignisse dieser Szene</h3>
+      <h3 class="section-title kind--events"><app-icon name="flag" /> Ereignisse dieser Szene</h3>
       <div class="tiles tiles--wide">
         @for (event of sceneEvents(); track event.id) {
           <ng-container *ngTemplateOutlet="eventTile; context: { $implicit: event, whole: true }" />
@@ -57,7 +57,7 @@
 }
 
 <section class="stack">
-  <h3 class="section-title"><app-icon name="quest" /> Hauptquests</h3>
+  <h3 class="section-title kind--quests"><app-icon name="quest" /> Hauptquests</h3>
   <div class="tiles tiles--wide">
     @for (quest of mainQuests(); track quest.id) {
       <ng-container *ngTemplateOutlet="questTile; context: { $implicit: quest }" />
@@ -69,7 +69,7 @@
 
 <details class="fold">
   <summary class="section-title">
-    <app-icon class="fold__mark" name="right" /> <app-icon name="quest" /> Nebenquests
+    <app-icon class="fold__mark" name="right" /> <app-icon class="kind--quests" name="quest" /> Nebenquests
     <span class="chip">{{ sideCount() }} offen</span>
   </summary>
   <div class="stack">
@@ -105,7 +105,7 @@
 
 <details class="fold">
   <summary class="section-title">
-    <app-icon class="fold__mark" name="right" /> <app-icon name="flag" /> Freie Ereignisse
+    <app-icon class="fold__mark" name="right" /> <app-icon class="kind--events" name="flag" /> Freie Ereignisse
     <span class="chip">{{ freeCount() }} offen</span>
   </summary>
   <div class="stack">

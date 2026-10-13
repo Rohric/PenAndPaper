@@ -16,6 +16,16 @@
   --danger: #f0b9a8;
   --ok: #b9d8a6;
 
+  // One colour per kind of entry, so a link shows at a glance what it leads to.
+  --kind-location: #6fd0c2;
+  --kind-npc: #c4a7f0;
+  --kind-quest: #f0c060;
+  --kind-event: #f29477;
+  --kind-trivia: #8fb8f0;
+  --kind-item: #c3d977;
+  --kind-scene: #f0a3c8;
+  --kind-chapter: #d9d2c5;
+
   --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'IBM Plex Sans', system-ui, sans-serif;
 

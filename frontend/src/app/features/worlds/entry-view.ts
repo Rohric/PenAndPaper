@@ -15,12 +15,12 @@ import { WorldStore } from './world-store';
   imports: [Icon, Portrait, LinkRow, DialogueView],
   template: `
     @if (view(); as shown) {
-      <article class="panel">
+      <article [class]="'panel kind--' + shown.tone">
         <header class="row row--between">
           <div class="tile__head">
             <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="52" />
             <div>
-              <span class="kicker">{{ shown.kicker }}</span>
+              <span class="kicker kicker--kind">{{ shown.kicker }}</span>
               <h2 class="subtitle">{{ shown.title }}</h2>
               @if (shown.sub) {
                 <p class="soft">{{ shown.sub }}</p>

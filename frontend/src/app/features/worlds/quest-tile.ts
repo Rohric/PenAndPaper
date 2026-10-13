@@ -21,7 +21,7 @@ interface Tag extends EntryLink {
   selector: 'app-quest-tile',
   imports: [Portrait],
   template: `
-    <article class="tile" [class.tile--done]="done()">
+    <article class="tile kind--quests" [class.tile--done]="done()">
       <button type="button" class="tile__body" (click)="lookUp()">
         <span class="tile__head">
           <app-portrait fallback="quest" [symbol]="now().symbol" [size]="36" />
@@ -42,7 +42,9 @@ interface Tag extends EntryLink {
       @if (tags().length) {
         <div class="row">
           @for (tag of tags(); track tag.word + tag.kind + tag.id) {
-            <button type="button" class="chip chip--link" (click)="follow(tag)">{{ tag.word }} · {{ tag.label }}</button>
+            <button type="button" [class]="'chip chip--link kind--' + (tag.tone ?? tag.kind)" (click)="follow(tag)">
+              {{ tag.word }} · {{ tag.label }}
+            </button>
           }
         </div>
       }
@@ -76,7 +78,7 @@ export class QuestTile {
       ...this.tagged('Startgebiet', places.map((place) => ({ kind: 'locations', id: place.id, label: place.name }))),
       ...this.tagged('Szene', sceneLinks(this.store, scenes)),
       ...this.tagged('Figur', npcLinks(this.store, quest.npcs)),
-      ...this.tagged('Gegenstand', items.map((item) => ({ kind: 'trivia', id: item.id, label: item.name }))),
+      ...this.tagged('Gegenstand', items.map((item) => ({ kind: 'trivia', id: item.id, label: item.name, tone: 'items' }))),
     ];
   });
 

@@ -57,6 +57,8 @@ export interface Option {
   id: number;
   label: string;
   hint?: string;
+  /** The kind of entry behind the choice, like "npcs"; it gives the choice its colour. */
+  tone?: string;
 }
 
 /** One piece of knowledge about an entry: a text with an optional title. */
@@ -228,6 +230,13 @@ export interface Peek extends EntryRef {
 /** A pointer to an entry together with the text shown for it. */
 export interface EntryLink extends EntryRef {
   label: string;
+  /** Where the colour differs from the kind: an item is a knowledge entry, but has its own colour. */
+  tone?: string;
+}
+
+/** Whether a knowledge entry is an item: its category is "Gegenstand". */
+export function isItem(trivia: { category: string }): boolean {
+  return trivia.category.trim().toLowerCase() === 'gegenstand';
 }
 
 /** Something special a character can do, with the condition for its roll. */

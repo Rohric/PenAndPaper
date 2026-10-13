@@ -15,7 +15,7 @@ import { WorldStore } from './world-store';
   template: `
     <div class="stack">
       <div class="row row--between">
-        <h2 class="section-title"><app-icon name="book" /> Kapitel</h2>
+        <h2 class="section-title kind--chapters"><app-icon name="book" /> Kapitel</h2>
         <app-tutorial-button topic="chapters" />
       </div>
 
@@ -30,7 +30,7 @@ import { WorldStore } from './world-store';
 
       <div class="tiles tiles--wide">
         @for (chapter of store.chapters(); track chapter.id) {
-          <a class="tile tile--link" [routerLink]="[chapter.id]">
+          <a class="tile tile--link kind--chapters" [routerLink]="[chapter.id]">
             <span class="kicker">Kapitel {{ chapter.number }}</span>
             <span class="tile__title">{{ chapter.name }}</span>
             @if (chapter.text) {

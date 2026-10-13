@@ -20,7 +20,9 @@ interface Row {
         <h3 class="section-title">{{ group.label }}</h3>
         @for (entry of group.rows; track entry.id) {
           <div class="row row--between">
-            <button type="button" class="chip chip--link" (click)="world.peek.set({ kind: group.list, id: entry.id })">{{ entry.name }}</button>
+            <button type="button" [class]="'chip chip--link kind--' + group.list" (click)="world.peek.set({ kind: group.list, id: entry.id })">
+              {{ entry.name }}
+            </button>
             <button type="button" class="btn btn--small" (click)="store.toggle(group.kind, entry.id, 'done')">
               <app-icon name="undo" [size]="16" /> Zurückholen
             </button>

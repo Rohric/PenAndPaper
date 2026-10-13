@@ -4,7 +4,7 @@ import { Observable, forkJoin, tap } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { ApiService } from '../../core/api.service';
 import {
-  Chapter, EntryTexts, Location, Option, Peek, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, questLabel,
+  Chapter, EntryTexts, Location, Option, Peek, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, isItem, questLabel,
 } from '../../core/models';
 
 /** The lists inside a world, named like their part of the API address. */
@@ -70,20 +70,26 @@ export class WorldStore {
   questChanges: (questId: number) => Partial<Quest> = () => ({});
 
   readonly locationOptions = computed<Option[]>(() =>
-    this.locations().map((l) => ({ id: l.id, label: l.name, hint: this.parentHint(l) || excerpt(l) })),
+    this.locations().map((l) => ({ id: l.id, label: l.name, hint: this.parentHint(l) || excerpt(l), tone: 'locations' })),
   );
   /** Characters by their own id, because quests and scenes point to the character. */
-  readonly npcOptions = computed<Option[]>(() => this.npcs().map((n) => ({ id: n.npc, label: n.name, hint: n.profession })));
-  readonly questOptions = computed<Option[]>(() =>
-    this.quests().map((q) => ({ id: q.id, label: q.name, hint: [questLabel(q), excerpt(q)].filter(Boolean).join(' · ') })),
+  readonly npcOptions = computed<Option[]>(() =>
+    this.npcs().map((n) => ({ id: n.npc, label: n.name, hint: n.profession, tone: 'npcs' })),
   );
-  readonly eventOptions = computed<Option[]>(() => this.events().map((e) => ({ id: e.id, label: e.name, hint: excerpt(e) })));
+  readonly questOptions = computed<Option[]>(() =>
+    this.quests().map((q) => ({ id: q.id, label: q.name, hint: [questLabel(q), excerpt(q)].filter(Boolean).join(' · '), tone: 'quests' })),
+  );
+  readonly eventOptions = computed<Option[]>(() =>
+    this.events().map((e) => ({ id: e.id, label: e.name, hint: e.trigger || e.happening || excerpt(e), tone: 'events' })),
+  );
   readonly triviaOptions = computed<Option[]>(() =>
-    this.trivia().map((t) => ({ id: t.id, label: t.name, hint: [t.category, excerpt(t)].filter(Boolean).join(' · ') })),
+    this.trivia().map((t) => ({
+      id: t.id, label: t.name, hint: [t.category, excerpt(t)].filter(Boolean).join(' · '), tone: isItem(t) ? 'items' : 'trivia',
+    })),
   );
   /** Every scene of the world, with its chapter as a hint. */
   readonly sceneOptions = computed<Option[]>(() =>
-    this.scenes().map((scene) => ({ id: scene.id, label: scene.name, hint: this.chapterHint(scene) })),
+    this.scenes().map((scene) => ({ id: scene.id, label: scene.name, hint: this.chapterHint(scene), tone: 'scenes' })),
   );
 
   private readonly lists: Record<Kind, WritableSignal<Entry[]>> = {

@@ -1,7 +1,7 @@
 import { Params, Router } from '@angular/router';
 
 import {
-  Dialogue, EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, Trivia, questLabel,
+  Dialogue, EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, isItem, questLabel,
 } from '../../core/models';
 import { damageText, skillValue } from '../../core/rules';
 import { IconName } from '../../shared/icon';
@@ -15,6 +15,8 @@ export interface EntryViewModel {
   kicker: string;
   title: string;
   sub: string;
+  /** The kind whose colour the entry shows, like "npcs" or "items". */
+  tone: string;
   /** The symbol the entry carries, and the usual symbol of its kind. */
   symbol: string;
   fallback: IconName;
@@ -44,12 +46,7 @@ export const KIND_LABELS: Record<EntryKind, string> = {
   scenes: 'Szene',
 };
 
-const ITEM_CATEGORY = 'gegenstand';
-
-/** Whether a knowledge entry is an item: its category is "Gegenstand". */
-export function isItem(trivia: Trivia): boolean {
-  return trivia.category.trim().toLowerCase() === ITEM_CATEGORY;
-}
+export { isItem };
 
 const links = (kind: EntryKind, entries: Named[]): EntryLink[] => entries.map((e) => ({ kind, id: e.id, label: e.name }));
 const among = <T extends Named>(entries: T[], ids: (number | null)[]): T[] => entries.filter((e) => ids.includes(e.id));
@@ -109,7 +106,7 @@ export function allText(entry: EntryTexts): string {
 function attached(store: WorldStore, kind: 'locations' | 'npcs' | 'quests' | 'events', id: number): EntryViewModel['links'] {
   const all = store.trivia().filter((trivia) => trivia[kind].includes(id));
   return [
-    { label: 'Gegenstände', items: links('trivia', all.filter(isItem)) },
+    { label: 'Gegenstände', items: links('trivia', all.filter(isItem)).map((link) => ({ ...link, tone: 'items' })) },
     { label: 'Wissen', items: links('trivia', all.filter((trivia) => !isItem(trivia))) },
   ];
 }
@@ -132,7 +129,7 @@ function locationView(store: WorldStore, id: number): EntryViewModel | null {
   const here = <T extends { location: number | null }>(entries: T[]) => entries.filter((e) => e.location === id);
   return tidy({
     kicker: 'Ort', title: place.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(place),
-    symbol: place.symbol, fallback: 'pin', pictures: 3, dialogues: [],
+    tone: 'locations', symbol: place.symbol, fallback: 'pin', pictures: 3, dialogues: [],
     blocks: [{ label: 'Beschreibung', text: place.description }],
     links: [
       { label: 'Liegt in', items: links('locations', among(store.locations(), [place.parent])) },
@@ -154,7 +151,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
   const loaded = npc?.id === id ? npc : null;
   return tidy({
     kicker: 'Figur', title: link.name, sub: link.profession, phrases: loaded?.phrases ?? [],
-    symbol: loaded?.symbol ?? link.symbol, fallback: 'sheet', pictures: 0, dialogues: [],
+    tone: 'npcs', symbol: loaded?.symbol ?? link.symbol, fallback: 'sheet', pictures: 0, dialogues: [],
     knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
       { label: 'Beschreibung', text: loaded?.description ?? '' },
@@ -200,7 +197,7 @@ function questView(store: WorldStore, id: number): EntryViewModel | null {
   const quest = store.questNow(found);
   return tidy({
     kicker: questLabel(quest), title: quest.name, sub: '', phrases: [],
-    symbol: quest.symbol, fallback: 'quest', pictures: 0, dialogues: quest.dialogues,
+    tone: 'quests', symbol: quest.symbol, fallback: 'quest', pictures: 0, dialogues: quest.dialogues,
     knowledge: knowledgeOf(quest),
     blocks: [{ label: 'Beschreibung', text: quest.description }, { label: 'Ziel', text: quest.goal }],
     lists: [{ label: 'Checkliste', items: quest.checklist }],
@@ -221,7 +218,7 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
   }
   return tidy({
     kicker: 'Ereignis', title: event.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(event),
-    symbol: event.symbol, fallback: 'flag', pictures: 0, dialogues: event.dialogues,
+    tone: 'events', symbol: event.symbol, fallback: 'flag', pictures: 0, dialogues: event.dialogues,
     blocks: [
       { label: 'Auslöser', text: event.trigger },
       { label: 'Was passiert', text: event.happening },
@@ -251,7 +248,8 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
   }
   return tidy({
     kicker: trivia.category || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(trivia),
-    symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note', pictures: isItem(trivia) ? 3 : 0, dialogues: [],
+    tone: isItem(trivia) ? 'items' : 'trivia', symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note',
+    pictures: isItem(trivia) ? 3 : 0, dialogues: [],
     blocks: [{ label: 'Beschreibung', text: trivia.description }],
     links: [
       { label: 'Orte', items: links('locations', among(store.locations(), trivia.locations)) },

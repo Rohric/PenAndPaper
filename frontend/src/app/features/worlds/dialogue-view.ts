@@ -42,7 +42,7 @@ import { WorldStore } from './world-store';
       padding: 0;
       border: 0;
       background: transparent;
-      color: var(--info);
+      color: var(--kind-npc);
       font-weight: 600;
     }
   `,

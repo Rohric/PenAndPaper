@@ -63,7 +63,7 @@ export class SceneForm {
     this.store
       .scenesOf(this.entry().chapter)
       .filter((scene) => scene.id !== this.entry().id)
-      .map((scene) => ({ id: scene.id, label: scene.name, hint: scene.optional ? 'optionale Szene' : 'am roten Faden' })),
+      .map((scene) => ({ id: scene.id, label: scene.name, hint: scene.optional ? 'optionale Szene' : 'am roten Faden', tone: 'scenes' })),
   );
 
   private readonly title = viewChild.required<ElementRef<HTMLInputElement>>('title');

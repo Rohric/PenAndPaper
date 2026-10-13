@@ -59,7 +59,7 @@
         <nav class="tabs" aria-label="Bereiche des Glossars">
           @for (part of sections; track part.id) {
             <button type="button" class="tabs__tab" [class.is-active]="part.id === sectionId()" (click)="sectionId.set(part.id)">
-              <app-icon [name]="part.icon" [size]="16" /> {{ part.label }}
+              <app-icon [class]="'kind--' + part.id" [name]="part.icon" [size]="16" /> {{ part.label }}
             </button>
           }
         </nav>
@@ -72,7 +72,7 @@
       }
       @default {
         <section class="stack">
-          <h2 class="section-title"><app-icon name="group" /> Gruppe</h2>
+          <h2 class="section-title kind--npcs"><app-icon name="group" /> Gruppe</h2>
           <app-session-group (open)="openPanel($event)" />
         </section>
 
@@ -92,7 +92,7 @@
     <div class="row">
       <app-icon name="pin" />
       @for (pin of pins(); track pin.kind + pin.id) {
-        <button type="button" class="chip chip--link" (click)="openPin(pin)">{{ pin.label }}</button>
+        <button type="button" [class]="'chip chip--link kind--' + pin.kind" (click)="openPin(pin)">{{ pin.label }}</button>
       } @empty {
         <span class="soft">Noch nichts angeheftet.</span>
       }

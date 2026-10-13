@@ -25,17 +25,19 @@ interface Card {
   text: string;
   symbol: string;
   fallback: IconName;
+  /** The kind whose colour the tile shows. */
+  tone: string;
   entry: SharedEntry | null;
   item: CarriedItem | null;
 }
 
 const ITEM_CATEGORY = 'gegenstand';
 const NOTHING_MORE = 'Mehr wisst ihr noch nicht.';
-const PARTS: { kind: SessionEntryKind; label: string; icon: IconName }[] = [
-  { kind: 'location', label: 'Orte', icon: 'pin' },
-  { kind: 'npc', label: 'Figuren', icon: 'sheet' },
-  { kind: 'event', label: 'Ereignisse', icon: 'flag' },
-  { kind: 'trivia', label: 'Wissen', icon: 'note' },
+const PARTS: { kind: SessionEntryKind; label: string; icon: IconName; tone: string }[] = [
+  { kind: 'location', label: 'Orte', icon: 'pin', tone: 'locations' },
+  { kind: 'npc', label: 'Figuren', icon: 'sheet', tone: 'npcs' },
+  { kind: 'event', label: 'Ereignisse', icon: 'flag', tone: 'events' },
+  { kind: 'trivia', label: 'Wissen', icon: 'note', tone: 'trivia' },
 ];
 
 const isItem = (entry: SharedEntry) => entry.kind === 'trivia' && entry.category.trim().toLowerCase() === ITEM_CATEGORY;
@@ -71,7 +73,7 @@ export class PlayerPanels {
   protected readonly sections = computed(() => {
     const entries = this.view().glossary;
     const parts = PARTS.map((part) => ({ ...part, cards: entries.filter((entry) => entry.kind === part.kind && !isItem(entry)).map(entryCard) }));
-    const items = { kind: 'trivia' as const, label: 'Gegenstände', icon: 'gift' as const, cards: this.items().map(itemCard) };
+    const items = { kind: 'trivia' as const, label: 'Gegenstände', icon: 'gift' as const, tone: 'items', cards: this.items().map(itemCard) };
     return [...parts, items].filter((part) => part.cards.length);
   });
   protected readonly openQuest = computed(() => this.quests().find((quest) => `quest:${quest.id}` === this.openKey()) ?? null);
@@ -97,10 +99,10 @@ export class PlayerPanels {
 }
 
 function entryCard(entry: SharedEntry): Card {
-  const fallback = PARTS.find((part) => part.kind === entry.kind)?.icon ?? 'note';
+  const part = PARTS.find((other) => other.kind === entry.kind);
   return {
     key: `${entry.kind}:${entry.id}`, kicker: entry.category, title: entry.name, text: entry.description,
-    symbol: entry.symbol, fallback, entry, item: null,
+    symbol: entry.symbol, fallback: part?.icon ?? 'note', tone: part?.tone ?? 'trivia', entry, item: null,
   };
 }
 
@@ -108,7 +110,7 @@ function itemCard(item: CarriedItem): Card {
   const owners = item.owners.length ? `Getragen von ${item.owners.join(', ')}` : 'Gegenstand';
   return {
     key: `item:${item.name.toLowerCase()}`, kicker: owners + (item.hidden ? ' · versteckt' : ''), title: item.name, text: item.text,
-    symbol: item.entry?.symbol ?? '', fallback: 'gift', entry: item.entry, item,
+    symbol: item.entry?.symbol ?? '', fallback: 'gift', tone: 'items', entry: item.entry, item,
   };
 }
 

@@ -14,7 +14,7 @@
     <nav class="tabs" aria-label="Teile des Kapitels">
       @for (item of tabs; track item.id) {
         <a class="tabs__tab" [routerLink]="[]" [queryParams]="{ tab: item.id }" [class.is-active]="item.id === currentTab()">
-          <app-icon [name]="item.icon" [size]="16" /> {{ item.label }}
+          <app-icon [class]="'kind--' + item.id" [name]="item.icon" [size]="16" /> {{ item.label }}
         </a>
       }
     </nav>

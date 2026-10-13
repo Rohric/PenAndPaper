@@ -130,6 +130,10 @@ export const TUTORIALS: Tutorial[] = [
         text: 'Jeder Bereich zeigt seine Einträge als Kacheln. Ein Klick öffnet den Eintrag rechts im Seitenfenster, ohne dass du die Seite verlässt.\n\nIm Seitenfenster liest du, mit „Bearbeiten“ änderst du den Eintrag gleich dort, mit „Zurück“ gehst du den Weg durch verlinkte Einträge zurück, und „Ganze Seite“ öffnet den Eintrag groß.',
       },
       {
+        title: 'Farben',
+        text: 'Jede Art von Eintrag hat ihre Farbe, überall in der App: Orte sind türkis, Figuren violett, Quests gelb, Ereignisse orange, Gegenstände hellgrün, Wissen blau und Szenen rosa.\n\nDie Farbe steht an Kacheln, Symbolen, Marken und Verknüpfungen. So siehst du schon vor dem Klick, wohin ein Link führt.',
+      },
+      {
         title: 'Suchen',
         text: 'Das Suchfeld oben in der Leiste sucht in der ganzen Welt, in Namen und in Texten, egal auf welcher Seite du gerade bist. Tippen, mit den Pfeiltasten wählen, Enter: Der Eintrag öffnet sich im Seitenfenster.',
       },

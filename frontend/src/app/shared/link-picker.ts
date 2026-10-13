@@ -17,6 +17,7 @@ interface Choice {
  * Link entries by typing. The linked entries stand as chips in the field. Typing shows what fits,
  * the arrow keys walk through the list, Enter links the marked entry, Backspace in the empty field
  * takes the last chip away, and Tab moves on. A click on a chip looks the entry up.
+ * Chips and choices show the colour of the kind of entry they stand for.
  * With "single" the field holds one entry at most and speaks "value" instead of "selected".
  */
 @Component({
@@ -26,7 +27,7 @@ interface Choice {
     <div class="box" (click)="focus()">
       @if (chips()) {
         @for (option of chosen(); track option.id) {
-          <span class="token">
+          <span [class]="'token kind--' + (option.tone ?? '')">
             <button type="button" class="token__name" tabindex="-1" (click)="look.emit(option.id); $event.stopPropagation()">
               {{ option.label }}
             </button>
@@ -65,8 +66,8 @@ interface Choice {
       <div class="list" role="listbox" [id]="listId">
         @for (choice of choices(); track $index) {
           <div
-            class="list__item"
             role="option"
+            [class]="'list__item kind--' + (choice.option?.tone ?? '')"
             [id]="listId + '-' + $index"
             [class.is-active]="$index === active()"
             [attr.aria-selected]="$index === active()"
@@ -128,8 +129,9 @@ interface Choice {
     .token {
       display: inline-flex;
       align-items: center;
-      border: 1px solid var(--info);
+      border: 1px solid var(--kind, var(--info));
       border-radius: 999px;
+      background: color-mix(in srgb, var(--kind, var(--info)) 12%, transparent);
     }
 
     .token__name,
@@ -143,7 +145,7 @@ interface Choice {
 
     .token__name {
       padding: 0 4px 0 12px;
-      color: var(--info);
+      color: var(--kind, var(--info));
       font-size: 14px;
       font-weight: 600;
     }
@@ -173,20 +175,23 @@ interface Choice {
       box-shadow: 0 12px 28px rgb(0 0 0 / 45%);
     }
 
+    // A choice carries the colour of its kind on its left edge and in its name.
     .list__item {
       display: flex;
       flex-direction: column;
       padding: 6px 10px;
+      border-left: 3px solid var(--kind, transparent);
       border-radius: 8px;
       cursor: pointer;
     }
 
     .list__item.is-active {
       background: var(--surface);
-      box-shadow: inset 3px 0 0 var(--accent);
+      outline: 1px solid var(--accent);
     }
 
     .list__label {
+      color: var(--kind, var(--text));
       font-weight: 600;
     }
 

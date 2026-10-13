@@ -18,10 +18,10 @@ interface Named {
   selector: 'app-scene-view',
   imports: [Icon, LinkRow, DialogueView, EventTile],
   template: `
-    <article class="panel">
+    <article class="panel kind--scenes">
       <header class="row row--between">
         <div>
-          <span class="kicker">{{ scene().optional ? 'Optionale Szene' : 'Szene am roten Faden' }}</span>
+          <span class="kicker kicker--kind">{{ scene().optional ? 'Optionale Szene' : 'Szene am roten Faden' }}</span>
           <h2 class="subtitle">{{ scene().name }}</h2>
         </div>
         @if (editable()) {

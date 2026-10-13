@@ -41,8 +41,8 @@ export class EventScenes {
   /** Inside a chapter the name is enough, across the world the chapter number is added. */
   protected readonly options = computed<Option[]>(() =>
     this.chapterId() === null
-      ? sceneLinks(this.store, this.scenes()).map((link) => ({ id: link.id, label: link.label }))
-      : this.scenes().map((scene) => ({ id: scene.id, label: scene.name })),
+      ? sceneLinks(this.store, this.scenes()).map((link) => ({ id: link.id, label: link.label, tone: 'scenes' }))
+      : this.scenes().map((scene) => ({ id: scene.id, label: scene.name, tone: 'scenes' })),
   );
   protected readonly selected = computed(() =>
     this.scenes()

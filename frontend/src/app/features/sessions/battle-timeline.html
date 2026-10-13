@@ -1,6 +1,6 @@
 <ol class="line" aria-label="Reihenfolge im Kampf">
   @for (entry of entries(); track entry.id) {
-    <li class="who" [class.is-current]="entry.id === current()">
+    <li class="who" [class.is-current]="entry.id === current()" [class.kind--npcs]="!entry.isPlayer">
       @if (editable()) {
         <button
           type="button"

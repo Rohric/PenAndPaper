@@ -14,7 +14,9 @@ import { WorldStore } from './world-store';
         <span class="label">{{ label() }}</span>
         <div class="row">
           @for (item of items(); track item.kind + item.id) {
-            <button type="button" class="chip chip--link" (click)="open(item)">{{ item.label }}</button>
+            <button type="button" [class]="'chip chip--link kind--' + (item.tone ?? item.kind)" (click)="open(item)">
+              {{ item.label }}
+            </button>
           }
         </div>
       </div>

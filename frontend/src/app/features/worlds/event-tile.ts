@@ -13,7 +13,7 @@ import { WorldStore } from './world-store';
   selector: 'app-event-tile',
   imports: [Portrait],
   template: `
-    <article class="tile">
+    <article class="tile kind--events">
       <button type="button" class="tile__body" (click)="store.peek.set({ kind: 'events', id: event().id })">
         <span class="tile__head">
           <app-portrait fallback="flag" [symbol]="event().symbol" [size]="36" />

@@ -7,7 +7,8 @@ export type PortraitState = 'plain' | 'turn' | 'out' | 'frozen' | 'poisoned' | '
 
 /**
  * The face of an entry or a character: its symbol in a round frame, or its picture when it has one
- * and wants it shown. The frame takes the colour of a state, like "on turn" or "frozen".
+ * and wants it shown. The frame takes the colour of the kind of its owner, or of a state like
+ * "on turn" or "frozen".
  */
 @Component({
   selector: 'app-portrait',
@@ -32,10 +33,10 @@ export type PortraitState = 'plain' | 'turn' | 'out' | 'frozen' | 'poisoned' | '
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 2px solid var(--line-2);
+      border: 2px solid var(--kind, var(--line-2));
       border-radius: 50%;
       background: var(--surface-2);
-      color: var(--soft);
+      color: var(--kind, var(--soft));
     }
 
     .portrait__image {

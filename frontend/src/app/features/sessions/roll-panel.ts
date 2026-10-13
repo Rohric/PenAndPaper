@@ -124,7 +124,9 @@ export class RollPanel {
   private readonly npc = signal<Npc | null>(null);
 
   protected readonly options = computed<Option[]>(() => [
-    ...this.characters().map((character) => ({ id: -character.id, label: character.name, hint: `Spielercharakter von ${character.player}` })),
+    ...this.characters().map((character) => ({
+      id: -character.id, label: character.name, hint: `Spielercharakter von ${character.player}`, tone: 'npcs',
+    })),
     ...this.npcs().map((npc) => ({ ...npc, hint: npc.hint || 'Figur der Welt' })),
   ]);
   /** The sheet of whoever is rolled for. */

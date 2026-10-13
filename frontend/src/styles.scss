@@ -317,16 +317,59 @@ textarea.input {
   color: var(--danger);
 }
 
-// A chip that leads to another entry.
+// Every kind of entry has its own colour. An element with one of these classes hands the colour
+// to everything inside it: chips, tags, tiles, symbols and kickers pick it up as --kind.
+.kind--locations {
+  --kind: var(--kind-location);
+}
+
+.kind--npcs {
+  --kind: var(--kind-npc);
+}
+
+.kind--quests {
+  --kind: var(--kind-quest);
+}
+
+.kind--events {
+  --kind: var(--kind-event);
+}
+
+.kind--trivia {
+  --kind: var(--kind-trivia);
+}
+
+.kind--items {
+  --kind: var(--kind-item);
+}
+
+.kind--scenes {
+  --kind: var(--kind-scene);
+}
+
+.kind--chapters {
+  --kind: var(--kind-chapter);
+}
+
+// A chip that leads to another entry, in the colour of the kind it leads to.
 .chip--link {
   display: inline-flex;
   align-items: center;
   min-height: 36px;
-  border-color: var(--info);
-  background: transparent;
-  color: var(--info);
+  border-color: var(--kind, var(--info));
+  background: color-mix(in srgb, var(--kind, var(--info)) 12%, transparent);
+  color: var(--kind, var(--info));
   font-weight: 600;
   text-decoration: none;
+}
+
+.chip--link:hover {
+  background: color-mix(in srgb, var(--kind, var(--info)) 24%, transparent);
+}
+
+// A small label in the colour of the kind it stands for.
+.kicker--kind {
+  color: var(--kind, var(--muted));
 }
 
 // Reading views: written text keeps its line breaks.
@@ -424,7 +467,16 @@ textarea.input {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
+  // A tile of an entry shows the colour of its kind as a stripe on its left edge.
+  box-shadow: inset 3px 0 0 var(--kind, transparent);
   color: var(--text);
+}
+
+// The label of a tile takes the colour of the kind of entry the tile shows.
+.tile > .kicker,
+.tile__body > .kicker,
+.tile__names > .kicker {
+  color: var(--kind, var(--muted));
 }
 
 // A chip inside a tile keeps its own width.
@@ -534,6 +586,12 @@ button.tile:hover {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
+}
+
+// The symbol of a heading or a tab shows the colour of the kind it stands for.
+.section-title app-icon,
+.tabs__tab app-icon {
+  color: var(--kind, currentColor);
 }
 
 // Tabs: the parts of a world and of a chapter.

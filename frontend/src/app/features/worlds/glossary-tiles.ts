@@ -77,7 +77,7 @@ interface Tile {
         }
       } @else {
         @for (tile of tiles(); track $index) {
-          <button type="button" class="tile" (click)="open(tile)">
+          <button type="button" [class]="'tile kind--' + section().id" (click)="open(tile)">
             <span class="tile__head">
               <app-portrait [symbol]="tile.symbol" [fallback]="tile.fallback" [size]="36" />
               <span class="tile__names">

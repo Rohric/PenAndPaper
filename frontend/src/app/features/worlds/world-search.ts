@@ -1,6 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 
-import { EntryKind, Option } from '../../core/models';
+import { EntryKind, Option, isItem } from '../../core/models';
 import { LinkPicker } from '../../shared/link-picker';
 import { KIND_LABELS, allText } from './entry-views';
 import { WorldStore } from './world-store';
@@ -41,7 +41,10 @@ export class WorldSearch {
     ...this.store.npcs().map((link) => this.option('npcs', link.npc, link.name, link.profession)),
     ...this.store.quests().map((quest) => this.option('quests', quest.id, quest.name, `${quest.goal} ${allText(quest)}`)),
     ...this.store.events().map((event) => this.option('events', event.id, event.name, allText(event))),
-    ...this.store.trivia().map((trivia) => this.option('trivia', trivia.id, trivia.name, `${trivia.category} ${allText(trivia)}`)),
+    ...this.store.trivia().map((trivia) => ({
+      ...this.option('trivia', trivia.id, trivia.name, `${trivia.category} ${allText(trivia)}`),
+      tone: isItem(trivia) ? 'items' : 'trivia',
+    })),
   ]);
 
   /** Look the chosen entry up at the side. */
@@ -52,6 +55,6 @@ export class WorldSearch {
   }
 
   private option(kind: EntryKind, id: number, label: string, text: string): Option {
-    return { id: KINDS.indexOf(kind) * SPAN + id, label, hint: `${KIND_LABELS[kind]} · ${text}`.trim() };
+    return { id: KINDS.indexOf(kind) * SPAN + id, label, hint: `${KIND_LABELS[kind]} · ${text}`.trim(), tone: kind };
   }
 }

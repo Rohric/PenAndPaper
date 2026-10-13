@@ -14,10 +14,10 @@
 
 @if (shows().quests) {
   <section class="stack">
-    <h3 class="section-title"><app-icon name="quest" /> Quests</h3>
+    <h3 class="section-title kind--quests"><app-icon name="quest" /> Quests</h3>
     <div class="tiles tiles--wide">
       @for (quest of quests(); track quest.id) {
-        <button type="button" class="tile" [class.tile--done]="quest.done" (click)="openKey.set('quest:' + quest.id)">
+        <button type="button" class="tile kind--quests" [class.tile--done]="quest.done" (click)="openKey.set('quest:' + quest.id)">
           <span class="tile__head">
             <app-portrait fallback="quest" [symbol]="quest.symbol" [size]="36" />
             <span class="tile__names">
@@ -47,10 +47,10 @@
 @if (shows().glossary) {
   @for (section of sections(); track section.label) {
     <section class="stack">
-      <h3 class="section-title"><app-icon [name]="section.icon" /> {{ section.label }}</h3>
+      <h3 [class]="'section-title kind--' + section.tone"><app-icon [name]="section.icon" /> {{ section.label }}</h3>
       <div class="tiles">
         @for (card of section.cards; track card.key) {
-          <button type="button" class="tile" (click)="openKey.set(card.key)">
+          <button type="button" [class]="'tile kind--' + card.tone" (click)="openKey.set(card.key)">
             <span class="tile__head">
               <app-portrait [symbol]="card.symbol" [fallback]="card.fallback" [size]="36" />
               <span class="tile__names">
@@ -74,8 +74,8 @@
 
 @if (openQuest(); as quest) {
   <app-side-panel title="Quest" (closed)="openKey.set(null)">
-    <article class="panel">
-      <span class="kicker">{{ kicker(quest) }}</span>
+    <article class="panel kind--quests">
+      <span class="kicker kicker--kind">{{ kicker(quest) }}</span>
       <h2 class="subtitle">{{ quest.name }}</h2>
       @if (quest.giver) {
         <p class="soft">Questgeber: {{ quest.giver }}</p>
@@ -113,12 +113,12 @@
 
 @if (openCard(); as card) {
   <app-side-panel title="Glossar" (closed)="openKey.set(null)">
-    <article class="panel">
+    <article [class]="'panel kind--' + card.tone">
       <div class="tile__head">
         <app-portrait [symbol]="card.symbol" [fallback]="card.fallback" [size]="52" />
         <div>
           @if (card.kicker) {
-            <span class="kicker">{{ card.kicker }}</span>
+            <span class="kicker kicker--kind">{{ card.kicker }}</span>
           }
           <h2 class="subtitle">{{ card.title }}</h2>
         </div>
