@@ -1,4 +1,4 @@
-import { Params, Router } from '@angular/router';
+import { Params } from '@angular/router';
 
 import {
   Dialogue, EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, isItem, questLabel,
@@ -7,6 +7,11 @@ import { damageText, skillValue } from '../../core/rules';
 import { IconName } from '../basic/icon';
 import { tagColour } from './tag-colour';
 import { WorldStore } from '../../core/world-store';
+
+/** The line above the name: the kind, then the category the game master gave the entry, then what follows. */
+export function kickerOf(kind: string, category: string, ...more: string[]): string {
+  return [kind, category.trim(), ...more].filter(Boolean).join(' · ');
+}
 
 /**
  * What the reading view of an entry shows: built here for every kind of entry,
@@ -26,13 +31,15 @@ export interface EntryViewModel {
   /** How many pictures the entry can show; places and items have room for three. */
   pictures: number;
   dialogues: Dialogue[];
-  /** key names the part for the eye of the session, like "goal". */
-  blocks: { key?: string; label: string; text: string }[];
+  /** key names the part for the eye of the session, like "goal"; a text to read aloud is set apart. */
+  blocks: { key?: string; label: string; text: string; readAloud?: boolean }[];
   /** Knowledge pieces in two groups: what players can learn, and what only the game master knows. */
   knowledge: { label: string; gmOnly: boolean; pieces: Knowledge[] }[];
   lists: { key?: string; label: string; items: string[] }[];
   phrases: Phrase[];
   links: { key?: string; label: string; items: EntryLink[] }[];
+  /** The note of the game master on the entry; players never see it. */
+  note: string;
 }
 
 /** What a session lets the players see of an entry: the name, single parts, found knowledge, checked steps. */
@@ -93,6 +100,10 @@ export function viewOf(store: WorldStore, ref: EntryRef, npc: Npc | null): Entry
       return eventView(store, ref.id);
     case 'trivia':
       return triviaView(store, ref.id);
+    case 'scenes':
+      return sceneView(store, ref.id);
+    case 'chapters':
+      return chapterView(store, ref.id);
     default:
       return null;
   }
@@ -143,7 +154,7 @@ function locationView(store: WorldStore, id: number): EntryViewModel | null {
   }
   const here = <T extends { location: number | null }>(entries: T[]) => entries.filter((e) => e.location === id);
   return tidy({
-    kicker: 'Ort', title: place.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(place),
+    kicker: kickerOf('Ort', place.category), title: place.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(place), note: place.note,
     tone: 'locations', symbol: place.symbol, fallback: 'pin', pictures: 3, dialogues: [],
     blocks: [{ key: 'description', label: 'Beschreibung', text: place.description }],
     links: [
@@ -165,7 +176,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
   }
   const loaded = npc?.id === id ? npc : null;
   return tidy({
-    kicker: 'Figur', title: link.name, sub: link.profession, phrases: loaded?.phrases ?? [],
+    kicker: kickerOf('Figur', link.category), title: link.name, sub: link.profession, phrases: loaded?.phrases ?? [], note: link.note,
     tone: 'npcs', symbol: loaded?.symbol ?? link.symbol, fallback: 'sheet', pictures: 0, dialogues: [],
     knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
@@ -213,7 +224,7 @@ function questView(store: WorldStore, id: number): EntryViewModel | null {
   }
   const quest = store.questNow(found);
   return tidy({
-    kicker: questLabel(quest), title: quest.name, sub: '', phrases: [],
+    kicker: kickerOf(questLabel(quest), quest.category), title: quest.name, sub: '', phrases: [], note: quest.note,
     tone: 'quests', symbol: quest.symbol, fallback: 'quest', pictures: 0, dialogues: quest.dialogues,
     knowledge: knowledgeOf(quest),
     blocks: [{ key: 'description', label: 'Beschreibung', text: quest.description }, { key: 'goal', label: 'Ziel', text: quest.goal }],
@@ -234,7 +245,7 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
     return null;
   }
   return tidy({
-    kicker: 'Ereignis', title: event.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(event),
+    kicker: kickerOf('Ereignis', event.category), title: event.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(event), note: event.note,
     tone: 'events', symbol: event.symbol, fallback: 'flag', pictures: 0, dialogues: event.dialogues,
     blocks: [
       { key: 'trigger', label: 'Auslöser', text: event.trigger },
@@ -266,7 +277,7 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
     return null;
   }
   return tidy({
-    kicker: trivia.category || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(trivia),
+    kicker: trivia.category.trim() || 'Wissen', title: trivia.name, sub: '', lists: [], phrases: [], knowledge: knowledgeOf(trivia), note: trivia.note,
     tone: isItem(trivia) ? 'items' : 'trivia', colour: trivia.category.trim() ? tagColour(trivia.category) : '',
     symbol: trivia.symbol, fallback: isItem(trivia) ? 'gift' : 'note',
     pictures: isItem(trivia) ? 3 : 0, dialogues: [],
@@ -277,6 +288,53 @@ function triviaView(store: WorldStore, id: number): EntryViewModel | null {
       { label: 'Quests', items: links('quests', among(store.quests(), trivia.quests)) },
       { label: 'Ereignisse', items: links('events', among(store.events(), trivia.events)) },
       { label: 'Szenen', items: sceneLinks(store, store.scenes().filter((s) => s.trivia.includes(id))) },
+    ],
+  });
+}
+
+function sceneView(store: WorldStore, id: number): EntryViewModel | null {
+  const scene = store.scenes().find((s) => s.id === id);
+  if (!scene) {
+    return null;
+  }
+  const chapter = store.chapters().find((c) => c.id === scene.chapter);
+  const trivia = store.trivia().filter((entry) => scene.trivia.includes(entry.id));
+  return tidy({
+    kicker: kickerOf(scene.optional ? 'Optionale Szene' : 'Szene', scene.category, chapter ? `Kap. ${chapter.number}` : ''),
+    title: scene.name, sub: '', lists: [], phrases: [], knowledge: [], note: scene.note,
+    tone: 'scenes', symbol: '', fallback: 'book', pictures: 0, dialogues: scene.dialogues,
+    blocks: [{ label: 'Vorlesen', text: scene.to_read, readAloud: true }, { label: 'Was passiert', text: scene.description }],
+    links: [
+      { label: 'Ort', items: links('locations', among(store.locations(), [scene.location])) },
+      { label: 'Figuren', items: npcLinks(store, scene.npcs) },
+      { label: 'Quests', items: links('quests', store.quests().filter((q) => scene.quests.includes(q.id) || q.scene === id)) },
+      { label: 'Ereignisse', items: links('events', among(store.events(), scene.events)) },
+      { label: 'Gegenstände', items: links('trivia', trivia.filter(isItem)).map((link) => ({ ...link, tone: 'items' })) },
+      { label: 'Wissen', items: links('trivia', trivia.filter((entry) => !isItem(entry))) },
+      { label: 'Führt zu', items: sceneLinks(store, store.scenes().filter((other) => scene.leads_to.includes(other.id))) },
+      { label: 'Kommt von', items: sceneLinks(store, store.scenes().filter((other) => other.leads_to.includes(id))) },
+    ],
+  });
+}
+
+function chapterView(store: WorldStore, id: number): EntryViewModel | null {
+  const chapter = store.chapters().find((c) => c.id === id);
+  if (!chapter) {
+    return null;
+  }
+  const trivia = store.trivia().filter((entry) => chapter.trivia.includes(entry.id));
+  return tidy({
+    kicker: kickerOf(`Kapitel ${chapter.number}`, chapter.category), title: chapter.name, sub: '', lists: [], phrases: [], knowledge: [],
+    note: chapter.note, tone: 'chapters', symbol: '', fallback: 'book', pictures: 0, dialogues: [],
+    blocks: [{ label: 'Vorlesen', text: chapter.to_read, readAloud: true }, { label: 'Worum es geht', text: chapter.description }],
+    links: [
+      { label: 'Szenen', items: sceneLinks(store, store.scenesOf(id)) },
+      { label: 'Quests', items: links('quests', among(store.quests(), chapter.quests)) },
+      { label: 'Ereignisse', items: links('events', among(store.events(), chapter.events)) },
+      { label: 'Orte', items: links('locations', among(store.locations(), chapter.locations)) },
+      { label: 'Figuren', items: npcLinks(store, chapter.npcs) },
+      { label: 'Gegenstände', items: links('trivia', trivia.filter(isItem)).map((link) => ({ ...link, tone: 'items' })) },
+      { label: 'Wissen', items: links('trivia', trivia.filter((entry) => !isItem(entry))) },
     ],
   });
 }
@@ -295,17 +353,15 @@ export function entryAddress(store: WorldStore, ref: EntryRef): { commands: unkn
   return { commands: [...base, 'glossary', item ? 'items' : ref.kind], queryParams: { entry: ref.id } };
 }
 
-/** Follow a link: scenes and chapters are opened, everything else is looked up by the rule of the windows. */
-export function openEntry(store: WorldStore, router: Router, ref: EntryRef): void {
-  if (ref.kind !== 'chapters' && ref.kind !== 'scenes') {
-    store.look(ref);
-    return;
-  }
-  store.closeWindows();
+/**
+ * Follow a link by the rule of the windows: every kind opens its popup first, scenes and chapters too. Only a
+ * session opens a scene its own way, in its story.
+ */
+export function openEntry(store: WorldStore, ref: EntryRef): void {
   if (ref.kind === 'scenes' && store.openScene) {
+    store.closeWindows();
     store.openScene(ref.id);
     return;
   }
-  const address = entryAddress(store, ref);
-  void router.navigate(address.commands, { queryParams: address.queryParams });
+  store.look(ref);
 }

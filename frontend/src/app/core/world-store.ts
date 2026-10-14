@@ -3,6 +3,7 @@ import { Observable, forkJoin, tap } from 'rxjs';
 
 import { readError } from './api-error';
 import { ApiService } from './api.service';
+import { categoriesOf } from './wall';
 import {
   Chapter, EntryRef, EntryTexts, Location, Option, Peek, Quest, Scene, Trivia, World, WorldEvent, WorldNpc, isItem, questLabel,
 } from './models';
@@ -12,6 +13,8 @@ export type Kind = 'locations' | 'world-npcs' | 'quests' | 'events' | 'trivia' |
 
 interface Entry {
   id: number;
+  /** Every list of the world has it; a body sent to create one may leave it out. */
+  category?: string;
 }
 
 interface WorldData {
@@ -114,7 +117,7 @@ export class WorldStore {
 
   /** Load the world and all of its lists. */
   load(worldId: number): void {
-    const list = <T>(kind: string) => this.api.get<T[]>(`worlds/${worldId}/${kind}/`);
+    const list = <T>(kind: Kind) => this.api.get<T[]>(this.listUrl(kind, worldId));
     forkJoin({
       world: this.api.get<World>(`worlds/${worldId}/`),
       locations: list<Location>('locations'),
@@ -154,12 +157,17 @@ export class WorldStore {
 
   /** Create an entry in one of the lists of the world. */
   add<T extends Entry>(kind: Exclude<Kind, 'scenes'>, body: unknown): Observable<T> {
-    return this.created(kind, this.api.post<T>(`worlds/${this.worldId()}/${kind}/`, body));
+    return this.created(kind, this.api.post<T>(this.listUrl(kind, this.worldId()), body));
   }
 
   /** Create a scene; scenes are created inside their chapter. */
   addScene(chapterId: number, body: Partial<Scene>): Observable<Scene> {
     return this.created('scenes', this.api.post<Scene>(`chapters/${chapterId}/scenes/`, body));
+  }
+
+  /** The categories the entries of one list already have, to offer them while typing a new one. */
+  categoriesOf(kind: Kind): string[] {
+    return categoriesOf(this.lists[kind]().map((entry) => ({ category: entry.category ?? '' })));
   }
 
   /** Save changes of one entry. */
@@ -234,6 +242,11 @@ export class WorldStore {
     this.quests.update((all) => all.map((entry) => tagged(entry, 'quests', entry.id)));
     this.events.update((all) => all.map((entry) => tagged(entry, 'events', entry.id)));
     this.trivia.update((all) => all.map((entry) => tagged(entry, 'trivia', entry.id)));
+  }
+
+  /** The one place that names the address of a list of the world; reading and creating both use it. */
+  private listUrl(kind: Kind, worldId: number): string {
+    return `worlds/${worldId}/${kind}/`;
   }
 
   private chapterHint(scene: Scene): string {

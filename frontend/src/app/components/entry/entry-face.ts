@@ -1,7 +1,7 @@
 import { Chapter, EntryLink, EntryRef, EntryTexts, isItem, questLabel } from '../../core/models';
 import { WorldStore } from '../../core/world-store';
 import { IconName } from '../basic/icon';
-import { KIND_LABELS, npcLinks, sceneLinks, summaryOf, viewOf } from './entry-views';
+import { KIND_LABELS, kickerOf, npcLinks, sceneLinks, summaryOf, viewOf } from './entry-views';
 import { tagColour } from './tag-colour';
 
 /** A link of an entry with the word that says what it is to the entry, like "Questgeber". */
@@ -26,13 +26,15 @@ export interface Face {
   text: string;
   /** How many points the checklist of a quest has; 0 for everything else. */
   steps: number;
+  /** A small line of figures, like what a chapter holds. */
+  facts: string;
   /** What the entry is linked to, for the largest size of the card. */
   tags: FaceTag[];
 }
 
 type Maker = (store: WorldStore, id: number) => Face | null;
 
-const BASE = { colour: '', lead: null, steps: 0, tags: [] };
+const BASE = { colour: '', lead: null, steps: 0, facts: '', tags: [] };
 const tagged = (word: string, links: EntryLink[]): FaceTag[] => links.map((link) => ({ ...link, word }));
 
 /** The word a tag of a connection carries, by the group the reading view puts it in; chapters are tags of their own. */
@@ -79,9 +81,9 @@ function texts<T extends EntryTexts & { id: number; name: string; symbol?: strin
 function locationFace(store: WorldStore, id: number): Face | null {
   const place = texts(store.locations(), id);
   const parent = store.locations().find((other) => other.id === place?.parent);
-  const kicker = parent ? `Ort · in ${parent.name}` : KIND_LABELS.locations;
   return place && {
-    ...BASE, name: place.name, kicker, symbol: place.symbol, fallback: 'pin', tone: 'locations', text: summaryOf(place),
+    ...BASE, name: place.name, kicker: kickerOf(KIND_LABELS.locations, place.category, parent ? `in ${parent.name}` : ''),
+    symbol: place.symbol, fallback: 'pin', tone: 'locations', text: summaryOf(place),
     tags: connectionTags(store, { kind: 'locations', id }),
   };
 }
@@ -89,7 +91,7 @@ function locationFace(store: WorldStore, id: number): Face | null {
 function npcFace(store: WorldStore, id: number): Face | null {
   const link = store.npcs().find((npc) => npc.npc === id);
   return link
-    ? { ...BASE, name: link.name, kicker: KIND_LABELS.npcs, symbol: link.symbol, fallback: 'sheet', tone: 'npcs', text: link.profession }
+    ? { ...BASE, name: link.name, kicker: kickerOf(KIND_LABELS.npcs, link.category), symbol: link.symbol, fallback: 'sheet', tone: 'npcs', text: link.profession }
     : null;
 }
 
@@ -102,7 +104,7 @@ function questFace(store: WorldStore, id: number): Face | null {
   const lead = quest.goal ? { label: 'Ziel', text: quest.goal } : null;
   const text = quest.description || (lead ? '' : summaryOf(quest));
   return {
-    ...BASE, name: quest.name, kicker: questLabel(quest), symbol: quest.symbol, fallback: 'quest', tone: 'quests',
+    ...BASE, name: quest.name, kicker: kickerOf(questLabel(quest), quest.category), symbol: quest.symbol, fallback: 'quest', tone: 'quests',
     lead, text, steps: quest.checklist.length, tags: questTags(store, quest),
   };
 }
@@ -124,7 +126,7 @@ function eventFace(store: WorldStore, id: number): Face | null {
   const event = texts(store.events(), id);
   const lead = event?.trigger ? { label: 'Auslöser', text: event.trigger } : null;
   return event && {
-    ...BASE, name: event.name, kicker: KIND_LABELS.events, symbol: event.symbol, fallback: 'flag', tone: 'events',
+    ...BASE, name: event.name, kicker: kickerOf(KIND_LABELS.events, event.category), symbol: event.symbol, fallback: 'flag', tone: 'events',
     lead, text: event.happening || summaryOf(event), tags: connectionTags(store, { kind: 'events', id }),
   };
 }
@@ -146,16 +148,33 @@ function triviaFace(store: WorldStore, id: number): Face | null {
 
 function sceneFace(store: WorldStore, id: number): Face | null {
   const scene = store.scenes().find((entry) => entry.id === id);
+  const chapter = store.chapters().find((other) => other.id === scene?.chapter);
   return scene
-    ? { ...BASE, name: scene.name, kicker: KIND_LABELS.scenes, symbol: '', fallback: 'book', tone: 'scenes', text: scene.to_read || scene.description }
+    ? {
+        ...BASE, name: scene.name, kicker: kickerOf(KIND_LABELS.scenes, scene.category, chapter ? `Kap. ${chapter.number}` : ''),
+        symbol: '', fallback: 'book', tone: 'scenes', text: scene.to_read || scene.description,
+      }
     : null;
 }
 
 function chapterFace(store: WorldStore, id: number): Face | null {
   const chapter = store.chapters().find((entry) => entry.id === id);
   return chapter
-    ? { ...BASE, name: chapter.name, kicker: `Kapitel ${chapter.number}`, symbol: '', fallback: 'book', tone: 'chapters', text: chapter.description }
+    ? {
+        ...BASE, name: chapter.name, kicker: kickerOf(`Kapitel ${chapter.number}`, chapter.category), symbol: '', fallback: 'book',
+        tone: 'chapters', text: chapter.description || chapter.to_read, facts: chapterFacts(store, chapter),
+      }
     : null;
+}
+
+/** What a chapter holds, in a few figures: "3 Szenen · 2 Quests · 4 Ereignisse". */
+function chapterFacts(store: WorldStore, chapter: Chapter): string {
+  const count = (number: number, one: string, many: string) => `${number} ${number === 1 ? one : many}`;
+  return [
+    count(store.scenesOf(chapter.id).length, 'Szene', 'Szenen'),
+    count(chapter.quests.length, 'Quest', 'Quests'),
+    count(chapter.events.length, 'Ereignis', 'Ereignisse'),
+  ].join(' · ');
 }
 
 const MAKERS: Record<EntryRef['kind'], Maker> = {

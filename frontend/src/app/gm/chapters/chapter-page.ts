@@ -2,16 +2,17 @@ import { Component, computed, inject, input, linkedSignal, signal } from '@angul
 import { Router, RouterLink } from '@angular/router';
 
 import { readError } from '../../core/api-error';
-import { EntryLink } from '../../core/models';
+import { Folds } from '../../core/folds';
+import { EntryRef } from '../../core/models';
+import { foldScope, foldTools } from '../../components/basic/fold';
 import { IconName } from '../../components/basic/icon';
 import { MasterDetail } from '../../components/basic/master-detail';
+import { EntryView } from '../../components/entry/entry-view';
 import { NameDialog } from '../../components/form/name-dialog';
 import { Crumb, NavItem, NavService } from '../../global/frame/nav.service';
 import { Tool, Tools } from '../../global/tool-bar/tools.service';
 import { ChapterEditor } from './chapter-editor';
 import { ChapterLinks } from './chapter-links';
-import { isItem, npcLinks } from '../../components/entry/entry-views';
-import { LinkRow } from '../../components/entry/link-row';
 import { SceneForm } from './scene-form';
 import { SceneThread } from './scene-thread';
 import { SceneView } from './scene-view';
@@ -28,16 +29,18 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
 
 /**
  * One chapter: the thread of its scenes with the opened scene beside it, its quests and events, and an overview
- * of the chapter itself. Its parts are links in the bar on top; creating, writing and moving are tools at the bottom.
+ * of the chapter itself, read like every entry. Its parts are links in the bar on top; creating, editing, moving and
+ * folding are tools at the bottom.
  */
 @Component({
   selector: 'app-chapter-page',
-  imports: [RouterLink, MasterDetail, NameDialog, ChapterEditor, ChapterLinks, LinkRow, SceneForm, SceneThread, SceneView],
+  imports: [RouterLink, MasterDetail, NameDialog, ChapterEditor, ChapterLinks, EntryView, SceneForm, SceneThread, SceneView],
   templateUrl: './chapter-page.html',
 })
 export class ChapterPage {
   protected readonly store = inject(WorldStore);
   private readonly router = inject(Router);
+  private readonly folds = inject(Folds);
 
   /** All three come from the URL: .../chapters/:chapterId?tab=scenes&scene=id */
   readonly chapterId = input.required<string>();
@@ -46,6 +49,8 @@ export class ChapterPage {
 
   protected readonly currentTab = computed<Tab>(() => TABS.find((tab) => tab.id === this.tab())?.id ?? 'scenes');
   protected readonly chapter = computed(() => this.store.chapters().find((c) => c.id === Number(this.chapterId())) ?? null);
+  /** The chapter as an entry, for its reading view in the overview. */
+  protected readonly chapterRef = computed<EntryRef>(() => ({ kind: 'chapters', id: Number(this.chapterId()) }));
   protected readonly scenes = computed(() => this.store.scenesOf(Number(this.chapterId())));
   protected readonly sceneId = computed(() => Number(this.scene()) || null);
   protected readonly openScene = computed(() => this.scenes().find((scene) => scene.id === this.sceneId()) ?? null);
@@ -65,13 +70,13 @@ export class ChapterPage {
   /** The place of the opened scene on the thread; -1 for an optional scene or none. */
   private readonly place = computed(() => this.scenes().filter((scene) => !scene.optional).findIndex((scene) => scene.id === this.sceneId()));
   private readonly threadLength = computed(() => this.scenes().filter((scene) => !scene.optional).length);
-  /** The tools of the open part of the chapter, for the bar at the bottom. */
+  /** The tools of the open part of the chapter, for the bar at the bottom; quests and events report their own. */
   private readonly pageTools = computed<Tool[]>(() => {
     switch (this.currentTab()) {
       case 'scenes':
-        return this.sceneTools();
+        return [...this.sceneTools(), ...foldTools(this.folds, foldScope(this.store))];
       case 'overview':
-        return [this.overviewTool()];
+        return [this.overviewTool(), ...foldTools(this.folds, foldScope(this.store))];
       default:
         return [];
     }
@@ -84,18 +89,6 @@ export class ChapterPage {
   protected readonly editing = linkedSignal({
     source: this.sceneId,
     computation: (id) => id !== null && id === this.createdId,
-  });
-
-  /** Places, NPCs and knowledge of the chapter: everything that carries its tag. */
-  protected readonly places = computed<EntryLink[]>(() => {
-    const ids = this.chapter()?.locations ?? [];
-    return this.store.locations().filter((place) => ids.includes(place.id)).map((place) => ({ kind: 'locations', id: place.id, label: place.name }));
-  });
-  protected readonly npcs = computed(() => npcLinks(this.store, this.chapter()?.npcs ?? []));
-  protected readonly knowledge = computed<EntryLink[]>(() => {
-    const ids = this.chapter()?.trivia ?? [];
-    const entries = this.store.trivia().filter((entry) => ids.includes(entry.id));
-    return entries.map((entry) => ({ kind: 'trivia', id: entry.id, label: entry.name, tone: isItem(entry) ? 'items' : undefined }));
   });
 
   constructor() {
@@ -158,14 +151,14 @@ export class ChapterPage {
     void this.router.navigate(this.chaptersLink());
   }
 
-  /** The tools of the scenes: a new scene, writing the opened one, and moving it on the thread. */
+  /** The tools of the scenes: a new scene, editing the opened one, and moving it on the thread. */
   private sceneTools(): Tool[] {
     const open = !!this.openScene();
     const place = this.place();
     const writing = this.editing();
     return [
       { id: 'scene-new', word: 'Neu', title: 'Neue Szene', icon: 'plus', click: () => this.creating.set(true) },
-      { id: 'scene-write', word: writing ? 'Fertig' : 'Schreiben', title: writing ? 'Zurück zum Lesen' : 'Szene schreiben', icon: writing ? 'check' : 'edit', pressed: writing, disabled: !open, click: () => (writing ? this.stopEditing() : this.editing.set(true)) },
+      { id: 'scene-edit', word: writing ? 'Lesen' : 'Bearbeiten', title: writing ? 'Zurück zum Lesen' : 'Szene bearbeiten', icon: writing ? 'eye' : 'edit', pressed: writing, disabled: !open, click: () => (writing ? this.stopEditing() : this.editing.set(true)) },
       { id: 'scene-up', word: 'Hoch', title: 'Szene im Faden nach oben schieben', icon: 'up', disabled: place <= 0, click: () => this.moveOpen(-1) },
       { id: 'scene-down', word: 'Runter', title: 'Szene im Faden nach unten schieben', icon: 'down', disabled: place < 0 || place >= this.threadLength() - 1, click: () => this.moveOpen(1) },
     ];

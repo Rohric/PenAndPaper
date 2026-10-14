@@ -12,18 +12,20 @@ Ein Tag ist die kleinste Größe der [Kachel](kachel.md): eine Zeile mit dem Nam
 
 | Tag | Farbe | Klick |
 | --- | --- | --- |
-| verknüpfter Eintrag (Ort, Figur, Quest …) | Farbe der Art | [Popup des Eintrags](eintrag-popup.md) |
-| Kapitel („Kap. 2") | Farbe der Kapitel | führt zum Kapitel |
-| freie Wörter der Spieler am Questlog, Kategorien von Wissen | einer der acht Töne, derselbe Name bekommt immer denselben | filtert |
+| verknüpfter Eintrag (Ort, Figur, Quest, Szene, Kapitel …) | Farbe der Art | [Popup des Eintrags](eintrag-popup.md) |
+| Kapitel an Kachel und Kopf („Kap. 2") | Farbe der Kapitel | Popup des Kapitels (in einer Runde nur Anzeige) |
+| Kategorie in der [Filterleiste](filterleiste.md), freie Wörter der Spieler am Questlog | einer der acht Töne, derselbe Name bekommt immer denselben; „Ohne Kategorie" grau | filtert |
 
 **Kapitel-Tags:** Jeder Eintrag kann zu mehreren Kapiteln gehören. Der Tag steht an Kachel und Karte, im Kopf der Lese-Ansicht und im Popup. Hängt ein Eintrag an einer Szene, bekommt er den Tag ihres Kapitels von selbst.
 
-**Tags setzen:** im Formular über ein Feld, in dem man tippt: darunter erscheint, was passt; Pfeiltasten wählen, Enter verknüpft, die Rücktaste im leeren Feld nimmt den letzten Tag weg. Gibt es den Eintrag noch nicht, steht unten „neu anlegen".
+**Kategorien:** Jede Art hat eine freie Kategorie. Ihr Ton kommt aus `components/entry/tag-colour` und ist überall derselbe: am Filter, am Feld im Formular, bei Wissen an der ganzen Kachel. Die Kategorie „Gegenstand" hat die Farbe der Gegenstände.
+
+**Tags setzen:** im Formular über ein Feld, in dem man tippt: darunter erscheint, was passt; Pfeiltasten wählen, Enter verknüpft, die Rücktaste im leeren Feld nimmt den letzten Tag weg. Heißt kein Eintrag genau so, steht unten „„Name" neu anlegen". Das gilt für jedes Verknüpfungsfeld, auch für Kapitel. Nur Felder für Szenen außerhalb ihres Kapitels legen nichts an, denn eine Szene braucht ihr Kapitel. Ein Klick auf einen gesetzten Tag öffnet das Popup des Eintrags.
 
 ## Bausteine
 
 - [Kachel](kachel.md) in der Größe Tag
-- Code: `components/entry/entry-card`, `components/entry/link-row`, `components/form/link-picker`
+- Code: `components/entry/entry-card`, `components/entry/link-row`, `components/form/link-picker`, `components/entry/tag-colour`
 
 ## Leisten in dieser Ansicht
 

@@ -1,8 +1,9 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { WorldEvent } from '../../core/models';
 import { WorldStore } from '../../core/world-store';
+import { ToastService } from '../../global/toast/toast.service';
 import { LinkPicker } from '../../components/form/link-picker';
 
 /**
@@ -24,17 +25,14 @@ import { LinkPicker } from '../../components/form/link-picker';
       (create)="createNew($event)"
       (look)="store.look({ kind: 'events', id: $event })"
     />
-    @if (error()) {
-      <p class="notice notice--error" role="alert">{{ error() }}</p>
-    }
   `,
 })
 export class LocationEvents {
   protected readonly store = inject(WorldStore);
+  private readonly toast = inject(ToastService);
 
   readonly placeId = input.required<number>();
 
-  protected readonly error = signal('');
   protected readonly selected = computed(() => this.store.events().filter((event) => event.location === this.placeId()).map((event) => event.id));
 
   /** Save every event that came to this place or left it. */
@@ -49,15 +47,13 @@ export class LocationEvents {
   /** Create a new event with the typed name, at this place right away. */
   protected createNew(name: string): void {
     this.store.add<WorldEvent>('events', { name, location: this.placeId() }).subscribe({
-      next: () => this.error.set(''),
-      error: (e: unknown) => this.error.set(readError(e)),
+      error: (e: unknown) => this.toast.show(readError(e), 'danger'),
     });
   }
 
   private save(eventId: number, location: number | null): void {
     this.store.save('events', eventId, { location }).subscribe({
-      next: () => this.error.set(''),
-      error: (e: unknown) => this.error.set(readError(e)),
+      error: (e: unknown) => this.toast.show(readError(e), 'danger'),
     });
   }
 }

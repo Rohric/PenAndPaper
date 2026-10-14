@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { WorldEvent } from '../../core/models';
+import { CategoryField } from '../../components/form/category-field';
 import { ChapterField } from '../../components/form/chapter-field';
 import { EditorBar } from '../../components/form/editor-bar';
 import { EntryTextsEditor } from '../../components/form/entry-texts-editor';
@@ -15,7 +16,7 @@ import { EventScenes } from '../chapters/event-scenes';
 /** Edit one event: what sets it off, what happens, what is said, where it happens and the scenes it hangs on. */
 @Component({
   selector: 'app-event-editor',
-  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, AutoGrow, DialogueListEditor, EventScenes, EntryTextsEditor],
+  imports: [FormsModule, CategoryField, ChapterField, EditorBar, LinkPicker, SymbolPicker, AutoGrow, DialogueListEditor, EventScenes, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -27,29 +28,65 @@ import { EventScenes } from '../chapters/event-scenes';
           <span class="label">Symbol</span>
           <app-symbol-picker fallback="flag" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
         </div>
-        <div class="field">
-          <label for="event-trigger">Auslöser</label>
-          <span class="soft">Wann das Ereignis eintritt, zum Beispiel „nachts auf dem Pass“.</span>
-          <textarea
-            id="event-trigger"
-            class="input"
-            rows="2"
-            [appAutoGrow]="draft().trigger"
-            [ngModel]="draft().trigger"
-            (ngModelChange)="set('trigger', $event)"
-          ></textarea>
+        <app-category-field inputId="event-category" kind="events" [value]="draft().category" (valueChange)="set('category', $event)" />
+        <app-chapter-field inputId="event-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        <app-editor-bar [dirty]="dirty()" [busy]="busy()" (save)="save()" (remove)="remove(entry().name)" />
+      </div>
+
+      <app-entry-texts-editor
+        inputId="event-description"
+        [description]="draft().description"
+        [visibleFromStart]="!!draft().visible_from_start"
+        [playerKnowledge]="draft().player_knowledge"
+        [gmKnowledge]="draft().gm_knowledge"
+        [note]="draft().note"
+        (descriptionChange)="set('description', $event)"
+        (visibleFromStartChange)="set('visible_from_start', $event)"
+        (playerKnowledgeChange)="set('player_knowledge', $event)"
+        (gmKnowledgeChange)="set('gm_knowledge', $event)"
+        (noteChange)="set('note', $event)"
+      >
+        <div class="panel">
+          <div class="field">
+            <label for="event-trigger">Auslöser</label>
+            <span class="soft">Wann das Ereignis eintritt, zum Beispiel „nachts auf dem Pass“.</span>
+            <textarea
+              id="event-trigger"
+              class="input"
+              rows="2"
+              [appAutoGrow]="draft().trigger"
+              [ngModel]="draft().trigger"
+              (ngModelChange)="set('trigger', $event)"
+            ></textarea>
+          </div>
+          <div class="field">
+            <label for="event-happening">Was passiert</label>
+            <textarea
+              id="event-happening"
+              class="input"
+              rows="4"
+              [appAutoGrow]="draft().happening"
+              [ngModel]="draft().happening"
+              (ngModelChange)="set('happening', $event)"
+            ></textarea>
+          </div>
         </div>
-        <div class="field">
-          <label for="event-happening">Was passiert</label>
-          <textarea
-            id="event-happening"
-            class="input"
-            rows="4"
-            [appAutoGrow]="draft().happening"
-            [ngModel]="draft().happening"
-            (ngModelChange)="set('happening', $event)"
-          ></textarea>
-        </div>
+      </app-entry-texts-editor>
+
+      <div class="panel">
+        <h2 class="subtitle">Dialoge</h2>
+        <p class="soft">Was gesagt wird, wenn das Ereignis eintritt. Wer spricht, ist freiwillig.</p>
+        <app-dialogue-list-editor
+          [dialogues]="draft().dialogues"
+          [speakers]="store.npcOptions()"
+          [newSpeaker]="newSpeaker"
+          (dialoguesChange)="set('dialogues', $event)"
+          (look)="lookUp('npcs', $event)"
+        />
+      </div>
+
+      <div class="panel">
+        <h2 class="subtitle">Verknüpfungen</h2>
         <div class="field">
           <label for="event-location">Ort</label>
           <app-link-picker
@@ -92,32 +129,6 @@ import { EventScenes } from '../chapters/event-scenes';
             (look)="lookUp('scenes', $event)"
           />
         </div>
-        <app-chapter-field inputId="event-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
-        <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
-      </div>
-
-      <app-entry-texts-editor
-        inputId="event-description"
-        [description]="draft().description"
-        [visibleFromStart]="!!draft().visible_from_start"
-        [playerKnowledge]="draft().player_knowledge"
-        [gmKnowledge]="draft().gm_knowledge"
-        (descriptionChange)="set('description', $event)"
-        (visibleFromStartChange)="set('visible_from_start', $event)"
-        (playerKnowledgeChange)="set('player_knowledge', $event)"
-        (gmKnowledgeChange)="set('gm_knowledge', $event)"
-      />
-
-      <div class="panel">
-        <h2 class="subtitle">Dialoge</h2>
-        <p class="soft">Was gesagt wird, wenn das Ereignis eintritt. Wer spricht, ist freiwillig.</p>
-        <app-dialogue-list-editor
-          [dialogues]="draft().dialogues"
-          [speakers]="store.npcOptions()"
-          [newSpeaker]="newSpeaker"
-          (dialoguesChange)="set('dialogues', $event)"
-          (look)="lookUp('npcs', $event)"
-        />
       </div>
 
       <div class="panel">

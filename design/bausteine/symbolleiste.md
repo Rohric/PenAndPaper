@@ -36,6 +36,7 @@ Die untere Reihe ist die Hauptreihe, ganz links steht immer **Menü** (siehe [Le
 - Jede Seiten-Datei führt ihre Symbole als Tabelle auf: Wort, voller Name, was der Klick tut.
 - Informationen, die nicht dauernd sichtbar sein müssen (Quests und Ereignisse einer Szene, Gruppe, Würfe, Verlauf), stehen als Symbol mit Zahl in der Leiste, nicht als Abschnitt auf der Seite.
 - Ein Symbol, das gerade nichts tun kann, ist ausgegraut, nicht weg.
+- Dieselben Handgriffe heißen auf jeder Seite gleich und stehen in dieser Reihenfolge: „Neu", „Bearbeiten" (im Formular „Lesen"), „Zuordnen", eigene Symbole der Seite (etwa „Hoch", „Runter"), „Filter", „Alle zu", „Alle auf". Knöpfe in der Seite, die dasselbe tun, gibt es nicht.
 - Braucht eine Komponente den unteren Rand selbst (der Charakter-Editor der Spieler), deckt sie die Leiste ab.
 
 ## Bausteine

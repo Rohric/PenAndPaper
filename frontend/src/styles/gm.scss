@@ -2,7 +2,7 @@
 // the only place with media queries: a breakpoint changes the sizes below, components only read them.
 .area-gm {
   --page-gap: var(--gap-4);
-  --tile-min: 300px;
+  --tile-min: 260px;
   --side-window: 520px;
   --side-window-wide: 720px;
   --popup-max: 880px;
@@ -22,7 +22,7 @@
 
 @media (min-width: 1280px) {
   .area-gm {
-    --tile-min: 320px;
+    --tile-min: 280px;
     --list: 340px;
   }
 }

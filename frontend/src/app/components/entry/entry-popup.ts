@@ -1,12 +1,13 @@
 import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { EntryRef } from '../../core/models';
+import { EntryLink, EntryRef } from '../../core/models';
 import { WorldStore } from '../../core/world-store';
 import { Icon } from '../basic/icon';
 import { Popup } from '../window/popup';
 import { WindowHistory } from '../window/window-history';
 import { WindowTab } from '../window/window-head';
+import { chaptersOf } from './entry-face';
 import { entryAddress, viewOf } from './entry-views';
 import { LinkRow } from './link-row';
 
@@ -15,9 +16,10 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
 const SHORT_BLOCKS = 2;
 
 /**
- * The short look at an entry: every click on a tile or a link opens it first. It shows the beginning of the text
- * and, in a session, the switches of the round; its second tab lists what the entry is linked to, and a click
- * there changes the popup to that entry. From here the way leads into the window at the side or to the entry itself.
+ * The short look at an entry of any kind: every click on a tile or a link opens it first. It shows the beginning of
+ * the text, the note of the game master and, in a session, the switches of the round; its second tab lists what the
+ * entry is linked to, and a click there changes the popup to that entry. From here the way leads into the window at
+ * the side (to read, or with "Bearbeiten" right into the form) or to the entry itself.
  */
 @Component({
   selector: 'app-entry-popup',
@@ -51,10 +53,17 @@ const SHORT_BLOCKS = 2;
             @for (block of short(); track block.label) {
               <div class="field">
                 <span class="label">{{ block.label }}</span>
-                <p class="prose clamp">{{ block.text }}</p>
+                <p class="prose clamp" [class.read-aloud]="block.readAloud">{{ block.text }}</p>
               </div>
             } @empty {
               <p class="soft">Zu diesem Eintrag steht noch kein Text.</p>
+            }
+            <app-link-row label="Kapitel" [items]="chapters()" />
+            @if (entry.note) {
+              <div class="knowledge knowledge--gm">
+                <span class="kicker"><app-icon name="lock" [size]="12" /> Notiz (nur für dich)</span>
+                <p class="prose clamp">{{ entry.note }}</p>
+              </div>
             }
             <ng-content />
           }
@@ -65,9 +74,11 @@ const SHORT_BLOCKS = 2;
           <button windowFoot type="button" class="btn btn--small" (click)="store.read(shown, true)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
         }
         <button windowFoot type="button" class="btn btn--small" (click)="store.read(shown)"><app-icon name="sheet" [size]="16" /> Seitenfenster</button>
-        <button windowFoot type="button" class="btn btn--small btn--primary" (click)="toEntry(shown)">
-          <app-icon name="expand" [size]="16" /> Zum Eintrag
-        </button>
+        @if (hasHome(shown)) {
+          <button windowFoot type="button" class="btn btn--small btn--primary" (click)="toEntry(shown)">
+            <app-icon name="expand" [size]="16" /> Zum Eintrag
+          </button>
+        }
       </app-popup>
     }
   `,
@@ -88,6 +99,11 @@ export class EntryPopup {
     const shown = this.store.popup();
     return shown ? viewOf(this.store, shown, null) : null;
   });
+  /** The chapters the entry is tagged with, as tags. */
+  protected readonly chapters = computed<EntryLink[]>(() => {
+    const shown = this.store.popup();
+    return shown ? chaptersOf(this.store, shown).map((chapter) => ({ kind: 'chapters', id: chapter.id, label: `Kap. ${chapter.number}` })) : [];
+  });
   /** The first parts of the text that have something written in them. */
   protected readonly short = computed(() => (this.view()?.blocks ?? []).filter((block) => block.text).slice(0, SHORT_BLOCKS));
   private readonly linkCount = computed(() => (this.view()?.links ?? []).reduce((sum, group) => sum + group.items.length, 0));
@@ -101,6 +117,11 @@ export class EntryPopup {
       const shown = this.store.popup();
       untracked(() => this.follow(shown));
     });
+  }
+
+  /** Whether the entry has a place to go to; in a session a chapter has none. */
+  protected hasHome(ref: EntryRef): boolean {
+    return !(this.jump() && ref.kind === 'chapters');
   }
 
   /** Close the popup and go to the place where the entry lives. */

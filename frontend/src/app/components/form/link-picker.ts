@@ -1,4 +1,4 @@
-import { Component, ElementRef, booleanAttribute, computed, input, output, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, booleanAttribute, computed, effect, input, output, signal, viewChild } from '@angular/core';
 
 import { Option } from '../../core/models';
 import { Icon } from '../basic/icon';
@@ -6,11 +6,20 @@ import { Icon } from '../basic/icon';
 const SHOWN = 8;
 let fields = 0;
 
-/** One line in the list to choose from: an entry to link, or the offer to create a new one. */
+/** One line in the list to choose from: an entry to link, or the offer to create a new one (of one kind). */
 interface Choice {
   option: Option | null;
   label: string;
   hint: string;
+  /** The kind the new entry gets, when the field offers several. */
+  kind?: CreateKind;
+}
+
+/** One kind a new entry can be created as, like "Ort"; its tone gives the line its colour. */
+export interface CreateKind {
+  id: string;
+  label: string;
+  tone?: string;
 }
 
 /**
@@ -19,6 +28,8 @@ interface Choice {
  * takes the last chip away, and Tab moves on. A click on a chip looks the entry up.
  * Chips and choices show the colour of the kind of entry they stand for.
  * With "single" the field holds one entry at most and speaks "value" instead of "selected".
+ * When no entry is called exactly like the typed text, the list ends with the offer to create one; a field that
+ * can create several kinds offers one line for each ("„Hafen“ neu anlegen als Ort").
  */
 @Component({
   selector: 'app-link-picker',
@@ -63,11 +74,14 @@ interface Choice {
     </div>
 
     @if (open()) {
-      <div class="list" role="listbox" [id]="listId">
+      <div #list class="list" role="listbox" [id]="listId">
+        @if (!found().length) {
+          <span class="list__note">Nichts gefunden.</span>
+        }
         @for (choice of choices(); track $index) {
           <div
             role="option"
-            [class]="'list__item kind--' + (choice.option?.tone ?? '')"
+            [class]="'list__item kind--' + (choice.option?.tone ?? choice.kind?.tone ?? '')"
             [id]="listId + '-' + $index"
             [class.is-active]="$index === active()"
             [attr.aria-selected]="$index === active()"
@@ -79,8 +93,6 @@ interface Choice {
               <span class="list__hint">{{ choice.hint }}</span>
             }
           </div>
-        } @empty {
-          <span class="list__note">Nichts gefunden.</span>
         }
         @if (more()) {
           <span class="list__note">… und {{ more() }} weitere. Tippe weiter, um einzugrenzen.</span>
@@ -104,6 +116,8 @@ export class LinkPicker {
   readonly emptyText = input('Tippen zum Suchen …');
   /** Whether a new entry can be created from the typed name. */
   readonly creatable = input(false);
+  /** The kinds a new entry can be created as; empty offers one line and fires "create". */
+  readonly createKinds = input<CreateKind[]>([]);
   /** Whether the linked entries stand in the field; switched off when the page shows them itself. */
   readonly chips = input(true);
   /** Id of the text field, so a label can point to it. */
@@ -112,11 +126,14 @@ export class LinkPicker {
   readonly valueChange = output<number | null>();
   /** Fired with the typed name when the user wants a new entry. */
   readonly create = output<string>();
+  /** Fired with the typed name and the chosen kind, when the field offers several kinds. */
+  readonly createAs = output<{ name: string; kind: string }>();
   /** Fired with the id of a chip that was clicked, to look the entry up. */
   readonly look = output<number>();
 
   protected readonly listId = `link-list-${fields++}`;
   private readonly box = viewChild.required<ElementRef<HTMLInputElement>>('box');
+  private readonly list = viewChild<ElementRef<HTMLElement>>('list');
   protected readonly open = signal(false);
   protected readonly query = signal('');
   /** Position of the marked line in the list. */
@@ -129,7 +146,7 @@ export class LinkPicker {
   protected readonly chosen = computed(() => this.ids().flatMap((id) => this.options().filter((option) => option.id === id)));
   protected readonly placeholder = computed(() => (this.chips() && this.chosen().length ? (this.single() ? 'ändern …' : 'weitere …') : this.emptyText()));
   /** What fits the typed text and is not linked yet; names that begin with it come first. */
-  private readonly found = computed(() => {
+  protected readonly found = computed(() => {
     const query = this.query().trim().toLowerCase();
     const rank = (option: Option) => (option.label.toLowerCase().startsWith(query) ? 0 : option.label.toLowerCase().includes(query) ? 1 : 2);
     const fits = (option: Option) => `${option.label} ${option.hint ?? ''}`.toLowerCase().includes(query);
@@ -140,8 +157,20 @@ export class LinkPicker {
     const name = this.query().trim();
     const lines = this.found().slice(0, SHOWN).map((option) => ({ option, label: option.label, hint: option.hint ?? '' }));
     const known = this.options().some((option) => option.label.toLowerCase() === name.toLowerCase());
-    return this.creatable() && name && !known ? [...lines, { option: null, label: `„${name}“ neu anlegen`, hint: '' }] : lines;
+    if (!this.creatable() || !name || known) {
+      return lines;
+    }
+    const kinds = this.createKinds();
+    const offers = kinds.length
+      ? kinds.map((kind) => ({ option: null, label: `„${name}“ neu anlegen ${kind.label}`, hint: '', kind }))
+      : [{ option: null, label: `„${name}“ neu anlegen`, hint: '' }];
+    return [...lines, ...offers];
   });
+
+  constructor() {
+    // A list that opens near the bottom of a page or a window is scrolled into view.
+    effect(() => this.list()?.nativeElement.scrollIntoView({ block: 'nearest' }));
+  }
 
   /** Typing opens the list and marks its first line. */
   protected type(text: string): void {
@@ -170,6 +199,8 @@ export class LinkPicker {
   protected pick(choice: Choice): void {
     if (choice.option) {
       this.emit(this.single() ? [choice.option.id] : [...this.ids(), choice.option.id]);
+    } else if (choice.kind) {
+      this.createAs.emit({ name: this.query().trim(), kind: choice.kind.id });
     } else {
       this.create.emit(this.query().trim());
     }

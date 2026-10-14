@@ -1,10 +1,11 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { Option, Scene } from '../../core/models';
 import { LinkPicker } from '../../components/form/link-picker';
 import { sceneLinks } from '../../components/entry/entry-views';
 import { WorldStore } from '../../core/world-store';
+import { ToastService } from '../../global/toast/toast.service';
 
 /**
  * Hang an event on scenes. It is optional, and it is saved right away,
@@ -20,29 +21,20 @@ import { WorldStore } from '../../core/world-store';
       [options]="options()"
       [selected]="selected()"
       (selectedChange)="change($event)"
+      (look)="store.look({ kind: 'scenes', id: $event })"
     />
-    @if (error()) {
-      <p class="notice notice--error" role="alert">{{ error() }}</p>
-    }
   `,
 })
 export class EventScenes {
-  private readonly store = inject(WorldStore);
+  protected readonly store = inject(WorldStore);
+  private readonly toast = inject(ToastService);
 
   readonly eventId = input.required<number>();
-  /** Offer only the scenes of this chapter; without it all scenes of the world are offered. */
-  readonly chapterId = input<number | null>(null);
 
-  protected readonly error = signal('');
-  private readonly scenes = computed(() => {
-    const chapter = this.chapterId();
-    return chapter === null ? this.store.scenes() : this.store.scenesOf(chapter);
-  });
-  /** Inside a chapter the name is enough, across the world the chapter number is added. */
+  private readonly scenes = this.store.scenes;
+  /** Every scene of the world, with the number of its chapter. */
   protected readonly options = computed<Option[]>(() =>
-    this.chapterId() === null
-      ? sceneLinks(this.store, this.scenes()).map((link) => ({ id: link.id, label: link.label, tone: 'scenes' }))
-      : this.scenes().map((scene) => ({ id: scene.id, label: scene.name, tone: 'scenes' })),
+    sceneLinks(this.store, this.scenes()).map((link) => ({ id: link.id, label: link.label, tone: 'scenes' })),
   );
   protected readonly selected = computed(() =>
     this.scenes()
@@ -62,8 +54,7 @@ export class EventScenes {
     const id = this.eventId();
     const events = attach ? [...scene.events, id] : scene.events.filter((other) => other !== id);
     this.store.save('scenes', scene.id, { events }).subscribe({
-      next: () => this.error.set(''),
-      error: (e: unknown) => this.error.set(readError(e)),
+      error: (e: unknown) => this.toast.show(readError(e), 'danger'),
     });
   }
 }

@@ -30,20 +30,25 @@ Als Spielleiter will ich einen Eintrag ganz lesen und, wenn ich darf, gleich dor
 | **Runde** | Schalter (Angenommen, Beendet oder Erledigt, Stecknadel, Auf den Tisch, Alles zeigen, Alles verbergen); bei Quests das Questlog der Gruppe und „In dieser Runde ändern" | nur in einer Runde |
 | **Notiz** | Notiz des Spielleiters zu diesem Eintrag in dieser Runde, speichert sich beim Verlassen des Feldes | nur in einer Runde |
 
+Das Seitenfenster gibt es für jede Art: Ort, Figur, Quest, Ereignis, Gegenstand, Wissen, Szene und Kapitel.
+
 **Fuß:**
-- Beim Schreiben der Welt: „Bearbeiten" wechselt in das Formular des Eintrags (siehe [Eintrag schreiben](../spielleiter/eintrag-schreiben.md)) und ändert die Welt.
+- Beim Schreiben der Welt: „Bearbeiten" wechselt in das Formular des Eintrags (siehe [Eintrag schreiben](../spielleiter/eintrag-schreiben.md)) und ändert die Welt; im Formular heißt der Knopf „Lesen" und führt zurück. Er steht bei jeder Art an derselben Stelle, auch bei Szenen (das Formular speichert sich dort selbst) und Kapiteln.
 - In einer Runde gibt es keinen Knopf, der die Welt ändert. Bearbeitet wird dort nur für die Runde, im Reiter „Runde" unter „In dieser Runde ändern". Die Welt ändert man beim Schreiben unter „Welten".
-- „Zum Eintrag" ändert nichts. Es führt zu der Ansicht, in der der Eintrag zu Hause ist (Story, Quests oder Glossar).
+- „Zum Eintrag" ändert nichts. Es führt zu der Ansicht, in der der Eintrag zu Hause ist (beim Schreiben Glossar oder Kapitel, in einer Runde Story, Quests oder Glossar). In einer Runde fehlt es bei Kapiteln.
+- Auf ganzen Seiten (Eintrag im Glossar, Lore, Überblick eines Kapitels, Szene) gibt es keinen Knopf „Bearbeiten" in der Seite; dort steht „Bearbeiten" und „Lesen" als Symbol in der [Symbolleiste](symbolleiste.md).
 
 Im [Masterfenster](../spielleiter/masterfenster.md) gibt es auch kein „In dieser Runde ändern". Dort wird nur angesehen und benutzt.
 
 Beim Bearbeiten wird das Fenster breit (720 px).
 
+Entschieden: Bearbeiten gibt es an genau zwei Stellen: im Fuß der Fenster und, auf ganzen Seiten, in der Symbolleiste. Knöpfe „Bearbeiten" in Kacheln, Karten oder mitten in einer Seite gibt es nicht mehr.
+
 ## Bausteine
 
 - [Fenster](fenster.md): das Seitenfenster
 - [Eintrag lesen](eintrag-lesen.md), [Kachel](kachel.md), [Auge](auge.md), [Notiz](notiz.md)
-- Code: `components/entry/entry-window`, `entry-session`, `entry-links`
+- Code: `components/entry/entry-window`, `entry-session`, `entry-links`; das Formular wählt `gm/glossary/entry-form` nach der Art
 
 ## Leisten in dieser Ansicht
 

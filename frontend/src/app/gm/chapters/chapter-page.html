@@ -19,23 +19,7 @@
           @if (editingOverview()) {
             <app-chapter-editor [entry]="current" (saved)="editingOverview.set(false)" (closed)="leave()" />
           } @else {
-            <article class="panel">
-              <h3 class="subtitle">Überblick</h3>
-              @if (current.to_read) {
-                <div class="read-aloud">
-                  <span class="kicker">Vorlesen</span>
-                  <p class="prose">{{ current.to_read }}</p>
-                </div>
-              }
-              @if (current.description) {
-                <p class="prose">{{ current.description }}</p>
-              } @else {
-                <p class="soft">Noch kein Text zum Kapitel. Mit „Bearbeiten“ unten in der Leiste schreibst du, worum es geht.</p>
-              }
-              <app-link-row label="Orte dieses Kapitels" [items]="places()" />
-              <app-link-row label="Figuren dieses Kapitels" [items]="npcs()" />
-              <app-link-row label="Gegenstände und Wissen dieses Kapitels" [items]="knowledge()" />
-            </article>
+            <app-entry-view [entry]="chapterRef()" />
           }
         </div>
       }
@@ -64,7 +48,7 @@
 <ng-template #sceneTpl>
   @if (openScene(); as shown) {
     @if (editing()) {
-      <app-scene-form [entry]="shown" (saved)="stopEditing()" (closed)="closeScene()" />
+      <app-scene-form [entry]="shown" (closed)="closeScene()" />
     } @else {
       <app-scene-view [scene]="shown" [editable]="false" />
     }

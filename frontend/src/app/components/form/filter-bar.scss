@@ -1,0 +1,33 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+
+// The search field keeps a reading width; the offer to create stands beside it.
+.filter__search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-2);
+  align-items: center;
+}
+
+.filter__search .input {
+  flex: 0 1 420px;
+  min-height: 38px;
+}
+
+// The rows of filters are smaller than buttons: they are many and only switch what is shown.
+.filter__row {
+  gap: var(--gap-1);
+}
+
+.filter__row .pill {
+  min-height: 30px;
+  padding: 2px 12px;
+  font-size: 13px;
+}
+
+p {
+  margin: 0;
+}

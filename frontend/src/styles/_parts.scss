@@ -455,15 +455,6 @@ textarea.input {
   text-align: left;
 }
 
-// A tile that is a link as a whole, like a chapter.
-.tile--link {
-  text-decoration: none;
-}
-
-.tile--link:hover {
-  border-color: var(--accent);
-}
-
 // A tile that is a button as a whole, like a note on the board.
 button.tile {
   gap: 6px;
@@ -566,34 +557,6 @@ button.tabs__tab {
 .tabs__tab.is-active {
   border-bottom-color: var(--accent);
   color: var(--accent);
-}
-
-// A part of a page that folds: closed it shows only its heading, a click on the heading opens it.
-.fold > summary {
-  cursor: pointer;
-  list-style: none;
-}
-
-.fold > summary::-webkit-details-marker {
-  display: none;
-}
-
-.fold[open] > summary {
-  margin-bottom: 14px;
-}
-
-.fold__mark {
-  transition: transform 0.15s;
-}
-
-.fold[open] > summary .fold__mark {
-  transform: rotate(90deg);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .fold__mark {
-    transition: none;
-  }
 }
 
 // Dark layer behind a panel or a window that lies over the page.

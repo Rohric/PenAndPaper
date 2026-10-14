@@ -8,9 +8,11 @@ import { map } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { EntryKind, Option, Scene, WorldNpc } from '../../core/models';
 import { AutoGrow } from '../../components/form/auto-grow';
+import { CategoryField } from '../../components/form/category-field';
 import { DialogueListEditor } from '../../components/form/dialogue-list-editor';
 import { Icon } from '../../components/basic/icon';
 import { LinkPicker } from '../../components/form/link-picker';
+import { NoteField } from '../../components/form/note-field';
 import { WorldStore } from '../../core/world-store';
 
 type LinkField = 'npcs' | 'quests' | 'events' | 'trivia';
@@ -24,7 +26,7 @@ interface Unsent {
 
 const SAVE_AFTER_MS = 700;
 // What is written word by word: it stays as typed while the form is open, even after it was saved.
-const WRITTEN: string[] = ['name', 'description', 'to_read', 'dialogues'];
+const WRITTEN: string[] = ['name', 'category', 'description', 'to_read', 'note', 'dialogues'];
 const STATUS_TEXT: Record<Status, string> = {
   idle: '',
   unsaved: 'Wird gleich gespeichert …',
@@ -34,13 +36,14 @@ const STATUS_TEXT: Record<Status, string> = {
 };
 
 /**
- * Write one scene like a page of text: its name, where it plays, who appears, what is read aloud,
- * what happens, what is said and what it points to, one below the other in the order of the Tab key.
- * There is no save button: a moment after typing, the changed fields are saved.
+ * Write one scene like a page of text: its name, its category, where it plays, who appears, what is read aloud,
+ * what happens, the note of the game master, what is said and what it points to, one below the other in the order
+ * of the Tab key. There is no save button: a moment after typing, the changed fields are saved. Back to reading
+ * goes through "Lesen" in the bar of tools or in the foot of the window.
  */
 @Component({
   selector: 'app-scene-form',
-  imports: [Icon, LinkPicker, AutoGrow, DialogueListEditor],
+  imports: [Icon, LinkPicker, AutoGrow, CategoryField, DialogueListEditor, NoteField],
   templateUrl: './scene-form.html',
   styleUrl: './scene-form.scss',
 })
@@ -48,8 +51,6 @@ export class SceneForm {
   protected readonly store = inject(WorldStore);
 
   readonly entry = input.required<Scene>();
-  /** Fired when the writer is done and wants to read the scene again. */
-  readonly saved = output<void>();
   /** Fired after the scene was deleted. */
   readonly closed = output<void>();
 
@@ -94,12 +95,6 @@ export class SceneForm {
     this.timer = setTimeout(() => this.flush(), SAVE_AFTER_MS);
   }
 
-  /** Save what is left and go back to reading. */
-  protected finish(): void {
-    this.flush();
-    this.saved.emit();
-  }
-
   /** Delete the scene after the user confirmed. */
   protected remove(): void {
     if (!confirm(`„${this.entry().name}“ wirklich löschen?`)) {
@@ -118,6 +113,23 @@ export class SceneForm {
     const kind = field === 'npcs' ? 'world-npcs' : field;
     this.store.add<{ id: number; npc?: number }>(kind, { name }).subscribe({
       next: (created) => this.set(field, [...this.draft()[field], created.npc ?? created.id]),
+      error: (e: unknown) => this.error.set(readError(e)),
+    });
+  }
+
+  /** Create a place from the typed name and let the scene play there. */
+  protected addPlace(name: string): void {
+    this.store.add<{ id: number }>('locations', { name }).subscribe({
+      next: (place) => this.set('location', place.id),
+      error: (e: unknown) => this.error.set(readError(e)),
+    });
+  }
+
+  /** Create a scene in the same chapter, at the end of its thread, and let this one lead to it. */
+  protected addNext(name: string): void {
+    const position = Math.max(-1, ...this.store.scenesOf(this.entry().chapter).map((scene) => scene.position)) + 1;
+    this.store.addScene(this.entry().chapter, { name, position }).subscribe({
+      next: (scene) => this.set('leads_to', [...this.draft().leads_to, scene.id]),
       error: (e: unknown) => this.error.set(readError(e)),
     });
   }

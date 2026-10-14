@@ -1,9 +1,10 @@
 import { Component, computed, inject, input, output } from '@angular/core';
 
 import { EntryKind, EntryLink, Scene } from '../../core/models';
+import { Fold } from '../../components/basic/fold';
 import { Icon } from '../../components/basic/icon';
 import { DialogueView } from '../../components/entry/dialogue-view';
-import { npcLinks } from '../../components/entry/entry-views';
+import { kickerOf, npcLinks } from '../../components/entry/entry-views';
 import { EntryCard } from '../../components/entry/entry-card';
 import { LinkRow } from '../../components/entry/link-row';
 import { WorldStore } from '../../core/world-store';
@@ -13,19 +14,22 @@ interface Named {
   name: string;
 }
 
-/** Read one scene: where it plays, who appears, what is read aloud, what happens and what it points to. */
+/**
+ * Read one scene: where it plays, who appears, what is read aloud, what happens, the note of the game master, what
+ * is said and what it points to. Every section folds at its title, like in the reading view of the other entries.
+ */
 @Component({
   selector: 'app-scene-view',
-  imports: [Icon, LinkRow, DialogueView, EntryCard],
+  imports: [Icon, LinkRow, DialogueView, EntryCard, Fold],
   template: `
     <article class="panel kind--scenes">
       <header class="row row--between">
         <div>
-          <span class="kicker kicker--kind">{{ scene().optional ? 'Optionale Szene' : 'Szene am roten Faden' }}</span>
+          <span class="kicker kicker--kind">{{ kicker() }}</span>
           <h2 class="subtitle">{{ scene().name }}</h2>
         </div>
         @if (editable()) {
-          <button type="button" class="btn btn--small" (click)="edit.emit()"><app-icon name="edit" [size]="16" /> Schreiben</button>
+          <button type="button" class="btn btn--small" (click)="edit.emit()"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
         } @else {
           <ng-content />
         }
@@ -37,33 +41,46 @@ interface Named {
       }
 
       @if (scene().to_read) {
-        <div class="read-aloud">
-          <span class="kicker">Vorlesen</span>
-          <p class="prose">{{ scene().to_read }}</p>
-        </div>
+        <app-fold key="read:Vorlesen" title="Vorlesen">
+          <p class="prose read-aloud">{{ scene().to_read }}</p>
+        </app-fold>
       }
       @if (scene().description) {
-        <p class="prose">{{ scene().description }}</p>
+        <app-fold key="read:Was passiert" title="Was passiert">
+          <p class="prose">{{ scene().description }}</p>
+        </app-fold>
+      }
+      @if (scene().note) {
+        <app-fold key="read:Notiz" title="Notiz (nur für dich)" [locked]="true">
+          <div class="knowledge knowledge--gm">
+            <p class="prose">{{ scene().note }}</p>
+          </div>
+        </app-fold>
       }
 
-      <app-dialogue-view [dialogues]="scene().dialogues" />
+      @if (scene().dialogues.length) {
+        <app-fold key="read:Dialoge" title="Dialoge" [count]="scene().dialogues.length">
+          <app-dialogue-view [dialogues]="scene().dialogues" />
+        </app-fold>
+      }
 
       @if (showEvents() && events().length) {
-        <div class="field">
-          <span class="label">Ereignisse in dieser Szene</span>
+        <app-fold key="read:Ereignisse in dieser Szene" title="Ereignisse in dieser Szene" [count]="events().length">
           <div class="tiles tiles--wide">
             @for (event of events(); track event.id) {
               <app-entry-card size="card" [whole]="true" [ref]="{ kind: 'events', id: event.id }" />
             }
           </div>
-        </div>
+        </app-fold>
       }
 
-      @if (!compact()) {
-        <app-link-row label="Führt zu" [items]="leadsTo()" />
-        <app-link-row label="Kommt von" [items]="comesFrom()" />
-        <app-link-row label="Quests" [items]="quests()" />
-        <app-link-row label="Wissen" [items]="trivia()" />
+      @if (!compact() && linkCount()) {
+        <app-fold key="read:Verknüpfungen" title="Verknüpfungen" [count]="linkCount()">
+          <app-link-row label="Führt zu" [items]="leadsTo()" />
+          <app-link-row label="Kommt von" [items]="comesFrom()" />
+          <app-link-row label="Quests" [items]="quests()" />
+          <app-link-row label="Wissen" [items]="trivia()" />
+        </app-fold>
       }
 
       @if (!scene().to_read && !scene().description) {
@@ -76,7 +93,7 @@ export class SceneView {
   private readonly store = inject(WorldStore);
 
   readonly scene = input.required<Scene>();
-  /** Whether the edit button is shown; a session puts its own buttons there. */
+  /** Whether the edit button is shown; a session puts its own buttons there, the world edits through the bar of tools. */
   readonly editable = input(true);
   /** Whether the events of the scene are listed; a session shows them itself to check them off. */
   readonly showEvents = input(true);
@@ -84,6 +101,7 @@ export class SceneView {
   readonly compact = input(false);
   readonly edit = output<void>();
 
+  protected readonly kicker = computed(() => kickerOf(this.scene().optional ? 'Optionale Szene' : 'Szene am roten Faden', this.scene().category));
   protected readonly place = computed(() => this.links('locations', this.store.locations(), [this.scene().location]));
   protected readonly npcs = computed(() => npcLinks(this.store, this.scene().npcs));
   protected readonly leadsTo = computed(() => this.links('scenes', this.store.scenes(), this.scene().leads_to));
@@ -102,6 +120,7 @@ export class SceneView {
   /** The events that hang on this scene, shown with their text so they can be read in place. */
   protected readonly events = computed(() => this.store.events().filter((event) => this.scene().events.includes(event.id)));
   protected readonly trivia = computed(() => this.links('trivia', this.store.trivia(), this.scene().trivia));
+  protected readonly linkCount = computed(() => [this.leadsTo(), this.comesFrom(), this.quests(), this.trivia()].reduce((sum, list) => sum + list.length, 0));
 
   private links(kind: EntryKind, entries: Named[], ids: (number | null)[]): EntryLink[] {
     return entries.filter((entry) => ids.includes(entry.id)).map((entry) => ({ kind, id: entry.id, label: entry.name }));

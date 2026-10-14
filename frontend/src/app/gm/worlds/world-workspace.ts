@@ -1,4 +1,4 @@
-import { Component, TemplateRef, computed, effect, inject, input, viewChild } from '@angular/core';
+import { Component, TemplateRef, computed, effect, inject, input, untracked, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { IconName } from '../../components/basic/icon';
@@ -14,7 +14,8 @@ import { WorldSearch } from './world-search';
 /**
  * The frame of one world. It loads the world once and reports what the frame of the game master shows around
  * its pages: the parts of the world as tabs on the left (the chapters, the lore and the parts of the glossary),
- * the path to the world and the search on top, and "Zuletzt" in the bar at the bottom.
+ * the path to the world and the search on top, and "Zuletzt" in the bar at the bottom. It holds the popup and the
+ * window at the side of the entries; when one of them opens, the popup of a symbol closes, so only one popup is open.
  */
 @Component({
   selector: 'app-world-workspace',
@@ -51,6 +52,11 @@ export class WorldWorkspace {
 
   constructor() {
     effect(() => this.store.load(Number(this.worldId())));
+    effect(() => {
+      if (this.store.popup() || this.store.peek()) {
+        untracked(() => this.tools.dismiss());
+      }
+    });
     this.nav.here.provide(this.tabs);
     this.nav.crumbs.provide(this.crumbs);
     this.nav.extras.provide(this.extras);

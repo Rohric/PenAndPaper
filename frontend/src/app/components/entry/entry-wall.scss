@@ -1,0 +1,18 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-3);
+}
+
+// As many tiles side by side as fit; the smallest width comes from the area (styles/gm.scss).
+.wall__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--tile-min, 280px), 100%), 1fr));
+  gap: var(--gap-2);
+  align-items: start;
+}
+
+// A tile with many tags is two columns wide from the start, so it grows wider instead of taller.
+.wall__grid > app-entry-card.is-wide {
+  grid-column: span 2;
+}

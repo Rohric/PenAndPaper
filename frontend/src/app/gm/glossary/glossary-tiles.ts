@@ -1,15 +1,19 @@
-import { Component, computed, inject, input, linkedSignal, output, signal } from '@angular/core';
+import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Observable, map } from 'rxjs';
 
 import { readError } from '../../core/api-error';
-import { EntryRef, Location } from '../../core/models';
+import { EntryRef } from '../../core/models';
+import { Facet } from '../../core/wall';
 import { Kind, WorldStore } from '../../core/world-store';
 import { IconName } from '../../components/basic/icon';
-import { Portrait } from '../../components/basic/portrait';
-import { EntryCard } from '../../components/entry/entry-card';
-import { chaptersOf } from '../../components/entry/entry-face';
+import { EntryWall } from '../../components/entry/entry-wall';
 import { isItem } from '../../components/entry/entry-views';
-import { tagColour } from '../../components/entry/tag-colour';
+import {
+  ONE_GROUP, QUEST_KIND_FACET, WallTile, categoryFacet, chapterFacet, entryTile, eventTiles, knowledgeTiles, npcTiles, placeFacet, placeTiles,
+  questTiles,
+} from '../../components/entry/wall-tiles';
 import { NameDialog } from '../../components/form/name-dialog';
+import { ToastService } from '../../global/toast/toast.service';
 import { Tool, Tools } from '../../global/tool-bar/tools.service';
 import { Carrier, ItemRow, itemRows } from './item-rows';
 
@@ -19,6 +23,8 @@ export type SectionId = 'locations' | 'npcs' | 'quests' | 'events' | 'items' | '
 export interface GlossarySection {
   id: SectionId;
   label: string;
+  /** One entry of the part, like "Ort". */
+  one: string;
   icon: IconName;
   /** The list new entries are created in; items are knowledge entries of the category "Gegenstand". */
   kind: Exclude<Kind, 'chapters' | 'scenes'>;
@@ -27,83 +33,47 @@ export interface GlossarySection {
 }
 
 export const GLOSSARY_SECTIONS: GlossarySection[] = [
-  { id: 'locations', label: 'Orte', icon: 'pin', kind: 'locations', newLabel: 'Neuer Ort', empty: 'Noch kein Ort.' },
-  { id: 'npcs', label: 'Figuren', icon: 'sheet', kind: 'world-npcs', newLabel: 'Neue Figur', empty: 'Noch keine Figur.' },
-  { id: 'quests', label: 'Quests', icon: 'quest', kind: 'quests', newLabel: 'Neue Quest', empty: 'Noch keine Quest.' },
-  { id: 'events', label: 'Ereignisse', icon: 'flag', kind: 'events', newLabel: 'Neues Ereignis', empty: 'Noch kein Ereignis.' },
-  { id: 'items', label: 'Gegenstände', icon: 'gift', kind: 'trivia', newLabel: 'Neuer Gegenstand', empty: 'Noch kein Gegenstand.' },
-  { id: 'trivia', label: 'Wissen', icon: 'note', kind: 'trivia', newLabel: 'Neuer Eintrag im Wissen', empty: 'Noch kein Wissen.' },
+  { id: 'locations', label: 'Orte', one: 'Ort', icon: 'pin', kind: 'locations', newLabel: 'Neuer Ort', empty: 'Noch kein Ort.' },
+  { id: 'npcs', label: 'Figuren', one: 'Figur', icon: 'sheet', kind: 'world-npcs', newLabel: 'Neue Figur', empty: 'Noch keine Figur.' },
+  { id: 'quests', label: 'Quests', one: 'Quest', icon: 'quest', kind: 'quests', newLabel: 'Neue Quest', empty: 'Noch keine Quest.' },
+  { id: 'events', label: 'Ereignisse', one: 'Ereignis', icon: 'flag', kind: 'events', newLabel: 'Neues Ereignis', empty: 'Noch kein Ereignis.' },
+  { id: 'items', label: 'Gegenstände', one: 'Gegenstand', icon: 'gift', kind: 'trivia', newLabel: 'Neuer Gegenstand', empty: 'Noch kein Gegenstand.' },
+  { id: 'trivia', label: 'Wissen', one: 'Wissen', icon: 'note', kind: 'trivia', newLabel: 'Neuer Eintrag im Wissen', empty: 'Noch kein Wissen.' },
 ];
 
-const ITEM_CATEGORY = 'Gegenstand';
+/** The category that makes a knowledge entry an item. */
+export const ITEM_CATEGORY = 'Gegenstand';
+const NOBODY = 'none';
 
-/** One tile of the wall: an entry of the world, or an item that only a player character carries. */
-interface Tile {
-  ref: EntryRef | null;
-  /** The item of a player character, which has no entry of its own; a click opens the sheet of the character. */
-  carried: ItemRow | null;
+/** Create an entry of a part of the glossary from its name; an item gets the category that makes it an item. */
+export function createEntry(store: WorldStore, section: GlossarySection, name: string): Observable<EntryRef> {
+  const body = { name, ...(section.id === 'items' ? { category: ITEM_CATEGORY } : {}) };
+  const kind = section.id === 'items' ? 'trivia' : section.id;
+  return store.add<{ id: number; npc?: number }>(section.kind, body).pipe(map((created) => ({ kind, id: created.npc ?? created.id })));
 }
 
+/** Names a carrier in the row "Getragen von"; the ids of characters and of player characters can be the same. */
+const carrierKey = (carrier: Carrier) => `${carrier.isPlayer ? 'pc' : 'npc'}:${carrier.id}`;
+
 /**
- * One part of the glossary as a wall of cards. A click on a card opens the popup of the entry.
- * The same wall is used while writing a world and while playing it. The wall can be filtered by chapter,
- * knowledge also by its category; "Neu" in the bar at the bottom starts a new entry from its name.
+ * One part of the glossary as a wall of tiles. A click on a tile opens the popup of the entry. The same wall is used
+ * while writing a world and while playing it. "Neu" in the bar at the bottom, or the search of the wall, starts a new
+ * entry from its name; a session creates nothing.
  */
 @Component({
   selector: 'app-glossary-tiles',
-  imports: [Portrait, EntryCard, NameDialog],
+  imports: [EntryWall, NameDialog],
   template: `
-    @if (store.chapters().length) {
-      <div class="row" role="group" aria-label="Nach Kapitel filtern">
-        <button type="button" class="pill" [attr.aria-pressed]="chapter() === null" (click)="chapter.set(null)">Alle Kapitel</button>
-        @for (item of store.chapters(); track item.id) {
-          <button type="button" class="pill" [attr.title]="item.name" [attr.aria-pressed]="chapter() === item.id" (click)="chapter.set(item.id)">
-            Kap. {{ item.number }}
-          </button>
-        }
-      </div>
-    }
-
-    @if (section().id === 'trivia' && categories().length) {
-      <div class="row" role="group" aria-label="Nach Kategorie filtern">
-        <button type="button" class="pill" [attr.aria-pressed]="category() === null" (click)="category.set(null)">Alle</button>
-        @for (name of categories(); track name) {
-          <button type="button" class="pill pill--tone" [style.--kind]="colourOf(name)" [attr.aria-pressed]="category() === name" (click)="category.set(name)">
-            {{ name || 'Ohne Kategorie' }}
-          </button>
-        }
-      </div>
-    }
-
-    <div class="tiles">
-      @for (tile of tiles(); track $index) {
-        @if (tile.ref; as ref) {
-          <app-entry-card [ref]="ref" [size]="rich() ? 'card' : 'tile'" />
-        } @else if (tile.carried; as item) {
-          <button type="button" class="tile kind--items" (click)="carrier.emit(item.owners[0].id)">
-            <span class="tile__head">
-              <app-portrait fallback="gift" [symbol]="item.symbol" [size]="32" />
-              <span class="tile__names">
-                <span class="kicker">Getragen von {{ item.owners[0].name }}</span>
-                <span class="tile__title">{{ item.name }}</span>
-              </span>
-            </span>
-            @if (item.text) {
-              <span class="soft clamp">{{ item.text }}</span>
-            }
-          </button>
-        }
-      }
-    </div>
-
-    @if (!tiles().length) {
-      <div class="empty">
-        <p>{{ filtered() ? 'Kein Eintrag passt zu diesem Filter.' : section().empty }}</p>
-        @if (creatable() && !filtered()) {
-          <p class="soft">Mit „Neu“ unten in der Leiste legst du den ersten an.</p>
-        }
-      </div>
-    }
+    <app-entry-wall
+      [id]="section().id"
+      [items]="tiles()"
+      [offers]="offers()"
+      [placeholder]="section().label + ' durchsuchen …'"
+      [creatable]="creatable()"
+      [empty]="section().empty"
+      [emptyHint]="creatable() ? 'Mit „Neu“ unten in der Leiste legst du den ersten an.' : ''"
+      (create)="create($event)"
+    />
 
     @if (creating()) {
       <app-name-dialog
@@ -115,10 +85,10 @@ interface Tile {
       />
     }
   `,
-  styleUrl: './glossary-tiles.scss',
 })
 export class GlossaryTiles {
   protected readonly store = inject(WorldStore);
+  private readonly toast = inject(ToastService);
 
   readonly section = input.required<GlossarySection>();
   /** Whether new entries can be created here; a session only reads. */
@@ -130,23 +100,41 @@ export class GlossaryTiles {
 
   protected readonly creating = signal(false);
   protected readonly error = signal('');
-  /** The chapter the wall is filtered by; null shows all. */
-  protected readonly chapter = signal<number | null>(null);
-  /** The categories of the knowledge of the world, in the order of the alphabet; knowledge without one comes last. */
-  protected readonly categories = computed(() => {
-    const names = new Set(this.store.trivia().filter((trivia) => !isItem(trivia)).map((trivia) => trivia.category.trim()));
-    return [...names].sort((a, b) => Number(!a) - Number(!b) || a.localeCompare(b));
+  protected readonly tiles = computed<WallTile[]>(() => {
+    const store = this.store;
+    switch (this.section().id) {
+      case 'locations':
+        return placeTiles(store);
+      case 'npcs':
+        return npcTiles(store);
+      case 'quests':
+        return questTiles(store);
+      case 'events':
+        return eventTiles(store);
+      case 'items':
+        return itemRows(store.trivia(), this.allCarriers()).map((row) => this.itemTile(row));
+      default:
+        return knowledgeTiles(store, store.trivia().filter((trivia) => !isItem(trivia)));
+    }
   });
-  /** The category the knowledge is filtered by; null shows all. Another part of the glossary starts without a filter. */
-  protected readonly category = linkedSignal<SectionId, string | null>({ source: () => this.section().id, computation: () => null });
-  protected readonly colourOf = tagColour;
-  /** Quests and events show more of themselves than the other kinds. */
-  protected readonly rich = computed(() => this.section().id === 'quests' || this.section().id === 'events');
-  protected readonly filtered = computed(() => this.chapter() !== null || this.category() !== null);
-  protected readonly tiles = computed(() => {
-    const chapter = this.chapter();
-    const tiles = this.tilesOf(this.section().id);
-    return chapter === null ? tiles : tiles.filter((tile) => !!tile.ref && chaptersOf(this.store, tile.ref).some((other) => other.id === chapter));
+  /** The rows of filters of the part: chapters and categories everywhere, and what the kind has of its own. */
+  protected readonly offers = computed<Facet[]>(() => {
+    const store = this.store;
+    const chapters = chapterFacet(store);
+    switch (this.section().id) {
+      case 'locations':
+        return [chapters, categoryFacet(store.locations()), placeFacet(store)];
+      case 'npcs':
+        return [chapters, categoryFacet(store.npcs())];
+      case 'quests':
+        return [chapters, categoryFacet(store.quests()), QUEST_KIND_FACET];
+      case 'events':
+        return [chapters, categoryFacet(store.events())];
+      case 'items':
+        return [chapters, this.carrierFacet()];
+      default:
+        return [chapters, categoryFacet(store.trivia().filter((trivia) => !isItem(trivia)))];
+    }
   });
   private readonly newTool = computed<Tool[]>(() =>
     this.creatable() ? [{ id: 'new', word: 'Neu', title: this.section().newLabel, icon: 'plus', click: () => this.creating.set(true) }] : [],
@@ -156,61 +144,27 @@ export class GlossaryTiles {
     inject(Tools).provide('view', this.newTool);
   }
 
-  /** Create an entry from the typed name and open its form in the window at the side. */
+  /** Create an entry with the name and open its form in the window at the side. */
   protected create(name: string): void {
-    const section = this.section();
-    const body = { name, ...(section.id === 'items' ? { category: ITEM_CATEGORY } : {}) };
-    this.store.add<{ id: number; npc?: number }>(section.kind, body).subscribe({
-      next: (created) => this.created(created.npc ?? created.id),
-      error: (e: unknown) => this.error.set(readError(e)),
+    createEntry(this.store, this.section(), name).subscribe({
+      next: (ref) => this.created(ref),
+      error: (e: unknown) => this.fail(e),
     });
   }
 
-  private created(id: number): void {
-    const kind = this.section().id;
-    this.creating.set(false);
-    this.error.set('');
-    this.store.read({ kind: kind === 'items' ? 'trivia' : kind, id }, true);
-  }
-
-  private tilesOf(section: SectionId): Tile[] {
-    const entry = (kind: EntryRef['kind'], id: number): Tile => ({ ref: { kind, id }, carried: null });
-    switch (section) {
-      case 'locations':
-        return this.places(null, new Set()).map((place) => entry('locations', place.id));
-      case 'npcs':
-        return this.store.npcs().map((link) => entry('npcs', link.npc));
-      case 'quests':
-        return this.store.quests().map((quest) => entry('quests', quest.id));
-      case 'events':
-        return this.store.events().map((event) => entry('events', event.id));
-      case 'items':
-        return itemRows(this.store.trivia(), this.allCarriers()).map((row) => this.itemTile(row));
-      default:
-        return this.knowledge().map((id) => entry('trivia', id));
+  /** In the dialog the reason stands in the dialog, elsewhere in a short message on top. */
+  private fail(error: unknown): void {
+    if (this.creating()) {
+      this.error.set(readError(error));
+    } else {
+      this.toast.show(readError(error), 'danger');
     }
   }
 
-  /** Places in the order of their tree: every place is followed by the places that lie inside it. */
-  private places(parent: Location | null, seen: Set<number>): Location[] {
-    return this.store
-      .locations()
-      .filter((place) => place.parent === (parent?.id ?? null) && !seen.has(place.id))
-      .flatMap((place) => {
-        seen.add(place.id);
-        return [place, ...this.places(place, seen)];
-      });
-  }
-
-  /** Knowledge without the items, grouped by its category and filtered by the chosen one; entries without one come last. */
-  private knowledge(): number[] {
-    const rank = (category: string) => (category ? `0${category.toLowerCase()}` : '1');
-    const chosen = this.category();
-    return this.store
-      .trivia()
-      .filter((trivia) => !isItem(trivia) && (chosen === null || trivia.category.trim() === chosen))
-      .sort((a, b) => rank(a.category).localeCompare(rank(b.category)))
-      .map((trivia) => trivia.id);
+  private created(ref: EntryRef): void {
+    this.creating.set(false);
+    this.error.set('');
+    this.store.read(ref, true);
   }
 
   private allCarriers(): Carrier[] {
@@ -218,10 +172,34 @@ export class GlossaryTiles {
     return [...npcs, ...this.carriers()];
   }
 
-  /** An item opens its entry of the world; without one the NPC that carries it, or else the sheet of the player character. */
-  private itemTile(row: ItemRow): Tile {
-    const npc = row.owners.find((owner) => !owner.isPlayer);
-    const ref: EntryRef | null = row.trivia !== null ? { kind: 'trivia', id: row.trivia } : npc ? { kind: 'npcs', id: npc.id } : null;
-    return { ref, carried: ref || !row.owners.length ? null : row };
+  /** Everybody who carries something, and "Von niemandem" for items of the world nobody carries. */
+  private carrierFacet(): Facet {
+    const carrying = this.allCarriers().filter((carrier) => carrier.inventory.length);
+    return {
+      id: 'carrier', label: 'Nach Träger filtern', all: 'Alle Träger',
+      options: [...carrying.map((carrier) => ({ value: carrierKey(carrier), label: carrier.name })), { value: NOBODY, label: 'Von niemandem' }],
+    };
+  }
+
+  /**
+   * An item of the world is its own tile. An item that is only carried is a loose tile: a click looks up the NPC
+   * that carries it, or opens the sheet of the player character.
+   */
+  private itemTile(row: ItemRow): WallTile {
+    const carriers = row.owners.length ? row.owners.map(carrierKey) : [NOBODY];
+    if (row.trivia !== null) {
+      const ref: EntryRef = { kind: 'trivia', id: row.trivia };
+      const entry = { name: row.name, category: '', description: row.text };
+      return entryTile(this.store, ref, entry, ONE_GROUP, { carrier: carriers });
+    }
+    const owner = row.owners.find((one) => !one.isPlayer) ?? row.owners[0];
+    return {
+      key: `carried:${row.name.toLowerCase()}`, ref: null, name: row.name, text: row.text, values: { carrier: carriers }, group: ONE_GROUP,
+      loose: {
+        name: row.name, kicker: `Getragen von ${row.owners.map((one) => one.name).join(', ')}`, symbol: row.symbol, fallback: 'gift',
+        tone: 'items', colour: '', lead: null, text: row.text, steps: 0, facts: '', tags: [],
+      },
+      press: () => (owner.isPlayer ? this.carrier.emit(owner.id) : this.store.look({ kind: 'npcs', id: owner.id })),
+    };
   }
 }

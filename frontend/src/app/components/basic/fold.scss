@@ -1,0 +1,60 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  min-width: 0;
+}
+
+// The title line: what stands before the title, then the button that folds.
+.fold__head {
+  display: flex;
+  gap: var(--gap-2);
+  align-items: center;
+  min-width: 0;
+}
+
+.fold__toggle {
+  display: inline-flex;
+  gap: var(--gap-2);
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--soft);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.fold__toggle:hover .fold__title {
+  color: var(--accent);
+}
+
+.fold__mark {
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+
+.fold__mark.is-open {
+  transform: rotate(90deg);
+}
+
+.fold__count {
+  padding: 0 var(--gap-2);
+  font-size: 12px;
+}
+
+.fold__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fold__mark {
+    transition: none;
+  }
+}

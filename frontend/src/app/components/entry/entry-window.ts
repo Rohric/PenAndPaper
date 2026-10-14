@@ -16,9 +16,11 @@ import { EntryCard } from './entry-card';
 const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
 
 /**
- * An entry in the window at the side, to read and to edit without leaving the page. Its tabs: the text, what
- * the entry is linked to and, in a session, the round and the note. A click on a link changes the window to that
+ * An entry of any kind in the window at the side, to read and to edit without leaving the page. Its tabs: the text,
+ * what the entry is linked to and, in a session, the round and the note. "Bearbeiten" in the foot switches to the
+ * form of the entry and back ("Lesen"); a session switches it off. A click on a link changes the window to that
  * entry, the arrows lead back and forward. From here the only way on is to the entry itself, which closes the window.
+ * In a session a chapter has no place of its own, so it has no way there.
  */
 @Component({
   selector: 'app-entry-peek',
@@ -77,9 +79,11 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
             <app-icon [name]="editing() ? 'eye' : 'edit'" [size]="16" /> {{ editing() ? 'Lesen' : 'Bearbeiten' }}
           </button>
         }
-        <button windowFoot type="button" class="btn btn--small btn--primary" (click)="toEntry(shown)">
-          <app-icon name="expand" [size]="16" /> Zum Eintrag
-        </button>
+        @if (hasHome(shown)) {
+          <button windowFoot type="button" class="btn btn--small btn--primary" (click)="toEntry(shown)">
+            <app-icon name="expand" [size]="16" /> Zum Eintrag
+          </button>
+        }
       </app-side-window>
     }
   `,
@@ -131,6 +135,11 @@ export class EntryPeek {
   /** Ask into which group of the table the entry and everything connected to it shall be laid. */
   protected layAll(ref: EntryRef): void {
     this.round?.tableWish.set({ kind: ref.kind, id: ref.id });
+  }
+
+  /** Whether the entry has a place to go to; in a session a chapter has none. */
+  protected hasHome(ref: EntryRef): boolean {
+    return !(this.jump() && ref.kind === 'chapters');
   }
 
   /** Close the window and go to the place where the entry lives. */

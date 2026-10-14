@@ -53,7 +53,10 @@
 }
 
 .entry__name .kicker {
+  overflow: hidden;
   color: var(--kind, var(--muted));
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .entry__name:hover .entry__title {
@@ -63,11 +66,26 @@
 .entry__title {
   overflow: hidden;
   font-family: var(--font-display);
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// A tile shows the goal or what sets an event off in one line, a card in two.
+.entry__lead {
+  margin: 0;
+  overflow: hidden;
+  color: var(--soft);
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry--card .entry__lead {
+  white-space: normal;
 }
 
 // A tile shows two lines of its text, a card four.
@@ -114,6 +132,41 @@
   flex-wrap: wrap;
   gap: var(--gap-1);
   align-items: center;
+}
+
+// The tags flow in one wide row, also in a narrow column: each word once, then the small tags it is about.
+.entry__tags {
+  gap: var(--gap-1) var(--gap-2);
+}
+
+.entry__group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px var(--gap-1);
+  align-items: center;
+  min-width: 0;
+}
+
+.entry__word {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+// A small tag stays on one line; a long name is cut, its whole name is in the title.
+.entry .entry__tag {
+  display: inline-block;
+  max-width: 100%;
+  min-height: 22px;
+  overflow: hidden;
+  padding: 0 var(--gap-2);
+  font-size: 12px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry__tag app-icon {
+  vertical-align: -2px;
 }
 
 .entry__tools {

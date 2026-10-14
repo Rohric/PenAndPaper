@@ -1,19 +1,19 @@
-import { Component, computed } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Trivia } from '../../core/models';
+import { CategoryField } from '../../components/form/category-field';
 import { ChapterField } from '../../components/form/chapter-field';
 import { EditorBar } from '../../components/form/editor-bar';
 import { EntryTextsEditor } from '../../components/form/entry-texts-editor';
 import { LinkPicker } from '../../components/form/link-picker';
 import { SymbolPicker } from '../../components/form/symbol-picker';
-import { tagColour } from '../../components/entry/tag-colour';
 import { EntryEditor } from './entry-editor';
 
-/** Edit one piece of knowledge and the entries it is attached to. */
+/** Edit one piece of knowledge or one item and the entries it is attached to. */
 @Component({
   selector: 'app-trivia-editor',
-  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor],
+  imports: [FormsModule, CategoryField, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor],
   template: `
     <div class="stack">
       <div class="panel">
@@ -25,25 +25,16 @@ import { EntryEditor } from './entry-editor';
           <span class="label">Symbol</span>
           <app-symbol-picker fallback="note" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
         </div>
-        <div class="field">
-          <label for="trivia-category">Kategorie <span class="dot" [style.--kind]="colour()"></span></label>
-          <span class="soft">Im Glossar filterst du nach der Kategorie; jede hat ihre eigene Farbe.</span>
-          <input
-            id="trivia-category"
-            class="input"
-            list="trivia-categories"
-            placeholder="Zum Beispiel Tier, Volk. „Gegenstand“ macht den Eintrag zu einem Gegenstand"
-            [ngModel]="draft().category"
-            (ngModelChange)="set('category', $event)"
-          />
-          <datalist id="trivia-categories">
-            @for (category of categories(); track category) {
-              <option [value]="category"></option>
-            }
-          </datalist>
-        </div>
-        <app-chapter-field inputId="trivia-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
-        <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
+        <app-category-field
+          inputId="trivia-category"
+          kind="trivia"
+          hint="„Gegenstand“ macht den Eintrag zu einem Gegenstand."
+          placeholder="Zum Beispiel Tier, Volk, Gegenstand"
+          [value]="draft().category"
+          (valueChange)="set('category', $event)"
+        />
+        <app-chapter-field inputId="trivia-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        <app-editor-bar [dirty]="dirty()" [busy]="busy()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 
       <app-entry-texts-editor
@@ -52,17 +43,21 @@ import { EntryEditor } from './entry-editor';
         [visibleFromStart]="!!draft().visible_from_start"
         [playerKnowledge]="draft().player_knowledge"
         [gmKnowledge]="draft().gm_knowledge"
+        [note]="draft().note"
         (descriptionChange)="set('description', $event)"
         (visibleFromStartChange)="set('visible_from_start', $event)"
         (playerKnowledgeChange)="set('player_knowledge', $event)"
         (gmKnowledgeChange)="set('gm_knowledge', $event)"
+        (noteChange)="set('note', $event)"
       />
 
       <div class="panel">
-        <h2 class="subtitle">Gehört zu</h2>
+        <h2 class="subtitle">Verknüpfungen</h2>
+        <p class="soft">Woran der Eintrag hängt. Tippen sucht, Enter verknüpft.</p>
         <div class="field">
-          <span class="label">Orte</span>
+          <label for="trivia-locations">Orte</label>
           <app-link-picker
+            inputId="trivia-locations"
             label="Orte"
             [creatable]="true"
             [options]="store.locationOptions()"
@@ -73,8 +68,9 @@ import { EntryEditor } from './entry-editor';
           />
         </div>
         <div class="field">
-          <span class="label">Figuren</span>
+          <label for="trivia-npcs">Figuren</label>
           <app-link-picker
+            inputId="trivia-npcs"
             label="Figuren"
             [creatable]="true"
             [options]="store.npcOptions()"
@@ -85,8 +81,9 @@ import { EntryEditor } from './entry-editor';
           />
         </div>
         <div class="field">
-          <span class="label">Quests</span>
+          <label for="trivia-quests">Quests</label>
           <app-link-picker
+            inputId="trivia-quests"
             label="Quests"
             [creatable]="true"
             [options]="store.questOptions()"
@@ -97,8 +94,9 @@ import { EntryEditor } from './entry-editor';
           />
         </div>
         <div class="field">
-          <span class="label">Ereignisse</span>
+          <label for="trivia-events">Ereignisse</label>
           <app-link-picker
+            inputId="trivia-events"
             label="Ereignisse"
             [creatable]="true"
             [options]="store.eventOptions()"
@@ -114,9 +112,4 @@ import { EntryEditor } from './entry-editor';
 })
 export class TriviaEditor extends EntryEditor<Trivia> {
   protected readonly kind = 'trivia' as const;
-  /** The colour the typed category has everywhere in the app. */
-  protected readonly colour = computed(() => tagColour(this.draft().category));
-
-  /** The categories already used in this world, offered while typing. */
-  protected readonly categories = computed(() => [...new Set(this.store.trivia().map((t) => t.category).filter(Boolean))].sort());
 }

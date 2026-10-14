@@ -95,6 +95,14 @@ export interface EntryTexts {
   gm_knowledge: Knowledge[];
 }
 
+/** What the game master gives every entry for himself: a free category to sort and filter by, and his own note. */
+export interface Categorized {
+  /** Like "Stadt" or "Tier"; empty when the entry has none. Knowledge of the category "Gegenstand" is an item. */
+  category: string;
+  /** The note of the game master ("Notiz (nur für dich)"); players never see it. */
+  note: string;
+}
+
 /** A world, which is one adventure. */
 export interface World {
   id: number;
@@ -106,7 +114,7 @@ export interface World {
 }
 
 /** A place in a world; parent is the place it lies in. */
-export interface Location extends EntryTexts {
+export interface Location extends EntryTexts, Categorized {
   id: number;
   /** The ids of the chapters the entry is tagged with. */
   chapters: number[];
@@ -120,7 +128,7 @@ export interface Location extends EntryTexts {
 }
 
 /** The link between a world and one of its NPCs. `npc` is the id of the character itself. */
-export interface WorldNpc {
+export interface WorldNpc extends Categorized {
   id: number;
   npc: number;
   /** The ids of the chapters the entry is tagged with. */
@@ -129,7 +137,7 @@ export interface WorldNpc {
   profession: string;
   symbol: string;
   location: number | null;
-  /** What the character carries. Read only here; it is changed at the character itself. */
+  /** What the character carries. Read only here, like category and note; they are changed at the character itself. */
   inventory: InventoryItem[];
   /** When it was written and when it was changed last. */
   created_at: string;
@@ -150,7 +158,7 @@ export function questLabel(quest: { kind: QuestKind; number: number | null }): s
 }
 
 /** A quest; giver and npcs hold ids of characters. Players see description, goal and checklist. */
-export interface Quest extends EntryTexts {
+export interface Quest extends EntryTexts, Categorized {
   id: number;
   /** The ids of the chapters the entry is tagged with. */
   chapters: number[];
@@ -174,7 +182,7 @@ export interface Quest extends EntryTexts {
 }
 
 /** Something that can happen in a world. */
-export interface WorldEvent extends EntryTexts {
+export interface WorldEvent extends EntryTexts, Categorized {
   id: number;
   /** The ids of the chapters the entry is tagged with. */
   chapters: number[];
@@ -195,13 +203,12 @@ export interface WorldEvent extends EntryTexts {
 }
 
 /** A piece of knowledge about the world, on its own or attached to other entries. */
-export interface Trivia extends EntryTexts {
+export interface Trivia extends EntryTexts, Categorized {
   id: number;
   /** The ids of the chapters the entry is tagged with. */
   chapters: number[];
   name: string;
   symbol: string;
-  category: string;
   locations: number[];
   npcs: number[];
   quests: number[];
@@ -212,7 +219,7 @@ export interface Trivia extends EntryTexts {
 }
 
 /** A chapter of the story with its quests and events; its scenes form the thread of the story. */
-export interface Chapter {
+export interface Chapter extends Categorized {
   id: number;
   number: number;
   name: string;
@@ -234,7 +241,7 @@ export interface Chapter {
  * A scene of a chapter. Scenes on the thread are numbered by position,
  * optional scenes stand beside it and can be used wherever they fit.
  */
-export interface Scene {
+export interface Scene extends Categorized {
   id: number;
   chapter: number;
   position: number;
@@ -337,7 +344,7 @@ export interface Character {
 }
 
 /** A character the game master writes. */
-export interface Npc extends Character {
+export interface Npc extends Character, Categorized {
   phrases: Phrase[];
   player_knowledge: Knowledge[];
   gm_knowledge: Knowledge[];

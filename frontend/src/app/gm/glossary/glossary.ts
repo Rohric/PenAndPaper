@@ -1,9 +1,12 @@
 import { Component, computed, inject, input, linkedSignal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
+import { Folds } from '../../core/folds';
 import { EntryKind, EntryRef } from '../../core/models';
-import { Icon } from '../../components/basic/icon';
+import { foldScope, foldTools } from '../../components/basic/fold';
+import { Portrait } from '../../components/basic/portrait';
 import { Crumb, NavService } from '../../global/frame/nav.service';
+import { Tool, Tools } from '../../global/tool-bar/tools.service';
 import { EntryForm } from './entry-form';
 import { EntryView } from '../../components/entry/entry-view';
 import { viewOf } from '../../components/entry/entry-views';
@@ -32,17 +35,19 @@ const TOPICS: Record<SectionId, string> = {
 };
 
 /**
- * The glossary of a world: everything that exists in it. Every part is a wall of tiles; a click
- * looks an entry up at the side, and from there its whole page can be opened to read and edit.
+ * The glossary of a world: everything that exists in it. Every part is a wall of tiles; a click opens the popup of
+ * an entry, and from there its whole page. The whole page of an entry and the lore are read here and edited with
+ * "Bearbeiten" in the bar at the bottom; the page itself has no buttons.
  */
 @Component({
   selector: 'app-glossary',
-  imports: [RouterLink, Icon, EntryForm, EntryView, GlossaryTiles, LoreEditor],
+  imports: [Portrait, EntryForm, EntryView, GlossaryTiles, LoreEditor],
   templateUrl: './glossary.html',
 })
 export class Glossary {
   protected readonly store = inject(WorldStore);
   private readonly router = inject(Router);
+  private readonly folds = inject(Folds);
 
   /** Both come from the URL: .../glossary/:section?entry=id */
   readonly section = input('lore');
@@ -70,11 +75,25 @@ export class Glossary {
   });
   /** Every page starts in the reading view. */
   protected readonly editing = linkedSignal({ source: () => `${this.section()}:${this.entry()}`, computation: () => false });
+  /** "Bearbeiten" and the folding for the whole page of an entry, "Bearbeiten" for the lore; a wall reports its own. */
+  private readonly pageTools = computed<Tool[]>(() => {
+    const editing = this.editing();
+    if (this.current() && !this.opened()) {
+      return [];
+    }
+    const what = this.opened() ? 'Eintrag' : 'Lore';
+    const edit: Tool = {
+      id: 'edit', word: editing ? 'Lesen' : 'Bearbeiten', title: editing ? 'Zurück zum Lesen' : `${what} bearbeiten`,
+      icon: editing ? 'eye' : 'edit', pressed: editing, click: () => this.editing.set(!editing),
+    };
+    return this.opened() ? [edit, ...foldTools(this.folds, foldScope(this.store))] : [edit];
+  });
 
   constructor() {
     const nav = inject(NavService);
     nav.crumbs.provide(this.crumbs);
     nav.topic.provide(this.topic);
+    inject(Tools).provide('view', this.pageTools);
   }
 
   /** Address of a part of the glossary. */

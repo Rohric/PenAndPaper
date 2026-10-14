@@ -1,43 +1,35 @@
-<div class="stack">
-  @if (current(); as shown) {
-    @if (opened(); as page) {
-      <div class="row">
-        <a class="btn btn--small" [routerLink]="[]" [queryParams]="{}"><app-icon name="back" [size]="16" /> Alle {{ shown.label }}</a>
-        @if (editing()) {
-          <button type="button" class="btn btn--small" (click)="editing.set(false)"><app-icon name="eye" [size]="16" /> Lesen</button>
-        }
-      </div>
-      <div class="page">
-        @if (editing()) {
-          <app-entry-form [entry]="page" (saved)="editing.set(false)" (closed)="close()" />
-        } @else {
-          <app-entry-view [entry]="page" [editable]="true" (edit)="editing.set(true)" />
-        }
-      </div>
-    } @else {
-      <app-glossary-tiles [section]="shown" />
-    }
-  } @else if (editing()) {
-    <div class="row">
-      <button type="button" class="btn btn--small" (click)="editing.set(false)"><app-icon name="eye" [size]="16" /> Lesen</button>
-    </div>
+@if (current(); as shown) {
+  @if (opened(); as page) {
     <div class="page">
-      <app-lore-editor (saved)="editing.set(false)" />
+      @if (editing()) {
+        <app-entry-form [entry]="page" (saved)="editing.set(false)" (closed)="close()" />
+      } @else {
+        <app-entry-view [entry]="page" />
+      }
     </div>
   } @else {
-    <article class="panel page">
-      <header class="row row--between">
-        <div>
-          <span class="kicker">Lore</span>
-          <h2 class="subtitle">{{ store.world()?.name }}</h2>
-        </div>
-        <button type="button" class="btn btn--small" (click)="editing.set(true)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
-      </header>
-      @if (store.world()?.lore) {
-        <p class="prose">{{ store.world()?.lore }}</p>
-      } @else {
-        <p class="soft">Noch keine Lore geschrieben.</p>
-      }
-    </article>
+    <app-glossary-tiles [section]="shown" />
   }
-</div>
+} @else if (editing()) {
+  <div class="page">
+    <app-lore-editor (saved)="editing.set(false)" />
+  </div>
+} @else {
+  <article class="panel page">
+    <header class="tile__head">
+      <app-portrait fallback="archive" [size]="52" />
+      <div>
+        <span class="kicker">Lore</span>
+        <h2 class="subtitle">{{ store.world()?.name }}</h2>
+        @if (store.world()?.second_bar_name; as secondBar) {
+          <p class="soft">Zweite Leiste: {{ secondBar }}</p>
+        }
+      </div>
+    </header>
+    @if (store.world()?.lore) {
+      <p class="prose">{{ store.world()?.lore }}</p>
+    } @else {
+      <p class="soft">Noch keine Lore geschrieben. Mit „Bearbeiten“ unten in der Leiste schreibst du sie.</p>
+    }
+  </article>
+}

@@ -18,7 +18,7 @@ Spieler (scrollt mit der Seite)
 **Spielleiter**, von links nach rechts:
 1. **Ort als Krümel:** Welt › Kapitel › Szene oder Runde › Welt › Kapitel. Jeder Krümel außer dem letzten ist ein Link.
 2. **Links der Ansicht:** Reiter, die nur zu dieser Ansicht gehören (zum Beispiel die vier Reiter eines Kapitels) und ihre wenigen eigenen Auswahlfelder (Kapitel der Runde).
-3. **Suche** über die ganze Welt, rechts. Ein Treffer öffnet das [Popup des Eintrags](eintrag-popup.md).
+3. **Suche** über die ganze Welt, rechts: Orte, Figuren, Quests, Ereignisse, Gegenstände, Wissen, Szenen und Kapitel, nach Name und Text. Ein Treffer öffnet das [Popup des Eintrags](eintrag-popup.md). Heißt kein Eintrag genau so wie der Text, bietet die Liste unten „„Text" neu anlegen als …" für jede Art des Glossars an; das legt an und öffnet das Seitenfenster im Formular. In einer Runde wird nichts angelegt.
 
 Die Kopfleiste bleibt beim Spielleiter oben stehen.
 

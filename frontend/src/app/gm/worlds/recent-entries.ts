@@ -1,10 +1,9 @@
-import { Component, computed, inject, output } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, computed, inject } from '@angular/core';
 
-import { EntryRef, isItem } from '../../core/models';
+import { EntryRef } from '../../core/models';
 import { Icon, IconName } from '../../components/basic/icon';
 import { timeAgo } from '../../components/basic/time-ago';
-import { KIND_LABELS, openEntry } from '../../components/entry/entry-views';
+import { EntryCard } from '../../components/entry/entry-card';
 import { WorldStore } from '../../core/world-store';
 
 const SHOWN = 8;
@@ -14,10 +13,6 @@ const MOMENT_MS = 2000;
 /** One entry of the world with the times it was written and changed. */
 interface Stamped {
   ref: EntryRef;
-  label: string;
-  kicker: string;
-  /** The kind whose colour the tile shows. */
-  tone: string;
   created: string;
   updated: string;
 }
@@ -31,22 +26,20 @@ interface RecentList {
 }
 
 /**
- * What was written and what was changed last in a world, across all kinds of entries, chapters
- * and scenes. A click looks an entry up at the side, or goes to the chapter or the scene.
+ * What was written and what was changed last in a world, across all kinds of entries, chapters and scenes, as the
+ * same tiles as everywhere, with how long ago in the line above the name. A click opens the popup of the entry;
+ * the frame of the world then closes the popup of the symbol around this list.
  */
 @Component({
   selector: 'app-recent-entries',
-  imports: [Icon],
+  imports: [Icon, EntryCard],
   template: `
     @for (list of lists(); track list.label) {
       <section class="stack">
         <h3 class="section-title"><app-icon [name]="list.icon" /> {{ list.label }}</h3>
         <div class="tiles">
           @for (entry of list.entries; track entry.ref.kind + entry.ref.id) {
-            <button type="button" [class]="'tile kind--' + entry.tone" (click)="open(entry.ref)">
-              <span class="kicker">{{ entry.kicker }} · {{ ago(entry.at) }}</span>
-              <span class="tile__title">{{ entry.label }}</span>
-            </button>
+            <app-entry-card [ref]="entry.ref" [marks]="' · ' + ago(entry.at)" />
           } @empty {
             <p class="soft">{{ list.empty }}</p>
           }
@@ -58,23 +51,18 @@ interface RecentList {
 })
 export class RecentEntries {
   private readonly store = inject(WorldStore);
-  private readonly router = inject(Router);
-
-  /** Fired after an entry was opened, so a window around this list can close. */
-  readonly opened = output<void>();
 
   protected readonly ago = timeAgo;
   private readonly all = computed<Stamped[]>(() => {
     const store = this.store;
-    const chapter = (id: number) => store.chapters().find((other) => other.id === id)?.number ?? '?';
     return [
-      ...store.locations().map((e) => stamped({ kind: 'locations', id: e.id }, e.name, KIND_LABELS.locations, 'locations', e)),
-      ...store.npcs().map((e) => stamped({ kind: 'npcs', id: e.npc }, e.name, KIND_LABELS.npcs, 'npcs', e)),
-      ...store.quests().map((e) => stamped({ kind: 'quests', id: e.id }, e.name, KIND_LABELS.quests, 'quests', e)),
-      ...store.events().map((e) => stamped({ kind: 'events', id: e.id }, e.name, KIND_LABELS.events, 'events', e)),
-      ...store.trivia().map((e) => stamped({ kind: 'trivia', id: e.id }, e.name, e.category || KIND_LABELS.trivia, isItem(e) ? 'items' : 'trivia', e)),
-      ...store.chapters().map((e) => stamped({ kind: 'chapters', id: e.id }, e.name, `Kapitel ${e.number}`, 'chapters', e)),
-      ...store.scenes().map((e) => stamped({ kind: 'scenes', id: e.id }, e.name, `Szene · Kapitel ${chapter(e.chapter)}`, 'scenes', e)),
+      ...store.locations().map((e) => stamped({ kind: 'locations', id: e.id }, e)),
+      ...store.npcs().map((e) => stamped({ kind: 'npcs', id: e.npc }, e)),
+      ...store.quests().map((e) => stamped({ kind: 'quests', id: e.id }, e)),
+      ...store.events().map((e) => stamped({ kind: 'events', id: e.id }, e)),
+      ...store.trivia().map((e) => stamped({ kind: 'trivia', id: e.id }, e)),
+      ...store.chapters().map((e) => stamped({ kind: 'chapters', id: e.id }, e)),
+      ...store.scenes().map((e) => stamped({ kind: 'scenes', id: e.id }, e)),
     ];
   });
   protected readonly lists = computed<RecentList[]>(() => {
@@ -84,16 +72,10 @@ export class RecentEntries {
       { label: 'Zuletzt bearbeitet', icon: 'edit', empty: 'Seit dem Anlegen wurde noch nichts geändert.', entries: newest(changed, 'updated') },
     ];
   });
-
-  /** Look the entry up at the side, or go to the chapter or the scene. */
-  protected open(ref: EntryRef): void {
-    openEntry(this.store, this.router, ref);
-    this.opened.emit();
-  }
 }
 
-function stamped(ref: EntryRef, label: string, kicker: string, tone: string, entry: { created_at: string; updated_at: string }): Stamped {
-  return { ref, label, kicker, tone, created: entry.created_at, updated: entry.updated_at };
+function stamped(ref: EntryRef, entry: { created_at: string; updated_at: string }): Stamped {
+  return { ref, created: entry.created_at, updated: entry.updated_at };
 }
 
 /** The newest entries by one of the two times, each with the time it is sorted by. */

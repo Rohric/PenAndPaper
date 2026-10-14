@@ -1,5 +1,5 @@
 @if (size() === 'tag') {
-  <button type="button" [class]="'chip chip--link kind--' + (tone() || face()?.tone || ref().kind)" [style.--kind]="face()?.colour || null" (click)="open()">
+  <button type="button" [class]="'chip chip--link kind--' + (tone() || face()?.tone || ref()?.kind)" [style.--kind]="face()?.colour || null" (click)="open()">
     {{ label() || face()?.name }}
   </button>
 } @else {
@@ -10,14 +10,14 @@
       [class.entry--done]="!!state()?.done"
       [style.--kind]="shown.colour || null"
     >
-      <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="size() === 'card' ? 36 : 32" />
+      <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="size() === 'card' ? 36 : 28" />
       <div class="entry__main">
         <button type="button" class="entry__name" (click)="open()">
           <span class="kicker">{{ kicker() }}{{ marks() }}</span>
           <span class="entry__title">{{ shown.name }}</span>
         </button>
         @if (shown.lead; as lead) {
-          <p class="entry__text"><strong>{{ lead.label }}:</strong> {{ lead.text }}</p>
+          <p class="entry__lead"><strong>{{ lead.label }}:</strong> {{ lead.text }}</p>
         }
         @if (shown.text) {
           <p class="entry__text" [class.entry__text--whole]="whole()">{{ shown.text }}</p>
@@ -28,34 +28,41 @@
         @if (shown.steps) {
           <span class="entry__small">Checkliste: {{ kind() ? (state()?.steps?.length ?? 0) + ' von ' : '' }}{{ shown.steps }} Schritte</span>
         }
+        @if (shown.facts) {
+          <span class="entry__small">{{ shown.facts }}</span>
+        }
         @if (chapters().length || kind() === 'quest' || canAdd()) {
           <div class="entry__row">
             @for (chapter of chapters(); track chapter.id) {
               @if (session) {
-                <span class="chip kind--chapters" [attr.title]="chapter.name">Kap. {{ chapter.number }}</span>
+                <span class="chip entry__tag kind--chapters" [attr.title]="chapter.name">Kap. {{ chapter.number }}</span>
               } @else {
-                <button type="button" class="chip chip--link kind--chapters" [attr.title]="chapter.name" (click)="follow({ kind: 'chapters', id: chapter.id })">
+                <button type="button" class="chip chip--link entry__tag kind--chapters" [attr.title]="chapter.name" (click)="follow({ kind: 'chapters', id: chapter.id })">
                   Kap. {{ chapter.number }}
                 </button>
               }
             }
             @if (kind() === 'quest') {
-              <button type="button" class="chip chip--link" [attr.aria-pressed]="!!state()?.started" (click)="toggle('started')">
-                <app-icon name="flag" [size]="12" /> {{ state()?.started ? 'Angenommen' : 'Annehmen' }}
+              <button type="button" class="chip chip--link entry__tag" [attr.aria-pressed]="!!state()?.started" (click)="toggle('started')">
+                <app-icon name="play" [size]="12" /> {{ state()?.started ? 'Angenommen' : 'Annehmen' }}
               </button>
             }
             @if (canAdd()) {
-              <button type="button" class="chip chip--link" (click)="addToScene()"><app-icon name="plus" [size]="12" /> Zur Szene</button>
+              <button type="button" class="chip chip--link entry__tag" (click)="addToScene()"><app-icon name="plus" [size]="12" /> Zur Szene</button>
             }
           </div>
         }
-        @if (shown.tags.length) {
-          <div class="entry__row">
-            @for (tag of size() === 'card' ? shown.tags : shown.tags.slice(0, TILE_TAGS); track tag.word + tag.kind + tag.id) {
-              <button type="button" [class]="'chip chip--link kind--' + (tag.tone ?? tag.kind)" (click)="follow(tag)">{{ tag.word }} · {{ tag.label }}</button>
-            }
-            @if (size() !== 'card' && shown.tags.length > TILE_TAGS) {
-              <span class="chip" [attr.title]="'Alle im Popup unter Verbindungen'">+{{ shown.tags.length - TILE_TAGS }}</span>
+        @if (tagGroups().length) {
+          <div class="entry__row entry__tags">
+            @for (group of tagGroups(); track group.word) {
+              <span class="entry__group">
+                <span class="entry__word">{{ group.word }}</span>
+                @for (tag of group.tags; track tag.kind + tag.id) {
+                  <button type="button" [class]="'chip chip--link entry__tag kind--' + (tag.tone ?? tag.kind)" [attr.title]="group.word + ' · ' + tag.label" (click)="follow(tag)">
+                    {{ tag.label }}
+                  </button>
+                }
+              </span>
             }
           </div>
         }

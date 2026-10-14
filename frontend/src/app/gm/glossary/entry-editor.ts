@@ -4,14 +4,18 @@ import { map } from 'rxjs';
 import { readError } from '../../core/api-error';
 import { EntryKind, WorldNpc } from '../../core/models';
 import { Kind, WorldStore } from '../../core/world-store';
+import { ToastService } from '../../global/toast/toast.service';
 
 /**
- * What every editor of a world entry shares: a draft of the entry, saving and deleting.
- * A concrete editor only names its list and adds its template.
+ * What every editor of a world entry shares: a draft of the entry, saving (also with Strg + Enter) and deleting.
+ * How saving went is told by a short message on top. A concrete editor only names its list and adds its template.
  */
-@Directive()
+@Directive({
+  host: { '(keydown.control.enter)': 'saveByKey($event)', '(keydown.meta.enter)': 'saveByKey($event)' },
+})
 export abstract class EntryEditor<T extends { id: number }> {
   protected readonly store = inject(WorldStore);
+  private readonly toast = inject(ToastService);
   protected abstract readonly kind: Kind;
 
   readonly entry = input.required<T>();
@@ -24,7 +28,6 @@ export abstract class EntryEditor<T extends { id: number }> {
   protected readonly draft = linkedSignal(() => structuredClone(this.entry()));
   protected readonly dirty = computed(() => JSON.stringify(this.draft()) !== JSON.stringify(this.entry()));
   protected readonly busy = signal(false);
-  protected readonly error = signal('');
   /** Create a character of the world from a typed name, for a line of a dialogue. */
   protected readonly newSpeaker = (name: string) => this.store.add<WorldNpc>('world-npcs', { name }).pipe(map((link) => link.npc));
 
@@ -57,7 +60,7 @@ export abstract class EntryEditor<T extends { id: number }> {
   protected createLinked<K extends keyof T>(key: K, kind: Exclude<Kind, 'scenes'>, name: string): void {
     this.store.add<{ id: number; npc?: number }>(kind, { name }).subscribe({
       next: (created) => this.link(key, created.npc ?? created.id),
-      error: (e: unknown) => this.error.set(readError(e)),
+      error: (e: unknown) => this.fail(e),
     });
   }
 
@@ -66,8 +69,16 @@ export abstract class EntryEditor<T extends { id: number }> {
     this.busy.set(true);
     this.store.save<T>(this.kind, this.entry().id, this.draft()).subscribe({
       next: () => this.done(),
-      error: (e: unknown) => this.finish(readError(e)),
+      error: (e: unknown) => this.fail(e),
     });
+  }
+
+  /** Strg + Enter anywhere in the form saves, when there is something to save. */
+  protected saveByKey(event: Event): void {
+    event.preventDefault();
+    if (this.dirty() && !this.busy()) {
+      this.save();
+    }
   }
 
   /** Delete the entry after the user confirmed. */
@@ -77,8 +88,14 @@ export abstract class EntryEditor<T extends { id: number }> {
     }
     this.store.remove(this.kind, this.entry().id).subscribe({
       next: () => this.closed.emit(),
-      error: (e: unknown) => this.finish(readError(e)),
+      error: (e: unknown) => this.fail(e),
     });
+  }
+
+  /** Say what went wrong in a short message on top; the form stays open. */
+  protected fail(error: unknown): void {
+    this.busy.set(false);
+    this.toast.show(readError(error), 'danger');
   }
 
   private link<K extends keyof T>(key: K, id: number): void {
@@ -87,12 +104,8 @@ export abstract class EntryEditor<T extends { id: number }> {
   }
 
   private done(): void {
-    this.finish('');
-    this.saved.emit();
-  }
-
-  private finish(error: string): void {
     this.busy.set(false);
-    this.error.set(error);
+    this.toast.show('Gespeichert', 'ok');
+    this.saved.emit();
   }
 }

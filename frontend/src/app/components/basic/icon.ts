@@ -56,6 +56,12 @@ const ICONS = {
   stop: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M9 9h6v6H9z'],
   // Something is under way, like a quest the group has taken on.
   play: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M10 8l6 4-6 4z'],
+  // The filters above a wall: a funnel.
+  filter: ['M3 4h18l-7 8.5V19l-4 2v-8.5z'],
+  // Fold everything shut: two angles that meet in the middle.
+  'fold-in': ['M7 4l5 5 5-5', 'M7 20l5-5 5 5'],
+  // Fold everything open: two angles that part from the middle.
+  'fold-out': ['M7 9l5-5 5 5', 'M7 15l5 5 5-5'],
 } satisfies Record<string, string[]>;
 
 export type IconName = keyof typeof ICONS;

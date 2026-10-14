@@ -2,6 +2,7 @@ import { Component, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { Location } from '../../core/models';
+import { CategoryField } from '../../components/form/category-field';
 import { ChapterField } from '../../components/form/chapter-field';
 import { EditorBar } from '../../components/form/editor-bar';
 import { EntryTextsEditor } from '../../components/form/entry-texts-editor';
@@ -14,7 +15,7 @@ import { LocationEvents } from './location-events';
 /** Edit one location: its name, the place it lies in, what is known about it, the events that happen there and the items found there. */
 @Component({
   selector: 'app-location-editor',
-  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems, LocationEvents],
+  imports: [FormsModule, CategoryField, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems, LocationEvents],
   template: `
     <div class="stack">
       <div class="panel">
@@ -26,6 +27,27 @@ import { LocationEvents } from './location-events';
           <span class="label">Symbol</span>
           <app-symbol-picker fallback="pin" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
         </div>
+        <app-category-field inputId="location-category" kind="locations" [value]="draft().category" (valueChange)="set('category', $event)" />
+        <app-chapter-field inputId="location-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        <app-editor-bar [dirty]="dirty()" [busy]="busy()" (save)="save()" (remove)="remove(entry().name)" />
+      </div>
+
+      <app-entry-texts-editor
+        inputId="location-description"
+        [description]="draft().description"
+        [visibleFromStart]="!!draft().visible_from_start"
+        [playerKnowledge]="draft().player_knowledge"
+        [gmKnowledge]="draft().gm_knowledge"
+        [note]="draft().note"
+        (descriptionChange)="set('description', $event)"
+        (visibleFromStartChange)="set('visible_from_start', $event)"
+        (playerKnowledgeChange)="set('player_knowledge', $event)"
+        (gmKnowledgeChange)="set('gm_knowledge', $event)"
+        (noteChange)="set('note', $event)"
+      />
+
+      <div class="panel">
+        <h2 class="subtitle">Verknüpfungen</h2>
         <div class="field">
           <label for="location-parent">Liegt in</label>
           <app-link-picker
@@ -41,21 +63,7 @@ import { LocationEvents } from './location-events';
             (look)="lookUp('locations', $event)"
           />
         </div>
-        <app-chapter-field inputId="location-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
-        <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
-
-      <app-entry-texts-editor
-        inputId="location-description"
-        [description]="draft().description"
-        [visibleFromStart]="!!draft().visible_from_start"
-        [playerKnowledge]="draft().player_knowledge"
-        [gmKnowledge]="draft().gm_knowledge"
-        (descriptionChange)="set('description', $event)"
-        (visibleFromStartChange)="set('visible_from_start', $event)"
-        (playerKnowledgeChange)="set('player_knowledge', $event)"
-        (gmKnowledgeChange)="set('gm_knowledge', $event)"
-      />
 
       <div class="panel">
         <h2 class="subtitle">Ereignisse</h2>

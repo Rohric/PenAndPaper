@@ -54,6 +54,9 @@ Was noch nicht entschieden ist.
 - [Popup eines Eintrags](bausteine/eintrag-popup.md)
 - [Seitenfenster eines Eintrags](bausteine/eintrag-seitenfenster.md)
 - [Kachel](bausteine/kachel.md)
+- [Wand](bausteine/wand.md): Kacheln einer Art mit Filter und Gruppen
+- [Filterleiste](bausteine/filterleiste.md): suchen, filtern, neu anlegen über einer Wand
+- [Klappen](bausteine/klappen.md): Gruppen und Abschnitte zu- und aufklappen
 - [Eintrag lesen](bausteine/eintrag-lesen.md)
 - [Auge](bausteine/auge.md)
 - [Tags](bausteine/tags.md)

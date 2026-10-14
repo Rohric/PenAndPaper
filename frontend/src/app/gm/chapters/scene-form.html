@@ -1,9 +1,8 @@
 <article class="panel doc">
   <div class="row row--between">
-    <span class="kicker">Szene schreiben</span>
+    <span class="kicker">Szene bearbeiten</span>
     <div class="row">
       <span class="soft" role="status">{{ statusText() }}</span>
-      <button type="button" class="btn btn--small btn--primary" (click)="finish()"><app-icon name="check" [size]="16" /> Fertig</button>
       <button type="button" class="btn btn--small btn--danger" (click)="remove()"><app-icon name="trash" [size]="16" /> Löschen</button>
     </div>
   </div>
@@ -26,6 +25,8 @@
     Optionale Szene: hängt nicht am roten Faden und kann eingesetzt werden, wo sie passt
   </label>
 
+  <app-category-field inputId="scene-category" kind="scenes" [value]="draft().category" (valueChange)="set('category', $event)" />
+
   <div class="doc__line">
     <label for="scene-location">Ort</label>
     <app-link-picker
@@ -35,7 +36,9 @@
       emptyText="Wo spielt die Szene?"
       [options]="store.locationOptions()"
       [value]="draft().location"
+      [creatable]="true"
       (valueChange)="set('location', $event)"
+      (create)="addPlace($event)"
       (look)="lookUp('locations', $event)"
     />
   </div>
@@ -79,6 +82,8 @@
       (input)="set('description', $any($event.target).value)"
     ></textarea>
   </div>
+
+  <app-note-field inputId="scene-note" [value]="draft().note" (valueChange)="set('note', $event)" />
 
   <div class="field">
     <span class="label">Dialoge</span>
@@ -141,12 +146,15 @@
       emptyText="Welche Szene kann folgen?"
       [options]="otherScenes()"
       [selected]="draft().leads_to"
+      [creatable]="true"
       (selectedChange)="set('leads_to', $event)"
+      (create)="addNext($event)"
+      (look)="lookUp('scenes', $event)"
     />
   </div>
 
   <p class="soft">
     Tab springt zum nächsten Feld. In einem Verknüpfungsfeld: tippen sucht, Pfeiltasten wählen, Enter verknüpft, die Rücktaste nimmt
-    den letzten Eintrag weg. Ein Klick auf einen verknüpften Eintrag öffnet ihn rechts zum Lesen und Bearbeiten.
+    den letzten Eintrag weg. Ein Klick auf einen verknüpften Eintrag öffnet sein Popup.
   </p>
 </article>

@@ -1,53 +1,55 @@
-<span class="kicker">Roter Faden</span>
-<ol class="list list--thread">
-  @for (scene of thread(); track scene.id) {
-    <li class="item">
-      <button
-        type="button"
-        class="scene"
-        [class.is-active]="scene.id === selected()"
-        [class.is-next]="next().has(scene.id)"
-        [attr.aria-current]="scene.id === selected() ? 'true' : null"
-        (click)="open.emit(scene.id)"
-      >
-        <span class="scene__mark" [class.scene__mark--done]="done().includes(scene.id)">{{ $index + 1 }}</span>
-        <span class="scene__name">{{ scene.name }}</span>
-        @if (done().includes(scene.id)) {
-          <span class="chip">gespielt</span>
-        }
-        @if (next().has(scene.id)) {
-          <span class="chip chip--accent">als Nächstes</span>
-        }
-      </button>
-    </li>
-  } @empty {
-    <li class="soft">Noch keine Szene am Faden.</li>
-  }
-</ol>
+<app-fold key="thread:main" title="Roter Faden" [count]="thread().length">
+  <ol class="list list--thread">
+    @for (scene of thread(); track scene.id) {
+      <li class="item">
+        <button
+          type="button"
+          class="scene"
+          [class.is-active]="scene.id === selected()"
+          [class.is-next]="next().has(scene.id)"
+          [attr.aria-current]="scene.id === selected() ? 'true' : null"
+          (click)="open.emit(scene.id)"
+        >
+          <span class="scene__mark" [class.scene__mark--done]="done().includes(scene.id)">{{ $index + 1 }}</span>
+          <span class="scene__name">{{ scene.name }}</span>
+          @if (done().includes(scene.id)) {
+            <span class="chip">gespielt</span>
+          }
+          @if (next().has(scene.id)) {
+            <span class="chip chip--accent">als Nächstes</span>
+          }
+        </button>
+      </li>
+    } @empty {
+      <li class="soft">Noch keine Szene am Faden.</li>
+    }
+  </ol>
+</app-fold>
 
-<span class="kicker section">Optionale Szenen</span>
-<ul class="list">
-  @for (scene of optional(); track scene.id) {
-    <li class="item">
-      <button
-        type="button"
-        class="scene"
-        [class.is-active]="scene.id === selected()"
-        [class.is-next]="next().has(scene.id)"
-        [attr.aria-current]="scene.id === selected() ? 'true' : null"
-        (click)="open.emit(scene.id)"
-      >
-        <span class="scene__mark scene__mark--optional" [class.scene__mark--done]="done().includes(scene.id)">+</span>
-        <span class="scene__name">{{ scene.name }}</span>
-        @if (done().includes(scene.id)) {
-          <span class="chip">gespielt</span>
-        }
-        @if (next().has(scene.id)) {
-          <span class="chip chip--accent">als Nächstes</span>
-        }
-      </button>
-    </li>
-  } @empty {
-    <li class="soft">Noch keine optionale Szene.</li>
-  }
-</ul>
+<app-fold class="section" key="thread:optional" title="Optionale Szenen" [count]="optional().length">
+  <ul class="list">
+    @for (scene of optional(); track scene.id) {
+      <li class="item">
+        <button
+          type="button"
+          class="scene"
+          [class.is-active]="scene.id === selected()"
+          [class.is-next]="next().has(scene.id)"
+          [attr.aria-current]="scene.id === selected() ? 'true' : null"
+          (click)="open.emit(scene.id)"
+        >
+          <span class="scene__mark scene__mark--optional" [class.scene__mark--done]="done().includes(scene.id)">+</span>
+          <span class="scene__name">{{ scene.name }}</span>
+          @if (done().includes(scene.id)) {
+            <span class="chip">gespielt</span>
+          }
+          @if (next().has(scene.id)) {
+            <span class="chip chip--accent">als Nächstes</span>
+          }
+        </button>
+      </li>
+    } @empty {
+      <li class="soft">Noch keine optionale Szene.</li>
+    }
+  </ul>
+</app-fold>

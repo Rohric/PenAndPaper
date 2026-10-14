@@ -1,12 +1,12 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { Trivia } from '../../core/models';
 import { LinkPicker } from '../../components/form/link-picker';
 import { isItem } from '../../components/entry/entry-views';
 import { WorldStore } from '../../core/world-store';
-
-const ITEM_CATEGORY = 'Gegenstand';
+import { ToastService } from '../../global/toast/toast.service';
+import { ITEM_CATEGORY } from './glossary-tiles';
 
 /**
  * The items that belong to a place, a character or a quest. An item is a knowledge entry of the
@@ -26,19 +26,16 @@ const ITEM_CATEGORY = 'Gegenstand';
       (create)="createNew($event)"
       (look)="store.look({ kind: 'trivia', id: $event })"
     />
-    @if (error()) {
-      <p class="notice notice--error" role="alert">{{ error() }}</p>
-    }
   `,
 })
 export class EntryItems {
   protected readonly store = inject(WorldStore);
+  private readonly toast = inject(ToastService);
 
   /** What the items are attached to; a character is named by the id of the character. */
   readonly kind = input.required<'locations' | 'npcs' | 'quests'>();
   readonly entryId = input.required<number>();
 
-  protected readonly error = signal('');
   private readonly items = computed(() => this.store.trivia().filter(isItem));
   protected readonly options = computed(() => {
     const ids = new Set(this.items().map((item) => item.id));
@@ -62,8 +59,7 @@ export class EntryItems {
   protected createNew(name: string): void {
     const body = { name, category: ITEM_CATEGORY, [this.kind()]: [this.entryId()] };
     this.store.add<Trivia>('trivia', body).subscribe({
-      next: () => this.error.set(''),
-      error: (e: unknown) => this.error.set(readError(e)),
+      error: (e: unknown) => this.toast.show(readError(e), 'danger'),
     });
   }
 
@@ -71,8 +67,7 @@ export class EntryItems {
     const id = this.entryId();
     const linked = attach ? [...item[this.kind()], id] : item[this.kind()].filter((other) => other !== id);
     this.store.save('trivia', item.id, { [this.kind()]: linked }).subscribe({
-      next: () => this.error.set(''),
-      error: (e: unknown) => this.error.set(readError(e)),
+      error: (e: unknown) => this.toast.show(readError(e), 'danger'),
     });
   }
 }

@@ -1,15 +1,15 @@
-import { Component, computed, input, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, input, output } from '@angular/core';
 
 import { Scene } from '../../core/models';
+import { Fold } from '../../components/basic/fold';
 
 /**
  * The thread of a chapter: the scenes that should happen, numbered in the order of the game master,
- * and below them the optional scenes that can be used wherever they fit.
+ * and below them the optional scenes that can be used wherever they fit. Both groups fold at their title.
  */
 @Component({
   selector: 'app-scene-thread',
-  imports: [FormsModule],
+  imports: [Fold],
   templateUrl: './scene-thread.html',
   styleUrl: './scene-thread.scss',
 })
