@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from auth_app.api.permissions import IsGameMaster
 from character_app.models import PlayerCharacter
-from character_app.utils import npcs_for_user, player_characters_for_user, set_image
+from character_app.utils import listed_npcs_for_user, npcs_for_user, player_characters_for_user, set_image
 
 from .serializers import (
     CharacterImageSerializer,
@@ -25,7 +25,7 @@ class NpcList(generics.ListCreateAPIView):
     """
     List and create NPCs.
 
-    - GET: the NPCs the requesting game master owns.
+    - GET: the NPCs the requesting game master owns, without those made up in a session.
     - POST: create a new NPC owned by the requesting game master.
     """
 
@@ -33,8 +33,8 @@ class NpcList(generics.ListCreateAPIView):
     permission_classes = GAME_MASTER_ONLY
 
     def get_queryset(self):
-        """Return only the NPCs the requesting user owns."""
-        return npcs_for_user(self.request.user)
+        """Return the NPCs the requesting user owns, without those made up in a session."""
+        return listed_npcs_for_user(self.request.user)
 
     def perform_create(self, serializer):
         """Save the new NPC with the requesting user as owner."""

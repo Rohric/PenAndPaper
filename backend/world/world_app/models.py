@@ -7,6 +7,17 @@ from character_app.models import Npc
 from core.models import BaseEntry
 
 
+def _made_up_in(related_name):
+    """Return the link to the session an entry was made up in; it stays empty for an entry of the world itself.
+
+    What the game master makes up while a session plays is stored with that session and deleted with it.
+    """
+    # A string reference: session_app imports this module, so importing the session here would go in a circle.
+    return models.ForeignKey(
+        "session_app.Session", on_delete=models.CASCADE, null=True, blank=True, related_name=related_name
+    )
+
+
 class World(models.Model):
     """Store a world, which is one adventure the game master writes."""
 
@@ -16,6 +27,7 @@ class World(models.Model):
     # The name of the second bar next to life in this world, like "Willen"; empty means the world has none.
     second_bar_name = models.CharField(max_length=60, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["name"]
@@ -48,6 +60,7 @@ class Location(Entry):
     """Store a place inside a world; places can lie inside other places."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="locations")
+    session = _made_up_in("locations")
     parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="children")
 
 
@@ -55,6 +68,7 @@ class WorldNpc(models.Model):
     """Attach an NPC to its world and to the place where the players can meet it."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="world_npcs")
+    session = _made_up_in("world_npcs")
     # One-to-one: an NPC belongs to exactly one world.
     npc = models.OneToOneField(Npc, on_delete=models.CASCADE, related_name="world_link")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="world_npcs")
@@ -77,6 +91,7 @@ class Quest(Entry):
         SIDE = "side", "Nebenquest"
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="quests")
+    session = _made_up_in("quests")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="quests")
     giver = models.ForeignKey(Npc, on_delete=models.SET_NULL, null=True, blank=True, related_name="given_quests")
     # The scene in which the quest comes up; optional like the place and the giver.
@@ -95,6 +110,7 @@ class Event(Entry):
     """Store something that can happen in a world, optionally at a place."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="events")
+    session = _made_up_in("events")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, blank=True, related_name="events")
     # What sets the event off, like "on the pass, in the first night".
     trigger = models.TextField(blank=True)
@@ -111,8 +127,7 @@ class Trivia(Entry):
     """Store a piece of knowledge about a world, on its own or attached to other entries."""
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, related_name="trivia")
-    # Free text, so the game master forms his own groups: "Tier", "Gegenstand", "Volk".
-    category = models.CharField(max_length=100, blank=True)
+    session = _made_up_in("trivia")
     locations = models.ManyToManyField(Location, blank=True, related_name="trivia")
     npcs = models.ManyToManyField(Npc, blank=True, related_name="trivia")
     quests = models.ManyToManyField(Quest, blank=True, related_name="trivia")
@@ -150,6 +165,7 @@ class Scene(BaseEntry):
     """Store one scene of a chapter: numbered on the thread of the story, or optional beside it."""
 
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name="scenes")
+    session = _made_up_in("scenes")
     # The order on the thread of the chapter; there is no day and no date.
     position = models.PositiveIntegerField(default=0)
     # An optional scene has no place on the thread and can be used wherever it fits.

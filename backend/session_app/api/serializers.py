@@ -11,8 +11,17 @@ from session_app.utils import characters_in_other_sessions, chat_name
 
 MAX_AMOUNT = 9999
 MAX_CHECK_VALUE = 300
-# What a session may have different about a quest, and the type of each value. None takes a link away.
-QUEST_CHANGES = {"name": str, "goal": str, "giver": int, "location": int, "scene": int}
+# What a session may have different about an entry ("In dieser Runde ändern"), by kind, and the type of each
+# value. None takes a change or a link away.
+TEXT_CHANGES = {"name": str, "description": str}
+CHANGES = {
+    SessionEntry.Kind.QUEST: {**TEXT_CHANGES, "goal": str, "giver": int, "location": int, "scene": int},
+    SessionEntry.Kind.SCENE: {**TEXT_CHANGES, "to_read": str},
+    SessionEntry.Kind.EVENT: {**TEXT_CHANGES, "trigger": str, "happening": str},
+    SessionEntry.Kind.LOCATION: TEXT_CHANGES,
+    SessionEntry.Kind.NPC: TEXT_CHANGES,
+    SessionEntry.Kind.TRIVIA: TEXT_CHANGES,
+}
 # What can be shown to the players piece by piece: a part of the entry, or one point of a checklist.
 SHOWN_PART = re.compile(r"^(description|goal|giver|location|trigger|happening|step:\d+)$")
 # The key of a point in the order of the group: a given point by its position, or a point of its own.
@@ -28,6 +37,11 @@ def _texts(values, pattern=None):
     if pattern and not all(pattern.match(value) for value in cleaned):
         raise serializers.ValidationError("Einer der Einträge ist nicht bekannt.")
     return cleaned
+
+
+def _fits(value, kind):
+    """Return whether a changed value has the type its key needs; None always fits, a yes or no is never a number."""
+    return value is None or (isinstance(value, kind) and not isinstance(value, bool))
 
 
 def _clean_point(point):
@@ -58,7 +72,10 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ["id", "name", "date", "world", "world_name", "characters", "chapter", "finished"]
+        fields = [
+            "id", "name", "date", "world", "world_name", "characters", "chapter", "finished",
+            "created_at", "updated_at",
+        ]
 
     def validate_world(self, world):
         """Accept only a world the requesting game master owns."""
@@ -118,13 +135,13 @@ class SessionEntrySerializer(serializers.ModelSerializer):
         return clean_log(log)
 
     def validate_changes(self, changes):
-        """Accept what a session may have different about a quest: name, goal, giver, place and scene."""
+        """Accept what a session may have different about the entry; which keys are allowed depends on its kind."""
+        allowed = CHANGES[self.instance.kind]
         fits = isinstance(changes, dict) and all(
-            key in QUEST_CHANGES and (value is None or isinstance(value, QUEST_CHANGES[key]))
-            for key, value in changes.items()
+            key in allowed and _fits(value, allowed[key]) for key, value in changes.items()
         )
         if not fits:
-            raise serializers.ValidationError("Erlaubt sind name, goal, giver, location und scene.")
+            raise serializers.ValidationError(f"Erlaubt sind {', '.join(allowed)}.")
         return changes
 
 
@@ -192,7 +209,10 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class NoteSerializer(serializers.ModelSerializer):
-    """Serialize a note with its comments; "mine" tells the reader whether it is his own."""
+    """Serialize a note with its comments; "mine" tells the reader whether it is his own.
+
+    The table group belongs to the game master: only he sets it, on his own notes, and only the author reads it.
+    """
 
     author = serializers.CharField(source="author.username", read_only=True)
     mine = serializers.SerializerMethodField()
@@ -200,16 +220,38 @@ class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Note
-        fields = ["id", "title", "text", "shared", "author", "mine", "comments", "created_at"]
+        fields = [
+            "id", "title", "text", "shared", "table_group", "author", "mine", "comments", "created_at", "updated_at",
+        ]
 
     def get_mine(self, note):
         """Return True when the requesting user wrote the note."""
         return note.author_id == self.context["request"].user.pk
 
+    def to_representation(self, note):
+        """Return the note; whoever did not write it, like a player reading a shared note, gets no table group."""
+        data = super().to_representation(note)
+        if not data["mine"]:
+            data["table_group"] = ""
+        return data
+
+    def validate_table_group(self, group):
+        """Accept a table group only on the game master's own note in his session; players' notes reject it."""
+        if group and not self._game_masters_own():
+            raise serializers.ValidationError("Nur der Spielleiter legt eigene Notizen auf seinen Tisch.")
+        return group
+
+    def _game_masters_own(self):
+        """Return whether the requesting user writes his own note in a session he runs."""
+        user, note = self.context["request"].user, self.instance
+        session = note.session if note else self.context["session"]
+        return session.owner_id == user.pk and (note is None or note.author_id == user.pk)
+
     def update(self, instance, validated_data):
-        """Change the note; only its author decides whether it lies in the notepad of the group."""
+        """Change the note; only its author decides whether it lies in the notepad of the group or on his table."""
         if instance.author_id != self.context["request"].user.pk:
             validated_data.pop("shared", None)
+            validated_data.pop("table_group", None)
         return super().update(instance, validated_data)
 
 

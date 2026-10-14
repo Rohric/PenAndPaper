@@ -12,6 +12,7 @@ from character_app.models import Npc
 from character_app.utils import use_inspiration
 from session_app.models import Note, Session, SessionEntry
 from world.world_app.models import Quest
+from world.world_app.utils import in_scope, npcs_in_world
 
 KEPT_ROLLS = 30
 # The bonus points a character gets for a closed chapter when the game master names no other number.
@@ -20,14 +21,17 @@ ROLLS = defaultdict(lambda: deque(maxlen=KEPT_ROLLS))
 
 
 def _marked_entries(world):
-    """Return for each kind of entry the ones of a world that are marked as visible from the start."""
+    """Return for each kind of entry the ones of a world that are marked as visible from the start.
+
+    What a session made up stays out: it belongs to that session alone.
+    """
     kinds = SessionEntry.Kind
     return {
-        kinds.LOCATION: world.locations.filter(visible_from_start=True),
-        kinds.QUEST: world.quests.filter(visible_from_start=True),
-        kinds.EVENT: world.events.filter(visible_from_start=True),
-        kinds.TRIVIA: world.trivia.filter(visible_from_start=True),
-        kinds.NPC: Npc.objects.filter(world_link__world=world, visible_from_start=True),
+        kinds.LOCATION: in_scope(world.locations).filter(visible_from_start=True),
+        kinds.QUEST: in_scope(world.quests).filter(visible_from_start=True),
+        kinds.EVENT: in_scope(world.events).filter(visible_from_start=True),
+        kinds.TRIVIA: in_scope(world.trivia).filter(visible_from_start=True),
+        kinds.NPC: npcs_in_world(world).filter(visible_from_start=True),
     }
 
 
@@ -53,6 +57,13 @@ def sessions_for_player(user):
 def session_for_game_master(user, session_id):
     """Return the user's own session with the given id or raise a 404."""
     return get_object_or_404(sessions_for_game_master(user), pk=session_id)
+
+
+@transaction.atomic
+def delete_session(session):
+    """Delete a session with everything made up in it; its NPCs would otherwise stay behind without a world."""
+    Npc.objects.filter(world_link__session=session).delete()
+    session.delete()
 
 
 def session_for_member(user, session_id):
@@ -160,9 +171,20 @@ def latest_rolls(session, with_secret):
     return [roll for roll in ROLLS[session.pk] if with_secret or not roll["secret"]]
 
 
+def session_text(entry, state, key):
+    """Return a text of an entry as the session has it: changed for this session, or as the world wrote it.
+
+    An empty name counts as no change, so an entry never loses its name.
+    """
+    value = state.changes.get(key)
+    if not isinstance(value, str) or (key == "name" and not value):
+        return getattr(entry, key, "")
+    return value
+
+
 def shown_text(entry, state, part):
-    """Return a text of an entry when the session shows this part to the players, otherwise an empty text."""
-    return getattr(entry, part, "") if part in state.shown else ""
+    """Return a text of an entry as the session has it when it shows this part to the players, otherwise nothing."""
+    return session_text(entry, state, part) if part in state.shown else ""
 
 
 def known_pieces(entry, state):
@@ -173,7 +195,7 @@ def known_pieces(entry, state):
 def shared_entry(kind, entry, state):
     """Return what players see of one revealed entry: its name, the parts shown to them and what they found out."""
     return {
-        "kind": kind, "id": entry.pk, "name": entry.name, "category": getattr(entry, "category", ""),
+        "kind": kind, "id": entry.pk, "name": session_text(entry, state, "name"), "category": entry.category,
         "symbol": entry.symbol, "description": shown_text(entry, state, "description"),
         "trigger": shown_text(entry, state, "trigger"), "happening": shown_text(entry, state, "happening"),
         "knowledge": known_pieces(entry, state),
@@ -192,15 +214,15 @@ def place_name(quest, state):
     """Return the name of the place a quest starts at as the session has it; empty when hidden or unknown."""
     place = quest.location
     if "location" in state.changes:
-        place = quest.world.locations.filter(pk=state.changes["location"]).first()
+        place = in_scope(quest.world.locations, state.session_id).filter(pk=state.changes["location"]).first()
     return place.name if place and "location" in state.shown else ""
 
 
-def giver_name(quest, changes):
+def giver_name(quest, state):
     """Return the name of the giver of a quest as the session has it; empty when there is none."""
     giver = quest.giver
-    if "giver" in changes:
-        giver = Npc.objects.filter(world_link__world=quest.world_id, pk=changes["giver"]).first()
+    if "giver" in state.changes:
+        giver = npcs_in_world(quest.world_id, state.session_id).filter(pk=state.changes["giver"]).first()
     return giver.name if giver else ""
 
 
@@ -209,12 +231,10 @@ def shared_quest(quest, state):
 
     What the session has different about the quest counts before what the world says.
     """
-    changes, shown = state.changes, state.shown
     return {
-        **shared_entry("quest", quest, state), "name": changes.get("name") or quest.name,
-        "main": quest.kind == Quest.Kind.MAIN, "number": quest.number,
-        "goal": changes.get("goal", quest.goal) if "goal" in shown else "",
-        "giver": giver_name(quest, changes) if "giver" in shown else "", "location": place_name(quest, state),
+        **shared_entry("quest", quest, state),
+        "main": quest.kind == Quest.Kind.MAIN, "number": quest.number, "goal": shown_text(quest, state, "goal"),
+        "giver": giver_name(quest, state) if "giver" in state.shown else "", "location": place_name(quest, state),
         "checklist": shown_steps(quest, state), "started": state.started, "done": state.done, "log": state.log,
     }
 
@@ -226,13 +246,13 @@ def shared_entries(kind, entries, states):
 
 
 def glossary_for_players(session, states):
-    """Return the revealed places, characters, knowledge and events of a session's world."""
+    """Return the revealed places, characters, knowledge and events of a session's world and of the session itself."""
     world = session.world
     return (
-        shared_entries("location", world.locations, states)
-        + shared_entries("npc", Npc.objects.filter(world_link__world=world), states)
-        + shared_entries("trivia", world.trivia, states)
-        + shared_entries("event", world.events, states)
+        shared_entries("location", in_scope(world.locations, session), states)
+        + shared_entries("npc", npcs_in_world(world, session), states)
+        + shared_entries("trivia", in_scope(world.trivia, session), states)
+        + shared_entries("event", in_scope(world.events, session), states)
     )
 
 
@@ -265,10 +285,13 @@ def equipment_of(session, user):
 
 
 def player_view(session, user):
-    """Return everything the given user may see of a session as one of its players."""
+    """Return everything the given user may see of a session as one of its players.
+
+    Entries of the world and those made up in this session count; what other sessions made up never does.
+    """
     states = {(state.kind, state.entry_id): state for state in session.entries.filter(revealed=True)}
     shared = [pk for kind, pk in states if kind == "quest"]
-    quests = session.world.quests.filter(pk__in=shared).select_related("giver", "location", "world")
+    quests = in_scope(session.world.quests, session).filter(pk__in=shared).select_related("giver", "location", "world")
     return {
         "id": session.pk, "name": session.name, "world": session.world.name, "date": session.date,
         "chapter": str(session.chapter) if session.chapter else "", "finished": session.finished,

@@ -18,6 +18,7 @@ from session_app.state import game_master_state, player_state, state_tag
 from session_app.utils import (
     characters_of,
     chat_of,
+    delete_session,
     give_bonus_points,
     give_item,
     inspire,
@@ -116,6 +117,10 @@ class SessionDetail(generics.RetrieveUpdateDestroyAPIView):
         """Return only the sessions the requesting user runs."""
         return sessions_for_game_master(self.request.user)
 
+    def perform_destroy(self, instance):
+        """Delete the session together with everything made up in it."""
+        delete_session(instance)
+
 
 class MySessionList(generics.ListAPIView):
     """List the sessions in which one of the requesting player's characters plays."""
@@ -139,7 +144,10 @@ class SessionEntryList(GameMasterSessionMixin, generics.ListAPIView):
 
 
 class SessionEntryDetail(GameMasterSessionMixin, generics.UpdateAPIView):
-    """Set the state of one world entry in the session: done, revealed, pinned, steps and known pieces."""
+    """Set the state of one entry in the session: done, revealed, pinned, steps, known pieces and changes.
+
+    The entry is one of the world or one made up in this session.
+    """
 
     serializer_class = SessionEntrySerializer
 
@@ -239,7 +247,8 @@ class NoteList(SessionMixin, generics.ListCreateAPIView):
     List and create the notes of a session.
 
     - GET: the own notes and the notepad of the group.
-    - POST: write a note; it is personal unless "shared" is set.
+    - POST: write a note; it is personal unless "shared" is set. The game master can lay his own note
+      on his table ("table_group").
     """
 
     serializer_class = NoteSerializer
@@ -248,6 +257,10 @@ class NoteList(SessionMixin, generics.ListCreateAPIView):
     def get_queryset(self):
         """Return the user's own notes and the shared ones, with their comments."""
         return notes_for_reader(self.session, self.request.user)
+
+    def get_serializer_context(self):
+        """Pass the session, so the serializer knows whether the author runs it."""
+        return {**super().get_serializer_context(), "session": self.session}
 
     def perform_create(self, serializer):
         """Save the note in the session with the requesting user as author."""

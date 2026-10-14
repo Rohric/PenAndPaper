@@ -119,6 +119,11 @@ def npcs_for_user(user):
     return Npc.objects.filter(owner=user)
 
 
+def listed_npcs_for_user(user):
+    """Return the NPCs of the given game master without those he made up in a session, which belong to it."""
+    return npcs_for_user(user).filter(world_link__session__isnull=True)
+
+
 def player_characters_for_user(user):
     """Return the characters the given player owns."""
     return PlayerCharacter.objects.filter(owner=user)

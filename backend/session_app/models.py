@@ -24,6 +24,8 @@ class Session(models.Model):
     # The chapter the group is in.
     chapter = models.ForeignKey(Chapter, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     finished = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-date"]
@@ -97,7 +99,11 @@ class Note(models.Model):
     text = models.TextField(blank=True)
     # False: only the author sees it. True: it lies in the notepad of the group.
     shared = models.BooleanField(default=False)
+    # The group on the table of the master mode a note of the game master lies in; empty: not on the table.
+    # Only the game master sets it on his own notes, and players never learn it.
+    table_group = models.CharField(max_length=60, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]

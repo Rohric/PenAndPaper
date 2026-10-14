@@ -9,5 +9,5 @@ from .models import Npc, PlayerCharacter
 class CharacterAdmin(admin.ModelAdmin):
     """Show NPCs and player characters with their owner."""
 
-    list_display = ["name", "profession", "owner"]
+    list_display = ["name", "profession", "category", "owner"]
     search_fields = ["name"]

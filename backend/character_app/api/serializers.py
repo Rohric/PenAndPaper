@@ -206,11 +206,13 @@ class CharacterSerializer(serializers.ModelSerializer):
 
 
 class NpcSerializer(CharacterSerializer):
-    """Serialize an NPC with the phrases it might say and the knowledge about it."""
+    """Serialize an NPC for its game master: the phrases it might say, the knowledge about it, its category and note."""
 
     class Meta:
         model = Npc
-        fields = CHARACTER_FIELDS + ["visible_from_start", "phrases", "player_knowledge", "gm_knowledge"]
+        fields = CHARACTER_FIELDS + [
+            "visible_from_start", "phrases", "player_knowledge", "gm_knowledge", "category", "note",
+        ]
 
     def validate_player_knowledge(self, pieces):
         """Check the knowledge pieces players can learn."""
