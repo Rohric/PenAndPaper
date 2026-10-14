@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("character_app", "0011_second_bar"),
+        ("character_app", "0012_repair_imported_npcs"),
     ]
 
     operations = [
