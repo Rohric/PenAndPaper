@@ -19,7 +19,7 @@ Als Spielleiter will ich eine Runde mit einer Welt und den Charakteren meiner Sp
 | Gruppe | Die Gruppe | Popup: die Charakter-Kacheln mit Plus und Minus für das Leben und, wenn die Welt eine hat, die zweite Leiste; „Gruppe bearbeiten". Zahl: ungelesene geheime Nachrichten |
 | Würfeln | Würfeln | Seitenfenster mit dem [Würfelfeld](../bausteine/wuerfel.md) |
 | Chat | Chat der Gruppe | Seitenfenster. Zahl: neu |
-| Kampf | Kampf | öffnet den laufenden Kampf oder startet einen mit der Gruppe |
+| Kampf | Kampf | öffnet den laufenden Kampf oder startet einen mit der Gruppe, auch mit nur einem Charakter |
 | Archiv | Archiv | Seitenfenster: erledigte Ereignisse und beendete Quests, mit „Zurückholen" |
 | LvUp | Bonuspunkte und Geistesblitz | Popup: Bonuspunkte einzeln oder für alle, Geistesblitz für einzelne oder die ganze Gruppe auffüllen (siehe [LvUp](lvup.md)) |
 

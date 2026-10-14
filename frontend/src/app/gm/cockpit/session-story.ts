@@ -105,9 +105,9 @@ export class SessionStory {
     ];
     const switches: Tool[] = scene
       ? [
-          { id: 'story-played', word: 'Gespielt', icon: 'check', pressed: !!this.store.state('scene', scene.id)?.done, click: () => this.store.toggle('scene', scene.id, 'done') },
-          { id: 'story-pin', word: 'Nadel', title: 'Stecknadel', icon: 'pin', pressed: !!this.store.state('scene', scene.id)?.pinned, click: () => this.store.toggle('scene', scene.id, 'pinned') },
-          { id: 'story-fight', word: 'Kampf hier', icon: 'sword', click: () => this.fight.emit(scene) },
+          { id: 'story-played', word: 'Gespielt', icon: 'check', pressed: !!this.store.state('scene', scene.id)?.done, click: () => this.toggleHere('done') },
+          { id: 'story-pin', word: 'Nadel', title: 'Stecknadel', icon: 'pin', pressed: !!this.store.state('scene', scene.id)?.pinned, click: () => this.toggleHere('pinned') },
+          { id: 'story-fight', word: 'Kampf hier', icon: 'sword', click: () => this.fightHere() },
         ]
       : [];
     return [...here, ...world, ...switches];
@@ -115,6 +115,25 @@ export class SessionStory {
 
   constructor() {
     inject(Tools).provide('view', this.tools);
+  }
+
+  /**
+   * Switch a mark of the opened scene. The scene is read when the symbol is clicked, not when the bar was drawn:
+   * the bar can lag behind the scene for a moment, and a click must never act on the scene before.
+   */
+  private toggleHere(flag: 'done' | 'pinned'): void {
+    const scene = this.scene();
+    if (scene) {
+      this.store.toggle('scene', scene.id, flag);
+    }
+  }
+
+  /** Ask to fight in the opened scene, read at the moment of the click for the same reason. */
+  private fightHere(): void {
+    const scene = this.scene();
+    if (scene) {
+      this.fight.emit(scene);
+    }
   }
 
   /** How many main quests the group is working on. */

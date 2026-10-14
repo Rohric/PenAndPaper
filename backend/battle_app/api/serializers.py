@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 from battle_app.models import Battle, Combatant
-from battle_app.utils import add_character, battle_log, create_battle, symbol_of
+from battle_app.utils import add_character, battle_log, create_battle, joining_initiative, symbol_of
 from character_app.utils import MAX_DAMAGE_DICE
 from world.world_app.models import Scene
 
@@ -11,6 +11,7 @@ MAX_AMOUNT = 9999
 MAX_CHECK_VALUE = 300
 MAX_ROUNDS = 99
 NOT_YOURS = "Dieser Eintrag gehört dir nicht."
+SELF_ATTACK = "Ein Teilnehmer kann sich nicht selbst angreifen."
 
 
 def clean_status(status):
@@ -35,11 +36,12 @@ class CombatantSerializer(serializers.ModelSerializer):
             "id", "npc", "player_character", "name", "symbol", "action_value", "initiative",
             "life_points", "surprised", "has_parried", "statuses",
         ]
+        # A linked character brings its own name; validate() asks for a name only when there is none.
+        extra_kwargs = {"name": {"required": False}}
 
     def get_symbol(self, combatant):
         """Return the symbol of the character behind the combatant."""
         return symbol_of(combatant)
-        extra_kwargs = {"name": {"required": False}}
 
     def validate_statuses(self, statuses):
         """Check every status the game master gives."""
@@ -61,10 +63,15 @@ class CombatantSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        """Create the combatant; a linked character fills name, Handeln value and life points."""
+        """Create the combatant; a linked character fills name, Handeln value and life points.
+
+        A free combatant who joins a running fight rolls the initiative right away, like a character does.
+        """
+        battle = validated_data["battle"]
         npc, player_character = validated_data.get("npc"), validated_data.get("player_character")
         if npc or player_character:
-            return add_character(validated_data["battle"], npc=npc, player_character=player_character)
+            return add_character(battle, npc=npc, player_character=player_character)
+        validated_data.setdefault("initiative", joining_initiative(battle, validated_data.get("action_value", 0)))
         return super().create(validated_data)
 
 
@@ -122,6 +129,12 @@ class AttackSerializer(serializers.Serializer):
     value = serializers.IntegerField(min_value=0, max_value=MAX_CHECK_VALUE)
     damage_dice = serializers.IntegerField(min_value=0, max_value=MAX_DAMAGE_DICE)
     damage_bonus = serializers.IntegerField(min_value=0, max_value=MAX_AMOUNT, default=0)
+
+    def validate(self, data):
+        """Refuse an attack of a combatant on itself."""
+        if data["attacker"] == data["defender"]:
+            raise serializers.ValidationError(SELF_ATTACK)
+        return data
 
 
 class ActionSerializer(serializers.Serializer):

@@ -68,12 +68,19 @@
   white-space: nowrap;
 }
 
-// The head of a table: a click folds the table shut or open.
-.table__head {
+// The head row of a table: the title folds the table shut or open, "Löschen" stands at the right end.
+.table__bar {
   display: flex;
   gap: var(--gap-2);
   align-items: center;
-  width: 100%;
+}
+
+.table__head {
+  display: flex;
+  flex: 1;
+  gap: var(--gap-2);
+  align-items: center;
+  min-width: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -96,10 +103,33 @@
   }
 }
 
+// The entries of a table: two columns as soon as the table has room for two rows, otherwise one.
+// The smallest column is a whole row (--placed-min) or just under half of the table, so there are never three.
+.placed-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(max(var(--placed-min), calc(50% - var(--gap-2))), 1fr));
+  gap: var(--gap-2);
+  align-items: start;
+}
+
+// One entry as a wide, low row: the card, and beside it, not under it, its group and "Vom Tisch".
 .placed {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--placed-tools);
+  gap: var(--gap-2);
+  align-items: start;
+}
+
+.placed__tools {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--gap-1);
+}
+
+.placed__tools .btn {
+  justify-content: center;
+  padding-inline: var(--gap-2);
+  white-space: nowrap;
 }
 
 .found {

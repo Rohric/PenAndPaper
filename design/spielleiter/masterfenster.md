@@ -30,7 +30,20 @@ Das Masterfenster ist unabhängig von der Story. Die Szene, die dort offen ist, 
 **Mitte, von oben nach unten.**
 1. **Suche in allem.** Solange Text im Feld steht, zeigt die Mitte nur die Treffer als [Kacheln](../bausteine/kachel.md) (höchstens 30).
 2. **Zeitleiste der Szenen** des Kapitels: nummerierte Haltepunkte, gespielte markiert, die freien Szenen hinter einem Strich. Ein Klick öffnet das Popup der Szene.
-3. **Mein Tisch.** Die eigenen Gruppen des Spielleiters mit ihren Kacheln. Je Kachel die Auswahl der Gruppe und „Vom Tisch". Jede Gruppe (jeder Tisch) lässt sich am Titel zu- und aufklappen; zugeklappt zeigt sie nur Titel und Zahl der Kacheln. Was zugeklappt ist, merkt sich das Gerät je Runde.
+3. **Mein Tisch.** Die Überschrift trägt den Kompass, das Zeichen des Masterfensters. Darunter die eigenen Gruppen des Spielleiters mit ihren Einträgen. Jede Gruppe (jeder Tisch) lässt sich am Titel zu- und aufklappen; zugeklappt zeigt sie nur Titel und Zahl der Einträge. Was zugeklappt ist, merkt sich das Gerät je Runde. Rechts in der Kopfzeile jeder Gruppe steht „Löschen“. Ein Popup fragt zuerst: „Gruppe „X“ löschen? Die Einträge gehen vom Tisch.“ (bei einer leeren Gruppe nur „Gruppe „X“ löschen?“). Mit „Löschen“ gehen alle Einträge der Gruppe vom Tisch, die Gruppe verschwindet, und dass sie zu- oder aufgeklappt war, ist vergessen. Die Einträge selbst bleiben in der Welt und in der Runde; es fällt nur ihr Platz auf dem Tisch weg. Auch „Ohne Gruppe“ hat den Knopf; dort räumt er die losen Einträge vom Tisch. Später hält eine Gruppe auch Notizen; sie werden mit der Gruppe gelöscht.
+
+   **Die Einträge einer Gruppe** liegen in zwei Spalten nebeneinander. Jeder Eintrag ist eine breite, niedrige Zeile, kein Quadrat: links die [Kachel](../bausteine/kachel.md), rechts daneben, nicht darunter, die Auswahl der Gruppe und „Vom Tisch“.
+
+   ```
+   v Für später  2                                                              [Löschen]
+   +--------------------------------------+---------+  +--------------------------------------+---------+
+   || (S) Figur              (A)(N)(+)    | [Grp v] |  || (O) Ort                (A)(N)(+)    | [Grp v] |
+   ||     Sigrun                           | [Vom T.]|  ||     Wachhaus                         | [Vom T.]|
+   ||     Hauptfrau der Stadtwache ...     |         |  ||     Ein schmaler Raum ...            |         |
+   +--------------------------------------+---------+  +--------------------------------------+---------+
+   ```
+
+   Zwei Spalten gibt es, sobald der Platz in der Gruppe für zwei Zeilen reicht (ungefähr 970 px, das ist ein Fenster ab etwa 1420 px Breite); auf einem schmaleren Desktop steht eine Spalte, damit die Kachel nicht zu schmal wird. Die Mindestbreite einer Zeile (`--placed-min`) steht in `gm.scss`. Die Kachel selbst ist die eine [Kachel](../bausteine/kachel.md) und wird hier nicht verändert.
 4. **Schubladen.** Eine Reihe großer Knöpfe mit Zahl: Szenen, Quests, Ereignisse, Figuren, Orte, Gegenstände, Wissen. Genau eine ist offen (Start: Szenen), ein Klick auf die offene schließt sie. Darunter die Kacheln dieser Art nach den Filtern. Die offene Schublade wird je Runde gemerkt.
 
 **Rechts, Charaktere.** Je Charakter der Gruppe ein runder Knopf mit Portrait, schmalem Lebensbalken und der Zahl ungelesener geheimer Nachrichten. Ein Klick öffnet links daneben ein Popup mit der Charakter-Kachel (Lebenspunkte setzen, Bogen, Nachrichten, Gegenstand).
@@ -53,6 +66,7 @@ Das Masterfenster ist unabhängig von der Story. Die Szene, die dort offen ist, 
 ## Bausteine
 
 - [Runden](runden.md), [Kachel](../bausteine/kachel.md), [Popup eines Eintrags](../bausteine/eintrag-popup.md), [Seitenfenster eines Eintrags](../bausteine/eintrag-seitenfenster.md), [Notiz](../bausteine/notiz.md), [Charakterbogen](../bausteine/charakterbogen.md), [Tags](../bausteine/tags.md)
+- Zeichen: Der Kompass (`compass`) steht für das Masterfenster: am Reiter „Master“ und an der Überschrift „Mein Tisch“. Die Fahne gehört nur den Ereignissen, siehe [Farben und Schrift](../grundlagen/farben-und-schrift.md). „Gruppe neu“ trägt die Mappe (`folder`), „Gruppe löschen“ den Mülleimer (`trash`).
 - Code: `gm/master/master-table`
 
 ## Leisten in dieser Ansicht
@@ -65,7 +79,7 @@ Symbolleiste, Abschnitt „zur Ansicht":
 | Wort | voller Name | Klick |
 | --- | --- | --- |
 | Auf Tisch | Auf den Tisch legen | Popup: Suche und Zielgruppe; die Zielgruppe gilt auch für den Knopf an den Kacheln |
-| Gruppe neu | Neue Gruppe anlegen | Popup: Name |
+| Gruppe neu | Neue Gruppe anlegen | Popup: Name; die neue Gruppe ist das Ziel für den nächsten Eintrag |
 | Offen | Erledigtes ausblenden | schaltet |
 | Geteilt | Nur für Spieler sichtbare | schaltet |
 | Angepinnt | Nur angepinnte | schaltet |
@@ -73,6 +87,7 @@ Symbolleiste, Abschnitt „zur Ansicht":
 
 ## Zustände
 
+- **Gruppe löschen:** Popup „Gruppe „X“ löschen? Die Einträge gehen vom Tisch.“ mit „Abbrechen“ und „Löschen“ (Gefahr-Knopf). Esc und ein Klick daneben brechen ab.
 - **Tisch leer:** „Der Tisch ist leer. Mit ‚Auf Tisch' legst du Einträge dazu und sortierst sie in eigene Gruppen."
 - **Schublade leer:** „Hier ist nichts, was zu den Filtern passt."
 - **Suche ohne Treffer:** „Nichts gefunden."

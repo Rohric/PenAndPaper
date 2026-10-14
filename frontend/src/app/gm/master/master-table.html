@@ -121,20 +121,25 @@
         }
       </div>
     } @else {
-      <h2 class="section-title"><app-icon name="flag" /> Mein Tisch</h2>
+      <h2 class="section-title"><app-icon name="compass" /> Mein Tisch</h2>
       @for (group of groups(); track group.name) {
         <div class="panel">
-          <button type="button" class="table__head" [attr.aria-expanded]="!isFolded(group.name)" (click)="toggleFold(group.name)">
-            <app-icon class="table__mark" [class.is-open]="!isFolded(group.name)" name="right" [size]="14" />
-            <span class="kicker">{{ label(group.name) }}</span>
-            <span class="chip">{{ group.entries.length }}</span>
-          </button>
+          <div class="table__bar">
+            <button type="button" class="table__head" [attr.aria-expanded]="!isFolded(group.name)" (click)="toggleFold(group.name)">
+              <app-icon class="table__mark" [class.is-open]="!isFolded(group.name)" name="right" [size]="14" />
+              <span class="kicker">{{ label(group.name) }}</span>
+              <span class="chip">{{ group.entries.length }}</span>
+            </button>
+            <button type="button" class="btn btn--small" [attr.aria-label]="'Gruppe ' + label(group.name) + ' löschen'" title="Gruppe löschen" (click)="deleting.set(group)">
+              <app-icon name="trash" [size]="14" /> Löschen
+            </button>
+          </div>
           @if (!isFolded(group.name)) {
-          <div class="cards">
+          <div class="placed-list">
             @for (item of group.entries; track item.ref.kind + item.ref.id) {
               <div class="placed">
                 <app-entry-card [ref]="item.ref" [master]="true" (pick)="pick($event)" (table)="toggleTable($event)" />
-                <div class="row">
+                <div class="placed__tools">
                   <select class="input input--small" aria-label="Gruppe wechseln" [ngModel]="group.name" (ngModelChange)="move(item, $event)">
                     @for (name of groupNames(); track name) {
                       <option [value]="name">{{ label(name) }}</option>
@@ -213,6 +218,16 @@
     </button>
     <button windowFoot type="button" class="btn btn--small btn--primary" (click)="lay({ kind: 'scenes', id: scene.id }, target())">
       <app-icon name="plus" [size]="14" /> Auf den Tisch
+    </button>
+  </app-popup>
+}
+
+@if (deleting(); as group) {
+  <app-popup kind="Mein Tisch" title="Gruppe löschen" [size]="420" (closed)="deleting.set(null)">
+    <p>Gruppe „{{ label(group.name) }}“ löschen?{{ group.entries.length ? ' Die Einträge gehen vom Tisch.' : '' }}</p>
+    <button windowFoot type="button" class="btn btn--small" (click)="deleting.set(null)">Abbrechen</button>
+    <button windowFoot type="button" class="btn btn--small btn--danger" (click)="deleteGroup(group.name)">
+      <app-icon name="trash" [size]="14" /> Löschen
     </button>
   </app-popup>
 }

@@ -77,6 +77,11 @@ def check_line(text, roll):
     return f"{text}: {roll['rolled']} gegen {roll['value']}, {RESULT_WORDS[roll['result']]}."
 
 
+def joining_initiative(battle, action_value):
+    """Return the initiative of a combatant who joins now: rolled when the fight runs, 0 before it begins."""
+    return rules.initiative(action_value) if battle.round else 0
+
+
 def add_character(battle, npc=None, player_character=None):
     """Add an NPC or a player character with its name, Handeln value and life points.
 
@@ -86,7 +91,7 @@ def add_character(battle, npc=None, player_character=None):
     action_value = talent_value(character.skills, BaseCharacter.Talent.ACTION)
     return Combatant.objects.create(
         battle=battle, npc=npc, player_character=player_character, name=character.name, action_value=action_value,
-        life_points=character.life_points, initiative=rules.initiative(action_value) if battle.round else 0,
+        life_points=character.life_points, initiative=joining_initiative(battle, action_value),
     )
 
 

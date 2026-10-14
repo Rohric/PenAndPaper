@@ -107,7 +107,7 @@ export class NavService {
     const url = this.url();
     return [
       { id: 'worlds', label: 'Welten', icon: 'world', path: '/gm/worlds', active: url.startsWith('/gm/worlds') },
-      { id: 'sessions', label: 'Runden', icon: 'flag', path: '/gm/sessions', active: url.startsWith('/gm/sessions') },
+      { id: 'sessions', label: 'Runden', icon: 'calendar', path: '/gm/sessions', active: url.startsWith('/gm/sessions') },
       { id: 'characters', label: 'Figuren', icon: 'group', path: '/gm/characters', active: url.startsWith('/gm/characters') },
     ];
   }
@@ -116,7 +116,7 @@ export class NavService {
     const url = this.url();
     return [
       { id: 'characters', label: 'Charaktere', icon: 'group', path: '/player/characters', active: url.startsWith('/player/characters') },
-      { id: 'sessions', label: 'Runden', icon: 'flag', path: '/player/sessions', active: url.startsWith('/player/sessions') },
+      { id: 'sessions', label: 'Runden', icon: 'calendar', path: '/player/sessions', active: url.startsWith('/player/sessions') },
       { id: 'rules', label: 'Regeln', icon: 'book', click: () => this.tutorial.open('rules') },
     ];
   }

@@ -16,7 +16,7 @@ Auf der Seite, von oben nach unten:
    - Wird man selbst getroffen: Auswahl „Parieren mit" und die Knöpfe „Parieren" / „Nicht parieren". Eine Parade geht einmal pro Runde.
    - Ist es der eigene Zug und die Parade entschieden: der Knopf **„Zug abschließen"**. Damit zählt der Wurf und der Nächste ist dran.
    - sonst der Satz, worauf gewartet wird.
-4. **Du bist dran** (kein Wurf offen): je nach gewähltem Symbol „Angriff" (Ziel, Angriff mit, Waffe, „Angriff würfeln") oder „Aktion" (Was tust du, Haken „Dafür muss ich würfeln", „Probe würfeln" / „Aktion ansagen").
+4. **Du bist dran** (kein Wurf offen): je nach gewähltem Symbol „Angriff" (Ziel, nie du selbst; Angriff mit, Waffe, „Angriff würfeln") oder „Aktion" (Was tust du, Haken „Dafür muss ich würfeln", „Probe würfeln" / „Aktion ansagen").
 
 Fähigkeit, Waffe und Ziel des letzten Zugs merkt sich das Handy.
 
@@ -41,6 +41,7 @@ Obere Reihe:
 ## Zustände
 
 - **kein Kampf:** „Gerade wird nicht gekämpft."
+- **allein im Kampf:** Gibt es kein Ziel außer dir selbst, steht bei „Angriff“ der Satz „Es gibt noch kein Ziel. Der Spielleiter nimmt Gegner in den Kampf auf.“ und „Angriff würfeln“ ist ausgegraut. „Aktion“ geht, und dein Zug lässt sich abschließen.
 - **eigener Charakter kampfunfähig:** die Zeitleiste zeigt ihn ausgegraut, es gibt nichts zu tun.
 
 ## Tastatur

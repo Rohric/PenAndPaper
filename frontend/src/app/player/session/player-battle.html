@@ -72,12 +72,16 @@
           @if (mode() === 'attack') {
           <div class="field">
             <label for="own-target">Ziel</label>
-            <select id="own-target" class="input" [ngModel]="target()" (ngModelChange)="defenderId.set($event)">
-              <option [ngValue]="null">Ziel wählen</option>
-              @for (combatant of targets(); track combatant.id) {
-                <option [ngValue]="combatant.id">{{ combatant.name }}</option>
-              }
-            </select>
+            @if (targets().length) {
+              <select id="own-target" class="input" [ngModel]="target()" (ngModelChange)="defenderId.set($event)">
+                <option [ngValue]="null">Ziel wählen</option>
+                @for (combatant of targets(); track combatant.id) {
+                  <option [ngValue]="combatant.id">{{ combatant.name }}</option>
+                }
+              </select>
+            } @else {
+              <p class="notice">Es gibt noch kein Ziel. Der Spielleiter nimmt Gegner in den Kampf auf.</p>
+            }
           </div>
           }
           @if (mode() === 'attack' || actionRolls()) {

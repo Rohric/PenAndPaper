@@ -99,6 +99,8 @@ export class MasterTable {
   private readonly empty = signal<string[]>([]);
   /** The character whose popup is open, and the button it opens at. */
   protected readonly characterId = signal<number | null>(null);
+  /** The group the question "Gruppe löschen?" is about; null while nobody asks. */
+  protected readonly deleting = signal<TableGroup | null>(null);
 
   private readonly addList = viewChild<TemplateRef<unknown>>('addList');
   private readonly newGroup = viewChild<TemplateRef<unknown>>('newGroup');
@@ -177,7 +179,7 @@ export class MasterTable {
 
   protected readonly tools = computed<Tool[]>(() => [
     { id: 'table-add', word: 'Auf Tisch', title: 'Auf den Tisch legen', icon: 'plus', popup: this.addList(), popupTitle: 'Auf den Tisch legen' },
-    { id: 'table-group', word: 'Gruppe neu', title: 'Neue Gruppe anlegen', icon: 'flag', popup: this.newGroup(), popupTitle: 'Neue Gruppe' },
+    { id: 'table-group', word: 'Gruppe neu', title: 'Neue Gruppe anlegen', icon: 'folder', popup: this.newGroup(), popupTitle: 'Neue Gruppe' },
     { id: 'table-open', word: 'Offen', title: 'Erledigtes ausblenden', icon: 'check', pressed: this.onlyOpen(), click: () => this.onlyOpen.set(!this.onlyOpen()) },
     { id: 'table-shared', word: 'Geteilt', title: 'Nur für Spieler sichtbare', icon: 'eye', pressed: this.onlyShared(), click: () => this.onlyShared.set(!this.onlyShared()) },
     { id: 'table-pinned', word: 'Angepinnt', title: 'Nur angepinnte', icon: 'pin', pressed: this.onlyPinned(), click: () => this.onlyPinned.set(!this.onlyPinned()) },
@@ -236,10 +238,24 @@ export class MasterTable {
   /** Fold a group of the table shut or open, and remember it on this device. */
   protected toggleFold(group: string): void {
     this.folded.update((names) => (names.includes(group) ? names.filter((name) => name !== group) : [...names, group]));
-    const id = this.store.session()?.id;
-    if (id !== undefined) {
-      this.remember(FOLDED_KEY + id, JSON.stringify(this.folded()));
+    this.saveFolds();
+  }
+
+  /**
+   * Delete a group of the table: every entry in it goes off the table, and the group is gone with its fold state.
+   * The entries stay in the world and in the session; only their place on the table falls away.
+   */
+  protected deleteGroup(name: string): void {
+    // Later a group also holds notes; they are deleted here together with the entries.
+    const entries = this.groups().find((group) => group.name === name)?.entries ?? [];
+    entries.forEach((item) => this.take(item));
+    this.empty.update((names) => names.filter((other) => other !== name));
+    this.folded.update((names) => names.filter((other) => other !== name));
+    this.saveFolds();
+    if (this.target() === name) {
+      this.target.set(NO_GROUP);
     }
+    this.deleting.set(null);
   }
 
   /** Lay an entry of the world on the table, in a group. */
@@ -410,6 +426,13 @@ export class MasterTable {
 
   private save(sessionId: number, drawer: Drawer | null): void {
     this.remember(DRAWER_KEY + sessionId, drawer ?? 'none');
+  }
+
+  private saveFolds(): void {
+    const id = this.store.session()?.id;
+    if (id !== undefined) {
+      this.remember(FOLDED_KEY + id, JSON.stringify(this.folded()));
+    }
   }
 
   private savedFolds(sessionId: number): string[] {

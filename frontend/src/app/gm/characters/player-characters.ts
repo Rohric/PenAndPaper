@@ -86,7 +86,7 @@ export class PlayerCharacters {
   ]);
   /** Leveling the opened character, behind its own symbol. */
   private readonly levelTool = computed<Tool[]>(() => [
-    { id: 'level', word: 'Leveln', title: 'Budgets und Lebenspunkte', icon: 'flag', disabled: !this.selected(), popup: this.levelPop(), popupTitle: `${this.selected()?.name ?? 'Charakter'} leveln` },
+    { id: 'level', word: 'Leveln', title: 'Budgets und Lebenspunkte', icon: 'level', disabled: !this.selected(), popup: this.levelPop(), popupTitle: `${this.selected()?.name ?? 'Charakter'} leveln` },
   ]);
   /** The order of the list as switches in the bar at the bottom. */
   private readonly sortTools = computed<Tool[]>(() =>
@@ -126,7 +126,7 @@ export class PlayerCharacters {
   }
 
   private link(id: string, label: string): NavItem {
-    return { id, label, icon: id === 'all' ? 'group' : id === 'free' ? 'sheet' : 'flag', active: this.filter() === id, click: () => this.filter.set(id) };
+    return { id, label, icon: id === 'all' ? 'group' : id === 'free' ? 'sheet' : 'calendar', active: this.filter() === id, click: () => this.filter.set(id) };
   }
 
   private compare(a: PlayerCharacter, b: PlayerCharacter): number {

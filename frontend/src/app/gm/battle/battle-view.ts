@@ -101,6 +101,10 @@ export class BattleView {
   protected readonly combatantOptions = computed<Option[]>(() =>
     this.combatants().filter((c) => c.life_points > 0).map((c) => ({ id: c.id, label: c.name, hint: `LP ${c.life_points}` })),
   );
+  /** Who can be attacked: every other combatant that still fights; the attacker never attacks itself. */
+  protected readonly targets = computed(() => this.combatantOptions().filter((option) => option.id !== this.attackerId()));
+  /** The picked target, as long as it can still be attacked. */
+  protected readonly target = computed(() => this.targets().find((option) => option.id === this.defenderId())?.id ?? null);
   protected readonly npcOptions = computed<Option[]>(() => {
     const fighting = new Set(this.combatants().map((combatant) => combatant.npc));
     return this.world.npcOptions().filter((option) => !fighting.has(option.id));
@@ -140,7 +144,7 @@ export class BattleView {
       { id: 'battle-close', word: 'Abschließen', title: 'Zug abschließen', icon: 'check', disabled: !exchange || exchange.stage === 'parry', click: () => this.step('close') },
       { id: 'battle-discard', word: 'Verwerfen', title: 'Wurf verwerfen', icon: 'undo', disabled: !exchange, click: () => this.step('discard') },
       { id: 'battle-add', word: 'Aufnehmen', title: 'Teilnehmer aufnehmen', icon: 'plus', disabled: over, popup: this.addPop(), popupTitle: 'Teilnehmer aufnehmen' },
-      { id: 'battle-finish', word: 'Beenden', title: 'Kampf beenden', icon: 'flag', disabled: over, click: () => this.step('finish') },
+      { id: 'battle-finish', word: 'Beenden', title: 'Kampf beenden', icon: 'stop', disabled: over, click: () => this.step('finish') },
     ];
   });
 
@@ -162,7 +166,7 @@ export class BattleView {
     const attacker = this.combatant(id);
     const last = attacker ? recall(combatantKey(attacker)) : {};
     const target = this.combatant(last.defender ?? null);
-    this.defenderId.set(target && target.life_points > 0 ? target.id : null);
+    this.defenderId.set(target && target.life_points > 0 && target.id !== id ? target.id : null);
     this.skill.set(last.skill ?? ACTION);
     this.weapon.set(last.weapon ?? '');
     this.typedValue.set(last.value ?? DEFAULT_VALUE);
@@ -173,7 +177,7 @@ export class BattleView {
   /** Roll the prepared attack; it stays open until the turn is closed. */
   protected attack(): void {
     const attacker = this.combatant(this.attackerId());
-    const defender = this.defenderId();
+    const defender = this.target();
     if (!attacker || defender === null) {
       return;
     }
@@ -237,20 +241,24 @@ export class BattleView {
     this.run(this.api.removeCombatant(combatant.id), () => this.afterChange());
   }
 
-  /** Add an NPC of the world to the fight. */
+  /** Add an NPC of the world to the fight, before or after the initiative. */
   protected addNpc(): void {
     const npc = this.newNpc();
     if (npc !== null) {
-      this.run(this.api.addCombatant(this.battleId(), { npc }), () => this.afterChange());
-      this.newNpc.set(null);
+      this.run(this.api.addCombatant(this.battleId(), { npc }), () => {
+        this.afterChange();
+        this.newNpc.set(null);
+      });
     }
   }
 
-  /** Add a combatant that is just a name with a Handeln value and life points. */
+  /** Add a combatant that is just a name with a Handeln value and life points; after the initiative it rolls its own. */
   protected addFree(): void {
     const combatant = { name: this.newName().trim(), action_value: this.newAction(), life_points: this.newLife() };
-    this.run(this.api.addCombatant(this.battleId(), combatant), () => this.afterChange());
-    this.newName.set('');
+    this.run(this.api.addCombatant(this.battleId(), combatant), () => {
+      this.afterChange();
+      this.newName.set('');
+    });
   }
 
   /** Load the fight again while it runs. */

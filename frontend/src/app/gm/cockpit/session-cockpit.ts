@@ -62,7 +62,7 @@ type View = 'story' | 'master' | 'quests' | 'glossary' | 'notes' | 'players';
 /** The views in the bar on top. */
 const VIEWS: { id: View; label: string; icon: IconName; tone?: string }[] = [
   { id: 'story', label: 'Story', icon: 'book', tone: 'kind--scenes' },
-  { id: 'master', label: 'Master', icon: 'flag' },
+  { id: 'master', label: 'Master', icon: 'compass' },
   { id: 'quests', label: 'Quests', icon: 'quest', tone: 'kind--quests' },
   { id: 'glossary', label: 'Glossar', icon: 'search' },
   { id: 'notes', label: 'Notizen', icon: 'note' },
@@ -298,7 +298,7 @@ export class SessionCockpit {
     { id: 'chat', word: 'Chat', icon: 'speech', count: this.chatUnread(), click: () => this.openPanel({ kind: 'chat' }) },
     { id: 'fight', word: 'Kampf', icon: 'sword', pressed: this.battleId() !== null, click: () => this.openBattle() },
     { id: 'archive', word: 'Archiv', icon: 'archive', click: () => this.openPanel({ kind: 'archive' }) },
-    { id: 'level', word: 'LvUp', title: 'Bonuspunkte und Geistesblitz', icon: 'flag', popup: this.levelPop(), popupTitle: 'LvUp', wide: true },
+    { id: 'level', word: 'LvUp', title: 'Bonuspunkte und Geistesblitz', icon: 'level', popup: this.levelPop(), popupTitle: 'LvUp', wide: true },
   ]);
   /** The symbols on the right: one for every kind of pin that exists, and the last roll. */
   private readonly rightTools = computed<Tool[]>(() => {

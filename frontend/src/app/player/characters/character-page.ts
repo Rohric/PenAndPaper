@@ -61,7 +61,7 @@ export class CharacterPage implements Leavable {
     const adventure = this.character()?.adventure;
     return [
       { id: 'sheet-edit', word: 'Bearbeiten', icon: 'edit', click: () => this.open('profile') },
-      ...(adventure ? [{ id: 'sheet-adventure', word: 'Zur Runde', icon: 'flag' as const, title: `Zur Runde: ${adventure.name}`, click: () => void this.router.navigate(['/player/sessions', adventure.id]) }] : []),
+      ...(adventure ? [{ id: 'sheet-adventure', word: 'Zur Runde', icon: 'calendar' as const, title: `Zur Runde: ${adventure.name}`, click: () => void this.router.navigate(['/player/sessions', adventure.id]) }] : []),
       this.playerTools.help('my-characters'),
     ];
   });

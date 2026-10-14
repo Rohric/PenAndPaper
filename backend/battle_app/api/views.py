@@ -15,6 +15,7 @@ from battle_app.models import Combatant
 from session_app.utils import session_for_member
 
 from .serializers import (
+    SELF_ATTACK,
     ActionSerializer,
     AttackSerializer,
     BattleSerializer,
@@ -236,6 +237,13 @@ class PlayerBattleMixin:
             raise PermissionDenied("Dein Charakter kämpft gerade nicht.")
         return own
 
+    def check_target(self, defender, own):
+        """Refuse a target that fights elsewhere, is out of the fight or is the player's own combatant."""
+        if defender.battle_id != self.battle.pk or defender.life_points <= 0:
+            raise ValidationError("Dieses Ziel kämpft nicht mehr in diesem Kampf.")
+        if defender.pk == own.pk:
+            raise ValidationError(SELF_ATTACK)
+
     def answer(self):
         """Return the battle as the players see it."""
         self.battle.refresh_from_db()
@@ -264,8 +272,7 @@ class PlayerBattleAttack(PlayerBattleMixin, APIView):
             raise ValidationError(TURN_OPEN)
         if self.battle.current_id != own.pk:
             raise PermissionDenied("Du bist nicht dran.")
-        if data["defender"].battle_id != self.battle.pk or data["defender"].life_points <= 0:
-            raise ValidationError("Dieses Ziel kämpft nicht mehr in diesem Kampf.")
+        self.check_target(data["defender"], own)
         value = utils.attack_value(own.player_character, data["skill"])
         dice, bonus = utils.weapon_damage(own.player_character, data["weapon"])
         utils.attack(self.battle, own, data["defender"], value, dice, bonus)

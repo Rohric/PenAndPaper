@@ -1,5 +1,8 @@
 <!-- The popups behind the symbols of the bar. -->
 <ng-template #peoplePop>
+          @if (error()) {
+            <p class="notice notice--error" role="alert">{{ error() }}</p>
+          }
           @for (combatant of combatants(); track combatant.id) {
             <div class="knowledge" [class.knowledge--gm]="combatant.life_points <= 0">
               <div class="row row--between">
@@ -44,6 +47,9 @@
 </ng-template>
 
 <ng-template #addPop>
+          @if (error()) {
+            <p class="notice notice--error" role="alert">{{ error() }}</p>
+          }
           @if (!battle()!.finished) {
             <div class="grid-fields">
               <div class="field">
@@ -93,6 +99,8 @@
       }
       @if (fight.finished) {
         <p class="soft">Die Lebenspunkte der Spielercharaktere stehen schon auf ihren Bögen.</p>
+      } @else if (!fight.round) {
+        <p class="soft">Nimm zuerst alle Teilnehmer auf. Dann würfelst du die Initiative.</p>
       }
     </div>
 
@@ -163,7 +171,11 @@
               @if (mode() === 'attack') {
                 <div class="field">
                   <label for="attack-defender">Wen</label>
-                  <app-id-select inputId="attack-defender" emptyLabel="Ziel wählen" [options]="combatantOptions()" [value]="defenderId()" (valueChange)="defenderId.set($event)" />
+                  @if (targets().length) {
+                    <app-id-select inputId="attack-defender" emptyLabel="Ziel wählen" [options]="targets()" [value]="target()" (valueChange)="defenderId.set($event)" />
+                  } @else {
+                    <p class="notice">Es gibt noch kein Ziel. Nimm mit „Aufnehmen“ einen Gegner auf.</p>
+                  }
                 </div>
               } @else {
                 <div class="field">
@@ -216,7 +228,7 @@
             }
             <div class="row">
               @if (mode() === 'attack') {
-                <button type="button" class="btn btn--primary" [disabled]="attackerId() === null || defenderId() === null" (click)="attack()">
+                <button type="button" class="btn btn--primary" [disabled]="attackerId() === null || target() === null" (click)="attack()">
                   <app-icon name="dice" /> Angriff würfeln
                 </button>
               } @else {

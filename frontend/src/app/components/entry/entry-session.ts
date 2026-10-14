@@ -36,7 +36,7 @@ const PARTS: Record<string, string[]> = {
           </button>
           @if (sessionKind === 'quest') {
             <button type="button" class="pill" [attr.aria-pressed]="!!state()?.started" (click)="session.toggle('quest', entry().id, 'started')">
-              <app-icon name="flag" [size]="16" /> Angenommen
+              <app-icon name="play" [size]="16" /> Angenommen
             </button>
           }
           <button type="button" class="pill" [attr.aria-pressed]="!!state()?.done" (click)="session.toggle(sessionKind, entry().id, 'done')">
@@ -46,7 +46,7 @@ const PARTS: Record<string, string[]> = {
             <app-icon name="pin" [size]="16" /> Stecknadel
           </button>
           <button type="button" class="pill" [attr.aria-pressed]="!!state()?.on_table" (click)="session.toggle(sessionKind, entry().id, 'on_table')">
-            <app-icon name="flag" [size]="16" /> Auf den Tisch
+            <app-icon name="plus" [size]="16" /> Auf den Tisch
           </button>
           <button type="button" class="pill" (click)="layAll()"><app-icon name="plus" [size]="16" /> Alles auf den Tisch</button>
         </div>

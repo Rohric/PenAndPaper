@@ -43,6 +43,19 @@ const ICONS = {
   logout: ['M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4', 'M16 17l5-5-5-5', 'M21 12H9'],
   image: ['M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z', 'M7 9a2 2 0 1 0 4 0a2 2 0 1 0-4 0', 'M21 15l-5-5L5 21'],
   lock: ['M5 11h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z', 'M7 11V7a5 5 0 0 1 10 0v4'],
+  // The master mode: a circle with the needle as a diamond.
+  compass: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M16.24 7.76l-2.12 6.36-6.36 2.12 2.12-6.36z'],
+  // A group of the table, laid like a folder.
+  folder: ['M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'],
+  // Level up: two angles pointing up.
+  level: ['M7 11l5-5 5 5', 'M7 18l5-5 5 5'],
+  // A round of the game: a date in the calendar.
+  calendar: ['M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', 'M16 2v4', 'M8 2v4', 'M3 10h18'],
+  star: ['M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z'],
+  // End something: a circle with a square.
+  stop: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M9 9h6v6H9z'],
+  // Something is under way, like a quest the group has taken on.
+  play: ['M2 12a10 10 0 1 0 20 0a10 10 0 1 0-20 0', 'M10 8l6 4-6 4z'],
 } satisfies Record<string, string[]>;
 
 export type IconName = keyof typeof ICONS;

@@ -44,6 +44,26 @@ Alle Werte stehen einmal in `frontend/src/styles/_tokens.scss`. Im Code einer Ko
 
 Eine Klasse `kind--…` setzt `--kind`. Alles darin (Streifen der Kachel, Symbol, Tag, Überzeile) nimmt diese Farbe. Eigene Kategorien und Tags des Nutzers bekommen einen von acht festen Tönen `--tag-1` bis `--tag-8`; derselbe Name bekommt immer denselben Ton.
 
+### Symbole
+
+Ein Zeichen meint eine Sache, und dieselbe Sache hat überall dasselbe Zeichen.
+
+**Die Fahne (`flag`) ist das Symbol der Art „Ereignis“ und nur dieser Art.** Wo sie steht, geht es um ein Ereignis: Kachel, Reiter, Schublade, Symbolleiste der Szene. Kein Reiter, Knopf oder Titel nimmt sie für etwas anderes.
+
+| Sache | Symbol |
+| --- | --- |
+| Ereignis | `flag` (Fahne) |
+| Masterfenster, „Mein Tisch“ | `compass` (Kompass) |
+| LvUp, Leveln | `level` (zwei Winkel nach oben) |
+| Runde (Reiter „Runden“, „Zur Runde“, Filter einer Runde) | `calendar` (Kalender) |
+| Neue Gruppe des Tisches | `folder` (Mappe) |
+| Kampf beenden | `stop` (Kreis mit Quadrat) |
+| Besonderes eines Charakters | `star` (Stern) |
+| Quest angenommen | `play` (Kreis mit Pfeil nach rechts) |
+| Auf den Tisch legen | `plus` |
+
+Neue Symbole werden an das Ende von `ICONS` in `components/basic/icon.ts` gehängt: 24 × 24 Raster, nur Linien, derselbe Strich wie die anderen.
+
 ### Schrift
 
 - Überschriften und große Zahlen: `--font-display` (Cormorant Garamond).
@@ -92,4 +112,4 @@ Der Fokus ist immer sichtbar: ein Rahmen in `--accent`.
 
 ## Offen
 
-entfällt
+- Die Fahne steht noch an Stellen, die keine Ereignisse meinen, und wird in einer späteren Runde ersetzt: an der Kachel bei „Annehmen“ / „Angenommen“ (soll `play` werden), an der Seite der Spieler im Reiter „Runde“, bei „Blitz“ und „Laufend“ der Quests, bei „Geistesblitz einsetzen“ und „Neu seit deinem letzten Blick“.

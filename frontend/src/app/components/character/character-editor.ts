@@ -28,7 +28,7 @@ const SECTIONS: { id: EditorSection; label: string; short: string; icon: IconNam
   { id: 'profile', label: 'Steckbrief', short: 'Profil', icon: 'sheet' },
   { id: 'skills', label: 'Skillung', short: 'Skillung', icon: 'dice' },
   { id: 'inventory', label: 'Inventar', short: 'Inventar', icon: 'gift' },
-  { id: 'abilities', label: 'Besonderes', short: 'Extra', icon: 'flag' },
+  { id: 'abilities', label: 'Besonderes', short: 'Extra', icon: 'star' },
   { id: 'phrases', label: 'Sätze', short: 'Sätze', icon: 'speech', npcOnly: true },
 ];
 
