@@ -6,7 +6,7 @@ import { readError } from '../../core/api-error';
 import { EditorBar } from '../../components/form/editor-bar';
 import { WorldStore } from '../../core/world-store';
 
-/** Edit the world itself: its name and its lore. */
+/** Edit the world itself: its name, the name of its second bar and its lore. */
 @Component({
   selector: 'app-lore-editor',
   imports: [FormsModule, EditorBar],
@@ -15,6 +15,11 @@ import { WorldStore } from '../../core/world-store';
       <div class="field">
         <label for="world-name">Name der Welt</label>
         <input id="world-name" class="input input--title" [ngModel]="draft().name" (ngModelChange)="set('name', $event)" />
+      </div>
+      <div class="field">
+        <label for="world-second-bar">Zweite Leiste (freiwillig)</label>
+        <span class="soft">Zum Beispiel Willen oder Geistige Gesundheit. Leer lassen, wenn die Welt keine hat. Jeder Charakter in Runden dieser Welt hat sie dann neben dem Leben.</span>
+        <input id="world-second-bar" class="input" maxlength="60" [ngModel]="draft().second_bar_name" (ngModelChange)="set('second_bar_name', $event)" />
       </div>
       <div class="field">
         <label for="world-lore">Lore</label>
@@ -31,23 +36,27 @@ export class LoreEditor {
   /** Fired after name and lore were saved. */
   readonly saved = output<void>();
 
-  protected readonly draft = linkedSignal(() => ({ name: this.store.world()?.name ?? '', lore: this.store.world()?.lore ?? '' }));
+  protected readonly draft = linkedSignal(() => {
+    const world = this.store.world();
+    return { name: world?.name ?? '', second_bar_name: world?.second_bar_name ?? '', lore: world?.lore ?? '' };
+  });
   protected readonly dirty = computed(() => {
     const world = this.store.world();
-    return this.draft().name !== world?.name || this.draft().lore !== world?.lore;
+    const draft = this.draft();
+    return draft.name !== world?.name || draft.lore !== world?.lore || draft.second_bar_name !== world?.second_bar_name;
   });
   protected readonly busy = signal(false);
   protected readonly error = signal('');
 
-  /** Change name or lore in the draft. */
-  protected set(key: 'name' | 'lore', value: string): void {
+  /** Change one field of the draft. */
+  protected set(key: 'name' | 'second_bar_name' | 'lore', value: string): void {
     this.draft.update((draft) => ({ ...draft, [key]: value }));
   }
 
-  /** Save name and lore. */
+  /** Save the world; the second bar is saved without spaces around it. */
   protected save(): void {
     this.busy.set(true);
-    this.store.saveWorld(this.draft()).subscribe({ next: () => this.done(), error: (e: unknown) => this.finish(readError(e)) });
+    this.store.saveWorld({ ...this.draft(), second_bar_name: this.draft().second_bar_name.trim() }).subscribe({ next: () => this.done(), error: (e: unknown) => this.finish(readError(e)) });
   }
 
   /** Delete the whole world after the user confirmed. */

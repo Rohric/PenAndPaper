@@ -15,7 +15,7 @@ class WorldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = World
-        fields = ["id", "name", "lore", "created_at"]
+        fields = ["id", "name", "lore", "second_bar_name", "created_at"]
 
 
 class WorldScopedSerializer(serializers.ModelSerializer):

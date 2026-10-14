@@ -5,6 +5,7 @@ are in house_rules.py. Wherever the rules say "points", base points and bonus po
 """
 
 from character_app.models import BaseCharacter, Npc, PlayerCharacter
+from core.images import CHARACTER_PICTURE, shrink_image
 
 MAX_SKILL_POINTS = 100
 MAX_SKILL_VALUE = 100
@@ -126,11 +127,11 @@ def player_characters_for_user(user):
 def set_image(character, image):
     """Replace the picture of a character and return the character; None removes the picture.
 
-    The file of the picture before is deleted. A new picture is shown right away instead of the symbol.
+    The file of the picture before is deleted. A new picture is made smaller and shown right away instead of the symbol.
     """
     if character.image:
         character.image.delete(save=False)
-    character.image = image
+    character.image = shrink_image(image, CHARACTER_PICTURE) if image is not None else None
     character.shows_image = image is not None
     character.save(update_fields=["image", "shows_image"])
     return character

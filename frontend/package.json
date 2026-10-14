@@ -6,6 +6,8 @@
     "start": "ng serve",
     "start:tunnel": "node tools/start-tunnel.cjs",
     "start:lan": "node tools/login-qr.cjs && ng serve --host 0.0.0.0 --port 4200",
+    "start:play": "node tools/login-qr.cjs && ng build && node tools/play-server.cjs",
+    "start:play:tunnel": "node tools/start-tunnel.cjs --play",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"

@@ -9,6 +9,7 @@ import { Portrait } from '../../components/basic/portrait';
 import { KIND_LABELS, isItem, summaryOf, viewOf } from '../../components/entry/entry-views';
 import { WorldStore } from '../../core/world-store';
 import { CharacterPanel, CharacterTile } from '../../components/character/character-tile';
+import { barPercent } from '../../components/character/point-bar';
 import { Tools, Tool } from '../../global/tool-bar/tools.service';
 import { EntryCard } from '../../components/entry/entry-card';
 import { SESSION_KINDS, SessionStore } from '../../core/session-store';
@@ -68,6 +69,8 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
 export class MasterTable {
   protected readonly store = inject(SessionStore);
   private readonly world = inject(WorldStore);
+  /** The name of the second bar of the world; empty when it has none. */
+  protected readonly secondBar = computed(() => this.world.world()?.second_bar_name ?? '');
 
   /** A scene the cockpit asks the master mode to show, for example from a link; it opens in the popup of the scene. */
   readonly focus = model<EntryRef | null>(null);
@@ -304,7 +307,13 @@ export class MasterTable {
   /** The share of the life points a character has left, for the thin bar under its button. */
   protected life(id: number): number {
     const character = this.characters().find((other) => other.id === id);
-    return character?.max_life_points ? Math.min(100, Math.max(0, (character.life_points / character.max_life_points) * 100)) : 0;
+    return character ? barPercent(character.life_points, character.max_life_points) : 0;
+  }
+
+  /** The share of the second bar a character has left, for the second thin bar. */
+  protected second(id: number): number {
+    const character = this.characters().find((other) => other.id === id);
+    return character ? barPercent(character.second_bar_points, character.max_second_bar_points) : 0;
   }
 
   /** Every entry of a drawer, without any filter. */

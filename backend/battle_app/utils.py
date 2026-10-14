@@ -46,6 +46,12 @@ def running_battle(session):
     return session.battles.filter(finished=False).first()
 
 
+def current_battle(session):
+    """Return the running battle with the life points the player characters have right now, or None."""
+    battle = running_battle(session)
+    return follow_characters(battle) if battle else None
+
+
 def own_combatant(battle, user):
     """Return the combatant that is a character of the given player, or None."""
     return battle.combatants.filter(player_character__owner=user).first()

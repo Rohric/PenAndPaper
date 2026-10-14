@@ -1,16 +1,18 @@
 import { Injectable, signal } from '@angular/core';
 
 const VISIBLE_MS = 3500;
+/** Rewards like bonus points stay a little longer. */
+const REWARD_MS = 6000;
 const MAX_SHOWN = 3;
 
 /** One short message at the top of the screen. */
 export interface Toast {
   id: number;
   text: string;
-  tone: 'info' | 'ok' | 'danger';
+  tone: 'info' | 'ok' | 'danger' | 'reward';
 }
 
-/** Short messages like "Gespeichert" or "Neue Quest: …" that fade away by themselves. */
+/** Short messages like "Gespeichert" or "Neue Quest: …" that come in from the top and go away by themselves. */
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   readonly toasts = signal<Toast[]>([]);
@@ -20,7 +22,7 @@ export class ToastService {
   show(text: string, tone: Toast['tone'] = 'info'): void {
     const id = this.nextId++;
     this.toasts.update((all) => [...all.slice(1 - MAX_SHOWN), { id, text, tone }]);
-    setTimeout(() => this.dismiss(id), VISIBLE_MS);
+    setTimeout(() => this.dismiss(id), tone === 'reward' ? REWARD_MS : VISIBLE_MS);
   }
 
   /** Take a message away. */

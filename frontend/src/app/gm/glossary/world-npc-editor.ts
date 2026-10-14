@@ -43,7 +43,7 @@ import { WorldStore } from '../../core/world-store';
       </div>
 
       @if (npc(); as loaded) {
-        <app-character-editor kind="npc" [character]="loaded" (saved)="onSaved($event)" (deleted)="onDeleted()" />
+        <app-character-editor kind="npc" [character]="loaded" [secondBar]="store.world()?.second_bar_name ?? ''" (saved)="onSaved($event)" (deleted)="onDeleted()" />
       }
     </div>
   `,

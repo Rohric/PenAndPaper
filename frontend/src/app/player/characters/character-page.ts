@@ -28,13 +28,14 @@ const SECTIONS: EditorSection[] = ['profile', 'skills', 'inventory', 'abilities'
           <app-character-editor
             kind="player"
             [character]="shown"
+            [secondBar]="shown.adventure?.second_bar ?? ''"
             [section]="section()"
             (saved)="onSaved($event)"
             (deleted)="leave()"
             (dirtyChange)="dirty.set($event)"
           />
         } @else {
-          <app-character-sheet [character]="shown" [editable]="true" (edit)="open($event)" />
+          <app-character-sheet [character]="shown" [secondBar]="shown.adventure?.second_bar ?? ''" [editable]="true" (edit)="open($event)" />
         }
       }
     </section>

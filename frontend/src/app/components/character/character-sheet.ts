@@ -4,6 +4,7 @@ import { AnyCharacter, Skill, TALENTS } from '../../core/models';
 import { damageText, inspirationPoints, skillValue, talentValue } from '../../core/rules';
 import { Icon } from '../basic/icon';
 import { Portrait } from '../basic/portrait';
+import { PointBar } from './point-bar';
 import { EditorSection } from './character-editor';
 import { PointsOverview } from './points-overview';
 
@@ -21,12 +22,14 @@ export interface RollWish {
  */
 @Component({
   selector: 'app-character-sheet',
-  imports: [Icon, Portrait, PointsOverview],
+  imports: [Icon, Portrait, PointBar, PointsOverview],
   templateUrl: './character-sheet.html',
   styleUrl: './character-sheet.scss',
 })
 export class CharacterSheet {
   readonly character = input.required<AnyCharacter>();
+  /** The name of the second bar of the world the character plays in; empty when there is none. */
+  readonly secondBar = input('');
   /** Whether talents and skills are buttons that ask for a roll. */
   readonly rollable = input(false);
   readonly roll = output<RollWish>();
@@ -47,10 +50,6 @@ export class CharacterSheet {
   protected readonly leveling = computed(() => this.isPlayer() && !!this.character().adventure);
   /** Bonus points are shown for NPCs and in an adventure; the creation of a player character knows only base points. */
   protected readonly bonus = computed(() => !this.isPlayer() || this.leveling());
-  protected readonly lifePercent = computed(() => {
-    const { life_points, max_life_points } = this.character();
-    return max_life_points ? Math.min(100, Math.max(0, (life_points / max_life_points) * 100)) : 0;
-  });
   /** The three talents, each with its value, its inspiration points and its skills. */
   protected readonly talents = computed(() => {
     const skills = this.character().skills;

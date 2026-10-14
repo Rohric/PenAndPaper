@@ -2,7 +2,7 @@
 
 from functools import cached_property
 
-from django.db.models import Q
+
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
@@ -14,11 +14,16 @@ from rest_framework.views import APIView
 from auth_app.api.permissions import IsGameMaster
 from character_app.utils import refill_inspiration
 from session_app.models import Note, SessionEntry
+from session_app.state import game_master_state, player_state, state_tag
 from session_app.utils import (
-    close_chapter,
+    characters_of,
+    chat_of,
+    give_bonus_points,
     give_item,
     inspire,
     latest_rolls,
+    messages_for_reader,
+    notes_for_reader,
     notes_for_user,
     player_view,
     reveal_from_start,
@@ -33,6 +38,7 @@ from session_app.utils import (
 from .serializers import (
     ChatMessageSerializer,
     CommentSerializer,
+    InspirationSerializer,
     ItemSerializer,
     LevelSerializer,
     MessageSerializer,
@@ -163,22 +169,24 @@ class QuestLog(SessionMixin, generics.UpdateAPIView):
 
 
 class SessionLevel(GameMasterSessionMixin, APIView):
-    """Close the chapter of a session: every character gets its bonus points, the next chapter begins."""
+    """Give characters of a session bonus points to level with (LvUp); the chapter stays as it is."""
 
     def post(self, request, session_id):
         """Give the bonus points and return the session."""
         serializer = LevelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        close_chapter(self.session, serializer.validated_data["bonus_points"])
+        give_bonus_points(self.session, serializer.validated_data["bonus_points"])
         return Response(SessionSerializer(self.session, context={"request": request}).data)
 
 
 class SessionInspiration(GameMasterSessionMixin, APIView):
-    """Give the characters of the session all their inspiration points back, for a new evening."""
+    """Give characters of the session all their inspiration points back: the named ones, or the whole group."""
 
     def post(self, request, session_id):
         """Refill the inspiration points and answer without content."""
-        refill_inspiration(self.session.characters.all())
+        serializer = InspirationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        refill_inspiration(characters_of(self.session, serializer.validated_data["characters"]))
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -207,6 +215,25 @@ class PlayerView(SessionMixin, APIView):
         return Response(player_view(self.session, request.user))
 
 
+class SessionState(SessionMixin, APIView):
+    """
+    Return everything a device shows during a session, in one answer.
+
+    - GET: the state for the game master or for a player, with its tag. With "?have=" set to the tag
+      of the last answer, no content (204) when nothing has changed since.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, session_id):
+        """Return the state with its tag, or no content when the caller has it already."""
+        state = game_master_state(self.session, request) if self.is_game_master else player_state(self.session, request)
+        tag = state_tag(state)
+        if request.query_params.get("have") == tag:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"tag": tag, **state})
+
+
 class NoteList(SessionMixin, generics.ListCreateAPIView):
     """
     List and create the notes of a session.
@@ -220,8 +247,7 @@ class NoteList(SessionMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Return the user's own notes and the shared ones, with their comments."""
-        visible = Q(shared=True) | Q(author=self.request.user)
-        return self.session.notes.filter(visible).select_related("author").prefetch_related("comments__author")
+        return notes_for_reader(self.session, self.request.user)
 
     def perform_create(self, serializer):
         """Save the note in the session with the requesting user as author."""
@@ -276,11 +302,8 @@ class MessageList(SessionMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Return the messages the requesting user may read."""
-        messages = self.session.messages.all()
-        if not self.is_game_master:
-            return messages.filter(character__owner=self.request.user)
         character = self.request.query_params.get("character")
-        return messages.filter(character_id=character) if character else messages
+        return messages_for_reader(self.session, self.request.user, self.is_game_master, character)
 
     def perform_create(self, serializer):
         """Save the message for a character of the session and note who wrote it."""
@@ -301,7 +324,7 @@ class ChatList(SessionMixin, generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Return the messages of the chat of the session."""
-        return self.session.chat.select_related("author", "session")
+        return chat_of(self.session)
 
     def perform_create(self, serializer):
         """Save the message with the requesting user as its author."""

@@ -13,6 +13,13 @@
     <div class="life__bar"><div class="life__fill" [class.life__fill--low]="percent() <= 25" [style.width.%]="percent()"></div></div>
     <strong>{{ character().life_points }} / {{ character().max_life_points }}</strong>
   </div>
+  @if (secondBar()) {
+    <div class="life" [attr.aria-label]="secondBar() + ' ' + character().second_bar_points + ' von ' + character().max_second_bar_points">
+      <span class="life__name">{{ secondBar() }}</span>
+      <div class="life__bar"><div class="life__fill life__fill--second" [style.width.%]="secondPercent()"></div></div>
+      <strong>{{ character().second_bar_points }} / {{ character().max_second_bar_points }}</strong>
+    </div>
+  }
 
   @if (expanded()) {
     <div class="row">
@@ -27,6 +34,21 @@
         </button>
       }
     </div>
+    @if (secondBar()) {
+      <div class="row">
+        <span class="soft">{{ secondBar() }}</span>
+        @for (step of steps; track step) {
+          <button
+            type="button"
+            class="btn btn--small"
+            [attr.aria-label]="secondBar() + ' ' + (step > 0 ? 'plus ' : 'minus ') + (step > 0 ? step : -step)"
+            (click)="changeSecond(step)"
+          >
+            {{ step > 0 ? '+' + step : step }}
+          </button>
+        }
+      </div>
+    }
 
     @for (talent of talents(); track talent.label) {
       <div class="values">

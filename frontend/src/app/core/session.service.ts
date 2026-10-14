@@ -53,7 +53,7 @@ export class SessionService {
     return this.api.patch(`sessions/${id}/quest-log/${questId}/`, changes);
   }
 
-  /** Close the chapter: every character gets its bonus points, named by character id; the next chapter begins. */
+  /** LvUp: give characters bonus points, named by character id; the chapter stays as it is. */
   level(id: number, bonusPoints: Record<number, number>): Observable<Session> {
     return this.api.post<Session>(`sessions/${id}/level/`, { bonus_points: bonusPoints });
   }
@@ -112,9 +112,14 @@ export class SessionService {
     return this.api.post<ChatMessage>(`sessions/${id}/chat/`, { text });
   }
 
-  /** Give all characters of the session their inspiration points back, for a new evening. */
-  refillInspiration(id: number): Observable<unknown> {
-    return this.api.post(`sessions/${id}/inspiration/`, {});
+  /** Give characters of the session all their inspiration points back: the named ones, or the whole group. */
+  refillInspiration(id: number, characters: number[] = []): Observable<unknown> {
+    return this.api.post(`sessions/${id}/inspiration/`, { characters });
+  }
+
+  /** Everything a device shows during a session at once; null when nothing changed since the given tag. */
+  state<T>(id: number, have: string | null): Observable<T | null> {
+    return this.api.get<T | null>(`sessions/${id}/state/${have ? `?have=${have}` : ''}`);
   }
 
   rolls(id: number): Observable<Roll[]> {

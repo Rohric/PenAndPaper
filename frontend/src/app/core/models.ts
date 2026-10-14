@@ -100,6 +100,8 @@ export interface World {
   id: number;
   name: string;
   lore: string;
+  /** The name of the second bar next to life, like "Willen"; empty when the world has none. */
+  second_bar_name: string;
   created_at: string;
 }
 
@@ -321,6 +323,9 @@ export interface Character {
   /** The life points right now, and the most the character can have. */
   life_points: number;
   max_life_points: number;
+  /** The second bar a world can name, like "Willen": the points right now, and the most. */
+  second_bar_points: number;
+  max_second_bar_points: number;
   skill_points_total: number;
   bonus_points_total: number;
   skills: Skill[];
@@ -340,7 +345,7 @@ export interface PlayerCharacter extends Character {
   backstory: string;
   player: string;
   /** The running adventure the character plays in; null while it is free, also after a finished one. */
-  adventure: { id: number; name: string; finished: boolean } | null;
+  adventure: { id: number; name: string; finished: boolean; /** The name of the second bar of its world; empty when it has none. */ second_bar: string } | null;
   /** Spent inspiration points by talent. */
   inspiration_used: Partial<Record<Talent, number>>;
 }

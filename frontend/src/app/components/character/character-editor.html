@@ -125,6 +125,16 @@
               <label for="character-life-max">Lebenspunkte maximal</label>
               <input id="character-life-max" class="input" type="number" min="0" [ngModel]="draft().max_life_points" (ngModelChange)="setNumber('max_life_points', $event)" />
             </div>
+            @if (secondBar()) {
+              <div class="field">
+                <label for="character-second">{{ secondBar() }}</label>
+                <input id="character-second" class="input" type="number" min="0" [ngModel]="draft().second_bar_points" (ngModelChange)="setNumber('second_bar_points', $event)" />
+              </div>
+              <div class="field">
+                <label for="character-second-max">{{ secondBar() }} maximal</label>
+                <input id="character-second-max" class="input" type="number" min="0" [ngModel]="draft().max_second_bar_points" (ngModelChange)="setNumber('max_second_bar_points', $event)" />
+              </div>
+            }
             <div class="field">
               <label for="character-base">Budget Grundpunkte</label>
               <input id="character-base" class="input" type="number" min="0" [ngModel]="draft().skill_points_total" (ngModelChange)="setNumber('skill_points_total', $event)" />
@@ -138,6 +148,9 @@
           <p class="soft">Lebenspunkte und Budgets setzt der Spielleiter.</p>
           <div class="row">
             <span class="chip">Lebenspunkte: {{ draft().life_points }} von {{ draft().max_life_points }}</span>
+            @if (secondBar()) {
+              <span class="chip">{{ secondBar() }}: {{ draft().second_bar_points }} von {{ draft().max_second_bar_points }}</span>
+            }
             <span class="chip">Budget Grundpunkte: {{ draft().skill_points_total }}</span>
             <span class="chip">Budget Bonuspunkte: {{ draft().bonus_points_total }}</span>
           </div>

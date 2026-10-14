@@ -16,12 +16,12 @@ Als Spielleiter will ich eine Runde mit einer Welt und den Charakteren meiner Sp
 
 | Wort | voller Name | Klick |
 | --- | --- | --- |
-| Gruppe | Die Gruppe | Popup: die Charakter-Kacheln, „Neuer Abend", „Gruppe bearbeiten". Zahl: ungelesene geheime Nachrichten |
+| Gruppe | Die Gruppe | Popup: die Charakter-Kacheln mit Plus und Minus für das Leben und, wenn die Welt eine hat, die zweite Leiste; „Gruppe bearbeiten". Zahl: ungelesene geheime Nachrichten |
 | Würfeln | Würfeln | Seitenfenster mit dem [Würfelfeld](../bausteine/wuerfel.md) |
 | Chat | Chat der Gruppe | Seitenfenster. Zahl: neu |
 | Kampf | Kampf | öffnet den laufenden Kampf oder startet einen mit der Gruppe |
 | Archiv | Archiv | Seitenfenster: erledigte Ereignisse und beendete Quests, mit „Zurückholen" |
-| Kapitel | Kapitel abschließen | Seitenfenster: Bonuspunkte je Charakter |
+| LvUp | Bonuspunkte und Geistesblitz | Popup: Bonuspunkte einzeln oder für alle, Geistesblitz für einzelne oder die ganze Gruppe auffüllen (siehe [LvUp](lvup.md)) |
 
 Rechts in der Symbolleiste: Stecknadeln je Art mit Zahl (Popup mit [Tags](../bausteine/tags.md)) und „Wurf" (letzter Wurf, Popup mit „Alle Würfe").
 
@@ -30,7 +30,7 @@ Rechts in der Symbolleiste: Stecknadeln je Art mit Zahl (Popup mit [Tags](../bau
 ## Bausteine
 
 - [Rahmen](rahmen.md), [Symbolleiste](../bausteine/symbolleiste.md), [Charakterbogen](../bausteine/charakterbogen.md), [Würfel](../bausteine/wuerfel.md), [Chat](../bausteine/chat.md)
-- Code: `gm/sessions/` (`session-list`, `session-members`), `gm/cockpit/` (`session-cockpit`, `session-group`, `session-archive`, `chapter-close-form`, `item-gift-form`), `core/session-store`
+- Code: `gm/sessions/` (`session-list`, `session-members`), `gm/cockpit/` (`session-cockpit`, `session-group`, `session-archive`, `level-up-form`, `item-gift-form`), `core/session-store`
 
 ## Leisten in dieser Ansicht
 

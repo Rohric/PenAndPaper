@@ -12,6 +12,8 @@ Als Spielleiter will ich meine Welten sehen, eine neue anlegen und eine öffnen,
 
 **Zuletzt:** was in der Welt zuletzt angelegt und zuletzt bearbeitet wurde, über alle Arten. Liegt als Symbol in der Symbolleiste.
 
+**Zweite Leiste:** Im Formular der Lore steht das Feld „Zweite Leiste (freiwillig)". Trägt man einen Namen ein, zum Beispiel „Willen" oder „Geistige Gesundheit", hat jeder Charakter in Runden dieser Welt neben dem Leben eine zweite Leiste (Start 100 von 100). Leer heißt: keine zweite Leiste. Sichtbar ist sie wie das Leben, ändern kann sie nur der Spielleiter.
+
 ## Bausteine
 
 - [Rahmen](rahmen.md), [Kachel](../bausteine/kachel.md), [Formular](../bausteine/formular.md)

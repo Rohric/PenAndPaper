@@ -256,8 +256,14 @@ class ItemSerializer(serializers.Serializer):
 
 
 class LevelSerializer(serializers.Serializer):
-    """Read the bonus points for a closed chapter: one number per character id."""
+    """Read the bonus points of a LvUp: one number per character id."""
 
     bonus_points = serializers.DictField(
         child=serializers.IntegerField(min_value=0, max_value=MAX_AMOUNT), required=False, default=dict
     )
+
+
+class InspirationSerializer(serializers.Serializer):
+    """Read whose inspiration points are refilled: the named characters, or the whole group when none is named."""
+
+    characters = serializers.ListField(child=serializers.IntegerField(min_value=1), required=False, default=list)

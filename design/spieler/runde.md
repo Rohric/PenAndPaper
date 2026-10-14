@@ -24,8 +24,8 @@ Die Runde hat fünf Seiten in der Hauptreihe (Runde, Charakter, Quests, Chat, un
 +--------------------------------+
 ```
 
-- **Mein Charakter:** Portrait, Name, Beruf, Lebensbalken, Geistesblitzpunkte je Begabung.
-- **Neu seit deinem letzten Blick:** neue Quests, neue Einträge im Glossar, erhaltene Gegenstände, geänderte Lebenspunkte, Notizen, Nachrichten. Ein Tipp führt dorthin.
+- **Mein Charakter:** Portrait, Name, Beruf, Lebensbalken, darunter die zweite Leiste, wenn die Welt eine benennt, Geistesblitzpunkte je Begabung.
+- **Neu seit deinem letzten Blick:** neue Quests, neue Einträge im Glossar, erhaltene Gegenstände, geänderte Lebenspunkte, die geänderte zweite Leiste („Willen: 80 → 70"), Bonuspunkte („Du hast 10 Bonuspunkte bekommen"), aufgefüllter Geistesblitz („Deine Geistesblitzpunkte sind wieder voll"), Notizen, Nachrichten. Ein Tipp führt dorthin. Bonuspunkte und Geistesblitz erscheinen immer auch als Einblendung im Ton „Belohnung", egal welche Seite offen ist.
 - Die letzten Würfe stehen nicht auf der Seite, sondern als Symbol „Würfe".
 - Kommt etwas Neues dazu, während man spielt, erscheint oben eine kurze [Meldung](../bausteine/meldung.md).
 

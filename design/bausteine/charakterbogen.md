@@ -9,7 +9,7 @@ Als Spieler will ich meinen Charakter auf einen Blick lesen und auf einen Wert t
 Ein Baustein für Spielercharaktere und NSC, von oben nach unten:
 
 1. **Kopf:** Portrait, „Charakter von …", Name, Beruf.
-2. **Leben:** „Lebenspunkte 82 von 100" mit Balken.
+2. **Leben:** „Lebenspunkte 82 von 100" mit Balken. Darunter die **zweite Leiste**, wenn die Welt der Runde eine benennt, zum Beispiel „Willen 70 von 100", mit eigenem Balken in eigener Farbe. Ein freier Charakter (in keiner Runde) hat keine zweite Leiste. Beide Balken sind ein Baustein (`components/character/point-bar`).
 3. **Zeile mit Marken:** Alter, Geschlecht, „spielt in: …" oder „frei".
 4. **Punkte:** Balken „Grundpunkte"; die drei Begabungen als Karten mit Wert und Geistesblitz. In einer laufenden Runde zusätzlich der Balken „Bonuspunkte" und der rote Tag „Guthaben N" an der Begabung. Außerhalb einer Runde stehen Bonuspunkte und Guthaben nicht da.
 5. **Beschreibung, Hintergrundgeschichte.**
@@ -20,7 +20,7 @@ Ein Baustein für Spielercharaktere und NSC, von oben nach unten:
 
 **Bearbeiten:** Wo der Bogen bearbeitet werden darf, steht an jedem Abschnitt ein Stift, der den Editor an dieser Stelle öffnet.
 
-Die **Charakter-Kachel** der Gruppe ist die Kurzform: Portrait, Name, Lebensbalken, ungelesene Nachrichten; aufgeklappt Lebenspunkte setzen, Bogen, geheime Nachrichten, Gegenstand übergeben.
+Die **Charakter-Kachel** der Gruppe ist die Kurzform: Portrait, Name, Lebensbalken und, wenn es sie gibt, die zweite Leiste mit eigenem Plus und Minus, ungelesene Nachrichten; aufgeklappt Lebenspunkte setzen, Bogen, geheime Nachrichten, Gegenstand übergeben.
 
 ## Bausteine
 

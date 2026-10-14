@@ -19,7 +19,7 @@ import { PointsOverview } from './points-overview';
 import { SkillEditor } from './skill-editor';
 import { SpecialAbilityListEditor } from './special-ability-list-editor';
 
-type NumberField = 'life_points' | 'max_life_points' | 'skill_points_total' | 'bonus_points_total';
+type NumberField = 'life_points' | 'max_life_points' | 'second_bar_points' | 'max_second_bar_points' | 'skill_points_total' | 'bonus_points_total';
 
 /** The parts of the editor; the phrases belong to NPCs only. */
 export type EditorSection = 'profile' | 'skills' | 'inventory' | 'abilities' | 'phrases';
@@ -53,6 +53,8 @@ export class CharacterEditor {
 
   readonly character = input.required<AnyCharacter>();
   readonly kind = input.required<'npc' | 'player'>();
+  /** The name of the second bar of the world; empty when there is none. */
+  readonly secondBar = input('');
   /** The section the editor opens at. */
   readonly section = input<EditorSection>('profile');
   readonly saved = output<AnyCharacter>();

@@ -4,7 +4,12 @@
     @for (member of view().group; track member.id) {
       <div class="row row--between">
         <span><strong>{{ member.name }}</strong> <span class="soft">({{ member.player }})</span></span>
-        <span class="chip chip--accent">Lebenspunkte {{ member.life_points }} von {{ member.max_life_points }}</span>
+        <span class="row">
+          <span class="chip chip--accent">Lebenspunkte {{ member.life_points }} von {{ member.max_life_points }}</span>
+          @if (view().second_bar; as bar) {
+            <span class="chip chip--info">{{ bar }} {{ member.second_bar_points }} von {{ member.max_second_bar_points }}</span>
+          }
+        </span>
       </div>
     } @empty {
       <p class="soft">Noch niemand in der Gruppe.</p>

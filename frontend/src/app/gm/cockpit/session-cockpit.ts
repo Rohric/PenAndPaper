@@ -1,4 +1,4 @@
-import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { Component, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { forkJoin } from 'rxjs';
 
 import { readError } from '../../core/api-error';
@@ -21,7 +21,7 @@ import { SceneView } from '../chapters/scene-view';
 import { WorldSearch } from '../worlds/world-search';
 import { WorldStore } from '../../core/world-store';
 import { BattleView } from '../battle/battle-view';
-import { ChapterCloseForm } from './chapter-close-form';
+import { LevelUpForm } from './level-up-form';
 import { ChatThread, groupBubbles } from '../../components/play/chat-thread';
 import { Tools, Tool } from '../../global/tool-bar/tools.service';
 import { CharacterPanel } from '../../components/character/character-tile';
@@ -42,7 +42,6 @@ import { SessionStory } from './session-story';
 import { SessionThread } from '../../components/play/session-thread';
 import { SessionService } from '../../core/session.service';
 
-const REFRESH_MS = 5000;
 const SEEN_KEY = 'pnp.notes.seen.';
 const CHAT_KEY = 'pnp.chat.seen.gm.';
 
@@ -53,7 +52,6 @@ type Panel =
   | { kind: 'archive' }
   | { kind: 'rolls' }
   | { kind: 'roll' }
-  | { kind: 'level' }
   | { kind: 'members' }
   | { kind: 'chat' }
   | { kind: 'scene'; sceneId: number };
@@ -91,7 +89,6 @@ const PANEL_TITLES: Record<Panel['kind'], string> = {
   archive: 'Archiv',
   rolls: 'Letzte Würfe',
   roll: 'Würfeln',
-  level: 'Kapitel abschließen',
   members: 'Gruppe bearbeiten',
   chat: 'Chat der Gruppe',
   scene: 'Szene',
@@ -117,7 +114,7 @@ const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
   selector: 'app-session-cockpit',
   imports: [
     Icon, IdSelect, SideWindow, CharacterSheet, EntryPeek, EntryPopup, TableAsk, SceneThread, BattleView,
-    ChapterCloseForm, ChatThread, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
+    ChatThread, LevelUpForm, GlossaryTiles, ItemGiftForm, NoteDetail, PlayerPanels, QuestBoard, RollPanel, SessionArchive, SessionEntryActions,
     SessionGroup, SessionMembers, SessionNotes, SessionRolls, SessionStory, SessionThread, WorldSearch, MasterTable, SceneView,
   ],
   providers: [WorldStore, SessionStore],
@@ -249,6 +246,7 @@ export class SessionCockpit {
 
   // The popups behind the symbols that belong to the whole cockpit.
   private readonly groupPop = viewChild<TemplateRef<unknown>>('groupPop');
+  private readonly levelPop = viewChild<TemplateRef<unknown>>('levelPop');
   private readonly pinPop = viewChild<TemplateRef<unknown>>('pinPop');
   private readonly rollPop = viewChild<TemplateRef<unknown>>('rollPop');
   private readonly recentPop = viewChild<TemplateRef<unknown>>('recentPop');
@@ -300,7 +298,7 @@ export class SessionCockpit {
     { id: 'chat', word: 'Chat', icon: 'speech', count: this.chatUnread(), click: () => this.openPanel({ kind: 'chat' }) },
     { id: 'fight', word: 'Kampf', icon: 'sword', pressed: this.battleId() !== null, click: () => this.openBattle() },
     { id: 'archive', word: 'Archiv', icon: 'archive', click: () => this.openPanel({ kind: 'archive' }) },
-    { id: 'level', word: 'Kapitel', title: 'Kapitel abschließen', icon: 'flag', click: () => this.openPanel({ kind: 'level' }) },
+    { id: 'level', word: 'LvUp', title: 'Bonuspunkte und Geistesblitz', icon: 'flag', popup: this.levelPop(), popupTitle: 'LvUp', wide: true },
   ]);
   /** The symbols on the right: one for every kind of pin that exists, and the last roll. */
   private readonly rightTools = computed<Tool[]>(() => {
@@ -381,8 +379,6 @@ export class SessionCockpit {
       this.view() === 'master' && this.battleId() === null ? this.masterFocus.set({ kind: 'scenes', id: sceneId }) : this.sceneId.set(sceneId);
     // Quests are shown as this session has them, without changing the world.
     this.world.questChanges = (questId) => this.store.state('quest', questId)?.changes ?? {};
-    const timer = setInterval(() => this.store.refresh(), REFRESH_MS);
-    inject(DestroyRef).onDestroy(() => clearInterval(timer));
   }
 
 
@@ -468,13 +464,6 @@ export class SessionCockpit {
     }
   }
 
-  /** Give all characters their inspiration points back, after asking. */
-  protected newEvening(): void {
-    if (confirm('Neuer Abend: Alle Charaktere der Gruppe bekommen ihre Geistesblitzpunkte zurück. Weiter?')) {
-      this.store.refillInspiration();
-    }
-  }
-
   /** Hand an item to the character whose window is open. */
   protected give(item: Omit<ItemGift, 'character'>): void {
     const character = this.panelCharacter();
@@ -496,12 +485,6 @@ export class SessionCockpit {
       },
       error: (e: unknown) => this.error.set(readError(e)),
     });
-  }
-
-  /** Close the chapter with the bonus points of every character. */
-  protected closeChapter(points: Record<number, number>): void {
-    this.store.level(points);
-    this.panel.set(null);
   }
 
   /** Whether an item belongs to the opened scene: to the scene itself, its place, its characters or its quests. */

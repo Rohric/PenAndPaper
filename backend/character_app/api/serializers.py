@@ -2,7 +2,9 @@
 
 from rest_framework import serializers
 
-from character_app.models import START_LIFE_POINTS, START_SKILL_POINTS, BaseCharacter, Npc, PlayerCharacter
+from character_app.models import (
+    START_LIFE_POINTS, START_SECOND_BAR_POINTS, START_SKILL_POINTS, BaseCharacter, Npc, PlayerCharacter,
+)
 from character_app.utils import (
     MAX_DAMAGE_DICE,
     MAX_SKILL_POINTS,
@@ -18,13 +20,21 @@ MAX_AMOUNT = 9999
 # What every character has, in the order the API returns it.
 CHARACTER_FIELDS = [
     "id", "name", "age", "gender", "profession", "description",
-    "life_points", "max_life_points", "skill_points_total", "bonus_points_total",
-    "skills", "inventory", "special_abilities", "talents", "points_left",
+    "life_points", "max_life_points", "second_bar_points", "max_second_bar_points", "skill_points_total",
+    "bonus_points_total", "skills", "inventory", "special_abilities", "talents", "points_left",
     "symbol", "image", "shows_image", "created_at", "updated_at",
 ]
 ADVENTURE_FIELDS = ["backstory", "player", "adventure"]
 # What only the game master changes on a player character.
-LEVEL_FIELDS = ["life_points", "max_life_points", "skill_points_total", "bonus_points_total"]
+LEVEL_FIELDS = [
+    "life_points", "max_life_points", "second_bar_points", "max_second_bar_points",
+    "skill_points_total", "bonus_points_total",
+]
+# The bars of a character: the points right now, their maximum, and where both start.
+BARS = [
+    ("life_points", "max_life_points", START_LIFE_POINTS),
+    ("second_bar_points", "max_second_bar_points", START_SECOND_BAR_POINTS),
+]
 # What only the player changes on a player character.
 PLAYER_FIELDS = [
     "name", "age", "gender", "profession", "description",
@@ -187,10 +197,11 @@ class CharacterSerializer(serializers.ModelSerializer):
         return self._within_maximum(data)
 
     def _within_maximum(self, data):
-        """Keep the life points at or below the maximum whenever one of the two changes."""
-        if "life_points" in data or "max_life_points" in data:
-            maximum = self._current(data, "max_life_points", START_LIFE_POINTS)
-            data["life_points"] = min(self._current(data, "life_points", maximum), maximum)
+        """Keep the points of every bar at or below its maximum whenever one of the two changes."""
+        for points, most, start in BARS:
+            if points in data or most in data:
+                maximum = self._current(data, most, start)
+                data[points] = min(self._current(data, points, maximum), maximum)
         return data
 
 
@@ -245,9 +256,12 @@ class PlayerCharacterSerializer(CharacterSerializer):
         return super().validate(data)
 
     def get_adventure(self, character):
-        """Return the running adventure the character plays in, or None while it is free."""
+        """Return the running adventure of the character with the name of its second bar; None while it is free."""
         session = next((session for session in character.sessions.all() if not session.finished), None)
-        return {"id": session.pk, "name": session.name, "finished": session.finished} if session else None
+        if session is None:
+            return None
+        second_bar = session.world.second_bar_name
+        return {"id": session.pk, "name": session.name, "finished": session.finished, "second_bar": second_bar}
 
 
 class PlayerCharacterLevelSerializer(PlayerCharacterSerializer):

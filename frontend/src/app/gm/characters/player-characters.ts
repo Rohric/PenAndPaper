@@ -19,7 +19,7 @@ const SORTS: { id: SortBy; word: string; icon: IconName }[] = [
   { id: 'changed', word: 'Geändert', icon: 'clock' },
 ];
 
-type LevelField = 'skill_points_total' | 'bonus_points_total' | 'life_points' | 'max_life_points';
+type LevelField = 'skill_points_total' | 'bonus_points_total' | 'life_points' | 'max_life_points' | 'second_bar_points' | 'max_second_bar_points';
 
 /** The characters of all players as the game master sees them: read the sheet, and level it in a popup of the bar. */
 @Component({
@@ -65,6 +65,8 @@ export class PlayerCharacters {
       bonus_points_total: character?.bonus_points_total ?? 0,
       life_points: character?.life_points ?? 0,
       max_life_points: character?.max_life_points ?? 0,
+      second_bar_points: character?.second_bar_points ?? 0,
+      max_second_bar_points: character?.max_second_bar_points ?? 0,
     };
   });
   protected readonly dirty = computed(() => {

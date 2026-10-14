@@ -183,6 +183,9 @@
       >
         <app-portrait [symbol]="character.symbol" fallback="sheet" [image]="character.shows_image ? character.image : null" [size]="44" />
         <span class="person__life"><span class="person__fill" [style.width.%]="life(character.id)"></span></span>
+        @if (secondBar()) {
+          <span class="person__life"><span class="person__fill person__fill--second" [style.width.%]="second(character.id)"></span></span>
+        }
         @if (store.unread(character.id)) {
           <span class="person__badge">{{ store.unread(character.id) }}</span>
         }
@@ -219,7 +222,9 @@
     <app-character-tile
       [character]="character"
       [unread]="store.unread(character.id)"
-      (life)="store.setLife(character.id, $event)"
+      [secondBar]="secondBar()"
+      (life)="store.setPoints(character.id, { life_points: $event })"
+      (second)="store.setPoints(character.id, { second_bar_points: $event })"
       (open)="open.emit({ kind: $event, characterId: character.id })"
     />
   </app-popup>

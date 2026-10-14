@@ -68,9 +68,12 @@
 </section>
 
 <!-- The popups behind the symbols of the bar that belong to the whole cockpit. -->
+<ng-template #levelPop>
+  <app-level-up-form />
+</ng-template>
+
 <ng-template #groupPop>
   <div class="row">
-    <button type="button" class="btn btn--small" (click)="newEvening()"><app-icon name="clock" [size]="16" /> Neuer Abend</button>
     <button type="button" class="btn btn--small" (click)="openPanel({ kind: 'members' })"><app-icon name="edit" [size]="16" /> Gruppe bearbeiten</button>
   </div>
   <app-session-group (open)="openPanel($event)" />
@@ -160,7 +163,7 @@
     @switch (opened.kind) {
       @case ('sheet') {
         @if (panelCharacter(); as character) {
-          <app-character-sheet [character]="character" />
+          <app-character-sheet [character]="character" [secondBar]="world.world()?.second_bar_name ?? ''" />
         }
       }
       @case ('messages') {
@@ -211,9 +214,6 @@
       }
       @case ('members') {
         <app-session-members />
-      }
-      @case ('level') {
-        <app-chapter-close-form [characters]="store.characters()" (close)="closeChapter($event)" />
       }
     }
   </app-side-window>

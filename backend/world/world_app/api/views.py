@@ -9,6 +9,7 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 
 from auth_app.api.permissions import IsGameMaster
+from core.images import ENTRY_PICTURE, shrink_image
 from world.world_app.models import Chapter, Event, Location, Quest, Scene, Trivia, WorldNpc
 from world.world_app.utils import (
     MAX_PICTURES,
@@ -291,10 +292,11 @@ class PictureList(generics.ListCreateAPIView):
         return self.entry.pictures.all()
 
     def perform_create(self, serializer):
-        """Save the picture at the entry, unless it has three already."""
+        """Save the picture at the entry, made smaller, unless it has three already."""
         if self.entry.pictures.count() >= MAX_PICTURES:
             raise ValidationError(f"Mehr als {MAX_PICTURES} Bilder gehen nicht.")
-        serializer.save(**{self.field: self.entry})
+        image = shrink_image(serializer.validated_data["image"], ENTRY_PICTURE)
+        serializer.save(image=image, **{self.field: self.entry})
 
 
 class LocationPictureList(PictureList):

@@ -1,10 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 
 import { readError } from './api-error';
+import { Poller, ROUND_MS } from './poll';
+import { sameJson } from './same';
 import { EntryKind, EntryRef, PlayerCharacter } from './models';
 import {
-  ChatMessage, ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
+  ChatMessage, GameMasterState, ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
 } from './session-models';
 import { CharacterService } from './character.service';
 import { SessionService } from './session.service';
@@ -22,54 +24,58 @@ export const SESSION_KINDS: Partial<Record<EntryKind, SessionEntryKind>> = {
   trivia: 'trivia',
 };
 
-/** Everything of the session the game master runs, reloaded every few seconds while it is open. */
+/** Everything of the session the game master runs, asked for again every few seconds while it is open. */
 @Injectable()
 export class SessionStore {
   private readonly api = inject(SessionService);
   private readonly characterApi = inject(CharacterService);
 
   readonly session = signal<Session | null>(null);
-  readonly entries = signal<SessionEntry[]>([]);
+  // What the state address fills only fires when its data really changed.
+  readonly entries = signal<SessionEntry[]>([], { equal: sameJson });
   /** The characters of the group with their whole sheet. */
-  readonly characters = signal<PlayerCharacter[]>([]);
+  readonly characters = signal<PlayerCharacter[]>([], { equal: sameJson });
   /** Every character of every player, for the game master to pick from. */
   readonly everyone = signal<PlayerCharacter[]>([]);
-  readonly notes = signal<Note[]>([]);
-  readonly rolls = signal<Roll[]>([]);
+  readonly notes = signal<Note[]>([], { equal: sameJson });
+  readonly rolls = signal<Roll[]>([], { equal: sameJson });
   /** The roll the game master made last. */
   readonly lastRoll = signal<Roll | null>(null);
-  readonly messages = signal<Message[]>([]);
-  readonly chat = signal<ChatMessage[]>([]);
+  readonly messages = signal<Message[]>([], { equal: sameJson });
+  readonly chat = signal<ChatMessage[]>([], { equal: sameJson });
   readonly error = signal('');
   /** The entry that shall go on the table with everything connected to it; the question for the group opens while it is set. */
   readonly tableWish = signal<EntryRef | null>(null);
 
+  /** The tag of the last state; the server answers without content while it is still the same. */
+  private tag: string | null = null;
+  private readonly poller = new Poller(() => this.poll(), () => ROUND_MS);
+
   private readonly states = computed(() => new Map(this.entries().map((entry) => [`${entry.kind}:${entry.entry_id}`, entry])));
   readonly pinned = computed(() => this.entries().filter((entry) => entry.pinned));
 
+  constructor() {
+    this.poller.start(false);
+  }
+
   /** Load the session and everything in it. */
   load(id: number): void {
+    this.tag = null;
     this.run(this.api.get(id), (session) => {
       this.session.set(session);
       this.refresh();
     });
+    this.loadEveryone();
   }
 
-  /** Load again what changes while the group plays. */
+  /** Load the characters of all players again, to pick new members of the group from. */
+  loadEveryone(): void {
+    this.run(this.characterApi.list<PlayerCharacter>('gm/player-characters'), (all) => this.everyone.set(all));
+  }
+
+  /** Ask for the state at once, for example after an own action. */
   refresh(): void {
-    const session = this.session();
-    if (!session) {
-      return;
-    }
-    const parts = {
-      entries: this.api.entries(session.id),
-      notes: this.api.notes(session.id),
-      rolls: this.api.rolls(session.id),
-      messages: this.api.messages(session.id),
-      chat: this.api.chat(session.id),
-      characters: this.characterApi.list<PlayerCharacter>('gm/player-characters'),
-    };
-    this.run(forkJoin(parts), (data) => this.fill(session, data));
+    this.poller.now();
   }
 
   /** What the session did with one entry of the world; nothing yet when it is undefined. */
@@ -115,14 +121,17 @@ export class SessionStore {
     this.run(this.api.update(this.id(), changes), (session) => {
       this.session.set(session);
       this.refresh();
+      if ('characters' in changes) {
+        this.loadEveryone();
+      }
     });
   }
 
-  /** Close the chapter: every character gets its bonus points, the next chapter begins. */
-  level(bonusPoints: Record<number, number>): void {
-    this.run(this.api.level(this.id(), bonusPoints), (session) => {
-      this.session.set(session);
+  /** LvUp: give characters bonus points, named by character id; then tell the caller. */
+  level(bonusPoints: Record<number, number>, done: () => void): void {
+    this.run(this.api.level(this.id(), bonusPoints), () => {
       this.refresh();
+      done();
     });
   }
 
@@ -130,9 +139,9 @@ export class SessionStore {
     this.run(this.api.giveItem(this.id(), item), () => this.refresh());
   }
 
-  /** Set the life points of a character of the group. */
-  setLife(characterId: number, lifePoints: number): void {
-    const request = this.characterApi.update<PlayerCharacter>('gm/player-characters', characterId, { life_points: Math.max(0, lifePoints) });
+  /** Set the points of a bar of a character of the group: life, or the second bar of the world. */
+  setPoints(characterId: number, changes: Partial<Pick<PlayerCharacter, 'life_points' | 'second_bar_points'>>): void {
+    const request = this.characterApi.update<PlayerCharacter>('gm/player-characters', characterId, changes);
     this.run(request, (saved) => this.characters.update((all) => all.map((old) => (old.id === saved.id ? saved : old))));
   }
 
@@ -157,9 +166,12 @@ export class SessionStore {
     this.run(this.api.sendChat(this.id(), text), () => this.refresh());
   }
 
-  /** A new evening: all characters get their inspiration points back. */
-  refillInspiration(): void {
-    this.run(this.api.refillInspiration(this.id()), () => this.refresh());
+  /** Give characters all their inspiration points back: the named ones, or the whole group; then tell the caller. */
+  refillInspiration(characterIds: number[], done: () => void): void {
+    this.run(this.api.refillInspiration(this.id(), characterIds), () => {
+      this.refresh();
+      done();
+    });
   }
 
   send(characterId: number, text: string): void {
@@ -199,19 +211,25 @@ export class SessionStore {
     );
   }
 
-  private fill(
-    session: Session,
-    data: {
-      entries: SessionEntry[]; notes: Note[]; rolls: Roll[]; messages: Message[]; chat: ChatMessage[]; characters: PlayerCharacter[];
-    },
-  ): void {
-    this.entries.set(data.entries);
-    this.notes.set(data.notes);
-    this.rolls.set(data.rolls);
-    this.messages.set(data.messages);
-    this.chat.set(data.chat);
-    this.everyone.set(data.characters);
-    this.characters.set(data.characters.filter((character) => session.characters.includes(character.id)));
+  /** Ask the state address; it answers without content while nothing has changed. */
+  private poll(): Observable<unknown> {
+    const session = this.session();
+    if (!session) {
+      return of(null);
+    }
+    return this.api.state<GameMasterState>(session.id, this.tag).pipe(
+      tap({ next: (state) => state && this.fill(state), error: (e: unknown) => this.error.set(readError(e)) }),
+    );
+  }
+
+  private fill(state: GameMasterState): void {
+    this.tag = state.tag;
+    this.entries.set(state.entries);
+    this.notes.set(state.notes);
+    this.rolls.set(state.rolls);
+    this.messages.set(state.messages);
+    this.chat.set(state.chat);
+    this.characters.set(state.characters);
     this.error.set('');
   }
 

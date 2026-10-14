@@ -1,4 +1,4 @@
-import { InventoryItem, Knowledge, Quest } from './models';
+import { InventoryItem, Knowledge, PlayerCharacter, Quest } from './models';
 
 /** One group that plays a world over several evenings. */
 export interface Session {
@@ -186,6 +186,8 @@ export interface GroupMember {
   player: string;
   life_points: number;
   max_life_points: number;
+  second_bar_points: number;
+  max_second_bar_points: number;
 }
 
 /** A revealed entry of the world as the players see it. */
@@ -227,6 +229,8 @@ export interface PlayerView {
   date: string;
   chapter: string;
   finished: boolean;
+  /** The name of the second bar of the world; empty when it has none. */
+  second_bar: string;
   group: GroupMember[];
   quests: SharedQuest[];
   glossary: SharedEntry[];
@@ -350,4 +354,27 @@ export interface PlayerBattle {
   /** The attack that is open right now. */
   pending: Exchange | null;
   log: string[];
+}
+
+/** Everything the page of a player shows during a session, in one answer; tag names this state. */
+export interface PlayerState {
+  tag: string;
+  view: PlayerView;
+  notes: Note[];
+  messages: Message[];
+  chat: ChatMessage[];
+  rolls: Roll[];
+  battle: PlayerBattle | null;
+  character: PlayerCharacter | null;
+}
+
+/** Everything the cockpit of the game master shows during a session, in one answer; tag names this state. */
+export interface GameMasterState {
+  tag: string;
+  entries: SessionEntry[];
+  notes: Note[];
+  messages: Message[];
+  chat: ChatMessage[];
+  rolls: Roll[];
+  characters: PlayerCharacter[];
 }

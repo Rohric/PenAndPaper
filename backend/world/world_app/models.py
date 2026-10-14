@@ -13,6 +13,8 @@ class World(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="worlds")
     name = models.CharField(max_length=200)
     lore = models.TextField(blank=True)
+    # The name of the second bar next to life in this world, like "Willen"; empty means the world has none.
+    second_bar_name = models.CharField(max_length=60, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

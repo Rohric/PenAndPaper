@@ -19,6 +19,7 @@ urlpatterns = [
     path("sessions/<int:session_id>/inspiration/", views.SessionInspiration.as_view(), name="session-inspiration"),
     path("sessions/<int:session_id>/items/", views.SessionItems.as_view(), name="session-items"),
     path("sessions/<int:session_id>/player-view/", views.PlayerView.as_view(), name="session-player-view"),
+    path("sessions/<int:session_id>/state/", views.SessionState.as_view(), name="session-state"),
     path("sessions/<int:session_id>/notes/", views.NoteList.as_view(), name="note-list"),
     path("notes/<int:pk>/", views.NoteDetail.as_view(), name="note-detail"),
     path("notes/<int:note_id>/comments/", views.CommentList.as_view(), name="comment-list"),

@@ -31,8 +31,10 @@
                 <span class="soft">{{ own.profession }}</span>
               </div>
             </div>
-            <span class="soft">Lebenspunkte {{ own.life_points }} von {{ own.max_life_points }}</span>
-            <span class="meter"><span class="meter__fill meter__fill--life" [style.width.%]="lifePercent()"></span></span>
+            <app-point-bar label="Lebenspunkte" [value]="own.life_points" [max]="own.max_life_points" />
+            @if (data()?.second_bar; as bar) {
+              <app-point-bar tone="second" [label]="bar" [value]="own.second_bar_points" [max]="own.max_second_bar_points" />
+            }
             <div class="row">
               @for (talent of sparks(); track talent.label) {
                 <span class="chip">{{ talent.label }} · Geistesblitz {{ talent.left }}/{{ talent.total }}</span>
@@ -66,7 +68,7 @@
         }
         @if (character(); as own) {
           <p class="soft">Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln. Der Spielleiter sieht den Wurf.</p>
-          <app-character-sheet [character]="own" [rollable]="true" [editable]="true" (roll)="roll($event)" (edit)="startEdit($event)" />
+          <app-character-sheet [character]="own" [secondBar]="data()?.second_bar ?? ''" [rollable]="true" [editable]="true" (roll)="roll($event)" (edit)="startEdit($event)" />
         } @else {
           <div class="empty">
             <p>Keiner deiner Charaktere spielt in dieser Runde.</p>
@@ -149,6 +151,7 @@
     <app-character-editor
       kind="player"
       [character]="source"
+      [secondBar]="data()?.second_bar ?? ''"
       [section]="editSection()"
       (saved)="editSaved()"
       (deleted)="editDeleted()"

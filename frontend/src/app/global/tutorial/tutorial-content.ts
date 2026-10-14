@@ -171,7 +171,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Lore',
-        text: 'Unter „Lore“ stehen der Name der Welt und der große Text über sie. Einzelne Themen wie ein Tier oder ein Gegenstand sind unter „Wissen“ besser aufgehoben.\n\nHier löschst du auch die ganze Welt.',
+        text: 'Unter „Lore“ stehen der Name der Welt, ihre zweite Leiste und der große Text über sie. Die zweite Leiste ist freiwillig: Trägst du einen Namen ein, zum Beispiel „Willen“ oder „Geistige Gesundheit“, hat jeder Charakter in Runden dieser Welt neben dem Leben eine zweite Leiste mit 100 von 100. Einzelne Themen wie ein Tier oder ein Gegenstand sind unter „Wissen“ besser aufgehoben.\n\nHier löschst du auch die ganze Welt.',
         more: 'trivia',
       },
     ],
@@ -298,15 +298,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Spieler mit dem Handy',
-        text: '„QR-Code“ unten in der Leiste der Rundenübersicht zeigt einen Code, der ein Handy direkt zur Anmeldung bringt. Derselbe Code steht auf der Anmeldeseite, wenn sie an einem großen Bildschirm offen ist.\n\nDamit das klappt, starte das Frontend mit „npm run start:lan“ statt „npm start“. Die Handys müssen im selben WLAN sein wie dein Rechner. Der Code wird bei jedem Start neu erzeugt, mit der Adresse, die dein Rechner gerade hat.\n\nKlappt das WLAN nicht, zum Beispiel weil ein Repeater das Netz trennt, starte stattdessen „npm run start:tunnel“. Dann bekommt die App eine öffentliche Adresse, die auch über Mobilfunk geht, und der Code zeigt diese. Gib sie nur deinen Spielern und beende den Tunnel nach dem Abend.',
+        text: '„QR-Code“ unten in der Leiste der Rundenübersicht zeigt einen Code, der ein Handy direkt zur Anmeldung bringt. Derselbe Code steht auf der Anmeldeseite, wenn sie an einem großen Bildschirm offen ist.\n\nDamit das klappt, starte das Frontend am Spielabend mit „npm run start:play“ statt „npm start“: Das liefert die fertig gebaute, kleine App aus, die auf den Handys schnell lädt und flüssig läuft. Die Handys müssen im selben WLAN sein wie dein Rechner. Der Code wird bei jedem Start neu erzeugt, mit der Adresse, die dein Rechner gerade hat.\n\nKlappt das WLAN nicht, zum Beispiel weil ein Repeater das Netz trennt, starte stattdessen „npm run start:play:tunnel“. Dann bekommt die App eine öffentliche Adresse, die auch über Mobilfunk geht, und der Code zeigt diese. Gib sie nur deinen Spielern und beende den Tunnel nach dem Abend.',
       },
       {
-        title: 'Chat und neuer Abend',
-        text: 'Unten in der Leiste öffnet „Chat“ den Chat der ganzen Gruppe, die Zahl darauf zeigt neue Nachrichten. Die geheimen Nachrichten an einen Charakter schreibst du weiter in dessen Fenster.\n\n„Neuer Abend“ im Popup der Gruppe füllt die Geistesblitzpunkte aller Charaktere wieder auf. Einsetzen darf sie nur der Spieler selbst, direkt nach einer misslungenen Probe.',
+        title: 'Chat und Geistesblitz',
+        text: 'Unten in der Leiste öffnet „Chat“ den Chat der ganzen Gruppe, die Zahl darauf zeigt neue Nachrichten. Die geheimen Nachrichten an einen Charakter schreibst du weiter in dessen Fenster.\n\n„LvUp“ in der Leiste füllt die Geistesblitzpunkte wieder auf, für die ganze Gruppe oder für einzelne Charaktere. Einsetzen darf sie nur der Spieler selbst, direkt nach einer misslungenen Probe.',
       },
       {
         title: 'Das Cockpit',
-        text: 'Die Runde nutzt denselben Rahmen wie alle Seiten. Links in der Leiste stehen die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht; die Ziffern 1 bis 6 wechseln sie. Oben steht, wo du bist, dazu das Kapitel der Runde und die Suche („/“ springt hinein). Im Glossar stehen dort auch seine Bereiche.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und Kapitel abschließen. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet ein Popup in der Mitte des Bildschirms. Es ist immer nur eines offen. Esc, das Kreuz oder ein Klick daneben schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt.',
+        text: 'Die Runde nutzt denselben Rahmen wie alle Seiten. Links in der Leiste stehen die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht; die Ziffern 1 bis 6 wechseln sie. Oben steht, wo du bist, dazu das Kapitel der Runde und die Suche („/“ springt hinein). Im Glossar stehen dort auch seine Bereiche.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und LvUp. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet ein Popup in der Mitte des Bildschirms. Es ist immer nur eines offen. Esc, das Kreuz oder ein Klick daneben schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt.',
       },
       {
         title: 'Master-Modus: der Tisch',
@@ -350,7 +350,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Die Gruppe',
-        text: 'Das Symbol „Gruppe“ in der Symbolleiste öffnet die Charaktere als Kacheln zum Auf- und Zuklappen. Die Zahl darauf zählt ungelesene geheime Nachrichten. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters. Aufgeklappt änderst du die Lebenspunkte, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Gegenstände der Welt; die der offenen Szene stehen in der Auswahl oben. Mit „Versteckt“ sehen nur dieser Spieler und du den Gegenstand im Glossar. „Neuer Abend“ und „Gruppe bearbeiten“ stehen im selben Popup.',
+        text: 'Das Symbol „Gruppe“ in der Symbolleiste öffnet die Charaktere als Kacheln zum Auf- und Zuklappen. Die Zahl darauf zählt ungelesene geheime Nachrichten. Zugeklappt siehst du Name und Lebenspunkte als Balken, gemessen am Maximum des Charakters, und darunter die zweite Leiste, wenn deine Welt eine hat (zum Beispiel „Willen“). Aufgeklappt änderst du die Lebenspunkte und die zweite Leiste mit Plus und Minus, siehst Begabungen, Fähigkeiten und Waffen und öffnest Bogen, geheime Nachrichten oder die Übergabe eines Gegenstands.\n\nVorbereitete Gegenstände sind die Gegenstände der Welt; die der offenen Szene stehen in der Auswahl oben. Mit „Versteckt“ sehen nur dieser Spieler und du den Gegenstand im Glossar. „Gruppe bearbeiten“ steht im selben Popup.',
       },
       {
         title: 'Notizen und Würfe',
@@ -373,9 +373,9 @@ export const TUTORIALS: Tutorial[] = [
         text: 'Ein gewürfelter Angriff bleibt zuerst offen. Trifft er normal, entscheidet das Ziel, ob es pariert: ein Spieler auf seiner Seite, für alle anderen du. Kritische Treffer lassen sich nicht parieren.\n\nDanach entscheidest du in der Symbolleiste: „Zug abschließen“ zieht den Schaden ab, überträgt ihn sofort auf den Charakter, schreibt alles in den Verlauf und gibt an den Nächsten weiter. „Wurf verwerfen“ lässt alles, wie es war. Seinen eigenen Zug kann ein Spieler auch selbst abschließen.',
       },
       {
-        title: 'Kapitel abschließen',
+        title: 'LvUp: Bonuspunkte und Geistesblitz',
         house: true,
-        text: 'Am Ende eines Kapitels gibst du den Charakteren Bonuspunkte. Im Seitenfenster steht jeder Charakter mit den üblichen 10 Punkten, du kannst jedem eine eigene Zahl geben.\n\nDie Spieler verteilen die Punkte selbst auf ihre Fähigkeiten, und die Runde rückt ins nächste Kapitel.',
+        text: '„LvUp“ in der Leiste öffnet ein Popup. Oben gibst du Bonuspunkte: Jeder Charakter hat ein Feld, alle starten bei 0. Du gibst einzelnen eine Zahl oder mit „Allen +10“ allen auf einmal, dann „Bonuspunkte geben“. Unten füllst du den Geistesblitz auf, für einen Charakter oder die ganze Gruppe.\n\nDu und der Spieler seht sofort eine Einblendung, die von oben hereinfährt. Die Spieler verteilen die Punkte selbst auf ihre Fähigkeiten. Das Kapitel der Runde wechselst du oben über das Auswahlfeld; LvUp ändert es nicht.',
       },
     ],
   },
@@ -396,7 +396,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Charakter und Würfeln',
-        text: 'Im Reiter „Charakter“ siehst du deinen Bogen. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf, die Gruppe auch.\n\nMit „Würfeln“ in der oberen Reihe der Leiste wechselst du zu deinen Werten als Knöpfen und zu freien Würfeln ohne Wert (W100 oder 1 bis 10 W10). Mit „Bearbeiten“ änderst du deinen Charakter, auch in der Runde.\nIn der Leiste wechselst du zwischen „Bogen“ und „Würfeln“, öffnest mit „Bearbeiten“ den Editor und siehst unter „Blitz“ deine Geistesblitzpunkte.',
+        text: 'Im Reiter „Charakter“ siehst du deinen Bogen mit deinen Lebenspunkten und, wenn die Welt eine hat, der zweiten Leiste, zum Beispiel „Willen“. Beide ändert nur der Spielleiter; du bekommst eine kurze Meldung, wenn er es tut. Tippe auf eine Begabung oder Fähigkeit, um eine Probe zu würfeln: ein W100 gegen deinen Wert. Der Spielleiter sieht den Wurf, die Gruppe auch.\n\nMit „Würfeln“ in der oberen Reihe der Leiste wechselst du zu deinen Werten als Knöpfen und zu freien Würfeln ohne Wert (W100 oder 1 bis 10 W10). Mit „Bearbeiten“ änderst du deinen Charakter, auch in der Runde.\nIn der Leiste wechselst du zwischen „Bogen“ und „Würfeln“, öffnest mit „Bearbeiten“ den Editor und siehst unter „Blitz“ deine Geistesblitzpunkte.',
         more: 'rules#check',
       },
       {

@@ -11,9 +11,16 @@ Eine Web-App für Pen-and-Paper-Runden nach „How to be a Hero". Der Spielleite
 - **Regeln des Spiels** stehen zweimal und müssen gleich rechnen: offizielles Regelwerk in `backend/character_app/utils.py` und `frontend/src/app/core/rules.ts`, Hausregeln in `backend/character_app/house_rules.py` und `frontend/src/app/core/house-rules.ts`.
 - **Backend-Stil:** Funktionen höchstens 14 Zeilen, englische Docstrings im Imperativ, doppelte Anführungszeichen, Logik in `utils.py`, Views dünn.
 - **Sprache:** Code, Kommentare und Docstrings englisch. Alles, was der Nutzer liest, deutsch in du-Form.
-- **Nicht tun:** nicht committen (Emil committet selbst und bekommt eine Commit-Message als Vorschlag), keine Tests schreiben oder starten, keinen Dev-Server starten, die Welt „Pilzwahn" nicht neu laden.
+- **Schnell bleiben.** In einer Runde fragt jedes Gerät nur `sessions/<id>/state/` ab, über `core/poll.ts`; Signale, die eine Abfrage füllt, bekommen `{ equal: sameJson }`. Die Regeln stehen in `design/grundlagen/schnelligkeit.md`.
+- **Tests:** Frontend-Tests mit Vitest für Logik in `core/` und für Formulare sind erwünscht und müssen grün bleiben; Emils Dateien `core/rules.spec.ts` und `core/auth.service.spec.ts` nicht ändern. Keine Backend-Tests schreiben oder starten.
+- **Nicht tun:** nicht committen (Emil committet selbst und bekommt eine Commit-Message als Vorschlag), keine Backend-Tests, keinen Dev-Server auf Emils Ports 8000 und 4200 starten (zum Messen und Durchklicken eigene Test-Server auf anderen Ports mit einer Kopie der Datenbank, `DB_PATH`), die Welt „Pilzwahn" nicht neu laden.
+
+## Starten
+
+- Zum Spielen: `npm run start:play` (WLAN) oder `npm run start:play:tunnel` in `frontend/`, dazu `env/Scripts/python.exe manage.py runserver` in `backend/`.
+- Zum Entwickeln: `npm run start:lan` oder `npm run start:tunnel`.
 
 ## Prüfen
 
 - `backend/`: `env/Scripts/python.exe manage.py check` und `env/Scripts/python.exe manage.py makemigrations --check --dry-run`
-- `frontend/`: `npx ng build --configuration development`
+- `frontend/`: `npx ng build --configuration development`, `npx ng build` (Produktion, prüft die Budgets) und `npx ng test --watch=false`

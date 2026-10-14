@@ -30,6 +30,16 @@
         <label for="level-life-max">Lebenspunkte maximal</label>
         <input id="level-life-max" class="input" type="number" min="0" [ngModel]="level().max_life_points" (ngModelChange)="set('max_life_points', $event)" />
       </div>
+      @if (shown.adventure?.second_bar; as bar) {
+        <div class="field">
+          <label for="level-second">{{ bar }}</label>
+          <input id="level-second" class="input" type="number" min="0" [ngModel]="level().second_bar_points" (ngModelChange)="set('second_bar_points', $event)" />
+        </div>
+        <div class="field">
+          <label for="level-second-max">{{ bar }} maximal</label>
+          <input id="level-second-max" class="input" type="number" min="0" [ngModel]="level().max_second_bar_points" (ngModelChange)="set('max_second_bar_points', $event)" />
+        </div>
+      }
     </div>
     @if (error()) {
       <p class="notice notice--error" role="alert">{{ error() }}</p>
@@ -75,7 +85,7 @@
 
 <ng-template #detailTpl>
   @if (selected(); as shown) {
-    <app-character-sheet [character]="shown" />
+    <app-character-sheet [character]="shown" [secondBar]="shown.adventure?.second_bar ?? ''" />
   } @else {
     <div class="empty">
       <p>Wähle links einen Charakter.</p>

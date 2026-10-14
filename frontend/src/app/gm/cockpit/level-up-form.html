@@ -1,0 +1,49 @@
+@if (rows().length) {
+  <section class="part">
+    <div class="part__head">
+      <h3 class="section-title">Bonuspunkte</h3>
+      <div class="row">
+        <button type="button" class="btn btn--small" (click)="addToAll()"><app-icon name="plus" [size]="14" /> Allen +10</button>
+        <button type="button" class="btn btn--small" (click)="clear()">Alle auf 0</button>
+      </div>
+    </div>
+    @for (row of rows(); track row.id) {
+      <div class="line">
+        <span class="line__name">
+          <strong>{{ row.name }}</strong> <span class="soft">({{ row.player }})</span>
+          <span class="soft">frei: {{ row.free }}</span>
+        </span>
+        <span class="stepper">
+          <button type="button" class="btn btn--small" [attr.aria-label]="'Bonuspunkte für ' + row.name + ' minus 1'" [disabled]="!points()[row.id]" (click)="set(row.id, points()[row.id] - 1)">−</button>
+          <input
+            class="input input--number"
+            type="number"
+            min="0"
+            [attr.aria-label]="'Bonuspunkte für ' + row.name"
+            [ngModel]="points()[row.id]"
+            (ngModelChange)="set(row.id, $event)"
+          />
+          <button type="button" class="btn btn--small" [attr.aria-label]="'Bonuspunkte für ' + row.name + ' plus 1'" (click)="set(row.id, points()[row.id] + 1)">+</button>
+        </span>
+      </div>
+    }
+    <div class="part__foot">
+      <button type="button" class="btn btn--primary" [disabled]="!anyPoints()" (click)="give()">Bonuspunkte geben</button>
+    </div>
+  </section>
+
+  <section class="part">
+    <div class="part__head">
+      <h3 class="section-title">Geistesblitz</h3>
+      <button type="button" class="btn btn--small" [disabled]="!anyUsed()" (click)="refill(null)">Ganze Gruppe auffüllen</button>
+    </div>
+    @for (row of rows(); track row.id) {
+      <div class="line">
+        <span class="line__name"><strong>{{ row.name }}</strong> <span class="soft">{{ row.sparksLeft }} von {{ row.sparks }} übrig</span></span>
+        <button type="button" class="btn btn--small" [disabled]="row.sparksLeft >= row.sparks" (click)="refill(row)">Auffüllen</button>
+      </div>
+    }
+  </section>
+} @else {
+  <p class="soft">Noch kein Charakter in der Runde.</p>
+}

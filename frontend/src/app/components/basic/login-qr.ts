@@ -2,13 +2,14 @@ import { Component, signal } from '@angular/core';
 
 /**
  * The QR code that leads a phone to the login page. The picture is drawn when the frontend is
- * started for the network ("npm run start:lan"), with the address this computer has at that moment.
+ * started for the network ("npm run start:play" for a game night, "npm run start:lan" while developing), with the address
+ * this computer has at that moment.
  */
 @Component({
   selector: 'app-login-qr',
   template: `
     @if (missing()) {
-      <p class="soft">Noch kein QR-Code. Starte das Frontend mit <code>npm run start:lan</code>, dann wird er erzeugt.</p>
+      <p class="soft">Noch kein QR-Code. Starte das Frontend mit <code>npm run start:play</code>, dann wird er erzeugt.</p>
     } @else {
       <img class="qr" src="login-qr.svg" alt="QR-Code zur Anmeldeseite" (error)="missing.set(true)" />
       <p class="soft">Mit dem Handy scannen, im selben WLAN wie dieser Rechner. Der Code führt zur Anmeldung.</p>

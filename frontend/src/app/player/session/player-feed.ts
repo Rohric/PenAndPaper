@@ -1,6 +1,7 @@
 import { PlayerCharacter } from '../../core/models';
 import { ChatMessage, Message, Note, PlayerView } from '../../core/session-models';
 import { IconName } from '../../components/basic/icon';
+import { Toast } from '../../global/toast/toast.service';
 
 /** Where a piece of news leads to. */
 export type FeedTarget = 'quests' | 'glossary' | 'character' | 'notes' | 'chat' | 'round';
@@ -14,6 +15,13 @@ export interface Snapshot {
   notes: number;
   secret: number;
   chat: number;
+  /** The bonus points the character got in all; missing in a state saved before they were counted. */
+  bonus?: number | null;
+  /** The inspiration points the character has spent, over all talents. */
+  sparksUsed?: number | null;
+  /** The second bar of the world: its name and the points of the character. */
+  secondName?: string;
+  second?: number | null;
 }
 
 /** One piece of news for the player. */
@@ -24,6 +32,9 @@ export interface FeedItem {
   target: FeedTarget;
   /** The quest it is about, if it is about one. */
   quest?: number;
+  /** Shown as a message even while the page it leads to is open. */
+  always?: boolean;
+  tone?: Toast['tone'];
 }
 
 /** Boil down what the player sees right now. */
@@ -40,6 +51,10 @@ export function snapshotOf(
     notes: notes.filter((note) => note.shared).reduce((sum, note) => sum + 1 + note.comments.length, 0),
     secret: messages.filter((message) => message.from_gm).length,
     chat: chat.filter((message) => !message.mine).length,
+    bonus: character?.bonus_points_total ?? null,
+    sparksUsed: character ? Object.values(character.inspiration_used ?? {}).reduce((sum, used) => sum + (used ?? 0), 0) : null,
+    secondName: view.second_bar,
+    second: view.second_bar && character ? character.second_bar_points : null,
   };
 }
 
@@ -76,7 +91,24 @@ function personalNews(before: Snapshot, now: Snapshot): FeedItem[] {
     before.life !== null && now.life !== null && before.life !== now.life
       ? [{ key: 'life', text: `Lebenspunkte: ${before.life} → ${now.life}`, icon: 'heart' as const, target: 'character' as const }]
       : [];
-  return [...items, ...life];
+  return [...items, ...life, ...rewardNews(before, now), ...secondNews(before, now)];
+}
+
+/** Bonus points from the game master and inspiration points filled up again: always shown as a reward. */
+function rewardNews(before: Snapshot, now: Snapshot): FeedItem[] {
+  const reward = { icon: 'flag' as const, target: 'character' as const, always: true, tone: 'reward' as const };
+  const got = (now.bonus ?? 0) - (before.bonus ?? 0);
+  const bonus = before.bonus != null && now.bonus != null && got > 0 ? [{ ...reward, key: 'bonus', text: `Du hast ${got} Bonuspunkte bekommen` }] : [];
+  const filled = (before.sparksUsed ?? 0) > 0 && now.sparksUsed === 0;
+  return [...bonus, ...(filled ? [{ ...reward, key: 'sparks', text: 'Deine Geistesblitzpunkte sind wieder voll' }] : [])];
+}
+
+/** The second bar of the world changed, like the life points. */
+function secondNews(before: Snapshot, now: Snapshot): FeedItem[] {
+  if (before.second == null || now.second == null || before.second === now.second || !now.secondName) {
+    return [];
+  }
+  return [{ key: 'second', text: `${now.secondName}: ${before.second} → ${now.second}`, icon: 'heart' as const, target: 'character' as const }];
 }
 
 function countNews(before: Snapshot, now: Snapshot): FeedItem[] {

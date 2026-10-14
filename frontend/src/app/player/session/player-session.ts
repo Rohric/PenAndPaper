@@ -1,21 +1,23 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, signal, viewChild } from '@angular/core';
-import { Observable, forkJoin } from 'rxjs';
+import { Component, TemplateRef, computed, effect, inject, input, signal, untracked, viewChild } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 
 import { readError } from '../../core/api-error';
+import { BATTLE_MS, Poller, ROUND_MS } from '../../core/poll';
+import { sameJson } from '../../core/same';
 import { PlayerCharacter, TALENTS, Talent } from '../../core/models';
 import { inspirationLeft, inspirationPoints } from '../../core/rules';
 import {
-  ChatMessage, Message, Note, PlayerBattle, PlayerView, QuestLog, QuestStatus, Roll, RollOrder, Session,
+  ChatMessage, Message, Note, PlayerBattle, PlayerState, PlayerView, QuestLog, QuestStatus, Roll, RollOrder,
 } from '../../core/session-models';
 import { Icon, IconName } from '../../components/basic/icon';
 import { Portrait } from '../../components/basic/portrait';
+import { PointBar } from '../../components/character/point-bar';
 import { SideWindow } from '../../components/window/side-window';
 import { NavService } from '../../global/frame/nav.service';
 import { ToastService } from '../../global/toast/toast.service';
 import { CharacterEditor, EditorSection } from '../../components/character/character-editor';
 import { CharacterSheet, RollWish } from '../../components/character/character-sheet';
-import { CharacterService } from '../../core/character.service';
 import { PlayerTools } from '../../global/tool-bar/player-tools';
 import { Tool } from '../../global/tool-bar/tools.service';
 import { ChatThread, groupBubbles } from '../../components/play/chat-thread';
@@ -39,7 +41,6 @@ const ROUND_PAGES: { id: Page; label: string; icon: IconName }[] = [
   { id: 'notes', label: 'Notizen', icon: 'note' },
   { id: 'group', label: 'Gruppe', icon: 'group' },
 ];
-const REFRESH_MS = 5000;
 const FEED_KEY = 'pnp.feed.';
 const CHAT_KEY = 'pnp.chat.seen.';
 const TOASTED = 3;
@@ -52,7 +53,7 @@ const TOASTED = 3;
 @Component({
   selector: 'app-player-session',
   imports: [
-    NgTemplateOutlet, Icon, Portrait, SideWindow, CharacterEditor, CharacterSheet, ChatThread, DiceRoll,
+    NgTemplateOutlet, Icon, Portrait, PointBar, SideWindow, CharacterEditor, CharacterSheet, ChatThread, DiceRoll,
     NoteDetail, PlayerBattlePanel, PlayerPanels, RollPanel, SessionNotes, SessionRolls, SessionThread,
   ],
   templateUrl: './player-session.html',
@@ -60,7 +61,6 @@ const TOASTED = 3;
 })
 export class PlayerSession {
   private readonly api = inject(SessionService);
-  private readonly characterApi = inject(CharacterService);
   private readonly toast = inject(ToastService);
   private readonly tools = inject(PlayerTools);
 
@@ -69,16 +69,17 @@ export class PlayerSession {
 
   protected readonly page = signal<Page>('round');
   protected readonly channel = signal<'group' | 'gm'>('group');
-  protected readonly data = signal<PlayerView | null>(null);
-  protected readonly notes = signal<Note[]>([]);
-  protected readonly messages = signal<Message[]>([]);
-  protected readonly chat = signal<ChatMessage[]>([]);
+  // What the state address fills only fires when its data really changed.
+  protected readonly data = signal<PlayerView | null>(null, { equal: sameJson });
+  protected readonly notes = signal<Note[]>([], { equal: sameJson });
+  protected readonly messages = signal<Message[]>([], { equal: sameJson });
+  protected readonly chat = signal<ChatMessage[]>([], { equal: sameJson });
   /** The own character that plays in this session. */
-  protected readonly character = signal<PlayerCharacter | null>(null);
+  protected readonly character = signal<PlayerCharacter | null>(null, { equal: sameJson });
   protected readonly lastRoll = signal<Roll | null>(null);
   /** The latest rolls of the whole group; secret rolls of the game master are not among them. */
-  protected readonly rolls = signal<Roll[]>([]);
-  protected readonly battle = signal<PlayerBattle | null>(null);
+  protected readonly rolls = signal<Roll[]>([], { equal: sameJson });
+  protected readonly battle = signal<PlayerBattle | null>(null, { equal: sameJson });
   protected readonly offline = signal(false);
   protected readonly error = signal('');
   /** The note in the window at the side: an id, null for a new note, undefined when the window is closed. */
@@ -88,6 +89,10 @@ export class PlayerSession {
   protected readonly editSection = signal<EditorSection>('profile');
   protected readonly editDirty = signal(false);
 
+  /** The tag of the last state; the server answers without content while it is still the same. */
+  private tag: string | null = null;
+  /** Asks every few seconds, quicker while the group fights. */
+  private readonly poller = new Poller(() => this.poll(), () => (this.battle() ? BATTLE_MS : ROUND_MS));
   private readonly current = signal<Snapshot | null>(null);
   private readonly seen = signal<Snapshot | null>(null);
   private readonly chatSeen = signal(0);
@@ -118,10 +123,6 @@ export class PlayerSession {
   protected readonly feed = computed(() => feedOf(this.seen(), this.current()));
   protected readonly freshQuests = computed(() => this.feed().flatMap((item) => (item.quest !== undefined ? [item.quest] : [])));
   protected readonly recentRolls = computed(() => this.rolls().slice(0, 5));
-  protected readonly lifePercent = computed(() => {
-    const own = this.character();
-    return own?.max_life_points ? Math.min(100, Math.max(0, (own.life_points / own.max_life_points) * 100)) : 0;
-  });
   /** The inspiration points of each talent: left and in all. */
   protected readonly sparks = computed(() => {
     const own = this.character();
@@ -223,7 +224,8 @@ export class PlayerSession {
     });
     effect(() => {
       this.loadSeen(this.id());
-      this.refresh(this.id());
+      this.tag = null;
+      untracked(() => this.poller.now());
     });
     // While the group chat is open, everything in it counts as read.
     effect(() => {
@@ -231,8 +233,7 @@ export class PlayerSession {
         this.markChatSeen();
       }
     });
-    const timer = setInterval(() => this.refresh(this.id()), REFRESH_MS);
-    inject(DestroyRef).onDestroy(() => clearInterval(timer));
+    this.poller.start(false);
   }
 
   /** Open a page of the bar; opening the secret messages marks them as read. */
@@ -243,7 +244,7 @@ export class PlayerSession {
     }
     const character = this.character();
     if (page === 'chat' && this.channel() === 'gm' && character && this.unread()) {
-      this.run(this.api.markRead(this.id(), character.id), () => this.refresh(this.id()));
+      this.run(this.api.markRead(this.id(), character.id), () => this.reload());
     }
   }
 
@@ -279,7 +280,7 @@ export class PlayerSession {
   protected order(order: RollOrder): void {
     this.run(this.api.roll(this.id(), order), (roll) => {
       this.lastRoll.set(roll);
-      this.refresh(this.id());
+      this.reload();
     });
   }
 
@@ -301,46 +302,46 @@ export class PlayerSession {
   protected editSaved(): void {
     this.editDirty.set(false);
     this.editing.set(null);
-    this.refresh(this.id());
+    this.reload();
   }
 
   /** The character was deleted. */
   protected editDeleted(): void {
     this.editDirty.set(false);
     this.editing.set(null);
-    this.refresh(this.id());
+    this.reload();
   }
 
   /** Save what the group wrote into the log of a quest. */
   protected saveLog(change: { quest: number; log: QuestLog }): void {
     this.run(this.api.questLog(this.id(), change.quest, { log: change.log }), () => {
       this.toast.show('Questlog gespeichert', 'ok');
-      this.refresh(this.id());
+      this.reload();
     });
   }
 
   /** Save which points of a quest are checked. */
   protected saveSteps(change: { quest: number; steps: number[] }): void {
-    this.run(this.api.questLog(this.id(), change.quest, { steps: change.steps }), () => this.refresh(this.id()));
+    this.run(this.api.questLog(this.id(), change.quest, { steps: change.steps }), () => this.reload());
   }
 
   /** Answer the game master in the secret thread. */
   protected send(text: string): void {
     const character = this.character();
     if (character) {
-      this.run(this.api.sendMessage(this.id(), character.id, text), () => this.refresh(this.id()));
+      this.run(this.api.sendMessage(this.id(), character.id, text), () => this.reload());
     }
   }
 
   /** Write into the chat of the group. */
   protected sendChat(text: string): void {
-    this.run(this.api.sendChat(this.id(), text), () => this.refresh(this.id()));
+    this.run(this.api.sendChat(this.id(), text), () => this.reload());
   }
 
   protected addNote(note: Partial<Note>): void {
     this.run(this.api.addNote(this.id(), note), () => {
       this.toast.show('Notiz gespeichert', 'ok');
-      this.refresh(this.id());
+      this.reload();
     });
     this.noteId.set(undefined);
   }
@@ -349,57 +350,48 @@ export class PlayerSession {
   protected quickNote(title: string): void {
     this.run(this.api.addNote(this.id(), { title, text: '', shared: false }), () => {
       this.toast.show('Notiz gespeichert', 'ok');
-      this.refresh(this.id());
+      this.reload();
     });
   }
 
   protected saveNote(change: { id: number; changes: Partial<Note> }): void {
-    this.run(this.api.updateNote(change.id, change.changes), () => this.refresh(this.id()));
+    this.run(this.api.updateNote(change.id, change.changes), () => this.reload());
   }
 
   protected removeNote(noteId: number): void {
-    this.run(this.api.removeNote(noteId), () => this.refresh(this.id()));
+    this.run(this.api.removeNote(noteId), () => this.reload());
     this.noteId.set(undefined);
   }
 
   protected comment(comment: { id: number; text: string }): void {
-    this.run(this.api.addComment(comment.id, comment.text), () => this.refresh(this.id()));
+    this.run(this.api.addComment(comment.id, comment.text), () => this.reload());
   }
 
-  /** Load again what changes while the group plays; a failure only shows that the connection is gone. */
-  private refresh(id: number): void {
-    const parts = {
-      view: this.api.playerView(id),
-      notes: this.api.notes(id),
-      messages: this.api.messages(id),
-      chat: this.api.chat(id),
-      rolls: this.api.rolls(id),
-      battle: this.api.playerBattle(id),
-      sessions: this.api.mine(),
-      characters: this.characterApi.list<PlayerCharacter>('player-characters'),
-    };
-    forkJoin(parts).subscribe({ next: (data) => this.fill(id, data), error: () => this.offline.set(true) });
+  /** Ask for the state at once, for example after an own action. */
+  private reload(): void {
+    this.poller.now();
   }
 
-  private fill(
-    id: number,
-    data: {
-      view: PlayerView; notes: Note[]; messages: Message[]; chat: ChatMessage[]; rolls: Roll[]; battle: PlayerBattle | null;
-      sessions: Session[]; characters: PlayerCharacter[];
-    },
-  ): void {
-    const inSession = data.sessions.find((session) => session.id === id)?.characters ?? [];
-    const character = data.characters.find((other) => inSession.includes(other.id)) ?? null;
-    this.data.set(data.view);
-    this.notes.set(data.notes);
-    this.messages.set(data.messages);
-    this.chat.set(data.chat);
-    this.rolls.set(data.rolls);
-    this.battle.set(data.battle);
-    this.character.set(character);
+  /** Ask the state address; it answers without content while nothing has changed. A failure only shows that the connection is gone. */
+  private poll(): Observable<unknown> {
+    return this.api.state<PlayerState>(this.id(), this.tag).pipe(tap({ next: (state) => this.fill(state), error: () => this.offline.set(true) }));
+  }
+
+  private fill(state: PlayerState | null): void {
     this.offline.set(false);
+    if (!state) {
+      return;
+    }
+    this.tag = state.tag;
+    this.data.set(state.view);
+    this.notes.set(state.notes);
+    this.messages.set(state.messages);
+    this.chat.set(state.chat);
+    this.rolls.set(state.rolls);
+    this.battle.set(state.battle);
+    this.character.set(state.character);
     this.error.set('');
-    this.noticeNews(snapshotOf(data.view, data.notes, data.messages, data.chat, character));
+    this.noticeNews(snapshotOf(state.view, state.notes, state.messages, state.chat, state.character));
   }
 
   /** Tell with short messages what is new since the last reload; the first load only sets the baseline. */
@@ -412,9 +404,9 @@ export class PlayerSession {
     }
     const here = this.barPage();
     feedOf(before, now)
-      .filter((item) => item.target !== here)
+      .filter((item) => item.always || item.target !== here)
       .slice(0, TOASTED)
-      .forEach((item: FeedItem) => this.toast.show(item.text));
+      .forEach((item: FeedItem) => this.toast.show(item.text, item.tone ?? 'info'));
   }
 
   private loadSeen(id: number): void {

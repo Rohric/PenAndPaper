@@ -170,7 +170,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
     knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
       { key: 'description', label: 'Beschreibung', text: loaded?.description ?? '' },
-      { label: 'Steckbrief', text: loaded ? facts(loaded) : '' },
+      { label: 'Steckbrief', text: loaded ? facts(loaded, store.world()?.second_bar_name ?? '') : '' },
     ],
     lists: [
       { label: 'Fähigkeiten', items: loaded ? skillLines(loaded) : [] },
@@ -186,8 +186,9 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
   });
 }
 
-function facts(npc: Npc): string {
-  const parts = [['Alter', npc.age], ['Geschlecht', npc.gender], ['Lebenspunkte', String(npc.life_points)]];
+/** Age, gender, life points and, when the world names one, the second bar of an NPC in one line. */
+function facts(npc: Npc, secondBar: string): string {
+  const parts = [['Alter', npc.age], ['Geschlecht', npc.gender], ['Lebenspunkte', String(npc.life_points)], [secondBar, secondBar ? String(npc.second_bar_points) : '']];
   return parts.filter(([, value]) => value).map(([label, value]) => `${label}: ${value}`).join(' · ');
 }
 

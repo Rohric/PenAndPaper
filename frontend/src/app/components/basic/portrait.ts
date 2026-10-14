@@ -16,7 +16,7 @@ export type PortraitState = 'plain' | 'turn' | 'out' | 'frozen' | 'poisoned' | '
   template: `
     <span class="portrait" [class]="'portrait portrait--' + state()" [style.width.px]="size()" [style.height.px]="size()">
       @if (image()) {
-        <img class="portrait__image" alt="" [src]="source()" />
+        <img class="portrait__image" alt="" loading="lazy" decoding="async" [src]="source()" />
       } @else {
         <app-icon [name]="fallback()" [symbol]="symbol()" [size]="iconSize()" />
       }

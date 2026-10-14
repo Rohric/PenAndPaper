@@ -44,6 +44,11 @@ import { SessionStore } from '../../core/session-store';
 export class SessionMembers {
   protected readonly store = inject(SessionStore);
 
+  constructor() {
+    // Who is free to join can have changed since the cockpit was opened.
+    this.store.loadEveryone();
+  }
+
   /** The characters no adventure has taken yet. */
   protected readonly free = computed(() => this.store.everyone().filter((character) => !character.adventure));
 

@@ -631,6 +631,10 @@ button.tabs__tab {
   background: var(--ok);
 }
 
+.meter__fill--second {
+  background: var(--bar-second);
+}
+
 .meter--over .meter__fill {
   background: var(--danger);
 }

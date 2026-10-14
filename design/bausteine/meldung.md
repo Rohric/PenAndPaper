@@ -6,13 +6,14 @@ Als Nutzer will ich sofort sehen, ob etwas geklappt hat oder nicht, egal wo auf 
 
 ## Lösung
 
-**Kurze Meldung (Toast).** Erscheint oben in der Mitte, über allem, und verschwindet nach einigen Sekunden von selbst. Ein Tipp nimmt sie sofort weg. Höchstens drei gleichzeitig.
+**Kurze Meldung (Toast).** Fährt oben in der Mitte von oben herein, liegt über allem und verschwindet nach einigen Sekunden von selbst. Ein Tipp nimmt sie sofort weg. Höchstens drei gleichzeitig. Gilt gleich beim Spielleiter und bei den Spielern. Wer weniger Bewegung eingestellt hat, sieht sie ohne Hereinfahren.
 
 | Ton | Rand | Wofür |
 | --- | --- | --- |
 | neutral | Linie | Neuigkeiten („Neue Quest: Der Schwarzmarkt") |
 | gut | grün | „Gespeichert" |
 | Fehler | rot | Speichern ging nicht, Verbindung, Regel verletzt |
+| Belohnung | Akzentfarbe, Fläche leicht gefärbt; bleibt 6 s statt 3,5 s | Bonuspunkte und Geistesblitz aus [LvUp](../spielleiter/lvup.md), beim Spielleiter und beim Spieler |
 
 Regeln:
 - Jedes Speichern, das der Nutzer auslöst, bekommt eine Meldung: „Gespeichert" oder der Grund, warum nicht.

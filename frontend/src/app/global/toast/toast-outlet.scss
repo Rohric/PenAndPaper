@@ -30,3 +30,32 @@
 .toast--danger {
   border-color: var(--danger);
 }
+
+// Bonus points and inspiration: the colour of the accent, so it reads as a reward.
+.toast--reward {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface-2));
+}
+
+// Every message comes in from the top.
+.toast {
+  animation: toast-in 0.25s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-140%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

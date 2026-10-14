@@ -175,6 +175,10 @@
   background: var(--accent);
 }
 
+.person__fill--second {
+  background: var(--bar-second);
+}
+
 .person__badge {
   position: absolute;
   top: -4px;

@@ -73,7 +73,14 @@ AUTH_USER_MODEL = "auth_app.User"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        # A copy of the database can be used instead, for example to measure without touching the real one.
+        "NAME": os.environ.get("DB_PATH", BASE_DIR / "db.sqlite3"),
+        # Write-ahead log: while one writes, the others keep reading; a writer waits instead of failing.
+        "OPTIONS": {
+            "timeout": 20,
+            "transaction_mode": "IMMEDIATE",
+            "init_command": "PRAGMA journal_mode=WAL; PRAGMA synchronous=NORMAL;",
+        },
     }
 }
 

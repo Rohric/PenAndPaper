@@ -6,7 +6,7 @@ Als Spieler will ich sehen, wer mitspielt und wie es den anderen geht.
 
 ## Lösung
 
-Je Charakter der Runde eine Karte: Portrait, Name, Beruf, „gespielt von …", Lebensbalken. Die eigene Karte steht oben. Die Karten sind zum Lesen; die Bögen der anderen sieht man nicht.
+Je Charakter der Runde eine Karte: Portrait, Name, Beruf, „gespielt von …", Lebensbalken und, wenn die Welt eine benennt, die zweite Leiste. Die eigene Karte steht oben. Die Karten sind zum Lesen; die Bögen der anderen sieht man nicht.
 
 ## Bausteine
 

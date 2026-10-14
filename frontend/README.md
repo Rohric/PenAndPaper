@@ -2,6 +2,17 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.
 
+## Starting
+
+| Command | When |
+| --- | --- |
+| `npm run start:play` | Game night in the same Wi-Fi: the finished, smaller build, with the QR code for the phones |
+| `npm run start:play:tunnel` | Game night with phones outside the Wi-Fi: the same over a public tunnel |
+| `npm run start:lan` | Developing with phones in the Wi-Fi: reloads on every change |
+| `npm run start:tunnel` | Developing with phones outside the Wi-Fi |
+
+The backend runs next to it with `env/Scripts/python.exe manage.py runserver` in `backend/`.
+
 ## Development server
 
 To start a local development server, run:

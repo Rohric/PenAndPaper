@@ -15,7 +15,6 @@ from world.world_app.models import Quest
 
 KEPT_ROLLS = 30
 # The bonus points a character gets for a closed chapter when the game master names no other number.
-CHAPTER_BONUS = 10
 # The latest rolls of every session. They live only in the memory of the server.
 ROLLS = defaultdict(lambda: deque(maxlen=KEPT_ROLLS))
 
@@ -75,17 +74,39 @@ def characters_in_other_sessions(characters, session=None):
 
 
 @transaction.atomic
-def close_chapter(session, bonus_points):
-    """Give every character of the session its bonus points and move the session to the next chapter.
+def give_bonus_points(session, bonus_points):
+    """Add the named bonus points to the named characters of the session; nobody else gets any.
 
-    The points are named per character id; a character that is not named gets the usual amount.
+    The points are named per character id. The chapter of the session stays as it is.
     """
-    for character in session.characters.all():
-        character.bonus_points_total += bonus_points.get(str(character.pk), CHAPTER_BONUS)
+    for character in session.characters.filter(pk__in=[int(pk) for pk in bonus_points]):
+        character.bonus_points_total += bonus_points[str(character.pk)]
         character.save(update_fields=["bonus_points_total"])
-    number = session.chapter.number if session.chapter else 0
-    session.chapter = session.world.chapters.filter(number__gt=number).first() or session.chapter
-    session.save(update_fields=["chapter"])
+
+
+def characters_of(session, ids):
+    """Return the named characters of the session, or all of them when no id is named."""
+    characters = session.characters.all()
+    return characters.filter(pk__in=ids) if ids else characters
+
+
+def notes_for_reader(session, user):
+    """Return the own notes of the user and the notepad of the group, with their comments."""
+    visible = Q(shared=True) | Q(author=user)
+    return session.notes.filter(visible).select_related("author").prefetch_related("comments__author")
+
+
+def messages_for_reader(session, user, is_game_master, character=None):
+    """Return the secret messages the user may read: a player his own, the game master one thread or all."""
+    messages = session.messages.all()
+    if not is_game_master:
+        return messages.filter(character__owner=user)
+    return messages.filter(character_id=character) if character else messages
+
+
+def chat_of(session):
+    """Return the chat of the whole group of a session, oldest first."""
+    return session.chat.select_related("author", "session")
 
 
 def give_item(character, item):
@@ -216,12 +237,13 @@ def glossary_for_players(session, states):
 
 
 def group_of(session):
-    """Return the characters of a session as the whole group sees them: name, player and life points."""
+    """Return the characters of a session as the whole group sees them: name, player, life and the second bar."""
     characters = session.characters.select_related("owner")
     return [
         {
             "id": character.pk, "name": character.name, "player": character.owner.username,
             "life_points": character.life_points, "max_life_points": character.max_life_points,
+            "second_bar_points": character.second_bar_points, "max_second_bar_points": character.max_second_bar_points,
         }
         for character in characters
     ]
@@ -250,6 +272,7 @@ def player_view(session, user):
     return {
         "id": session.pk, "name": session.name, "world": session.world.name, "date": session.date,
         "chapter": str(session.chapter) if session.chapter else "", "finished": session.finished,
+        "second_bar": session.world.second_bar_name,
         "group": group_of(session),
         "quests": [shared_quest(quest, states["quest", quest.pk]) for quest in quests],
         "glossary": glossary_for_players(session, states),

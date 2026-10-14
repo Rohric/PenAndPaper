@@ -21,8 +21,10 @@
   </header>
 
   <div class="life">
-    <span class="life__text">Lebenspunkte {{ character().life_points }} von {{ character().max_life_points }}</span>
-    <span class="meter"><span class="meter__fill meter__fill--life" [style.width.%]="lifePercent()"></span></span>
+    <app-point-bar label="Lebenspunkte" [value]="character().life_points" [max]="character().max_life_points" />
+    @if (secondBar()) {
+      <app-point-bar tone="second" [label]="secondBar()" [value]="character().second_bar_points" [max]="character().max_second_bar_points" />
+    }
   </div>
   <div class="row">
     @if (facts()) {

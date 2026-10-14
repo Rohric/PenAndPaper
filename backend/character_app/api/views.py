@@ -65,7 +65,7 @@ class PlayerCharacterList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Return only the characters the requesting user owns."""
-        return player_characters_for_user(self.request.user).prefetch_related("sessions")
+        return player_characters_for_user(self.request.user).prefetch_related("sessions__world")
 
     def perform_create(self, serializer):
         """Save the new character with the requesting user as owner."""
@@ -88,7 +88,7 @@ class GmPlayerCharacterList(generics.ListAPIView):
 
     serializer_class = PlayerCharacterLevelSerializer
     permission_classes = GAME_MASTER_ONLY
-    queryset = PlayerCharacter.objects.select_related("owner").prefetch_related("sessions")
+    queryset = PlayerCharacter.objects.select_related("owner").prefetch_related("sessions__world")
 
 
 class GmPlayerCharacterDetail(generics.RetrieveUpdateAPIView):
@@ -96,7 +96,7 @@ class GmPlayerCharacterDetail(generics.RetrieveUpdateAPIView):
 
     serializer_class = PlayerCharacterLevelSerializer
     permission_classes = GAME_MASTER_ONLY
-    queryset = PlayerCharacter.objects.select_related("owner").prefetch_related("sessions")
+    queryset = PlayerCharacter.objects.select_related("owner").prefetch_related("sessions__world")
 
 
 class CharacterImage(APIView):

@@ -1,8 +1,10 @@
-import { Component, DestroyRef, TemplateRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
+import { Component, TemplateRef, computed, effect, inject, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 
 import { readError } from '../../core/api-error';
+import { BATTLE_MS, Poller } from '../../core/poll';
+import { sameJson } from '../../core/same';
 import { AnyCharacter, Npc, Option } from '../../core/models';
 import { damageText, skillValue, talentValue } from '../../core/rules';
 import { Battle, Combatant, Status } from '../../core/session-models';
@@ -17,7 +19,6 @@ import { Tools, Tool } from '../../global/tool-bar/tools.service';
 import { SessionStore } from '../../core/session-store';
 import { SessionService } from '../../core/session.service';
 
-const REFRESH_MS = 3000;
 const DEFAULT_VALUE = 50;
 const ACTION = 'Handeln';
 
@@ -57,7 +58,8 @@ export class BattleView {
   /** Fired when the game master goes back to the session. */
   readonly closed = output<void>();
 
-  protected readonly battle = signal<Battle | null>(null);
+  protected readonly battle = signal<Battle | null>(null, { equal: sameJson });
+  private readonly poller = new Poller(() => this.poll(), () => BATTLE_MS);
   protected readonly error = signal('');
   /** The sheets of the NPCs that fight, loaded once per NPC. */
   private readonly npcs = signal<Record<number, Npc>>({});
@@ -145,9 +147,8 @@ export class BattleView {
   constructor() {
     inject(Tools).provide('view', this.tools);
     effect(() => this.run(this.api.battle(this.battleId()), (battle) => this.show(battle)));
-    // The players roll on their own pages, so the fight is loaded again every few seconds.
-    const timer = setInterval(() => this.reload(), REFRESH_MS);
-    inject(DestroyRef).onDestroy(() => clearInterval(timer));
+    // The players roll on their own pages, so the fight is asked for again every moment.
+    this.poller.start(false);
   }
 
   /** Do one step of the fight and show the battle as it is afterwards. */
@@ -254,9 +255,15 @@ export class BattleView {
 
   /** Load the fight again while it runs. */
   private reload(): void {
-    if (!this.battle()?.finished) {
-      this.run(this.api.battle(this.battleId()), (battle) => this.show(battle));
+    this.poller.now();
+  }
+
+  /** Ask for the fight again, unless it is over. */
+  private poll(): Observable<unknown> {
+    if (this.battle()?.finished) {
+      return of(null);
     }
+    return this.api.battle(this.battleId()).pipe(tap({ next: (battle) => this.show(battle), error: (e: unknown) => this.error.set(readError(e)) }));
   }
 
   /** After a change by hand: load the fight again, and the group, whose life points may have changed. */

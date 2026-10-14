@@ -26,6 +26,9 @@
   --kind-scene: #f0a3c8;
   --kind-chapter: #d9d2c5;
 
+  // The second bar of a character, next to life.
+  --bar-second: var(--info);
+
   // Eight tones for categories and tags the user names himself; a name always gets the same tone.
   --tag-1: #8fb8f0;
   --tag-2: #f0a3c8;

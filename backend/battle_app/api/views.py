@@ -226,9 +226,7 @@ class PlayerBattleMixin:
     @cached_property
     def battle(self):
         """Return the battle the session is fighting, or None."""
-        session = session_for_member(self.request.user, self.kwargs["session_id"])
-        battle = utils.running_battle(session)
-        return utils.follow_characters(battle) if battle else None
+        return utils.current_battle(session_for_member(self.request.user, self.kwargs["session_id"]))
 
     @cached_property
     def own(self):

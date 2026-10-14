@@ -46,6 +46,7 @@ Was noch nicht entschieden ist.
 - [Ordnerbaum](grundlagen/ordnerbaum.md): wo im Code was liegt
 - [Farben und Schrift](grundlagen/farben-und-schrift.md)
 - [Breiten](grundlagen/breiten.md): Desktop und Handy
+- [Schnelligkeit](grundlagen/schnelligkeit.md): Abfragen, Zeichnen, Ausliefern
 
 ### Bausteine
 
@@ -81,6 +82,7 @@ Was noch nicht entschieden ist.
 - [Spieleransicht](spielleiter/spieleransicht.md)
 - [Kampffenster](spielleiter/kampffenster.md)
 - [Figuren der Spieler](spielleiter/figuren-der-spieler.md)
+- [LvUp](spielleiter/lvup.md): Bonuspunkte und Geistesblitz
 
 ### Spieler (Handy)
 

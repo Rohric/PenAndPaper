@@ -6,6 +6,7 @@ from django.db import models
 from core.models import BaseEntry
 
 START_LIFE_POINTS = 100
+START_SECOND_BAR_POINTS = 100
 START_SKILL_POINTS = 400
 
 
@@ -25,6 +26,9 @@ class BaseCharacter(BaseEntry):
     # The life points right now, and the most the character can have.
     life_points = models.PositiveIntegerField(default=START_LIFE_POINTS)
     max_life_points = models.PositiveIntegerField(default=START_LIFE_POINTS)
+    # The second bar a world can name, like "Willen": the points right now, and the most the character can have.
+    second_bar_points = models.PositiveIntegerField(default=START_SECOND_BAR_POINTS)
+    max_second_bar_points = models.PositiveIntegerField(default=START_SECOND_BAR_POINTS)
     # Two budgets: base points from character creation, bonus points from leveling.
     skill_points_total = models.PositiveIntegerField(default=START_SKILL_POINTS)
     bonus_points_total = models.PositiveIntegerField(default=0)
