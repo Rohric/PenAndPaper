@@ -171,7 +171,7 @@ class EventList(WorldChildList):
 
     serializer_class = EventSerializer
     related_name = "events"
-    prefetch = ["chapters"]
+    prefetch = ["npcs", "leads_to", "chapters"]
 
 
 class EventDetail(WorldChildDetail):

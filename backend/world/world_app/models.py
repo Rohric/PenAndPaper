@@ -102,6 +102,9 @@ class Event(Entry):
     happening = models.TextField(blank=True)
     # Each dialogue: title, lines. Each line: npc (id of the speaking character, or None) and text.
     dialogues = models.JSONField(default=list, blank=True)
+    # The characters that take part in the event, and the scenes it can lead to.
+    npcs = models.ManyToManyField(Npc, blank=True, related_name="events")
+    leads_to = models.ManyToManyField("Scene", blank=True, related_name="from_events")
 
 
 class Trivia(Entry):

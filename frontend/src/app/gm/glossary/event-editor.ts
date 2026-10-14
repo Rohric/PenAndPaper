@@ -65,6 +65,33 @@ import { EventScenes } from '../chapters/event-scenes';
             (look)="lookUp('locations', $event)"
           />
         </div>
+        <div class="field">
+          <label for="event-npcs">Figuren</label>
+          <app-link-picker
+            inputId="event-npcs"
+            label="Figuren in diesem Ereignis"
+            emptyText="Figur suchen oder neu anlegen …"
+            [options]="store.npcOptions()"
+            [selected]="draft().npcs"
+            [creatable]="true"
+            (selectedChange)="set('npcs', $event)"
+            (create)="createLinked('npcs', 'world-npcs', $event)"
+            (look)="lookUp('npcs', $event)"
+          />
+        </div>
+        <div class="field">
+          <label for="event-leads-to">Führt zu</label>
+          <span class="soft">Die Szenen, zu denen das Ereignis führen kann. Neue Szenen legst du im Kapitel an.</span>
+          <app-link-picker
+            inputId="event-leads-to"
+            label="Szenen, zu denen das Ereignis führt"
+            emptyText="Szene suchen …"
+            [options]="store.sceneOptions()"
+            [selected]="draft().leads_to"
+            (selectedChange)="set('leads_to', $event)"
+            (look)="lookUp('scenes', $event)"
+          />
+        </div>
         <app-chapter-field inputId="event-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" />
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" [error]="error()" (save)="save()" (remove)="remove(entry().name)" />
       </div>

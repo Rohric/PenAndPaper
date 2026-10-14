@@ -186,6 +186,9 @@ export interface WorldEvent extends EntryTexts {
   happening: string;
   dialogues: Dialogue[];
   location: number | null;
+  /** The characters that take part (by the id of the character), and the scenes the event can lead to. */
+  npcs: number[];
+  leads_to: number[];
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;

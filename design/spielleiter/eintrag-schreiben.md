@@ -23,7 +23,7 @@ Ein Eintrag wird im [Seitenfenster](../bausteine/eintrag-seitenfenster.md) gesch
 | Ort | „Liegt in"; „Ereignisse an diesem Ort" (verknüpfen oder neu anlegen, wird sofort gespeichert; ein Ereignis hat genau einen Ort, es zieht also hierher um) |
 | Figur | Steckbrief, Werte, Skillung, Inventar, Besondere Fähigkeiten, Beispielsätze (im Editor des Charakters, siehe [Charakterbogen](../bausteine/charakterbogen.md)); Ort, an dem man sie antrifft |
 | Quest | Art (Haupt- oder Nebenquest), Nummer, Ziel, Checkliste, Questgeber, Startgebiet, Szene, beteiligte Figuren, Dialoge |
-| Ereignis | Auslöser, Was passiert, Ort, Dialoge |
+| Ereignis | Auslöser, Was passiert, Ort, Figuren (suchen oder neu anlegen), Führt zu (Szenen, zu denen das Ereignis führen kann), Dialoge. So hat eine Szene mehrere mögliche Ereignisse, jedes mit eigenen Figuren und eigenem Weg weiter. |
 | Gegenstand, Wissen | Kategorie; Schaden bei Waffen; Orte, Figuren, Quests, Ereignisse, an denen es hängt |
 
 **Neu anlegen:** das Symbol „Neu" fragt in einem Dialog nur nach dem Namen und öffnet dann das Formular. In jedem Verknüpfungsfeld legt „neu anlegen" den Eintrag mit seinem Namen sofort an.

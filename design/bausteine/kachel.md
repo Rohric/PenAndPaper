@@ -35,7 +35,7 @@ KARTE (geöffnete Szene, Questbrett)
 | **Kachel** | bis drei Zeilen | Kapitel als kleine Tags; bei Orten und Ereignissen dazu ihre Verbindungen als Tags (höchstens sechs, dann „+N") | Glossar, Schubladen, Listen, Suche |
 | **Karte** | bis sechs Zeilen | Quest: Ziel, Checkliste, Verknüpfungen als Tags; Ereignis: Auslöser und Verbindungen als Tags; Ort: Verbindungen als Tags | geöffnete Szene, Questbrett |
 
-**Tags der Verbindungen:** wie bei Quests „Art · Name", in der Farbe der Art. Ein Ort zeigt, worin er liegt, die Orte darin, Figuren, Quests und Ereignisse dort, Gegenstände, Wissen und Szenen dort. Ein Ereignis zeigt seinen Ort, seine Szenen, Gegenstände und Wissen. Ein Klick auf einen Tag öffnet das Popup dieses Eintrags.
+**Tags der Verbindungen:** wie bei Quests „Art · Name", in der Farbe der Art. Ein Ort zeigt, worin er liegt, die Orte darin, Figuren, Quests und Ereignisse dort, Gegenstände, Wissen und Szenen dort. Ein Ereignis zeigt seinen Ort, seine Figuren, seine Szenen, wohin es führt, Gegenstände und Wissen. Ein Klick auf einen Tag öffnet das Popup dieses Eintrags.
 
 **Überzeile:** die Art; bei Quests zusätzlich der Status (offen, laufend, beendet), bei Wissen die Kategorie, bei Figuren der Beruf.
 

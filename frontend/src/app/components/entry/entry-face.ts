@@ -38,7 +38,7 @@ const tagged = (word: string, links: EntryLink[]): FaceTag[] => links.map((link)
 /** The word a tag of a connection carries, by the group the reading view puts it in; chapters are tags of their own. */
 const CONNECTION_WORDS: Record<string, string> = {
   'Liegt in': 'In', 'Orte darin': 'Ort', 'Figuren hier': 'Figur', 'Quests hier': 'Quest', 'Ereignisse hier': 'Ereignis',
-  'Szenen hier': 'Szene', Ort: 'Ort', Szenen: 'Szene', Gegenstände: 'Gegenstand', Wissen: 'Wissen',
+  'Szenen hier': 'Szene', Ort: 'Ort', Figuren: 'Figur', 'Führt zu': 'Führt zu', Szenen: 'Szene', Gegenstände: 'Gegenstand', Wissen: 'Wissen',
 };
 
 /** The connections of an entry as tags, as the reading view lists them. */

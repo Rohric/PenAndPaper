@@ -30,6 +30,11 @@ class WorldScopedSerializer(serializers.ModelSerializer):
         if any(entry.world_id != self.get_world().pk for entry in entries):
             raise serializers.ValidationError(OTHER_WORLD)
 
+    def _check_scenes(self, scenes):
+        """Raise when one of the given scenes belongs to another world."""
+        if any(scene.chapter.world_id != self.get_world().pk for scene in scenes):
+            raise serializers.ValidationError(OTHER_WORLD)
+
     def _check_npcs(self, npcs):
         """Raise when one of the given NPCs is not attached to this world."""
         allowed = set(npcs_in_world(self.get_world()).values_list("pk", flat=True))
@@ -130,7 +135,8 @@ class WorldNpcSerializer(WorldScopedSerializer):
     class Meta:
         model = WorldNpc
         fields = [
-            "id", "npc", "name", "profession", "symbol", "location", "inventory", "chapters", "created_at", "updated_at",
+            "id", "npc", "name", "profession", "symbol", "location", "inventory", "chapters",
+            "created_at", "updated_at",
         ]
         read_only_fields = ["npc"]
 
@@ -160,8 +166,7 @@ class QuestSerializer(ChapterTagged, WorldScopedSerializer):
 
     def validate_scene(self, scene):
         """Accept only a scene of the same world as the origin of the quest."""
-        if scene and scene.chapter.world_id != self.get_world().pk:
-            raise serializers.ValidationError(OTHER_WORLD)
+        self._check_scenes([scene] if scene else [])
         return scene
 
     def validate_giver(self, giver):
@@ -177,14 +182,19 @@ class QuestSerializer(ChapterTagged, WorldScopedSerializer):
 
 
 class EventSerializer(ChapterTagged, WorldScopedSerializer):
-    """Serialize an event with what sets it off, what happens then, and its dialogues."""
+    """Serialize an event: what sets it off and happens, its characters, where it leads, its dialogues."""
 
     class Meta:
         model = Event
         fields = [
             "id", "name", "symbol", "trigger", "happening", "description", "visible_from_start", "player_knowledge",
-            "gm_knowledge", "dialogues", "location", "chapters", "created_at", "updated_at",
+            "gm_knowledge", "dialogues", "location", "npcs", "leads_to", "chapters", "created_at", "updated_at",
         ]
+
+    def validate_leads_to(self, scenes):
+        """Accept only scenes of the same world as where the event can lead."""
+        self._check_scenes(scenes)
+        return scenes
 
 
 class TriviaSerializer(ChapterTagged, WorldScopedSerializer):
@@ -241,8 +251,7 @@ class SceneSerializer(WorldScopedSerializer):
 
     def validate_leads_to(self, scenes):
         """Accept only other scenes of the same world."""
-        if any(scene.chapter.world_id != self.get_world().pk for scene in scenes):
-            raise serializers.ValidationError(OTHER_WORLD)
+        self._check_scenes(scenes)
         if self.instance and self.instance in scenes:
             raise serializers.ValidationError("Eine Szene kann nicht zu sich selbst führen.")
         return scenes

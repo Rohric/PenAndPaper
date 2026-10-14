@@ -180,6 +180,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
     links: [
       { label: 'Anzutreffen in', items: links('locations', among(store.locations(), [link.location])) },
       { label: 'Quests', items: links('quests', store.quests().filter((q) => q.giver === id || q.npcs.includes(id))) },
+      { label: 'Ereignisse', items: links('events', store.events().filter((e) => e.npcs.includes(id))) },
       { label: 'Szenen', items: sceneLinks(store, store.scenes().filter((s) => s.npcs.includes(id))) },
       ...attached(store, 'npcs', id),
     ],
@@ -242,6 +243,8 @@ function eventView(store: WorldStore, id: number): EntryViewModel | null {
     ],
     links: [
       { label: 'Ort', items: links('locations', among(store.locations(), [event.location])) },
+      { label: 'Figuren', items: npcLinks(store, event.npcs) },
+      { label: 'Führt zu', items: sceneLinks(store, store.scenes().filter((scene) => event.leads_to.includes(scene.id))) },
       ...usedIn(store, 'events', id),
     ],
   });

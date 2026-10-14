@@ -41,7 +41,7 @@ Symbolleiste, Abschnitt „zur Ansicht":
 | Ort | Ort der Szene | Popup des Ortes |
 | Figuren | Figuren der Szene | Popup mit Kacheln; Zahl |
 | Quests | Quests der Szene | Popup mit Karten: Annehmen, Beendet, Auge; Zahl |
-| Ereignisse | Ereignisse der Szene | Popup mit Karten, ganzer Text, Erledigt; Zahl |
+| Ereignisse | Ereignisse der Szene | Popup mit Karten, ganzer Text, Erledigt; die Figuren des Ereignisses und wohin es führt stehen als Tags an seiner Karte (nicht unter „Figuren" der Szene); Zahl |
 | Wissen | Gegenstände und Wissen der Szene | Popup mit Kacheln; Zahl |
 | Weiter | Führt zu | Popup: die Szenen, zu denen diese führt |
 | Haupt | Hauptquests | Popup: alle Hauptquests mit Status |
