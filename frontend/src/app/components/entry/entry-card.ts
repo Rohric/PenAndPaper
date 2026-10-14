@@ -9,7 +9,7 @@ import { Icon } from '../basic/icon';
 import { Portrait } from '../basic/portrait';
 import { Popup } from '../window/popup';
 import { Face, FaceTag, chaptersOf, faceOf } from './entry-face';
-import { openEntry } from './entry-views';
+import { openEntry, roundKicker } from './entry-views';
 import { EyeToggle } from './eye-toggle';
 
 /** A tile with more tags than this is two columns wide in a wall, so it grows wider instead of taller. */
@@ -105,17 +105,18 @@ export class EntryCard {
     return kind && ref ? this.session?.state(kind, ref.id) : undefined;
   });
   protected readonly canFinish = computed(() => ['scene', 'quest', 'event'].includes(this.kind() ?? ''));
-  /** The kind in words; a quest in a session also says how far it is. */
+  /** The kind in words; a quest in a session also says how far it is, and an entry of the round ends with its mark. */
   protected readonly kicker = computed(() => {
+    const ref = this.ref();
     const kicker = this.face()?.kicker ?? '';
-    if (this.kind() !== 'quest') {
-      return kicker;
-    }
     const status = QUEST_STATUSES.find((other) => other.id === questStatus(this.state()))?.label.toLowerCase();
-    return `${kicker} · ${status}`;
+    return roundKicker(this.kind() === 'quest' ? `${kicker} · ${status}` : kicker, !!ref && this.world.ofRound(ref));
   });
-  /** The open scene of a session, when the entry can be added to it and is not part of it yet. */
-  private readonly scene = computed(() => this.world.scenes().find((scene) => scene.id === this.world.activeScene()) ?? null);
+  /**
+   * The open scene of a session, when the entry can be added to it and is not part of it yet. Only a scene the round
+   * made up takes new links; a scene of the world stays as it is written.
+   */
+  private readonly scene = computed(() => this.world.written.scenes().find((scene) => scene.id === this.world.activeScene() && !!scene.session) ?? null);
   protected readonly canAdd = computed(() => {
     const ref = this.ref();
     const list = ref && SCENE_LISTS[ref.kind];
@@ -175,7 +176,7 @@ export class EntryCard {
     this.noteOpen.set(false);
   }
 
-  /** Add the entry to the open scene, right away. This writes the scene of the world. */
+  /** Add the entry to the open scene of the round, right away. */
   protected addToScene(): void {
     const scene = this.scene();
     const ref = this.ref();

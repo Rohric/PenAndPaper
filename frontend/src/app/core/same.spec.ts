@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { sameJson } from './same';
+import { sameItems, sameJson } from './same';
 
 describe('sameJson', () => {
   it('finds equal data equal, also in new objects', () => {
@@ -19,5 +19,22 @@ describe('sameJson', () => {
     expect(sameJson(value, value)).toBe(true);
     expect(sameJson(null, null)).toBe(true);
     expect(sameJson(null, { a: 1 })).toBe(false);
+  });
+});
+
+describe('sameItems', () => {
+  it('finds lists of the very same objects the same, also as new arrays', () => {
+    const a = { id: 1 };
+    const b = { id: 2 };
+    expect(sameItems([a, b], [a, b])).toBe(true);
+    expect(sameItems([], [])).toBe(true);
+  });
+
+  it('finds a new object, another order or another length different, even with the same data', () => {
+    const a = { id: 1 };
+    const b = { id: 2 };
+    expect(sameItems([a, b], [a, { id: 2 }])).toBe(false);
+    expect(sameItems([a, b], [b, a])).toBe(false);
+    expect(sameItems([a], [a, b])).toBe(false);
   });
 });

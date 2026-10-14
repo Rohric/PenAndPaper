@@ -8,7 +8,7 @@ Als Spielleiter will ich einen Eintrag in immer derselben Reihenfolge lesen und 
 
 Die Lese-Ansicht ist für alle Arten gleich aufgebaut: Ort, Figur, Quest, Ereignis, Gegenstand, Wissen, Szene und Kapitel. Was eine Art nicht hat, fehlt.
 
-1. **Kopf:** Symbol oder Bild, Überzeile in der Farbe der Art (die Art und die Kategorie, „Ort · Stadt"; Wissen zeigt nur die Kategorie in ihrem Ton), Name, Unterzeile (Beruf), Kapitel als [Tags](tags.md).
+1. **Kopf:** Symbol oder Bild, Überzeile in der Farbe der Art (die Art und die Kategorie, „Ort · Stadt"; Wissen zeigt nur die Kategorie in ihrem Ton; ein Eintrag einer Runde endet mit „Nur diese Runde"), Name, Unterzeile (Beruf), Kapitel als [Tags](tags.md).
 2. **Textblöcke** mit Überschrift: Beschreibung; bei Quests Ziel; bei Ereignissen Auslöser und „Was passiert"; bei Figuren der Steckbrief; bei Szenen und Kapiteln „Vorlesen" (abgesetzt wie zum Vorlesen) und „Was passiert" bzw. „Worum es geht".
 3. **Wissen für Spieler:** Stück für Stück, jedes mit eigenem [Auge](auge.md).
 4. **Wissen nur für dich:** abgesetzt, mit Schloss.
@@ -19,6 +19,8 @@ Die Lese-Ansicht ist für alle Arten gleich aufgebaut: Ort, Figur, Quest, Ereign
 9. **Bilder.**
 
 **Klappen:** Jeder Abschnitt ab 2 lässt sich am Titel [klappen](klappen.md), mit der Zahl, was drin ist. Die Verknüpfungen klappen als ein Abschnitt. Das Gerät merkt sich je Welt, was zu ist, für alle Einträge gleich.
+
+In einer Runde stehen die Texte so da, wie die Runde sie hat: Was „In dieser Runde ändern“ geändert hat, steht an Stelle des Textes der Welt.
 
 In einer Runde steht vor jedem Teil, den Spieler sehen können, ein [Auge](auge.md): am Namen, an Beschreibung, Ziel, Questgeber, Startgebiet, Auslöser, „Was passiert", an jedem Punkt der Checkliste und jedem Stück Wissen. Das Auge steht vor dem Titel und klappt nicht mit.
 

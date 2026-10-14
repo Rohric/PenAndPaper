@@ -12,6 +12,9 @@
         >
           <span class="scene__mark" [class.scene__mark--done]="done().includes(scene.id)">{{ $index + 1 }}</span>
           <span class="scene__name">{{ scene.name }}</span>
+          @if (scene.session) {
+            <span class="chip">{{ mark }}</span>
+          }
           @if (done().includes(scene.id)) {
             <span class="chip">gespielt</span>
           }
@@ -40,6 +43,9 @@
         >
           <span class="scene__mark scene__mark--optional" [class.scene__mark--done]="done().includes(scene.id)">+</span>
           <span class="scene__name">{{ scene.name }}</span>
+          @if (scene.session) {
+            <span class="chip">{{ mark }}</span>
+          }
           @if (done().includes(scene.id)) {
             <span class="chip">gespielt</span>
           }

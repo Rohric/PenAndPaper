@@ -15,13 +15,15 @@ import { NoteField } from './note-field';
   imports: [FormsModule, KnowledgeListEditor, NoteField],
   template: `
     <div class="panel">
-      <div class="field">
-        <label class="check">
-          <input type="checkbox" [checked]="visibleFromStart()" (change)="visibleFromStartChange.emit($any($event.target).checked)" />
-          Von Anfang an für Spieler sichtbar
-        </label>
-        <span class="soft">Gilt für neue Runden. In einer laufenden Runde schaltest du das Auge.</span>
-      </div>
+      @if (startChoice()) {
+        <div class="field">
+          <label class="check">
+            <input type="checkbox" [checked]="visibleFromStart()" (change)="visibleFromStartChange.emit($any($event.target).checked)" />
+            Von Anfang an für Spieler sichtbar
+          </label>
+          <span class="soft">Gilt für neue Runden. In einer laufenden Runde schaltest du das Auge.</span>
+        </div>
+      }
       <div class="field">
         <label [for]="inputId()">Beschreibung</label>
         <span class="soft">Sehen die Spieler, sobald du den Eintrag in einer Runde freigibst.</span>
@@ -63,6 +65,8 @@ export class EntryTextsEditor {
   readonly description = input.required<string>();
   /** Whether a new session shows the entry to its players right away. */
   readonly visibleFromStart = input(false);
+  /** Whether the choice is offered at all; an entry a round made up has no new sessions, it plays in its own. */
+  readonly startChoice = input(true);
   readonly visibleFromStartChange = output<boolean>();
   readonly playerKnowledge = input.required<Knowledge[]>();
   readonly gmKnowledge = input.required<Knowledge[]>();

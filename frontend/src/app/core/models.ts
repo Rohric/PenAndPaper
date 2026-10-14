@@ -122,6 +122,8 @@ export interface Location extends EntryTexts, Categorized {
   name: string;
   /** Key of the symbol the entry carries; empty means the usual symbol of its kind. */
   symbol: string;
+  /** The round the entry was made up in ("Nur diese Runde"); null for an entry of the world itself. */
+  session: number | null;
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;
@@ -139,6 +141,8 @@ export interface WorldNpc extends Categorized {
   location: number | null;
   /** What the character carries. Read only here, like category and note; they are changed at the character itself. */
   inventory: InventoryItem[];
+  /** The round the entry was made up in ("Nur diese Runde"); null for an entry of the world itself. */
+  session: number | null;
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;
@@ -176,6 +180,8 @@ export interface Quest extends EntryTexts, Categorized {
   /** The scene in which the quest comes up. */
   scene: number | null;
   npcs: number[];
+  /** The round the entry was made up in ("Nur diese Runde"); null for an entry of the world itself. */
+  session: number | null;
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;
@@ -197,6 +203,8 @@ export interface WorldEvent extends EntryTexts, Categorized {
   /** The characters that take part (by the id of the character), and the scenes the event can lead to. */
   npcs: number[];
   leads_to: number[];
+  /** The round the entry was made up in ("Nur diese Runde"); null for an entry of the world itself. */
+  session: number | null;
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;
@@ -213,6 +221,8 @@ export interface Trivia extends EntryTexts, Categorized {
   npcs: number[];
   quests: number[];
   events: number[];
+  /** The round the entry was made up in ("Nur diese Runde"); null for an entry of the world itself. */
+  session: number | null;
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;
@@ -257,6 +267,8 @@ export interface Scene extends Categorized {
   quests: number[];
   events: number[];
   trivia: number[];
+  /** The round the entry was made up in ("Nur diese Runde"); null for an entry of the world itself. */
+  session: number | null;
   /** When it was written and when it was changed last. */
   created_at: string;
   updated_at: string;
@@ -299,6 +311,9 @@ export function itemDamage(item: EntryTexts): { dice: number; bonus: number } {
   const match = piece?.text.match(DAMAGE_PATTERN);
   return { dice: Number(match?.[1] ?? 0), bonus: Number(match?.[2] ?? 0) };
 }
+
+/** The category that makes a knowledge entry an item. */
+export const ITEM_CATEGORY = 'Gegenstand';
 
 /** Whether a knowledge entry is an item: its category is "Gegenstand". */
 export function isItem(trivia: { category: string }): boolean {

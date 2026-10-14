@@ -128,8 +128,13 @@
             <button type="button" class="table__head" [attr.aria-expanded]="!isFolded(group.name)" (click)="toggleFold(group.name)">
               <app-icon class="table__mark" [class.is-open]="!isFolded(group.name)" name="right" [size]="14" />
               <span class="kicker">{{ label(group.name) }}</span>
-              <span class="chip">{{ group.entries.length }}</span>
+              <span class="chip">{{ group.entries.length + group.notes.length }}</span>
             </button>
+            @if (group.name) {
+              <button type="button" class="btn btn--small" [attr.aria-label]="'Neue Notiz in ' + label(group.name)" title="Neue Notiz in dieser Gruppe" (click)="newNote(group.name)">
+                <app-icon name="note" [size]="14" /> Notiz
+              </button>
+            }
             <button type="button" class="btn btn--small" [attr.aria-label]="'Gruppe ' + label(group.name) + ' löschen'" title="Gruppe löschen" (click)="deleting.set(group)">
               <app-icon name="trash" [size]="14" /> Löschen
             </button>
@@ -148,7 +153,23 @@
                   <button type="button" class="btn btn--small" (click)="take(item)"><app-icon name="close" [size]="14" /> Vom Tisch</button>
                 </div>
               </div>
-            } @empty {
+            }
+            @for (item of group.notes; track item.id) {
+              <div class="placed">
+                <app-table-note [note]="item" [fresh]="freshNote() === item.id" (save)="writeNote(item, $event)" (open)="note.emit(item.id)" />
+                <div class="placed__tools">
+                  <select class="input input--small" aria-label="Notiz in eine andere Gruppe legen" [ngModel]="group.name" (ngModelChange)="moveNote(item, $event)">
+                    @for (name of noteGroups(); track name) {
+                      <option [value]="name">{{ label(name) }}</option>
+                    }
+                  </select>
+                  <button type="button" class="btn btn--small" title="Als Notiz der Runde behalten" (click)="keepNote(item)"><app-icon name="check" [size]="14" /> Behalten</button>
+                  <button type="button" class="btn btn--small" title="In einen Eintrag dieser Runde umwandeln" (click)="converting.set(item)"><app-icon name="right" [size]="14" /> Umwandeln</button>
+                  <button type="button" class="btn btn--small" (click)="dropNote(item)"><app-icon name="trash" [size]="14" /> Löschen</button>
+                </div>
+              </div>
+            }
+            @if (!group.entries.length && !group.notes.length) {
               <p class="soft">Noch nichts in dieser Gruppe.</p>
             }
           </div>
@@ -200,7 +221,7 @@
 </div>
 
 @if (openScene(); as scene) {
-  <app-popup kind="Szene" tone="kind--scenes" [title]="scene.name" [size]="460" (closed)="sceneId.set(null)">
+  <app-popup [kind]="sceneKicker(scene)" tone="kind--scenes" [title]="scene.name" [size]="460" (closed)="sceneId.set(null)">
     @if (scene.to_read) {
       <div class="read-aloud"><span class="kicker">Vorlesen</span><p class="prose">{{ scene.to_read }}</p></div>
     }
@@ -224,11 +245,33 @@
 
 @if (deleting(); as group) {
   <app-popup kind="Mein Tisch" title="Gruppe löschen" [size]="420" (closed)="deleting.set(null)">
-    <p>Gruppe „{{ label(group.name) }}“ löschen?{{ group.entries.length ? ' Die Einträge gehen vom Tisch.' : '' }}</p>
+    <p>{{ question(group) }}</p>
     <button windowFoot type="button" class="btn btn--small" (click)="deleting.set(null)">Abbrechen</button>
     <button windowFoot type="button" class="btn btn--small btn--danger" (click)="deleteGroup(group.name)">
       <app-icon name="trash" [size]="14" /> Löschen
     </button>
+  </app-popup>
+}
+
+@if (converting(); as turning) {
+  <app-popup kind="Notiz" title="In was umwandeln?" [size]="460" (closed)="converting.set(null)">
+    <p class="soft">„{{ turning.title }}“ wird ein Eintrag nur dieser Runde, mit Name und Beschreibung der Notiz. Er liegt danach in derselben Gruppe; die Notiz ist dann weg.</p>
+    <div class="row">
+      @for (target of targets; track target.id) {
+        <button
+          type="button"
+          [class]="'chip chip--link kind--' + target.id"
+          [disabled]="target.id === 'scenes' && chapterId() === null"
+          (click)="convert(turning, target.id)"
+        >
+          {{ target.label }}
+        </button>
+      }
+    </div>
+    @if (chapterId() === null) {
+      <p class="soft">Für eine Szene wähle oben ein Kapitel.</p>
+    }
+    <button windowFoot type="button" class="btn btn--small" (click)="converting.set(null)">Abbrechen</button>
   </app-popup>
 }
 

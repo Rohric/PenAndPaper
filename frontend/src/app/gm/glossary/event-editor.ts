@@ -29,7 +29,9 @@ import { EventScenes } from '../chapters/event-scenes';
           <app-symbol-picker fallback="flag" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
         </div>
         <app-category-field inputId="event-category" kind="events" [value]="draft().category" (valueChange)="set('category', $event)" />
-        <app-chapter-field inputId="event-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        @if (!ofRound()) {
+          <app-chapter-field inputId="event-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        }
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 
@@ -37,6 +39,7 @@ import { EventScenes } from '../chapters/event-scenes';
         inputId="event-description"
         [description]="draft().description"
         [visibleFromStart]="!!draft().visible_from_start"
+        [startChoice]="!ofRound()"
         [playerKnowledge]="draft().player_knowledge"
         [gmKnowledge]="draft().gm_knowledge"
         [note]="draft().note"

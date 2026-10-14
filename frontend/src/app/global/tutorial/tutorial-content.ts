@@ -64,7 +64,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Lesen und Bearbeiten',
-        text: 'Jeder Eintrag öffnet sich zum Lesen. Mit „Bearbeiten“ kommst du ins Formular, „Speichern“ bringt dich zurück.\n\nKlickst du auf einen verknüpften Namen, öffnet sich der Eintrag rechts in einer Seitenleiste. So verlierst du deinen Platz nicht.',
+        text: 'Ein Klick auf eine Kachel oder einen verknüpften Namen öffnet zuerst ein Popup in der Mitte. Von dort geht es ins Seitenfenster rechts zum Lesen, und mit „Bearbeiten“ unten im Fenster ins Formular. Im Formular heißt der Knopf „Lesen“ und bringt dich zurück. So verlierst du deinen Platz nicht.\n\nAuf einer ganzen Seite, zum Beispiel einem Eintrag im Glossar, der Lore, dem Überblick eines Kapitels oder einer Szene, stehen „Bearbeiten“ und „Lesen“ unten in der Symbolleiste.',
       },
       {
         title: 'Spielen',
@@ -92,7 +92,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Quests und Ereignisse im Kapitel',
-        text: 'Quests und Ereignisse gehören zur Welt und stehen im Glossar. Im Kapitel verknüpfst du sie nur. Über „Hinzufügen“ wählst du eine vorhandene aus oder legst gleich eine neue an.\n\nNimmst du eine Quest aus dem Kapitel, bleibt sie im Glossar erhalten.',
+        text: 'Quests und Ereignisse gehören zur Welt und stehen im Glossar. Im Kapitel legst du nur fest, welche hier vorkommen. „Zuordnen“ unten in der Leiste öffnet ein Feld: Tippen sucht, ein Klick nimmt eine dazu, das Kreuz nimmt sie heraus, und „neu anlegen“ legt eine neue an. „Neu“ legt eine an, die gleich zum Kapitel gehört, und öffnet sie rechts im Formular.\n\nNimmst du eine Quest aus dem Kapitel, bleibt sie im Glossar erhalten.',
       },
       {
         title: 'Weiter zu den Szenen',
@@ -108,11 +108,11 @@ export const TUTORIALS: Tutorial[] = [
     steps: [
       {
         title: 'Der rote Faden',
-        text: 'Links steht der rote Faden: die Szenen, die passieren sollen, nummeriert in deiner Reihenfolge. Mit den Pfeilen an der gewählten Szene schiebst du sie nach oben oder unten.\n\nDie Nummer ist nur die Reihenfolge im Kapitel. Sie hängt an keinem Tag.',
+        text: 'Links steht der rote Faden: die Szenen, die passieren sollen, nummeriert in deiner Reihenfolge. Mit „Hoch“ und „Runter“ unten in der Leiste schiebst du die gewählte Szene nach oben oder unten. Der Faden und die optionalen Szenen klappen an ihrem Titel zu und auf.\n\nDie Nummer ist nur die Reihenfolge im Kapitel. Sie hängt an keinem Tag.',
       },
       {
         title: 'Optionale Szenen',
-        text: 'Unter dem Faden stehen die optionalen Szenen. Sie müssen nicht passieren. Du ziehst sie beim Spielen hinzu, wo sie passen.\n\nOb eine Szene am Faden hängt oder optional ist, stellst du beim Schreiben der Szene mit einem Haken um.',
+        text: 'Unter dem Faden stehen die optionalen Szenen. Sie müssen nicht passieren. Du ziehst sie beim Spielen hinzu, wo sie passen.\n\n„Neu“ unten in der Leiste fragt nach dem Namen und dem Haken „Optionale Szene“. Ob eine Szene am Faden hängt oder optional ist, stellst du später beim Schreiben der Szene mit demselben Haken um.',
       },
       {
         title: 'Was in einer Szene steht',
@@ -120,7 +120,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Schreiben wie auf einer Seite',
-        text: '„Schreiben“ öffnet die Szene wie eine Seite Text: Name, Ort, Figuren, Vorlesen, Was passiert, dann Ereignisse, Quests, Wissen und „Führt zu“.\n\nMit Tab springst du von Feld zu Feld. Einen Speichern-Knopf gibt es nicht: Kurz nach dem Tippen wird von selbst gespeichert, oben steht „Gespeichert“. „Fertig“ bringt dich zurück zum Lesen.',
+        text: '„Bearbeiten“ unten in der Leiste öffnet die gewählte Szene wie eine Seite Text: Name, Optionale Szene, Kategorie, Ort, Figuren, Vorlesen, Was passiert, Notiz (nur für dich), Dialoge, dann Ereignisse, Quests, Wissen und „Führt zu“.\n\nMit Tab springst du von Feld zu Feld. Einen Speichern-Knopf gibt es nicht: Kurz nach dem Tippen wird von selbst gespeichert, oben steht „Gespeichert“. „Lesen“ an derselben Stelle in der Leiste bringt dich zurück.',
       },
       {
         title: 'Verknüpfen durch Tippen',
@@ -147,7 +147,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Kacheln, Popup und Seitenfenster',
-        text: 'Jeder Bereich zeigt seine Einträge als Kacheln, überall gleich aufgebaut: Farbstreifen der Art, Symbol, Art und Name, Text und die Kapitel als Tags. Die Bereiche wählst du links in der Leiste.\n\nEin Klick öffnet zuerst ein Popup in der Mitte: die ersten Zeilen und unter „Verbindungen“ alles, was mit dem Eintrag verknüpft ist. Von dort geht es ins Seitenfenster, wo du liest und mit „Bearbeiten“ änderst, oder mit „Zum Eintrag“ auf seine ganze Seite. Die Pfeile im Kopf des Fensters führen zurück und vor.\n\n„Neu“ unten in der Leiste legt einen Eintrag an. Über den Kacheln filterst du nach Kapitel; im Formular jedes Eintrags trägst du unter „Kapitel“ ein, wozu er gehört.',
+        text: 'Jeder Bereich zeigt seine Einträge als Kacheln, überall gleich aufgebaut: Farbstreifen der Art, Symbol, Art und Name, Text und die Kapitel als Tags. Die Bereiche wählst du links in der Leiste.\n\nEin Klick öffnet zuerst ein Popup in der Mitte: die ersten Zeilen und unter „Verbindungen“ alles, was mit dem Eintrag verknüpft ist. Von dort geht es ins Seitenfenster, wo du liest und mit „Bearbeiten“ änderst, oder mit „Zum Eintrag“ auf seine ganze Seite. Die Pfeile im Kopf des Fensters führen zurück und vor.\n\n„Neu“ unten in der Leiste legt einen Eintrag an. Im Formular jedes Eintrags trägst du unter „Kapitel“ ein, wozu er gehört, und unter „Kategorie“, wo er hingehört.',
+      },
+      {
+        title: 'Suchen und filtern',
+        text: 'Über den Kacheln steht die Filterleiste. Das Suchfeld sucht in Namen und allen Texten. Heißt noch kein Eintrag so, steht daneben „„Text“ neu anlegen“: ein Klick legt ihn an und öffnet sein Formular.\n\nDarunter filterst du nach Kapitel, nach Kategorie und nach dem, was eine Art ausmacht: bei Orten „Liegt in“, bei Quests Haupt- oder Nebenquest, bei Gegenständen der Träger. „Filter“ unten in der Leiste blendet diese Reihen ein und aus, die Zahl darauf sagt, wie viele Filter gewählt sind.\n\nDie Kacheln stehen in Gruppen: nach Kategorie, bei Orten nach dem Ort, in dem sie liegen.',
+      },
+      {
+        title: 'Zu- und aufklappen',
+        text: 'Jede Gruppe einer Wand und jeder Abschnitt eines Eintrags klappt an seinem Titel zu und auf; zugeklappt steht nur der Titel mit der Zahl, was darin ist. „Alle zu“ und „Alle auf“ unten in der Leiste klappen alles auf einmal.\n\nWas du zuklappst, merkt sich dein Gerät für diese Welt, auch in ihren Runden. Wer „Wissen nur für dich“ zuklappt, hat es in allen Einträgen zu.',
       },
       {
         title: 'Zuletzt',
@@ -171,7 +179,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Lore',
-        text: 'Unter „Lore“ stehen der Name der Welt, ihre zweite Leiste und der große Text über sie. Die zweite Leiste ist freiwillig: Trägst du einen Namen ein, zum Beispiel „Willen“ oder „Geistige Gesundheit“, hat jeder Charakter in Runden dieser Welt neben dem Leben eine zweite Leiste mit 100 von 100. Einzelne Themen wie ein Tier oder ein Gegenstand sind unter „Wissen“ besser aufgehoben.\n\nHier löschst du auch die ganze Welt.',
+        text: 'Unter „Lore“ stehen der Name der Welt, ihre zweite Leiste und der große Text über sie. Die zweite Leiste ist freiwillig: Trägst du einen Namen ein, zum Beispiel „Willen“ oder „Geistige Gesundheit“, hat jeder Charakter in Runden dieser Welt neben dem Leben eine zweite Leiste mit 100 von 100. Einzelne Themen wie ein Tier oder ein Gegenstand sind unter „Wissen“ besser aufgehoben.\n\n„Bearbeiten“ unten in der Leiste öffnet das Formular der Lore. Dort löschst du auch die ganze Welt.',
         more: 'trivia',
       },
     ],
@@ -289,7 +297,7 @@ export const TUTORIALS: Tutorial[] = [
     steps: [
       {
         title: 'Was eine Runde ist',
-        text: 'Eine Runde ist eine Gruppe, die eine deiner Welten spielt, über mehrere Abende. Du gibst ihr einen Namen und ein Datum, wählst die Welt und die Charaktere der Spieler.\n\nDie Welt selbst bleibt beim Spielen unverändert. Was die Runde erlebt, wird bei der Runde gespeichert. So können mehrere Gruppen dieselbe Welt spielen.',
+        text: 'Eine Runde ist eine Gruppe, die eine deiner Welten spielt, über mehrere Abende. Du gibst ihr einen Namen und ein Datum, wählst die Welt und die Charaktere der Spieler.\n\nDie Welt selbst bleibt beim Spielen unverändert. Was die Runde erlebt und was du in ihr dazudichtest, wird bei der Runde gespeichert. So können mehrere Gruppen dieselbe Welt spielen.',
       },
       {
         title: 'Ein Charakter, ein Abenteuer',
@@ -306,11 +314,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Das Cockpit',
-        text: 'Die Runde nutzt denselben Rahmen wie alle Seiten. Links in der Leiste stehen die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht; die Ziffern 1 bis 6 wechseln sie. Oben steht, wo du bist, dazu das Kapitel der Runde und die Suche („/“ springt hinein). Im Glossar stehen dort auch seine Bereiche.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und LvUp. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet ein Popup in der Mitte des Bildschirms. Es ist immer nur eines offen. Esc, das Kreuz oder ein Klick daneben schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt.',
+        text: 'Die Runde nutzt denselben Rahmen wie alle Seiten. Links in der Leiste stehen die Ansichten: Story, Master, Quests, Glossar, Notizen und Spieleransicht; die Ziffern 1 bis 6 wechseln sie. Oben steht, wo du bist, dazu das Kapitel der Runde und die Suche („/“ springt hinein). Im Glossar stehen dort auch seine Bereiche.\n\nUnten liegt die Symbolleiste, jedes Symbol mit Wort und Zahl. Links stehen die Symbole, die immer da sind: Gruppe, Würfeln, Chat, Kampf, Archiv und LvUp. In der Mitte stehen die Symbole der Ansicht, sie wechseln mit ihr. Rechts liegen die Stecknadeln und der letzte Wurf.\n\nEin Symbol tut entweder sofort etwas oder öffnet ein Popup in der Mitte des Bildschirms. Es ist immer nur eines offen. Esc, das Kreuz oder ein Klick daneben schließen es.\n\nIn der Story steht nur die gewählte Szene. Ort, Figuren, Quests, Ereignisse, Gegenstände und Wissen der Szene, wohin sie führt, die Hauptquests und die freien Ereignisse sind Symbole mit Zahl. Gespielt, Stecknadel und „Kampf hier“ schalten direkt. „Neu“ legt eine Szene an, die nur zu dieser Runde gehört, und öffnet sie zum Schreiben. „Bearbeiten“ schreibt eine solche Szene oder ändert eine Szene der Welt nur für diese Runde.',
       },
       {
         title: 'Master-Modus: der Tisch',
-        text: 'Die Ansicht „Master“ ist dein Tisch. Sie hängt nicht an der Szene der Story und ist zum Ansehen und Benutzen da, nicht zum Bearbeiten.\n\nOben suchst du in allem. Ein Klick auf eine Kachel öffnet ihr Popup: die ersten Zeilen, die Schalter der Runde und unter „Verbindungen“ alles, was dazugehört. Ein Klick auf eine Verbindung wechselt im selben Popup dorthin, die Pfeile führen zurück.\n\n„Alles auf den Tisch“ legt den Eintrag mit allem Verbundenen auf den Tisch. Vorher wählst du: eine neue Gruppe, deren vorgeschlagenen Namen du ändern kannst, oder eine bestehende.\n\n„Mein Tisch“ zeigt, was du in Gruppen gelegt hast. Jede Gruppe klappst du am Titel zu und auf. Darunter hat jede Art von Eintrag ihre Schublade mit einer Zahl, immer eine ist offen. Vier Schalter in der Leiste blenden Erledigtes, Ungeteiltes, nicht Angepinntes und andere Kapitel aus. Links stehen die Notizen, rechts die Charaktere der Gruppe als runde Knöpfe mit einem Popup.\n\nÄndern geht hier nicht: „Zum Eintrag“ bringt dich dorthin, wo der Eintrag zu Hause ist.',
+        text: 'Die Ansicht „Master“ ist dein Tisch. Sie hängt nicht an der Szene der Story und ist zum Ansehen und Benutzen da. Einträge der Welt bearbeitest du hier nicht.\n\nOben suchst du in allem. Ein Klick auf eine Kachel öffnet ihr Popup: die ersten Zeilen, die Schalter der Runde und unter „Verbindungen“ alles, was dazugehört. Ein Klick auf eine Verbindung wechselt im selben Popup dorthin, die Pfeile führen zurück.\n\n„Alles auf den Tisch“ legt den Eintrag mit allem Verbundenen auf den Tisch. Vorher wählst du: eine neue Gruppe, deren vorgeschlagenen Namen du ändern kannst, oder eine bestehende.\n\n„Mein Tisch“ zeigt, was du in Gruppen gelegt hast. Jede Gruppe klappst du am Titel zu und auf. Darunter hat jede Art von Eintrag ihre Schublade mit einer Zahl, immer eine ist offen. Vier Schalter in der Leiste blenden Erledigtes, Ungeteiltes, nicht Angepinntes und andere Kapitel aus. Links stehen die Notizen, rechts die Charaktere der Gruppe als runde Knöpfe mit einem Popup.\n\nWillst du einen Eintrag der Welt ändern, bringt dich „Zum Eintrag“ dorthin, wo er zu Hause ist. Einträge, die nur zu dieser Runde gehören, haben auch hier „Bearbeiten“.',
+      },
+      {
+        title: 'Notizen auf dem Tisch',
+        text: 'Jede Gruppe deines Tisches hat oben „Notiz“: Sie legt eine leere Notiz mit Name und Beschreibung in die Gruppe, die du gleich dort schreibst. Das Symbol oben rechts an der Notiz öffnet sie im Seitenfenster.\n\nDaneben stehen drei Handgriffe. „Behalten“ nimmt sie vom Tisch; ab dann steht sie links bei den Notizen und in der Ansicht „Notizen“. „Umwandeln“ macht aus ihr einen Eintrag dieser Runde, eine Szene, einen Ort, eine Figur, eine Quest, ein Ereignis, einen Gegenstand oder Wissen, mit ihrem Namen und ihrer Beschreibung. Er liegt danach in derselben Gruppe, die Notiz ist weg. „Löschen“ wirft sie weg.\n\nSolange eine Notiz auf dem Tisch liegt, steht sie nicht bei den anderen Notizen. Löschst du die Gruppe, sind ihre Notizen verloren, wenn du sie nicht behalten oder umgewandelt hast. Die Spieler sehen sie nie.',
       },
       {
         title: 'Notiz an einem Eintrag',
@@ -330,15 +342,15 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Quests im Überblick',
-        text: 'Die Ansicht „Quests“ zeigt alle Quests der Welt in zwei Blöcken, Hauptquests und Nebenquests. Jeder Block zeigt einen Status: Laufend, Offen oder Beendet, mit der Zahl dahinter.\n\nIn der Symbolleiste legt „Neue Quest“ eine Quest nur mit ihrem Titel an. „Nur geteilte“ und „Nur angepinnte“ grenzen beide Blöcke ein. An jeder Kachel nimmst du die Quest an, beendest sie, heftest sie an oder teilst sie mit dem Auge oben rechts.\n\nIm Seitenfenster einer Quest steht das Questlog der Gruppe: die gezeigten Punkte in der Reihenfolge der Spieler, ihre eigenen Punkte, Tags und Notizen. Du kannst mitschreiben.',
+        text: 'Die Ansicht „Quests“ zeigt alle Quests der Welt in zwei Blöcken, Hauptquests und Nebenquests. Jeder Block zeigt einen Status: Laufend, Offen oder Beendet, mit der Zahl dahinter.\n\nIn der Symbolleiste fragt „Neu“ nach dem Namen einer Quest, die nur zu dieser Runde gehört: eine Nebenquest, sofort angenommen und mit den Spielern geteilt. Sie öffnet sich rechts im Formular. „Nur geteilte“ und „Nur angepinnte“ grenzen beide Blöcke ein. An jeder Kachel nimmst du die Quest an, beendest sie, heftest sie an oder teilst sie mit dem Auge oben rechts.\n\nIm Seitenfenster einer Quest steht das Questlog der Gruppe: die gezeigten Punkte in der Reihenfolge der Spieler, ihre eigenen Punkte, Tags und Notizen. Du kannst mitschreiben.',
       },
       {
         title: 'Glossar und Suche',
-        text: 'Die Ansicht „Glossar“ zeigt dir die ganze Welt als Kacheln. Oben in der Kopfleiste wechselst du zwischen den sechs Bereichen: Orte, Figuren, Quests, Ereignisse, Gegenstände und Wissen. Unter „Gegenstände“ steht auch, was die Charaktere der Gruppe und die Figuren tragen. „Zuletzt“ zeigt, was zuletzt angelegt oder geändert wurde.\n\nMit der Suche oben findest du jeden Eintrag, ohne die Ansicht zu wechseln.',
+        text: 'Die Ansicht „Glossar“ zeigt dir die ganze Welt als Kacheln. Oben in der Kopfleiste wechselst du zwischen den sechs Bereichen: Orte, Figuren, Quests, Ereignisse, Gegenstände und Wissen. Unter „Gegenstände“ steht auch, was die Charaktere der Gruppe und die Figuren tragen. „Zuletzt“ zeigt, was zuletzt angelegt oder geändert wurde. „Neu“ und „„Text“ neu anlegen“ in der Filterleiste legen Einträge an, die nur zu dieser Runde gehören.\n\nMit der Suche oben findest du jeden Eintrag, ohne die Ansicht zu wechseln.',
       },
       {
-        title: 'Ändern: in der Runde oder in der Welt',
-        text: 'Im Seitenfenster einer Runde gibt es kein „Bearbeiten“ für die Welt. Bei einer Quest steht unter dem Reiter „Runde“ der Kasten „In dieser Runde ändern“: Name, Ziel, Questgeber, Startgebiet und die Szene, in der sie entsteht. Das gilt nur für diese Gruppe, die Welt bleibt, wie sie ist.\n\nWillst du den Eintrag selbst ändern, für alle Runden dieser Welt, öffnest du die Welt unter „Welten“ und bearbeitest ihn dort.\n\nUnter „Nebenquests“ legst du mitten im Spiel eine Quest nur mit ihrem Titel an. Sie hängt am Kapitel der Runde und ist sofort mit den Spielern geteilt.',
+        title: 'Dazudichten und ändern: nur für diese Runde',
+        text: 'Die Welt ist vorgegeben. Ergibt sich beim Spielen etwas Neues, dichtest du es in der Runde dazu: mit „Neu“ in Story, Quests und Glossar und mit „neu anlegen“ in der Filterleiste, der Suche und jedem Verknüpfungsfeld. Solche Einträge gehören nur dieser Runde. Sie tragen in der Überzeile „Nur diese Runde“, und Popup und Seitenfenster haben bei ihnen „Bearbeiten“. In der Welt und in anderen Runden tauchen sie nie auf.\n\nEinen Eintrag der Welt änderst du nur für diese Runde: Im Seitenfenster steht unter dem Reiter „Runde“ der Kasten „In dieser Runde ändern“ mit den Texten seiner Art, also Name und Beschreibung, bei Szenen Vorlesen und Was passiert, bei Ereignissen Auslöser und Was passiert, bei Quests das Ziel, Questgeber, Startgebiet und die Szene. Ein geleertes Feld bringt den Text der Welt zurück, „Zurücksetzen“ alle. Die Runde zeigt den Eintrag dann überall so, auch den Spielern.\n\nWillst du die Welt selbst ändern, für alle Runden, öffnest du sie unter „Welten“ und bearbeitest den Eintrag dort.',
       },
       {
         title: 'Würfeln',
@@ -354,7 +366,7 @@ export const TUTORIALS: Tutorial[] = [
       },
       {
         title: 'Notizen und Würfe',
-        text: 'Die Ansicht „Notizen“ zeigt eine Tafel: links deine eigenen Notizen, rechts der Gruppenblock der Spieler. Ein Klick öffnet eine Notiz im Seitenfenster, dort schreibst und kommentierst du. Notizen im Gruppenblock können alle bearbeiten, auch du. Die eigenen Notizen der Spieler siehst du nicht. In der Symbolleiste legt „Neue Notiz“ eine an, und „Gruppenblock“ zeigt mit einer Zahl, wenn dort etwas Neues steht.\n\nWürfelt ein Spieler in der App, steht der Wurf rechts in der Symbolleiste als „Letzter Wurf“. Dort gibt es auch „Alle Würfe“, die letzten 30. Nach einem Neustart des Servers ist die Liste leer.',
+        text: 'Die Ansicht „Notizen“ zeigt eine Tafel: links deine eigenen Notizen, rechts der Gruppenblock der Spieler. Ein Klick öffnet eine Notiz im Seitenfenster, dort schreibst und kommentierst du. Notizen im Gruppenblock können alle bearbeiten, auch du. Die eigenen Notizen der Spieler siehst du nicht. In der Symbolleiste legt „Neue Notiz“ eine an, und „Gruppenblock“ zeigt mit einer Zahl, wenn dort etwas Neues steht. Notizen, die auf deinem Tisch im Master liegen, stehen hier erst, wenn du sie behältst.\n\nWürfelt ein Spieler in der App, steht der Wurf rechts in der Symbolleiste als „Letzter Wurf“. Dort gibt es auch „Alle Würfe“, die letzten 30. Nach einem Neustart des Servers ist die Liste leer.',
       },
       {
         title: 'Kampf',

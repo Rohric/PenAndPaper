@@ -1,12 +1,11 @@
-import { Component, TemplateRef, computed, inject, input, signal, viewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { map, switchMap } from 'rxjs';
+import { Component, computed, inject, signal } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { Quest } from '../../core/models';
 import { QUEST_STATUSES, QuestStatus, questStatus } from '../../core/session-models';
 import { Icon } from '../../components/basic/icon';
 import { EntryCard } from '../../components/entry/entry-card';
+import { NameDialog } from '../../components/form/name-dialog';
 import { WorldStore } from '../../core/world-store';
 import { Tools, Tool } from '../../global/tool-bar/tools.service';
 import { SessionStore } from '../../core/session-store';
@@ -14,7 +13,7 @@ import { SessionStore } from '../../core/session-store';
 type Flag = 'done' | 'started' | 'revealed' | 'pinned';
 type BlockId = 'main' | 'side';
 
-/** One of the two blocks of the board: the main quests or the side quests of the world. */
+/** One of the two blocks of the board: the main quests or the side quests. */
 interface Block {
   id: BlockId;
   label: string;
@@ -22,31 +21,25 @@ interface Block {
 }
 
 /**
- * All quests of the world as a session has them, in two blocks: main quests and side quests.
+ * All quests of the world and of the session as the session has them, in two blocks: main quests and side quests.
  * Each block shows one status at a time: running (accepted), open (not accepted yet) or finished.
  * Shared and pinned are marks of their own and can narrow both blocks down.
- * A new quest can be created from its title alone; that and the two narrowing switches are symbols in the bar.
+ * "Neu" makes up a quest of this session from its name; that and the two narrowing switches are symbols in the bar.
  */
 @Component({
   selector: 'app-quest-board',
-  imports: [FormsModule, Icon, EntryCard],
+  imports: [Icon, EntryCard, NameDialog],
   template: `
-    <ng-template #newQuestForm>
-      <form class="list-row" (ngSubmit)="addQuest()">
-        <input
-          class="input"
-          name="newQuest"
-          aria-label="Titel einer neuen Quest"
-          placeholder="Neue Quest, der Titel genügt"
-          [disabled]="!chapter()"
-          [(ngModel)]="newQuest"
-        />
-        <button type="submit" class="btn btn--small" [disabled]="!newQuest().trim() || !chapter()"><app-icon name="plus" [size]="16" /> Quest</button>
-      </form>
-      <p class="soft">
-        {{ chapter() ? 'Eine neue Quest kommt als Nebenquest in die Welt, hängt am Kapitel der Runde, ist angenommen und mit den Spielern geteilt.' : 'Wähle oben ein Kapitel, dann kannst du hier schnell eine Quest anlegen.' }}
-      </p>
-    </ng-template>
+    @if (creating()) {
+      <app-name-dialog
+        title="Neue Quest"
+        label="Name der Quest"
+        hint="Die Quest gehört nur dieser Runde: eine Nebenquest, sofort angenommen und mit den Spielern geteilt. Sie öffnet sich danach im Seitenfenster, wo du den Rest schreibst."
+        [error]="error()"
+        (create)="addQuest($event)"
+        (closed)="creating.set(false)"
+      />
+    }
 
     @for (block of blocks(); track block.id) {
       <section class="stack">
@@ -76,22 +69,19 @@ export class QuestBoard {
   protected readonly store = inject(SessionStore);
   private readonly world = inject(WorldStore);
 
-  /** The chapter the group is in; a quest created here hangs on it. */
-  readonly chapterId = input<number | null>(null);
-
   protected readonly statuses = QUEST_STATUSES;
   /** The status each block shows. */
   protected readonly picked = signal<Record<BlockId, QuestStatus>>({ main: 'running', side: 'running' });
   protected readonly onlyShared = signal(false);
   protected readonly onlyPinned = signal(false);
-  protected readonly newQuest = signal('');
-  private readonly newQuestForm = viewChild<TemplateRef<unknown>>('newQuestForm');
+  /** Whether the dialog for a new quest is open, and why creating it failed. */
+  protected readonly creating = signal(false);
+  protected readonly error = signal('');
   protected readonly tools = computed<Tool[]>(() => [
-    { id: 'quests-new', word: 'Neu', title: 'Neue Quest', icon: 'plus', tone: 'kind--quests', popup: this.newQuestForm(), popupTitle: 'Neue Quest' },
+    { id: 'quests-new', word: 'Neu', title: 'Neue Quest in dieser Runde', icon: 'plus', tone: 'kind--quests', click: () => this.creating.set(true) },
     { id: 'quests-shared', word: 'Geteilte', title: 'Nur geteilte', icon: 'eye', pressed: this.onlyShared(), click: () => this.onlyShared.set(!this.onlyShared()) },
     { id: 'quests-pinned', word: 'Angepinnt', title: 'Nur angepinnte', icon: 'pin', pressed: this.onlyPinned(), click: () => this.onlyPinned.set(!this.onlyPinned()) },
   ]);
-  protected readonly chapter = computed(() => this.world.chapters().find((chapter) => chapter.id === this.chapterId()) ?? null);
   /** Main quests in the order of their number, side quests in the order of the alphabet. */
   protected readonly blocks = computed<Block[]>(() => {
     const quests = this.world.quests();
@@ -132,21 +122,18 @@ export class QuestBoard {
   }
 
   /**
-   * Create a quest from its title alone while playing. It becomes a side quest of the world, hangs on
-   * the chapter the group is in, counts as accepted and is shared with the players right away.
+   * Make up a quest from its name while playing. It belongs to this round only: a side quest that counts as accepted
+   * and is shared with the players right away. It opens in the window at the side to write the rest.
    */
-  protected addQuest(): void {
-    const chapter = this.chapter();
-    const name = this.newQuest().trim();
-    if (!chapter || !name) {
-      return;
-    }
-    this.newQuest.set('');
-    const created = this.world.add<Quest>('quests', { name });
-    const linked = created.pipe(switchMap((quest) => this.world.save('chapters', chapter.id, { quests: [...chapter.quests, quest.id] }).pipe(map(() => quest))));
-    linked.subscribe({
-      next: (quest) => this.store.patch('quest', quest.id, { revealed: true, started: true }),
-      error: (e: unknown) => this.store.error.set(readError(e)),
+  protected addQuest(name: string): void {
+    this.world.add<Quest>('quests', { name, kind: 'side' }).subscribe({
+      next: (quest) => {
+        this.creating.set(false);
+        this.error.set('');
+        this.store.patch('quest', quest.id, { revealed: true, started: true });
+        this.world.read({ kind: 'quests', id: quest.id }, true);
+      },
+      error: (e: unknown) => this.error.set(readError(e)),
     });
   }
 

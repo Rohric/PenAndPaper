@@ -27,7 +27,7 @@ Alle Bereiche filtern nach Kapitel und, außer Gegenständen, nach Kategorie. Ge
 
 **Lore** ist kein Kachel-Bereich: die Lese-Ansicht der Welt mit Name, „Zweite Leiste" (wenn die Welt eine hat) und dem großen Text. Bearbeitet wird über das Symbol „Bearbeiten"; im Formular löscht man auch die Welt.
 
-Dasselbe Glossar gibt es in einer Runde als Ansicht des Cockpits. Dort tragen die Kacheln die Schalter der Runde, und es kann nichts angelegt und nichts bearbeitet werden: kein „Neu", kein „neu anlegen" in der Filterleiste.
+Dasselbe Glossar gibt es in einer Runde als Ansicht des Cockpits. Dort tragen die Kacheln die Schalter der Runde und zeigen die Texte, wie die Runde sie hat. „Neu" und „„Text" neu anlegen" in der Filterleiste legen einen Eintrag **nur dieser Runde** an (Marke „Nur diese Runde"); er öffnet sich im Seitenfenster im Formular und hat im Popup und im Seitenfenster „Bearbeiten". Ein Eintrag der Welt wird in der Runde nicht bearbeitet, nur für die Runde geändert: Seitenfenster, Reiter „Runde", „In dieser Runde ändern".
 
 Entschieden: Quests und Ereignisse sind im Glossar Kacheln wie alle anderen, nicht mehr Karten; mit allen Tags werden Kacheln mit vielen Verbindungen breiter statt höher.
 
@@ -45,7 +45,7 @@ Symbolleiste, ein Bereich (Wand):
 
 | Wort | voller Name | Klick |
 | --- | --- | --- |
-| Neu | Neuer Ort, Neue Figur … | Dialog: Name; danach öffnet das Seitenfenster im Formular (nicht in einer Runde) |
+| Neu | Neuer Ort, Neue Figur … | Dialog: Name; danach öffnet das Seitenfenster im Formular. In einer Runde gehört der neue Eintrag nur dieser Runde |
 | Filter | Filter zeigen bzw. Filter verbergen | schaltet die Filterreihen; Zahl: gewählte Filter |
 | Alle zu | Alle Gruppen zuklappen | schaltet direkt |
 | Alle auf | Alle Gruppen aufklappen | schaltet direkt |
@@ -68,7 +68,7 @@ Dazu immer „Zuletzt" aus [Welten](welten.md). Die Hilfe zur Seite öffnet das 
 
 ## Zustände
 
-- **Bereich leer:** „Noch kein Ort." (je Art), darunter „Mit „Neu" unten in der Leiste legst du den ersten an."
+- **Bereich leer:** „Noch kein Ort." (je Art), darunter „Mit „Neu" unten in der Leiste legst du den ersten an." In einer Runde: „Mit „Neu" legst du einen an, der nur zu dieser Runde gehört."
 - **Filter ohne Treffer:** „Nichts gefunden." unter der Filterleiste, mit Text im Suchfeld „„Text" neu anlegen".
 - **Eintrag gelöscht:** „Diesen Eintrag gibt es nicht mehr."
 

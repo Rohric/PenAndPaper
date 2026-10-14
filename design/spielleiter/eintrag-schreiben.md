@@ -41,7 +41,9 @@ Ein Eintrag wird im [Seitenfenster](../bausteine/eintrag-seitenfenster.md) gesch
 - „„Text" neu anlegen" in der [Filterleiste](../bausteine/filterleiste.md) einer Wand, wenn kein Eintrag so heißt;
 - „„Text" neu anlegen als …" in der Suche der [Kopfleiste](../bausteine/kopfleiste.md), mit der Art zur Wahl;
 - in jedem Verknüpfungsfeld legt „neu anlegen" den Eintrag mit seinem Namen sofort an und verknüpft ihn; das Formular öffnet sich dabei nicht, ein Klick auf den neuen Tag zeigt ihn.
-Einträge des Glossars öffnen sich im Seitenfenster im Formular, ein Kapitel auf seiner Seite, eine Szene im Faden ihres Kapitels zum Bearbeiten.
+Einträge des Glossars öffnen sich im Seitenfenster im Formular, ein Kapitel auf seiner Seite, eine Szene im Faden ihres Kapitels zum Bearbeiten (in einer Runde in der Story).
+
+**Einträge einer Runde:** Was der Spielleiter in einer Runde anlegt („Neu“, „neu anlegen“ in der Filterleiste, in der Suche der Kopfleiste und in jedem Verknüpfungsfeld, „Umwandeln“ einer Notiz auf dem Tisch), ist ein Eintrag nur dieser Runde (siehe [Regeln](../grundlagen/regeln.md), Grundsatz 9). Er wird im selben Formular geschrieben und bei der Runde gespeichert. Es fehlen nur, was für eine Runde nichts bedeutet: das Feld „Kapitel“ (Einträge einer Runde tragen keine Kapitel) und der Haken „Von Anfang an für Spieler sichtbar“ (in der laufenden Runde schaltet man das Auge). Verknüpfen darf er mit Einträgen der Welt und der Runde. Die Kästen, die sofort andere Einträge ändern (Ereignisse an diesem Ort, Gegenstände, Hängt an Szenen), bieten nur Einträge der Runde an, weil ein Eintrag der Welt sich beim Spielen nicht ändert.
 
 **Speichern:** Knopf am Ende des Kopfs mit seinem Stand, oder Strg + Enter. Danach eine kurze [Meldung](../bausteine/meldung.md) („Gespeichert" oder der Grund), und das Formular wechselt zurück zum Lesen.
 

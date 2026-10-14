@@ -10,6 +10,8 @@ Eine Tafel mit zwei Spalten: links **Meine Notizen**, rechts der **Gruppenblock*
 
 Darunter **Einträge mit Notiz**: alle Einträge, zu denen in dieser Runde eine [Notiz am Eintrag](../bausteine/notiz.md) steht, als [Kacheln](../bausteine/kachel.md).
 
+Notizen, die auf dem Tisch des [Masterfensters](masterfenster.md) liegen, stehen hier erst, wenn der Spielleiter sie dort behält.
+
 Solange die Ansicht offen ist, gilt alles im Gruppenblock als gesehen.
 
 ## Bausteine

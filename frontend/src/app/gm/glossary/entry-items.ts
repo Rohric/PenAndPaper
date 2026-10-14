@@ -36,7 +36,8 @@ export class EntryItems {
   readonly kind = input.required<'locations' | 'npcs' | 'quests'>();
   readonly entryId = input.required<number>();
 
-  private readonly items = computed(() => this.store.trivia().filter(isItem));
+  /** The items that may change here: in a round only its own, because playing never changes the world. */
+  private readonly items = computed(() => this.store.written.trivia().filter((item) => isItem(item) && this.store.mayWrite({ kind: 'trivia', id: item.id })));
   protected readonly options = computed(() => {
     const ids = new Set(this.items().map((item) => item.id));
     return this.store.triviaOptions().filter((option) => ids.has(option.id));

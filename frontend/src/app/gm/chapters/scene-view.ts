@@ -4,7 +4,7 @@ import { EntryKind, EntryLink, Scene } from '../../core/models';
 import { Fold } from '../../components/basic/fold';
 import { Icon } from '../../components/basic/icon';
 import { DialogueView } from '../../components/entry/dialogue-view';
-import { kickerOf, npcLinks } from '../../components/entry/entry-views';
+import { kickerOf, npcLinks, roundKicker } from '../../components/entry/entry-views';
 import { EntryCard } from '../../components/entry/entry-card';
 import { LinkRow } from '../../components/entry/link-row';
 import { WorldStore } from '../../core/world-store';
@@ -101,7 +101,10 @@ export class SceneView {
   readonly compact = input(false);
   readonly edit = output<void>();
 
-  protected readonly kicker = computed(() => kickerOf(this.scene().optional ? 'Optionale Szene' : 'Szene am roten Faden', this.scene().category));
+  protected readonly kicker = computed(() => {
+    const kicker = kickerOf(this.scene().optional ? 'Optionale Szene' : 'Szene am roten Faden', this.scene().category);
+    return roundKicker(kicker, !!this.scene().session);
+  });
   protected readonly place = computed(() => this.links('locations', this.store.locations(), [this.scene().location]));
   protected readonly npcs = computed(() => npcLinks(this.store, this.scene().npcs));
   protected readonly leadsTo = computed(() => this.links('scenes', this.store.scenes(), this.scene().leads_to));

@@ -31,8 +31,9 @@ export class EventScenes {
 
   readonly eventId = input.required<number>();
 
-  private readonly scenes = this.store.scenes;
-  /** Every scene of the world, with the number of its chapter. */
+  /** The scenes that may take the event: in a round only its own, because playing never changes the world. */
+  private readonly scenes = computed(() => this.store.written.scenes().filter((scene) => this.store.mayWrite({ kind: 'scenes', id: scene.id })));
+  /** Every scene that may take the event, with the number of its chapter. */
   protected readonly options = computed<Option[]>(() =>
     sceneLinks(this.store, this.scenes()).map((link) => ({ id: link.id, label: link.label, tone: 'scenes' })),
   );

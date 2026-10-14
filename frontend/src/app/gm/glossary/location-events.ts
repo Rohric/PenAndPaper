@@ -19,7 +19,7 @@ import { LinkPicker } from '../../components/form/link-picker';
       label="Ereignisse an diesem Ort"
       emptyText="Ereignis suchen oder neu anlegen …"
       [creatable]="true"
-      [options]="store.eventOptions()"
+      [options]="options()"
       [selected]="selected()"
       (selectedChange)="change($event)"
       (create)="createNew($event)"
@@ -33,13 +33,18 @@ export class LocationEvents {
 
   readonly placeId = input.required<number>();
 
-  protected readonly selected = computed(() => this.store.events().filter((event) => event.location === this.placeId()).map((event) => event.id));
+  /** The events that may move here: in a round only its own, because playing never changes the world. */
+  private readonly events = computed(() => this.store.written.events().filter((event) => this.store.mayWrite({ kind: 'events', id: event.id })));
+  protected readonly options = computed(() => {
+    const ids = new Set(this.events().map((event) => event.id));
+    return this.store.eventOptions().filter((option) => ids.has(option.id));
+  });
+  protected readonly selected = computed(() => this.events().filter((event) => event.location === this.placeId()).map((event) => event.id));
 
   /** Save every event that came to this place or left it. */
   protected change(ids: number[]): void {
     const before = this.selected();
-    this.store
-      .events()
+    this.events()
       .filter((event) => ids.includes(event.id) !== before.includes(event.id))
       .forEach((event) => this.save(event.id, ids.includes(event.id) ? this.placeId() : null));
   }

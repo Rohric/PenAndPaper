@@ -6,7 +6,7 @@ Als Spieler will ich nachschlagen, was wir über die Welt schon wissen: Orte, Fi
 
 ## Lösung
 
-Das Glossar wächst beim Spielen. Ein Eintrag erscheint, sobald der Spielleiter sein [Auge](../bausteine/auge.md) einschaltet, zuerst nur mit dem Namen, dann mit den Teilen, die er freigibt.
+Das Glossar wächst beim Spielen. Ein Eintrag erscheint, sobald der Spielleiter sein [Auge](../bausteine/auge.md) einschaltet, zuerst nur mit dem Namen, dann mit den Teilen, die er freigibt. Was der Spielleiter in dieser Runde dazugedichtet oder für sie geändert hat, sieht genauso aus wie ein Eintrag der Welt; die Spieler sehen keinen Unterschied und nie seine Notizen.
 
 Die Seite hat vier Abschnitte zum Auf- und Zuklappen: **Orte, Figuren, Wissen, Gegenstände.** Jeder Eintrag ist eine [Kachel](../bausteine/kachel.md) ohne Schalter. Über den Abschnitten die Suche.
 

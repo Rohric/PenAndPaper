@@ -96,11 +96,10 @@ function npcFace(store: WorldStore, id: number): Face | null {
 }
 
 function questFace(store: WorldStore, id: number): Face | null {
-  const found = texts(store.quests(), id);
-  if (!found) {
+  const quest = texts(store.quests(), id);
+  if (!quest) {
     return null;
   }
-  const quest = store.questNow(found);
   const lead = quest.goal ? { label: 'Ziel', text: quest.goal } : null;
   const text = quest.description || (lead ? '' : summaryOf(quest));
   return {

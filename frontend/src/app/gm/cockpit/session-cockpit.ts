@@ -344,11 +344,11 @@ export class SessionCockpit {
         localStorage.setItem(CHAT_KEY + this.sessionId(), String(last));
       }
     });
-    // Load the world of the session once the session is known.
+    // Load the world of the session and what the session made up, once the session is known; never in the poll.
     effect(() => {
-      const world = this.store.session()?.world;
-      if (world && this.world.worldId() !== world) {
-        this.world.load(world);
+      const session = this.store.session();
+      if (session && this.world.worldId() !== session.world) {
+        this.world.openRound(session.world, session.id);
       }
     });
     // Only one window at a time: looking an entry up closes the other ones.
@@ -377,8 +377,8 @@ export class SessionCockpit {
     // Links to scenes stay in the cockpit instead of leading to the writing tool.
     this.world.openScene = (sceneId) =>
       this.view() === 'master' && this.battleId() === null ? this.masterFocus.set({ kind: 'scenes', id: sceneId }) : this.sceneId.set(sceneId);
-    // Quests are shown as this session has them, without changing the world.
-    this.world.questChanges = (questId) => this.store.state('quest', questId)?.changes ?? {};
+    // Every entry is shown as this round has it, without changing the world.
+    this.world.roundChanges.set((kind, id) => this.store.state(kind, id)?.changes);
   }
 
 

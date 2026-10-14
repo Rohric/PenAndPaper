@@ -2,7 +2,7 @@
 
 ## Userstory
 
-Als Spielleiter will ich alle Quests der Welt mit ihrem Stand in dieser Runde auf einem Brett sehen, sie annehmen, beenden und teilen und mitten im Spiel eine neue anlegen.
+Als Spielleiter will ich alle Quests der Welt und dieser Runde mit ihrem Stand auf einem Brett sehen, sie annehmen, beenden und teilen und mitten im Spiel eine neue anlegen, die nur zu dieser Runde gehört.
 
 ## Lösung
 
@@ -10,14 +10,15 @@ Zwei Blöcke untereinander: **Hauptquests** und **Nebenquests**. Jeder Block zei
 
 Jede Quest ist eine [Karte](../bausteine/kachel.md): Art und Nummer, Status, Name, Ziel, „Checkliste 1 von 3", Verknüpfungen als [Tags](../bausteine/tags.md), rechts die Schalter Auge, Stecknadel, Notiz, Beendet; darunter „Annehmen".
 
-Ein Klick auf den Namen öffnet das [Popup](../bausteine/eintrag-popup.md). Im [Seitenfenster](../bausteine/eintrag-seitenfenster.md), Reiter „Runde", stehen das Questlog der Gruppe und „In dieser Runde ändern" (Name, Ziel, Questgeber, Startgebiet, Szene; die Welt bleibt, wie sie ist).
+Ein Klick auf den Namen öffnet das [Popup](../bausteine/eintrag-popup.md). Im [Seitenfenster](../bausteine/eintrag-seitenfenster.md), Reiter „Runde", stehen das Questlog der Gruppe und, bei einer Quest der Welt, „In dieser Runde ändern" (Name, Beschreibung, Ziel, Questgeber, Startgebiet, Szene; die Welt bleibt, wie sie ist). Die Karten zeigen die Quest, wie die Runde sie hat.
 
-Eine neu angelegte Quest ist eine Nebenquest am Kapitel der Runde, sofort angenommen und geteilt.
+„Neu" fragt im Dialog nach dem Namen. Die neue Quest ist eine Nebenquest **nur dieser Runde** (Marke „Nur diese Runde"), sofort angenommen und mit den Spielern geteilt, und öffnet sich im Seitenfenster im Formular. Sie trägt kein Kapitel; Einträge einer Runde tragen keine Kapitel. Popup und Seitenfenster haben bei ihr „Bearbeiten".
 
 ## Bausteine
 
 - [Runden](runden.md), [Kachel](../bausteine/kachel.md), [Tags](../bausteine/tags.md), [Auge](../bausteine/auge.md)
-- Code: `gm/cockpit/quest-board`, `components/play/quest-log`
+- [Eintrag schreiben](eintrag-schreiben.md) (Einträge einer Runde)
+- Code: `gm/cockpit/quest-board`, `components/play/quest-log`, `components/form/name-dialog`
 
 ## Leisten in dieser Ansicht
 
@@ -28,7 +29,7 @@ Symbolleiste, Abschnitt „zur Ansicht":
 
 | Wort | voller Name | Klick |
 | --- | --- | --- |
-| Neu | Neue Quest | Popup: Titel |
+| Neu | Neue Quest in dieser Runde | Dialog: Name; danach öffnet das Seitenfenster im Formular |
 | Geteilte | Nur geteilte | schaltet |
 | Angepinnt | Nur angepinnte | schaltet |
 

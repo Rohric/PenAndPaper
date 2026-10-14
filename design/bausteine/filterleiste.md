@@ -15,7 +15,7 @@ Nichts gefunden.
 ```
 
 1. **Suchfeld**, immer da. Es sucht im Namen und in allen Texten des Eintrags, auch in Wissen und Notiz. Bei mehreren Wörtern müssen alle vorkommen.
-2. **Neu anlegen:** Steht im Feld ein Text und heißt kein Eintrag dieser Wand genau so, steht rechts daneben „„Text" neu anlegen". Ein Klick legt den Eintrag dieser Art mit diesem Namen an und öffnet ihn im Seitenfenster im Formular, genau wie „Neu". Danach ist das Feld leer. In einer Runde gibt es das nicht.
+2. **Neu anlegen:** Steht im Feld ein Text und heißt kein Eintrag dieser Wand genau so, steht rechts daneben „„Text" neu anlegen". Ein Klick legt den Eintrag dieser Art mit diesem Namen an und öffnet ihn im Seitenfenster im Formular, genau wie „Neu". Danach ist das Feld leer. In einer Runde legt es einen Eintrag nur dieser Runde an (Marke „Nur diese Runde"); die Welt bleibt, wie sie ist.
 3. **Filterreihen:** Jede Reihe beginnt mit „Alle …", dann kommen die Werte. Ein Klick wählt einen Wert, „Alle …" nimmt den Filter weg. Es gilt immer ein Wert je Reihe.
 
    | Reihe | Werte | Wo |

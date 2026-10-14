@@ -70,7 +70,7 @@ const SHORT_BLOCKS = 2;
         } @else {
           <p class="soft">Diesen Eintrag gibt es nicht mehr.</p>
         }
-        @if (editable()) {
+        @if (canEdit(shown)) {
           <button windowFoot type="button" class="btn btn--small" (click)="store.read(shown, true)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
         }
         <button windowFoot type="button" class="btn btn--small" (click)="store.read(shown)"><app-icon name="sheet" [size]="16" /> Seitenfenster</button>
@@ -87,7 +87,10 @@ export class EntryPopup {
   protected readonly store = inject(WorldStore);
   private readonly router = inject(Router);
 
-  /** Whether "Bearbeiten" opens the form at once; a session switches that off, it never changes the world. */
+  /**
+   * Whether "Bearbeiten" opens the form of an entry of the world; a session switches that off, it never changes the
+   * world. An entry the session made up belongs to it and can always be edited.
+   */
   readonly editable = input(true);
   /** Instead of going to the page of the entry, tell the page; a session uses it, because it has its own places. */
   readonly jump = input(false);
@@ -117,6 +120,11 @@ export class EntryPopup {
       const shown = this.store.popup();
       untracked(() => this.follow(shown));
     });
+  }
+
+  /** Whether the entry can be edited here: an entry of the world where the world is written, one of the round in it. */
+  protected canEdit(ref: EntryRef): boolean {
+    return this.editable() || this.store.ofRound(ref);
   }
 
   /** Whether the entry has a place to go to; in a session a chapter has none. */

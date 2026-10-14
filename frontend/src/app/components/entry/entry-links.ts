@@ -26,7 +26,7 @@ function sceneConnections(store: WorldStore, id: number): Connection[] {
   }
   const of = (kind: EntryKind, ids: number[]): EntryRef[] => ids.map((entry) => ({ kind, id: entry }));
   const trivia = store.trivia().filter((entry) => scene.trivia.includes(entry.id));
-  const quests = store.quests().filter((quest) => scene.quests.includes(quest.id) || store.questNow(quest).scene === scene.id);
+  const quests = store.quests().filter((quest) => scene.quests.includes(quest.id) || quest.scene === scene.id);
   return [
     { label: 'Ort', refs: of('locations', scene.location ? [scene.location] : []) },
     { label: 'Figuren', refs: of('npcs', scene.npcs) },

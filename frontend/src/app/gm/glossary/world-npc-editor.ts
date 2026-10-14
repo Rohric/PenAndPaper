@@ -22,10 +22,12 @@ import { WorldStore } from '../../core/world-store';
   template: `
     <div class="stack">
       <div class="panel">
-        <h2 class="subtitle">In dieser Welt</h2>
+        <h2 class="subtitle">{{ link().session ? 'In dieser Runde' : 'In dieser Welt' }}</h2>
         <p class="soft">Das wird sofort gespeichert, Kategorie und Notiz beim Verlassen des Feldes. Was die Figur bei sich trägt, steht unten im Inventar.</p>
         <app-category-field inputId="npc-category" kind="world-npcs" [value]="link().category" (commit)="saveCharacter({ category: $event })" />
-        <app-chapter-field inputId="npc-chapters" [selected]="link().chapters" (selectedChange)="setChapters($event)" (look)="store.look({ kind: 'chapters', id: $event })" />
+        @if (!link().session) {
+          <app-chapter-field inputId="npc-chapters" [selected]="link().chapters" (selectedChange)="setChapters($event)" (look)="store.look({ kind: 'chapters', id: $event })" />
+        }
         <div class="field">
           <label for="npc-location">Anzutreffen in</label>
           <app-link-picker
@@ -49,7 +51,14 @@ import { WorldStore } from '../../core/world-store';
       </div>
 
       @if (sheet(); as loaded) {
-        <app-character-editor kind="npc" [character]="loaded" [secondBar]="store.world()?.second_bar_name ?? ''" (saved)="onSaved($event)" (deleted)="onDeleted()" />
+        <app-character-editor
+          kind="npc"
+          [character]="loaded"
+          [secondBar]="store.world()?.second_bar_name ?? ''"
+          [startChoice]="!link().session"
+          (saved)="onSaved($event)"
+          (deleted)="onDeleted()"
+        />
       }
     </div>
   `,

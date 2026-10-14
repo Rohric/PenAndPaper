@@ -4,9 +4,9 @@ import { Observable, of, tap } from 'rxjs';
 import { readError } from './api-error';
 import { Poller, ROUND_MS } from './poll';
 import { sameJson } from './same';
-import { EntryKind, EntryRef, PlayerCharacter } from './models';
+import { EntryRef, PlayerCharacter } from './models';
 import {
-  ChatMessage, GameMasterState, ItemGift, Message, Note, QuestChanges, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
+  ChatMessage, EntryChanges, GameMasterState, ItemGift, Message, Note, QuestLog, Roll, RollOrder, Session, SessionEntry, SessionEntryKind,
 } from './session-models';
 import { CharacterService } from './character.service';
 import { SessionService } from './session.service';
@@ -14,15 +14,8 @@ import { SessionService } from './session.service';
 type Flag = 'done' | 'started' | 'revealed' | 'pinned' | 'on_table';
 type PositionList = 'steps' | 'known';
 
-/** How the kinds of world entries are called in a session. */
-export const SESSION_KINDS: Partial<Record<EntryKind, SessionEntryKind>> = {
-  scenes: 'scene',
-  quests: 'quest',
-  events: 'event',
-  locations: 'location',
-  npcs: 'npc',
-  trivia: 'trivia',
-};
+// The names of the kinds in a session live with the other rules of a round; many parts import them from here.
+export { SESSION_KINDS } from './round';
 
 /** Everything of the session the game master runs, asked for again every few seconds while it is open. */
 @Injectable()
@@ -53,6 +46,8 @@ export class SessionStore {
 
   private readonly states = computed(() => new Map(this.entries().map((entry) => [`${entry.kind}:${entry.entry_id}`, entry])));
   readonly pinned = computed(() => this.entries().filter((entry) => entry.pinned));
+  /** The notes of the round that are not lying on the table: they stand in the notes column and the notes view. */
+  readonly keptNotes = computed(() => this.notes().filter((note) => !note.table_group));
 
   constructor() {
     this.poller.start(false);
@@ -145,16 +140,27 @@ export class SessionStore {
     this.run(request, (saved) => this.characters.update((all) => all.map((old) => (old.id === saved.id ? saved : old))));
   }
 
-  addNote(note: Partial<Note>): void {
-    this.run(this.api.addNote(this.id(), note), () => this.refresh());
+  /** Write a new note; the caller can go on with the note as it was saved. */
+  addNote(note: Partial<Note>, then: (saved: Note) => void = () => undefined): void {
+    this.run(this.api.addNote(this.id(), note), (saved) => {
+      this.notes.update((all) => [saved, ...all]);
+      this.refresh();
+      then(saved);
+    });
   }
 
   saveNote(noteId: number, changes: Partial<Note>): void {
-    this.run(this.api.updateNote(noteId, changes), () => this.refresh());
+    this.run(this.api.updateNote(noteId, changes), (saved) => {
+      this.notes.update((all) => all.map((note) => (note.id === saved.id ? saved : note)));
+      this.refresh();
+    });
   }
 
   removeNote(noteId: number): void {
-    this.run(this.api.removeNote(noteId), () => this.refresh());
+    this.run(this.api.removeNote(noteId), () => {
+      this.notes.update((all) => all.filter((note) => note.id !== noteId));
+      this.refresh();
+    });
   }
 
   comment(noteId: number, text: string): void {
@@ -197,7 +203,7 @@ export class SessionStore {
   }
 
   /** Set what this session has different about an entry than the world; an empty object takes it all back. */
-  setChanges(kind: SessionEntryKind, entryId: number, changes: QuestChanges): void {
+  setChanges(kind: SessionEntryKind, entryId: number, changes: EntryChanges): void {
     this.setEntry(kind, entryId, { changes });
   }
 

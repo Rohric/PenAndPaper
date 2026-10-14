@@ -1,4 +1,4 @@
-import { InventoryItem, Knowledge, PlayerCharacter, Quest } from './models';
+import { InventoryItem, Knowledge, PlayerCharacter } from './models';
 
 /** One group that plays a world over several evenings. */
 export interface Session {
@@ -30,8 +30,8 @@ export interface SessionEntry {
   steps: number[];
   /** Positions of the pieces of player knowledge the group knows. */
   known: number[];
-  /** What this session has different about the entry than the world; used for quests. */
-  changes: QuestChanges;
+  /** What this session has different about the entry than the world ("In dieser Runde ändern"). */
+  changes: EntryChanges;
   /** A quest the group has accepted and is working on. */
   started: boolean;
   /** Whether the entry lies on the table of the master mode, and in which group of the game master's own. */
@@ -83,8 +83,16 @@ export function questStatus(state: { started?: boolean; done?: boolean } | undef
   return state?.started ? 'running' : 'open';
 }
 
-/** What a session can have different about a quest, without changing the world. */
-export type QuestChanges = Partial<Pick<Quest, 'name' | 'goal' | 'giver' | 'location' | 'scene'>>;
+/** The texts a round may change about an entry of the world. */
+export type TextKey = 'name' | 'description' | 'to_read' | 'goal' | 'trigger' | 'happening';
+/** The links a round may change about a quest of the world. */
+export type LinkKey = 'giver' | 'location' | 'scene';
+
+/**
+ * What a session has different about an entry of the world, without changing the world: texts, and for a quest its
+ * links. Which keys a kind allows stands in core/round.ts; null takes a link away.
+ */
+export type EntryChanges = Partial<Record<TextKey, string | null>> & Partial<Record<LinkKey, number | null>>;
 
 export interface NoteComment {
   id: number;
@@ -99,11 +107,17 @@ export interface Note {
   title: string;
   text: string;
   shared: boolean;
+  /**
+   * The group of the table of the master mode an own note of the game master lies in; empty when it lies on no
+   * table. Only its author ever reads anything here.
+   */
+  table_group: string;
   author: string;
   /** Whether the reader wrote the note himself. */
   mine: boolean;
   comments: NoteComment[];
   created_at: string;
+  updated_at: string;
 }
 
 /** A message in the chat of the whole group. */

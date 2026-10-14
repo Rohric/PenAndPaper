@@ -2,7 +2,6 @@ import { Component, computed, inject, viewChild } from '@angular/core';
 
 import { readError } from '../../core/api-error';
 import { EntryKind, Option, isItem } from '../../core/models';
-import { SessionStore } from '../../core/session-store';
 import { searchText } from '../../core/wall';
 import { CreateKind, LinkPicker } from '../../components/form/link-picker';
 import { KIND_LABELS, openEntry } from '../../components/entry/entry-views';
@@ -17,7 +16,7 @@ const SPAN = 1_000_000;
 /**
  * Search the whole world by typing: names and texts of places, characters, quests, events, items, knowledge, scenes
  * and chapters. The chosen entry opens its popup. When no entry is called like the typed text, the list offers to
- * create it as one of the kinds of the glossary and opens its form; a session creates nothing.
+ * create it as one of the kinds of the glossary and opens its form; in a session it belongs to the session only.
  */
 @Component({
   selector: 'app-world-search',
@@ -28,7 +27,7 @@ const SPAN = 1_000_000;
       label="In der ganzen Welt suchen"
       emptyText="Welt durchsuchen …"
       [chips]="false"
-      [creatable]="!session"
+      [creatable]="true"
       [createKinds]="kinds"
       [options]="options()"
       (valueChange)="open($event)"
@@ -40,7 +39,6 @@ const SPAN = 1_000_000;
 export class WorldSearch {
   private readonly store = inject(WorldStore);
   private readonly toast = inject(ToastService);
-  protected readonly session = inject(SessionStore, { optional: true });
   private readonly picker = viewChild(LinkPicker);
 
   /** The kinds of the glossary a new entry can be created as. */

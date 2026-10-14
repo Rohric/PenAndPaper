@@ -13,7 +13,7 @@
       <app-portrait [symbol]="shown.symbol" [fallback]="shown.fallback" [size]="size() === 'card' ? 36 : 28" />
       <div class="entry__main">
         <button type="button" class="entry__name" (click)="open()">
-          <span class="kicker">{{ kicker() }}{{ marks() }}</span>
+          <span class="kicker" [attr.title]="kicker() + marks()">{{ kicker() }}{{ marks() }}</span>
           <span class="entry__title">{{ shown.name }}</span>
         </button>
         @if (shown.lead; as lead) {

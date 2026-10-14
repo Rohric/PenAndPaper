@@ -8,6 +8,7 @@ from battle_app import rules
 from battle_app.models import Battle, Combatant
 from character_app.models import BaseCharacter
 from character_app.utils import skill_value, talent_value
+from world.world_app.models import WorldNpc
 
 KEPT_LINES = 30
 # What happened in every battle, newest first. It lives only in the memory of the server.
@@ -39,6 +40,28 @@ MAX_SKIPS = 50
 def battles_for_user(user):
     """Return the battles the given game master runs."""
     return Battle.objects.filter(owner=user)
+
+
+def fits_battle(world_id, made_up_in, session):
+    """Return whether an entry of a world may join a battle of the given session.
+
+    A battle of a session takes entries of its world and what that session made up, never what another
+    session made up. A battle without a session takes nothing a session made up.
+    """
+    if session is None:
+        return made_up_in is None
+    return world_id == session.world_id and made_up_in in (None, session.pk)
+
+
+def scene_fits_battle(scene, session):
+    """Return whether a scene may bring its NPCs into a battle of the given session."""
+    return fits_battle(scene.chapter.world_id, scene.session_id, session)
+
+
+def npc_fits_battle(npc, session):
+    """Return whether an NPC may join a battle of the given session; an NPC of no world joins no session's battle."""
+    link = WorldNpc.objects.filter(npc=npc).first()
+    return fits_battle(getattr(link, "world_id", None), getattr(link, "session_id", None), session)
 
 
 def running_battle(session):

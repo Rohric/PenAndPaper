@@ -3,6 +3,7 @@ import { Params } from '@angular/router';
 import {
   Dialogue, EntryKind, EntryLink, EntryRef, EntryTexts, Knowledge, Npc, Phrase, Scene, TALENTS, isItem, questLabel,
 } from '../../core/models';
+import { changedText } from '../../core/round';
 import { damageText, skillValue } from '../../core/rules';
 import { IconName } from '../basic/icon';
 import { tagColour } from './tag-colour';
@@ -11,6 +12,14 @@ import { WorldStore } from '../../core/world-store';
 /** The line above the name: the kind, then the category the game master gave the entry, then what follows. */
 export function kickerOf(kind: string, category: string, ...more: string[]): string {
   return [kind, category.trim(), ...more].filter(Boolean).join(' · ');
+}
+
+/** The mark of an entry a round made up; it ends the line above the name everywhere (see kachel.md). */
+export const ROUND_MARK = 'Nur diese Runde';
+
+/** The line above the name with the mark of the round at its end, when the entry belongs to the round only. */
+export function roundKicker(kicker: string, ofRound: boolean): string {
+  return ofRound ? kickerOf(kicker, '', ROUND_MARK) : kicker;
 }
 
 /**
@@ -87,8 +96,13 @@ export function sceneLinks(store: WorldStore, scenes: Scene[]): EntryLink[] {
   return scenes.map((scene) => ({ kind: 'scenes', id: scene.id, label: `Kap. ${number(scene)} · ${scene.name}` }));
 }
 
-/** Build the reading view of one entry; null when the entry does not exist (anymore). */
+/** Build the reading view of one entry; null when the entry does not exist (anymore). An entry of a round says so. */
 export function viewOf(store: WorldStore, ref: EntryRef, npc: Npc | null): EntryViewModel | null {
+  const view = viewOfKind(store, ref, npc);
+  return view && { ...view, kicker: roundKicker(view.kicker, store.ofRound(ref)) };
+}
+
+function viewOfKind(store: WorldStore, ref: EntryRef, npc: Npc | null): EntryViewModel | null {
   switch (ref.kind) {
     case 'locations':
       return locationView(store, ref.id);
@@ -180,7 +194,7 @@ function npcView(store: WorldStore, id: number, npc: Npc | null): EntryViewModel
     tone: 'npcs', symbol: loaded?.symbol ?? link.symbol, fallback: 'sheet', pictures: 0, dialogues: [],
     knowledge: loaded ? knowledgeOf(loaded) : [],
     blocks: [
-      { key: 'description', label: 'Beschreibung', text: loaded?.description ?? '' },
+      { key: 'description', label: 'Beschreibung', text: changedText(store.roundChanges()('npc', id), 'description') ?? loaded?.description ?? '' },
       { label: 'Steckbrief', text: loaded ? facts(loaded, store.world()?.second_bar_name ?? '') : '' },
     ],
     lists: [
@@ -218,11 +232,10 @@ function abilityLines(npc: Npc): string[] {
 }
 
 function questView(store: WorldStore, id: number): EntryViewModel | null {
-  const found = store.quests().find((q) => q.id === id);
-  if (!found) {
+  const quest = store.quests().find((q) => q.id === id);
+  if (!quest) {
     return null;
   }
-  const quest = store.questNow(found);
   return tidy({
     kicker: kickerOf(questLabel(quest), quest.category), title: quest.name, sub: '', phrases: [], note: quest.note,
     tone: 'quests', symbol: quest.symbol, fallback: 'quest', pictures: 0, dialogues: quest.dialogues,

@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 import { Observable, map } from 'rxjs';
 
 import { readError } from '../../core/api-error';
-import { EntryRef } from '../../core/models';
+import { EntryRef, ITEM_CATEGORY } from '../../core/models';
 import { Facet } from '../../core/wall';
 import { Kind, WorldStore } from '../../core/world-store';
 import { IconName } from '../../components/basic/icon';
@@ -41,8 +41,8 @@ export const GLOSSARY_SECTIONS: GlossarySection[] = [
   { id: 'trivia', label: 'Wissen', one: 'Wissen', icon: 'note', kind: 'trivia', newLabel: 'Neuer Eintrag im Wissen', empty: 'Noch kein Wissen.' },
 ];
 
-/** The category that makes a knowledge entry an item. */
-export const ITEM_CATEGORY = 'Gegenstand';
+// The category of items is a rule of the models; the forms of the glossary import it from here.
+export { ITEM_CATEGORY };
 const NOBODY = 'none';
 
 /** Create an entry of a part of the glossary from its name; an item gets the category that makes it an item. */
@@ -58,7 +58,7 @@ const carrierKey = (carrier: Carrier) => `${carrier.isPlayer ? 'pc' : 'npc'}:${c
 /**
  * One part of the glossary as a wall of tiles. A click on a tile opens the popup of the entry. The same wall is used
  * while writing a world and while playing it. "Neu" in the bar at the bottom, or the search of the wall, starts a new
- * entry from its name; a session creates nothing.
+ * entry from its name; in a session the new entry belongs to that session only, the store sees to it.
  */
 @Component({
   selector: 'app-glossary-tiles',
@@ -71,14 +71,14 @@ const carrierKey = (carrier: Carrier) => `${carrier.isPlayer ? 'pc' : 'npc'}:${c
       [placeholder]="section().label + ' durchsuchen …'"
       [creatable]="creatable()"
       [empty]="section().empty"
-      [emptyHint]="creatable() ? 'Mit „Neu“ unten in der Leiste legst du den ersten an.' : ''"
+      [emptyHint]="emptyHint()"
       (create)="create($event)"
     />
 
     @if (creating()) {
       <app-name-dialog
         [title]="section().newLabel"
-        hint="Der Eintrag öffnet sich danach im Seitenfenster, wo du den Rest schreibst."
+        [hint]="newHint()"
         [error]="error()"
         (create)="create($event)"
         (closed)="creating.set(false)"
@@ -91,7 +91,7 @@ export class GlossaryTiles {
   private readonly toast = inject(ToastService);
 
   readonly section = input.required<GlossarySection>();
-  /** Whether new entries can be created here; a session only reads. */
+  /** Whether new entries can be created here; in a session they belong to the session only. */
   readonly creatable = input(true);
   /** More carriers of items than the NPCs of the world: the characters of a group. */
   readonly carriers = input<Carrier[]>([]);
@@ -100,6 +100,18 @@ export class GlossaryTiles {
 
   protected readonly creating = signal(false);
   protected readonly error = signal('');
+  /** How to begin in an empty part, and what happens with a new entry; in a round it belongs to the round only. */
+  protected readonly emptyHint = computed(() => {
+    if (!this.creatable()) {
+      return '';
+    }
+    return this.store.inRound() ? 'Mit „Neu“ legst du einen an, der nur zu dieser Runde gehört.' : 'Mit „Neu“ unten in der Leiste legst du den ersten an.';
+  });
+  protected readonly newHint = computed(() =>
+    this.store.inRound()
+      ? 'Der Eintrag gehört nur dieser Runde. Er öffnet sich danach im Seitenfenster, wo du den Rest schreibst.'
+      : 'Der Eintrag öffnet sich danach im Seitenfenster, wo du den Rest schreibst.',
+  );
   protected readonly tiles = computed<WallTile[]>(() => {
     const store = this.store;
     switch (this.section().id) {

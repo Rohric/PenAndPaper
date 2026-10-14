@@ -104,6 +104,7 @@
           inputId="character-description"
           [description]="draft().description"
           [visibleFromStart]="!!draft().visible_from_start"
+          [startChoice]="startChoice()"
           [playerKnowledge]="draft().player_knowledge ?? []"
           [gmKnowledge]="draft().gm_knowledge ?? []"
           (descriptionChange)="set('description', $event)"

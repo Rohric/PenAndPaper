@@ -137,6 +137,12 @@
   list-style: none;
 }
 
+// A kind a note cannot become right now, like a scene while the round has no chapter.
+.chip--link:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .input--small {
   min-height: 32px;
   padding: 2px 8px;

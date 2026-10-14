@@ -44,9 +44,13 @@ KARTE (geöffnete Szene, Questbrett der Runde)
 
 **Überzeile:** die Art, dann die Kategorie („Ort · Stadt", „Kapitel 2 · Erster Akt"); bei Quests in einer Runde der Status (offen, laufend, beendet); bei Orten „in …". Wissen zeigt statt der Art nur seine Kategorie, und die ganze Kachel nimmt den Ton der Kategorie.
 
+**Nur diese Runde:** Ein Eintrag, den der Spielleiter in einer Runde dazugedichtet hat, trägt am Ende seiner Überzeile die Marke „Nur diese Runde“ („Ort · Stadt · Nur diese Runde“, „Nebenquest · laufend · Nur diese Runde“). Sie steht überall an dieser einen Stelle: in der Überzeile von Kachel und Karte, im Kopf von Popup und Seitenfenster, in der Überzeile der Lese-Ansicht und der Ansicht einer Szene. Wo es keine Überzeile gibt, im Faden der Szenen, steht sie als kleiner Chip hinter dem Namen, wie „gespielt“. Wird die Überzeile in einer schmalen Kachel abgeschnitten, steht sie beim Drüberfahren ganz da. Ein Tag zeigt nur den Namen und keine Marke. Ein Eintrag der Welt, den die Runde nur geändert hat („In dieser Runde ändern“), trägt keine Marke; er zeigt einfach den Text der Runde. Beim Schreiben der Welt gibt es die Marke nicht, weil die Welt die Einträge der Runden nie zeigt.
+
 **Text:** der Anfang der Beschreibung; bei Figuren der Beruf; bei Szenen der Vorlesetext; bei Kapiteln der Anfang des Textes und darunter klein „3 Szenen · 2 Quests · 4 Ereignisse".
 
 **Schalter rechts** (nur in einer Runde, in dieser Reihenfolge): [Auge](auge.md), Stecknadel, Notiz, Erledigt (Szene, Quest, Ereignis), Auf den Tisch (im Master). Außerhalb einer Runde hat eine Kachel keine Knöpfe; Handgriffe stehen im [Popup](eintrag-popup.md), im [Seitenfenster](eintrag-seitenfenster.md) oder in der [Symbolleiste](symbolleiste.md).
+
+**Zur Szene:** In der Story legt der Chip „Zur Szene“ einen Eintrag in die offene Szene, aber nur in eine Szene dieser Runde. Eine Szene der Welt bekommt in der Runde keine neuen Verknüpfungen, weil das die Welt ändern würde.
 
 **Klick auf den Namen:** öffnet das [Popup des Eintrags](eintrag-popup.md), bei jeder Art, auch bei Szenen und Kapiteln. Ein Tag tut dasselbe. In einer Runde öffnet eine Szene in der Story.
 

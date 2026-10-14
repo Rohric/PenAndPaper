@@ -45,7 +45,7 @@ entfällt
 
 ## Zustände
 
-- **leer:** ein ruhiger Kasten mit dem Satz der Seite („Noch kein Ort.") und, wo man anlegen kann: „Mit „Neu" unten in der Leiste legst du den ersten an."
+- **leer:** ein ruhiger Kasten mit dem Satz der Seite („Noch kein Ort.") und, wo man anlegen kann: „Mit „Neu" unten in der Leiste legst du den ersten an." In einer Runde: „Mit „Neu" legst du einen an, der nur zu dieser Runde gehört."
 - **nichts gefunden:** siehe [Filterleiste](filterleiste.md).
 - **lädt:** der vorige Stand bleibt stehen.
 

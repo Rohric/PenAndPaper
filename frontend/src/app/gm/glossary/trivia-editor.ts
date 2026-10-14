@@ -33,7 +33,9 @@ import { EntryEditor } from './entry-editor';
           [value]="draft().category"
           (valueChange)="set('category', $event)"
         />
-        <app-chapter-field inputId="trivia-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        @if (!ofRound()) {
+          <app-chapter-field inputId="trivia-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        }
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 
@@ -41,6 +43,7 @@ import { EntryEditor } from './entry-editor';
         inputId="trivia-description"
         [description]="draft().description"
         [visibleFromStart]="!!draft().visible_from_start"
+        [startChoice]="!ofRound()"
         [playerKnowledge]="draft().player_knowledge"
         [gmKnowledge]="draft().gm_knowledge"
         [note]="draft().note"

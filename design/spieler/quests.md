@@ -6,7 +6,7 @@ Als Spieler will ich sehen, welche Aufgaben die Gruppe hat, und mit den anderen 
 
 ## Lösung
 
-Die Seite zeigt die Quests, die der Spielleiter geteilt hat, als [Karten](../bausteine/kachel.md): Haupt- oder Nebenquest, Status, Name, Ziel, „Checkliste 1 von 3", neu geteilte mit einer Marke „neu".
+Die Seite zeigt die Quests, die der Spielleiter geteilt hat (aus der Welt und aus dieser Runde, mit den Namen und Texten der Runde), als [Karten](../bausteine/kachel.md): Haupt- oder Nebenquest, Status, Name, Ziel, „Checkliste 1 von 3", neu geteilte mit einer Marke „neu".
 
 Über den Karten: Suche, Sortierung (Hauptquests zuerst, Name, Fortschritt) und die Tags der Gruppe als Filter. Der Status (Alle, Laufend, Offen, Beendet) liegt in der oberen Reihe der Symbolleiste.
 

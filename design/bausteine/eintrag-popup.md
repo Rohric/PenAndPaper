@@ -34,13 +34,15 @@ Das Popup gibt es für jede Art: Ort, Figur, Quest, Ereignis, Gegenstand, Wissen
 **Reiter „Verbindungen":** die verknüpften Einträge in beschrifteten Gruppen als [Tags](tags.md). Ein Klick auf einen Tag wechselt im selben Popup zu diesem Eintrag; der Pfeil links geht zurück.
 
 **Fuß**, bei jeder Art gleich, von links nach rechts:
-- „Bearbeiten" (nur beim Schreiben der Welt, nicht in einer Runde) öffnet das [Seitenfenster](eintrag-seitenfenster.md) gleich im Formular und schließt das Popup. Auch Szenen und Kapitel werden so bearbeitet.
+- „Bearbeiten" (beim Schreiben der Welt, und in einer Runde nur bei Einträgen dieser Runde mit der Marke „Nur diese Runde") öffnet das [Seitenfenster](eintrag-seitenfenster.md) gleich im Formular und schließt das Popup. Auch Szenen und Kapitel werden so bearbeitet. Einen Eintrag der Welt ändert eine Runde nur für sich, im Seitenfenster unter „In dieser Runde ändern".
 - „Seitenfenster" öffnet den Eintrag im [Seitenfenster](eintrag-seitenfenster.md) zum Lesen und schließt das Popup.
 - „Zum Eintrag" führt dorthin, wo er zu Hause ist (Glossar, Kapitel, Szene im Kapitel), und schließt das Popup ebenfalls. In einer Runde fehlt es bei Kapiteln, weil ein Kapitel dort keine eigene Seite hat.
 
 Das Popup steht immer mittig im Bildschirm, die Seite dahinter ist leicht abgedunkelt und scrollt nicht.
 
 Außerhalb einer Runde (beim Schreiben der Welt) fehlen die Schalter und die Notiz der Runde.
+
+In einer Runde zeigt das Popup die Texte, wie die Runde sie hat („In dieser Runde ändern“), und ein Eintrag der Runde trägt im Kopf hinter der Art die Marke „Nur diese Runde“ (siehe [Kachel](kachel.md)).
 
 Entschieden: Szenen und Kapitel öffnen beim Schreiben der Welt wie alle anderen zuerst das Popup, statt gleich die Seite zu wechseln. So geht „Bearbeiten" überall denselben Weg: Popup, Seitenfenster im Formular.
 

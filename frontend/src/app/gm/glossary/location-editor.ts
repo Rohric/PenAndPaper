@@ -28,7 +28,9 @@ import { LocationEvents } from './location-events';
           <app-symbol-picker fallback="pin" [value]="draft().symbol" (valueChange)="set('symbol', $event)" />
         </div>
         <app-category-field inputId="location-category" kind="locations" [value]="draft().category" (valueChange)="set('category', $event)" />
-        <app-chapter-field inputId="location-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        @if (!ofRound()) {
+          <app-chapter-field inputId="location-chapters" [selected]="draft().chapters" (selectedChange)="set('chapters', $event)" (look)="lookUp('chapters', $event)" />
+        }
         <app-editor-bar [dirty]="dirty()" [busy]="busy()" (save)="save()" (remove)="remove(entry().name)" />
       </div>
 
@@ -36,6 +38,7 @@ import { LocationEvents } from './location-events';
         inputId="location-description"
         [description]="draft().description"
         [visibleFromStart]="!!draft().visible_from_start"
+        [startChoice]="!ofRound()"
         [playerKnowledge]="draft().player_knowledge"
         [gmKnowledge]="draft().gm_knowledge"
         [note]="draft().note"

@@ -27,6 +27,8 @@ export abstract class EntryEditor<T extends { id: number }> {
   /** Working copy; it starts over when another entry is opened or the saved one comes back. */
   protected readonly draft = linkedSignal(() => structuredClone(this.entry()));
   protected readonly dirty = computed(() => JSON.stringify(this.draft()) !== JSON.stringify(this.entry()));
+  /** Whether the entry was made up in a round: it carries no chapters and plays only in its own round. */
+  protected readonly ofRound = computed(() => !!(this.entry() as { session?: number | null }).session);
   protected readonly busy = signal(false);
   /** Create a character of the world from a typed name, for a line of a dialogue. */
   protected readonly newSpeaker = (name: string) => this.store.add<WorldNpc>('world-npcs', { name }).pipe(map((link) => link.npc));

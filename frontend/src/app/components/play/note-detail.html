@@ -11,7 +11,7 @@
     @if (note(); as own) {
       <div class="row">
         <button type="button" class="btn btn--primary" [disabled]="!dirty() || !title().trim()" (click)="store(own.shared)">Speichern</button>
-        @if (own.mine) {
+        @if (own.mine && !own.table_group) {
           <button type="button" class="btn" [disabled]="!title().trim()" (click)="store(!own.shared)">
             {{ own.shared ? 'Zurück zu meinen Notizen' : 'In den Gruppenblock legen' }}
           </button>
@@ -21,7 +21,11 @@
         }
       </div>
       <p class="soft">
-        {{ own.shared ? 'Diese Notiz liegt im Gruppenblock: alle in der Runde und der Spielleiter sehen und bearbeiten sie.' : 'Diese Notiz siehst nur du, auch der Spielleiter nicht.' }}
+        @if (own.table_group) {
+          Diese Notiz liegt auf deinem Tisch in der Gruppe „{{ own.table_group }}“. Dort behältst du sie oder wandelst sie in einen Eintrag um. Die Spieler sehen sie nie.
+        } @else {
+          {{ own.shared ? 'Diese Notiz liegt im Gruppenblock: alle in der Runde und der Spielleiter sehen und bearbeiten sie.' : 'Diese Notiz siehst nur du, auch der Spielleiter nicht.' }}
+        }
         @if (!own.mine) {
           Angelegt von {{ own.author }}.
         }

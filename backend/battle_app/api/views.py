@@ -91,6 +91,10 @@ class CombatantList(BattleMixin, generics.ListCreateAPIView):
         """Return the combatants of the battle."""
         return self.battle.combatants.all()
 
+    def get_serializer_context(self):
+        """Pass the battle, so the serializer can check which NPCs may join it."""
+        return {**super().get_serializer_context(), "battle": self.battle}
+
     def perform_create(self, serializer):
         """Save the new combatant in the battle."""
         serializer.save(battle=self.battle)

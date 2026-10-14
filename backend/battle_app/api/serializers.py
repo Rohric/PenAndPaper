@@ -3,7 +3,15 @@
 from rest_framework import serializers
 
 from battle_app.models import Battle, Combatant
-from battle_app.utils import add_character, battle_log, create_battle, joining_initiative, symbol_of
+from battle_app.utils import (
+    add_character,
+    battle_log,
+    create_battle,
+    joining_initiative,
+    npc_fits_battle,
+    scene_fits_battle,
+    symbol_of,
+)
 from character_app.utils import MAX_DAMAGE_DICE
 from world.world_app.models import Scene
 
@@ -11,6 +19,7 @@ MAX_AMOUNT = 9999
 MAX_CHECK_VALUE = 300
 MAX_ROUNDS = 99
 NOT_YOURS = "Dieser Eintrag gehört dir nicht."
+OTHER_ROUND = "Dieser Eintrag gehört nicht zur Welt oder zur Runde dieses Kampfes."
 SELF_ATTACK = "Ein Teilnehmer kann sich nicht selbst angreifen."
 
 
@@ -50,10 +59,16 @@ class CombatantSerializer(serializers.ModelSerializer):
         return [clean_status(status) for status in statuses]
 
     def validate_npc(self, npc):
-        """Accept only an NPC of the requesting game master."""
+        """Accept only an NPC of the requesting game master from the world or the session of the battle."""
         if npc and npc.owner_id != self.context["request"].user.pk:
             raise serializers.ValidationError(NOT_YOURS)
+        if npc and not npc_fits_battle(npc, self._battle().session):
+            raise serializers.ValidationError(OTHER_ROUND)
         return npc
+
+    def _battle(self):
+        """Return the battle of the combatant: its own, or the one the view passes for a new combatant."""
+        return self.instance.battle if self.instance else self.context["battle"]
 
     def validate(self, data):
         """Ask for a name when a new combatant is not linked to a character."""
@@ -107,6 +122,14 @@ class BattleSerializer(serializers.ModelSerializer):
         if scene and scene.chapter.world.owner_id != self.context["request"].user.pk:
             raise serializers.ValidationError(NOT_YOURS)
         return scene
+
+    def validate(self, data):
+        """Accept a scene only from the world of the battle's session or made up in that very session."""
+        scene = data.get("scene")
+        session = data.get("session", getattr(self.instance, "session", None))
+        if scene and not scene_fits_battle(scene, session):
+            raise serializers.ValidationError({"scene": OTHER_ROUND})
+        return data
 
     def create(self, validated_data):
         """Create the battle with the characters of its session and the NPCs of its scene."""

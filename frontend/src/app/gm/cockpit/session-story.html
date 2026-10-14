@@ -86,9 +86,34 @@
 </ng-template>
 
 @if (scene(); as shown) {
-  <app-scene-view [scene]="shown" [editable]="false" [showEvents]="false" [compact]="true" />
+  @if (!editing()) {
+    <app-scene-view [scene]="shown" [editable]="false" [showEvents]="false" [compact]="true" />
+  } @else if (ownScene(); as own) {
+    <app-scene-form [entry]="own" (closed)="open.emit(null)" />
+  } @else {
+    <div class="stack">
+      <span class="kicker kicker--kind kind--scenes">Szene · {{ shown.name }}</span>
+      <app-round-changes [entry]="{ kind: 'scenes', id: shown.id }" />
+    </div>
+  }
 } @else {
   <div class="empty">
     <p>Wähle links eine Szene.</p>
   </div>
+}
+
+@if (creating()) {
+  <app-name-dialog
+    title="Neue Szene"
+    label="Name der Szene"
+    hint="Die Szene gehört nur dieser Runde und öffnet sich danach zum Schreiben."
+    [error]="error()"
+    (create)="addScene($event)"
+    (closed)="creating.set(false)"
+  >
+    <label class="row">
+      <input type="checkbox" [checked]="optional()" (change)="optional.set($any($event.target).checked)" />
+      Optionale Szene (steht nicht am roten Faden)
+    </label>
+  </app-name-dialog>
 }

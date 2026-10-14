@@ -74,7 +74,7 @@ const same = (a: EntryRef, b: EntryRef) => a.kind === b.kind && a.id === b.id;
             }
           }
         }
-        @if (editable()) {
+        @if (canEdit(shown)) {
           <button windowFoot type="button" class="btn btn--small" [attr.aria-pressed]="editing()" (click)="editing.set(!editing())">
             <app-icon [name]="editing() ? 'eye' : 'edit'" [size]="16" /> {{ editing() ? 'Lesen' : 'Bearbeiten' }}
           </button>
@@ -94,7 +94,10 @@ export class EntryPeek {
   /** There is a session only while a round is played. */
   private readonly round = inject(SessionStore, { optional: true });
 
-  /** Whether the entry can be edited here. A session switches that off: it never changes the world. */
+  /**
+   * Whether an entry of the world can be edited here. A session switches that off: it never changes the world. An
+   * entry the session made up belongs to it and can always be edited.
+   */
   readonly editable = input(true);
   /** Whether a session is open: then the window has the tabs of the round and of the note. */
   readonly session = input(false);
@@ -109,7 +112,7 @@ export class EntryPeek {
   protected readonly history = new WindowHistory<EntryRef>(same);
   protected readonly tab = signal('read');
   /** Every newly opened entry starts in the reading view, unless it was asked for with its form. */
-  protected readonly editing = linkedSignal({ source: this.store.peek, computation: (shown) => !!shown?.edit && this.editable() });
+  protected readonly editing = linkedSignal({ source: this.store.peek, computation: (shown) => !!shown?.edit && this.canEdit(shown) });
   protected readonly view = computed(() => {
     const shown = this.store.peek();
     return shown ? viewOf(this.store, shown, null) : null;
@@ -135,6 +138,11 @@ export class EntryPeek {
   /** Ask into which group of the table the entry and everything connected to it shall be laid. */
   protected layAll(ref: EntryRef): void {
     this.round?.tableWish.set({ kind: ref.kind, id: ref.id });
+  }
+
+  /** Whether the entry can be edited here: an entry of the world where the world is written, one of the round in it. */
+  protected canEdit(ref: EntryRef): boolean {
+    return this.editable() || this.store.ofRound(ref);
   }
 
   /** Whether the entry has a place to go to; in a session a chapter has none. */

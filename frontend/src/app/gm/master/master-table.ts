@@ -1,18 +1,24 @@
 import { Component, TemplateRef, computed, effect, inject, model, output, signal, untracked, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Observable } from 'rxjs';
 
-import { EntryKind, EntryRef, Scene } from '../../core/models';
-import { SessionEntryKind } from '../../core/session-models';
+import { readError } from '../../core/api-error';
+import { CharacterService } from '../../core/character.service';
+import { EntryRef, Scene } from '../../core/models';
+import { ENTRY_KINDS, NOTE_TARGETS, NoteTarget, TableGroup, deleteQuestion, noteEntry, tableGroups } from '../../core/round';
+import { Note, SessionEntryKind } from '../../core/session-models';
 import { Icon } from '../../components/basic/icon';
 import { Popup } from '../../components/window/popup';
 import { Portrait } from '../../components/basic/portrait';
-import { KIND_LABELS, isItem, summaryOf, viewOf } from '../../components/entry/entry-views';
+import { KIND_LABELS, isItem, roundKicker, summaryOf } from '../../components/entry/entry-views';
 import { WorldStore } from '../../core/world-store';
 import { CharacterPanel, CharacterTile } from '../../components/character/character-tile';
 import { barPercent } from '../../components/character/point-bar';
 import { Tools, Tool } from '../../global/tool-bar/tools.service';
+import { ToastService } from '../../global/toast/toast.service';
 import { EntryCard } from '../../components/entry/entry-card';
 import { SESSION_KINDS, SessionStore } from '../../core/session-store';
+import { TableNote } from './table-note';
 
 /** The name of the group for what lies on the table without a group of its own. */
 const NO_GROUP = '';
@@ -20,6 +26,8 @@ const MAX_FOUND = 30;
 const MAX_GROUP_NAME = 60;
 const DRAWER_KEY = 'pnp.master.drawer.';
 const FOLDED_KEY = 'pnp.master.folded.';
+/** The name a note on the table has until the game master types another. */
+const NEW_NOTE = 'Neue Notiz';
 
 /** The drawers under the table: one kind of entry each. */
 type Drawer = 'scenes' | 'quests' | 'events' | 'npcs' | 'locations' | 'items' | 'trivia';
@@ -34,12 +42,6 @@ const DRAWERS: { id: Drawer; label: string }[] = [
   { id: 'trivia', label: 'Wissen' },
 ];
 
-/** A group of the table with the entries in it. */
-interface TableGroup {
-  name: string;
-  entries: { ref: EntryRef; kind: SessionEntryKind }[];
-}
-
 /** What a connected entry is called and says, for the head of "Dazu gehört". */
 interface Head {
   kicker: string;
@@ -48,27 +50,30 @@ interface Head {
   readAloud: boolean;
 }
 
-/** The kind of a world entry for a kind of the session. */
-const WORLD_KINDS: Record<SessionEntryKind, EntryKind> = {
-  scene: 'scenes', quest: 'quests', event: 'events', location: 'locations', npc: 'npcs', trivia: 'trivia',
-};
+/** An entry that was just made from a note: a scene or another entry, or a character by the id of the character. */
+interface Made {
+  id: number;
+  npc?: number;
+}
 
 /**
- * The master mode, "the table": quick access to everything of the world, to look at and to use, never to edit.
- * It does not follow the scene of the story. A search over the world, "Dazu gehört" to click through the
- * connections of an entry, the groups of the game master's own table, one drawer for each kind of entry,
- * the notes of the session on the left and the characters of the group on the right.
- * Whatever is laid on the table and every note is stored with the session; nothing here changes the world.
+ * The master mode, "the table": quick access to everything of the world, to look at and to use; entries of the world
+ * are never edited here. It does not follow the scene of the story. A search over the world, the groups of the game
+ * master's own table with entries and notes, one drawer for each kind of entry, the notes of the session on the left
+ * and the characters of the group on the right. A note on the table is kept, turned into an entry of the round or
+ * deleted. Whatever is laid on the table and every note is stored with the session; nothing here changes the world.
  */
 @Component({
   selector: 'app-master-table',
-  imports: [FormsModule, Icon, Popup, Portrait, CharacterTile, EntryCard],
+  imports: [FormsModule, Icon, Popup, Portrait, CharacterTile, EntryCard, TableNote],
   templateUrl: './master-table.html',
   styleUrl: './master-table.scss',
 })
 export class MasterTable {
   protected readonly store = inject(SessionStore);
   private readonly world = inject(WorldStore);
+  private readonly characterApi = inject(CharacterService);
+  private readonly toast = inject(ToastService);
   /** The name of the second bar of the world; empty when it has none. */
   protected readonly secondBar = computed(() => this.world.world()?.second_bar_name ?? '');
 
@@ -101,6 +106,11 @@ export class MasterTable {
   protected readonly characterId = signal<number | null>(null);
   /** The group the question "Gruppe löschen?" is about; null while nobody asks. */
   protected readonly deleting = signal<TableGroup | null>(null);
+  /** The note the question "In was umwandeln?" is about; null while nobody asks. */
+  protected readonly converting = signal<Note | null>(null);
+  protected readonly targets = NOTE_TARGETS;
+  /** The note that was just laid on the table; its name gets the cursor. */
+  protected readonly freshNote = signal<number | null>(null);
 
   private readonly addList = viewChild<TemplateRef<unknown>>('addList');
   private readonly newGroup = viewChild<TemplateRef<unknown>>('newGroup');
@@ -132,30 +142,19 @@ export class MasterTable {
   });
   protected readonly counts = computed(() => Object.fromEntries(DRAWERS.map((drawer) => [drawer.id, this.refsOf(drawer.id).length])));
 
-  /** The groups of the table, in the order of their names; what has no group comes first. */
-  protected readonly groups = computed<TableGroup[]>(() => {
-    const onTable = this.store.entries().filter((entry) => entry.on_table);
-    return this.groupNames()
-      .map((name) => ({
-        name,
-        entries: onTable
-          .filter((entry) => entry.table_group === name)
-          .map((entry) => ({ ref: { kind: WORLD_KINDS[entry.kind], id: entry.entry_id }, kind: entry.kind })),
-      }))
-      .filter((group) => group.entries.length || this.empty().includes(group.name));
-  });
-  protected readonly groupNames = computed(() => {
-    const names = new Set<string>([NO_GROUP, ...this.empty(), ...this.store.entries().filter((entry) => entry.on_table).map((entry) => entry.table_group)]);
-    return [...names].sort((a, b) => Number(!!a) - Number(!!b) || a.localeCompare(b));
-  });
-  /** Notes of the session, and the entries that carry a note of the game master. */
-  protected readonly notes = computed(() => this.store.notes());
+  /** The groups of the table with their entries and notes, in the order of their names; what has no group comes first. */
+  protected readonly groups = computed<TableGroup[]>(() => tableGroups(this.store.entries(), this.store.notes(), this.empty()));
+  /** Every group an entry can be laid into: "Ohne Gruppe" and the groups of the table. */
+  protected readonly groupNames = computed(() => [NO_GROUP, ...this.groups().map((group) => group.name).filter(Boolean)]);
+  /** The groups a note can lie in; a note without a group is an ordinary note. */
+  protected readonly noteGroups = computed(() => this.groupNames().filter(Boolean));
+  /** The notes of the session that do not lie on the table, and the entries that carry a note of the game master. */
+  protected readonly notes = computed(() => this.store.keptNotes());
   protected readonly noted = computed(() =>
-    this.store.entries().filter((entry) => entry.gm_note.trim()).map((entry) => ({
-      ref: { kind: WORLD_KINDS[entry.kind], id: entry.entry_id } as EntryRef,
-      name: this.headOf({ kind: WORLD_KINDS[entry.kind], id: entry.entry_id })?.name ?? 'Eintrag',
-      text: entry.gm_note,
-    })),
+    this.store.entries().filter((entry) => entry.gm_note.trim()).map((entry) => {
+      const ref: EntryRef = { kind: ENTRY_KINDS[entry.kind], id: entry.entry_id };
+      return { ref, name: this.headOf(ref)?.name ?? 'Eintrag', text: entry.gm_note };
+    }),
   );
   /** Entries of the world whose name contains the typed text, for the popup "Auf den Tisch". */
   protected readonly results = computed(() => {
@@ -238,17 +237,29 @@ export class MasterTable {
   /** Fold a group of the table shut or open, and remember it on this device. */
   protected toggleFold(group: string): void {
     this.folded.update((names) => (names.includes(group) ? names.filter((name) => name !== group) : [...names, group]));
+    this.freshNote.set(null);
     this.saveFolds();
   }
 
+  /** The kind of a scene in the head of its popup; a scene of the round says so. */
+  protected sceneKicker(scene: Scene): string {
+    return roundKicker(KIND_LABELS.scenes, !!scene.session);
+  }
+
+  /** The question before a group of the table is deleted. */
+  protected question(group: TableGroup): string {
+    return deleteQuestion(group, this.label(group.name));
+  }
+
   /**
-   * Delete a group of the table: every entry in it goes off the table, and the group is gone with its fold state.
-   * The entries stay in the world and in the session; only their place on the table falls away.
+   * Delete a group of the table: every entry in it goes off the table, its notes are deleted, and the group is gone
+   * with its fold state. The entries stay in the world and in the session; only their place on the table falls away.
+   * A note that was not kept or turned into an entry is lost with its group.
    */
   protected deleteGroup(name: string): void {
-    // Later a group also holds notes; they are deleted here together with the entries.
-    const entries = this.groups().find((group) => group.name === name)?.entries ?? [];
-    entries.forEach((item) => this.take(item));
+    const group = this.groups().find((other) => other.name === name);
+    group?.entries.forEach((item) => this.take(item));
+    group?.notes.forEach((note) => this.store.removeNote(note.id));
     this.empty.update((names) => names.filter((other) => other !== name));
     this.folded.update((names) => names.filter((other) => other !== name));
     this.saveFolds();
@@ -295,6 +306,50 @@ export class MasterTable {
     this.store.patch(item.kind, item.ref.id, { on_table: false, table_group: NO_GROUP });
   }
 
+  /** Lay a new, empty note into a group of the table; its name gets the cursor. */
+  protected newNote(group: string): void {
+    this.store.addNote({ title: NEW_NOTE, text: '', table_group: group }, (note) => this.freshNote.set(note.id));
+  }
+
+  /** Save what was written into a note on the table. */
+  protected writeNote(note: Note, changes: Pick<Note, 'title' | 'text'>): void {
+    this.store.saveNote(note.id, changes);
+  }
+
+  /** Put a note on the table into another group. */
+  protected moveNote(note: Note, group: string): void {
+    this.store.saveNote(note.id, { table_group: group });
+  }
+
+  /** Keep a note: it leaves the table and stays as an ordinary note of the round, in the notes on the left. */
+  protected keepNote(note: Note): void {
+    this.store.saveNote(note.id, { table_group: NO_GROUP });
+  }
+
+  /** Delete a note on the table after the game master confirmed. */
+  protected dropNote(note: Note): void {
+    if (confirm(`Die Notiz „${note.title}“ wirklich löschen?`)) {
+      this.store.removeNote(note.id);
+    }
+  }
+
+  /**
+   * Turn a note into an entry of the round: its name and description go into the new entry, which lies in the same
+   * group of the table afterwards; the note is deleted. A scene goes to the end of the thread of the round's chapter.
+   */
+  protected convert(note: Note, target: NoteTarget): void {
+    const made = noteEntry(target, note);
+    const chapterId = this.chapterId();
+    const request: Observable<Made> | null =
+      made.list === 'scenes'
+        ? chapterId === null ? null : this.world.addScene(chapterId, { ...made.body, position: this.nextPosition(chapterId) })
+        : this.world.add<Made>(made.list, made.body);
+    request?.subscribe({
+      next: (entry) => this.converted(note, made.kind, entry.npc ?? entry.id),
+      error: (e: unknown) => this.toast.show(readError(e), 'danger'),
+    });
+  }
+
   /** Make a group by its name and aim the next entry at it. */
   protected createGroup(): void {
     const name = this.draft().trim().slice(0, MAX_GROUP_NAME);
@@ -330,6 +385,27 @@ export class MasterTable {
   protected second(id: number): number {
     const character = this.characters().find((other) => other.id === id);
     return character ? barPercent(character.second_bar_points, character.max_second_bar_points) : 0;
+  }
+
+  /**
+   * Lay the entry made from a note into the note's group and delete the note. A character gets the description of
+   * the note at the character itself.
+   */
+  private converted(note: Note, kind: EntryRef['kind'], id: number): void {
+    const sessionKind = SESSION_KINDS[kind];
+    if (sessionKind) {
+      this.store.patch(sessionKind, id, { on_table: true, table_group: note.table_group });
+    }
+    if (kind === 'npcs' && note.text.trim()) {
+      this.characterApi.update('npcs', id, { description: note.text }).subscribe({ error: (e: unknown) => this.toast.show(readError(e), 'danger') });
+    }
+    this.store.removeNote(note.id);
+    this.converting.set(null);
+  }
+
+  /** The place after the last scene of a chapter, where a new scene of the thread goes. */
+  private nextPosition(chapterId: number): number {
+    return Math.max(-1, ...this.world.scenesOf(chapterId).map((scene) => scene.position)) + 1;
   }
 
   /** Every entry of a drawer, without any filter. */
@@ -372,7 +448,8 @@ export class MasterTable {
   /** Whether an entry belongs to the chapter of the session; kinds without a chapter always do. */
   private inChapter(ref: EntryRef): boolean {
     const chapter = this.world.chapters().find((other) => other.id === this.chapterId());
-    if (!chapter || !['scenes', 'quests', 'events'].includes(ref.kind)) {
+    // What the round made up carries no chapter; it belongs to what is played now.
+    if (!chapter || !['scenes', 'quests', 'events'].includes(ref.kind) || this.world.ofRound(ref)) {
       return true;
     }
     const scenes = this.world.scenesOf(chapter.id);

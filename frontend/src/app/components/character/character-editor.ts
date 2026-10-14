@@ -57,6 +57,8 @@ export class CharacterEditor {
   readonly secondBar = input('');
   /** The section the editor opens at. */
   readonly section = input<EditorSection>('profile');
+  /** Whether an NPC offers "Von Anfang an für Spieler sichtbar"; one a round made up plays only in that round. */
+  readonly startChoice = input(true);
   readonly saved = output<AnyCharacter>();
   readonly deleted = output<void>();
   /** Fired whenever there are unsaved changes or none. */

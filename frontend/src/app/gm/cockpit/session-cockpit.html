@@ -30,15 +30,14 @@
         }
       }
       @case ('notes') {
-        <app-session-notes [notes]="store.notes()" (open)="openPanel({ kind: 'note', noteId: $event })" />
+        <app-session-notes [notes]="store.keptNotes()" (open)="openPanel({ kind: 'note', noteId: $event })" />
       }
       @case ('quests') {
-        <app-quest-board [chapterId]="chapterId()" />
+        <app-quest-board />
       }
       @case ('glossary') {
         <app-glossary-tiles
           [section]="section()"
-          [creatable]="false"
           [carriers]="carriers()"
           (carrier)="openPanel({ kind: 'sheet', characterId: $event })"
         />
@@ -58,7 +57,7 @@
             <app-scene-thread [scenes]="scenes()" [selected]="sceneId()" [done]="playedScenes()" (open)="sceneId.set($event)" />
           </div>
           <div class="story__main">
-            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" />
+            <app-session-story [scene]="scene()" [chapterId]="chapterId()" (fight)="openBattle($event)" (open)="sceneId.set($event)" />
           </div>
         </div>
       }

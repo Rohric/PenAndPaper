@@ -2,6 +2,7 @@ import { Component, computed, input, output } from '@angular/core';
 
 import { Scene } from '../../core/models';
 import { Fold } from '../../components/basic/fold';
+import { ROUND_MARK } from '../../components/entry/entry-views';
 
 /**
  * The thread of a chapter: the scenes that should happen, numbered in the order of the game master,
@@ -21,6 +22,9 @@ export class SceneThread {
   /** Ids of the scenes a session has played. */
   readonly done = input<number[]>([]);
   readonly open = output<number>();
+
+  /** The mark of a scene that only this round has; the world never loads one. */
+  protected readonly mark = ROUND_MARK;
 
   protected readonly thread = computed(() => this.scenes().filter((scene) => !scene.optional));
   protected readonly optional = computed(() => this.scenes().filter((scene) => scene.optional));

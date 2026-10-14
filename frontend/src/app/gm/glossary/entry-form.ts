@@ -66,14 +66,16 @@ export class EntryForm {
   /** Fired after the entry was deleted. */
   readonly closed = output<void>();
 
-  protected readonly location = computed(() => this.find(this.store.locations()));
+  // A form edits the entry as it is written, never with what a round shows instead.
+  private readonly written = this.store.written;
+  protected readonly location = computed(() => this.find(this.written.locations()));
   /** An NPC is named by the id of the character, not of its link to the world. */
-  protected readonly npcLink = computed(() => this.store.npcs().find((link) => link.npc === this.entry().id) ?? null);
-  protected readonly quest = computed(() => this.find(this.store.quests()));
-  protected readonly event = computed(() => this.find(this.store.events()));
-  protected readonly trivia = computed(() => this.find(this.store.trivia()));
-  protected readonly chapter = computed(() => this.find(this.store.chapters()));
-  protected readonly scene = computed(() => this.find(this.store.scenes()));
+  protected readonly npcLink = computed(() => this.written.npcs().find((link) => link.npc === this.entry().id) ?? null);
+  protected readonly quest = computed(() => this.find(this.written.quests()));
+  protected readonly event = computed(() => this.find(this.written.events()));
+  protected readonly trivia = computed(() => this.find(this.written.trivia()));
+  protected readonly chapter = computed(() => this.find(this.written.chapters()));
+  protected readonly scene = computed(() => this.find(this.written.scenes()));
 
   private find<T extends { id: number }>(entries: T[]): T | null {
     return entries.find((entry) => entry.id === this.entry().id) ?? null;
