@@ -14,7 +14,7 @@ import { Dialog } from '../window/dialog';
     <app-dialog kind="Neu anlegen" [title]="title()" [size]="460" (closed)="closed.emit()">
       <form id="name-dialog-form" class="field" (ngSubmit)="submit()">
         <label for="name-dialog-name">{{ label() }}</label>
-        <input #field id="name-dialog-name" class="input" name="name" autocomplete="off" [(ngModel)]="name" />
+        <input #field id="name-dialog-name" class="input" name="name" autocomplete="off" [(ngModel)]="name" (keydown.enter)="$event.preventDefault(); submit()" />
       </form>
       <ng-content />
       @if (hint()) {

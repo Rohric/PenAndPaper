@@ -20,7 +20,7 @@ Ein Eintrag wird im [Seitenfenster](../bausteine/eintrag-seitenfenster.md) gesch
 
 | Art | eigene Felder |
 | --- | --- |
-| Ort | „Liegt in" |
+| Ort | „Liegt in"; „Ereignisse an diesem Ort" (verknüpfen oder neu anlegen, wird sofort gespeichert; ein Ereignis hat genau einen Ort, es zieht also hierher um) |
 | Figur | Steckbrief, Werte, Skillung, Inventar, Besondere Fähigkeiten, Beispielsätze (im Editor des Charakters, siehe [Charakterbogen](../bausteine/charakterbogen.md)); Ort, an dem man sie antrifft |
 | Quest | Art (Haupt- oder Nebenquest), Nummer, Ziel, Checkliste, Questgeber, Startgebiet, Szene, beteiligte Figuren, Dialoge |
 | Ereignis | Auslöser, Was passiert, Ort, Dialoge |

@@ -88,7 +88,13 @@ class WorldScopedSerializer(serializers.ModelSerializer):
         return cleaned
 
 
-class LocationSerializer(WorldScopedSerializer):
+class ChapterTagged(serializers.Serializer):
+    """Give an entry the chapters it is tagged with; a new entry needs none."""
+
+    chapters = serializers.PrimaryKeyRelatedField(many=True, queryset=Chapter.objects.all(), required=False)
+
+
+class LocationSerializer(ChapterTagged, WorldScopedSerializer):
     """Serialize a location; its parent must be another place of the same world."""
 
     class Meta:
@@ -141,7 +147,7 @@ class WorldNpcSerializer(WorldScopedSerializer):
         return super().update(instance, validated_data)
 
 
-class QuestSerializer(WorldScopedSerializer):
+class QuestSerializer(ChapterTagged, WorldScopedSerializer):
     """Serialize a quest with its goal, its checklist and its links to a place, a scene and NPCs."""
 
     class Meta:
@@ -170,7 +176,7 @@ class QuestSerializer(WorldScopedSerializer):
         return [point.strip() for point in checklist if point.strip()]
 
 
-class EventSerializer(WorldScopedSerializer):
+class EventSerializer(ChapterTagged, WorldScopedSerializer):
     """Serialize an event with what sets it off, what happens then, and its dialogues."""
 
     class Meta:
@@ -181,7 +187,7 @@ class EventSerializer(WorldScopedSerializer):
         ]
 
 
-class TriviaSerializer(WorldScopedSerializer):
+class TriviaSerializer(ChapterTagged, WorldScopedSerializer):
     """Serialize a piece of knowledge with its links to places, NPCs, quests and events."""
 
     class Meta:

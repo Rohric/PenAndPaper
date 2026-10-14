@@ -30,7 +30,7 @@ Als Spielleiter will ich im Spiel mit einem Klick sehen, wer oder was ein Eintra
 
 **Reiter „Verbindungen":** die verknüpften Einträge in beschrifteten Gruppen als [Tags](tags.md). Ein Klick auf einen Tag wechselt im selben Popup zu diesem Eintrag; der Pfeil links geht zurück.
 
-**Fuß:** „Seitenfenster" öffnet den Eintrag im [Seitenfenster](eintrag-seitenfenster.md) und schließt das Popup. „Zum Eintrag" führt dorthin, wo er zu Hause ist, und schließt das Popup ebenfalls.
+**Fuß:** „Bearbeiten" (nur beim Schreiben der Welt, nicht in einer Runde) öffnet das [Seitenfenster](eintrag-seitenfenster.md) gleich im Formular und schließt das Popup. „Seitenfenster" öffnet den Eintrag im [Seitenfenster](eintrag-seitenfenster.md) zum Lesen und schließt das Popup. „Zum Eintrag" führt dorthin, wo er zu Hause ist, und schließt das Popup ebenfalls.
 
 Das Popup steht immer mittig im Bildschirm, die Seite dahinter ist leicht abgedunkelt und scrollt nicht.
 

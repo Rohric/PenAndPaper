@@ -13,6 +13,9 @@ import { chaptersOf, faceOf } from './entry-face';
 import { openEntry } from './entry-views';
 import { EyeToggle } from './eye-toggle';
 
+/** How many tags of its connections a tile shows; the rest are counted, and all of them are in the popup. */
+const TILE_TAGS = 6;
+
 /** The lists of a scene that an entry can be added to, by the kind of the entry. */
 const SCENE_LISTS: Partial<Record<EntryRef['kind'], keyof Pick<Scene, 'quests' | 'events' | 'trivia' | 'npcs'>>> = {
   quests: 'quests',
@@ -56,6 +59,7 @@ export class EntryCard {
   readonly pick = output<EntryRef>();
   readonly table = output<EntryRef>();
 
+  protected readonly TILE_TAGS = TILE_TAGS;
   protected readonly noteOpen = signal(false);
   protected readonly draft = signal('');
 

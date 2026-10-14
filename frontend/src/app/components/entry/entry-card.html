@@ -49,10 +49,13 @@
             }
           </div>
         }
-        @if (size() === 'card' && shown.tags.length) {
+        @if (shown.tags.length) {
           <div class="entry__row">
-            @for (tag of shown.tags; track tag.word + tag.kind + tag.id) {
+            @for (tag of size() === 'card' ? shown.tags : shown.tags.slice(0, TILE_TAGS); track tag.word + tag.kind + tag.id) {
               <button type="button" [class]="'chip chip--link kind--' + (tag.tone ?? tag.kind)" (click)="follow(tag)">{{ tag.word }} · {{ tag.label }}</button>
+            }
+            @if (size() !== 'card' && shown.tags.length > TILE_TAGS) {
+              <span class="chip" [attr.title]="'Alle im Popup unter Verbindungen'">+{{ shown.tags.length - TILE_TAGS }}</span>
             }
           </div>
         }

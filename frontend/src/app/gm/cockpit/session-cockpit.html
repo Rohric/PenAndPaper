@@ -143,7 +143,7 @@
 
 <app-table-ask />
 
-<app-entry-popup [jump]="true" (jumped)="toEntry($event)">
+<app-entry-popup [editable]="false" [jump]="true" (jumped)="toEntry($event)">
   @if (world.popup(); as looked) {
     <app-session-entry-actions part="short" [entry]="looked" />
   }

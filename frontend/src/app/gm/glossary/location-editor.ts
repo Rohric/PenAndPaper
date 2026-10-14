@@ -9,11 +9,12 @@ import { LinkPicker } from '../../components/form/link-picker';
 import { SymbolPicker } from '../../components/form/symbol-picker';
 import { EntryEditor } from './entry-editor';
 import { EntryItems } from './entry-items';
+import { LocationEvents } from './location-events';
 
-/** Edit one location: its name, the place it lies in, what is known about it and the items found there. */
+/** Edit one location: its name, the place it lies in, what is known about it, the events that happen there and the items found there. */
 @Component({
   selector: 'app-location-editor',
-  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems],
+  imports: [FormsModule, ChapterField, EditorBar, LinkPicker, SymbolPicker, EntryTextsEditor, EntryItems, LocationEvents],
   template: `
     <div class="stack">
       <div class="panel">
@@ -55,6 +56,12 @@ import { EntryItems } from './entry-items';
         (playerKnowledgeChange)="set('player_knowledge', $event)"
         (gmKnowledgeChange)="set('gm_knowledge', $event)"
       />
+
+      <div class="panel">
+        <h2 class="subtitle">Ereignisse</h2>
+        <p class="soft">Was an diesem Ort passiert. Ein Ereignis hat einen Ort; was du hier hinzufügst, zieht hierher um. Das wird sofort gespeichert.</p>
+        <app-location-events [placeId]="entry().id" />
+      </div>
 
       <div class="panel">
         <h2 class="subtitle">Gegenstände</h2>

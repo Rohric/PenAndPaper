@@ -61,6 +61,9 @@ const SHORT_BLOCKS = 2;
         } @else {
           <p class="soft">Diesen Eintrag gibt es nicht mehr.</p>
         }
+        @if (editable()) {
+          <button windowFoot type="button" class="btn btn--small" (click)="store.read(shown, true)"><app-icon name="edit" [size]="16" /> Bearbeiten</button>
+        }
         <button windowFoot type="button" class="btn btn--small" (click)="store.read(shown)"><app-icon name="sheet" [size]="16" /> Seitenfenster</button>
         <button windowFoot type="button" class="btn btn--small btn--primary" (click)="toEntry(shown)">
           <app-icon name="expand" [size]="16" /> Zum Eintrag
@@ -73,6 +76,8 @@ export class EntryPopup {
   protected readonly store = inject(WorldStore);
   private readonly router = inject(Router);
 
+  /** Whether "Bearbeiten" opens the form at once; a session switches that off, it never changes the world. */
+  readonly editable = input(true);
   /** Instead of going to the page of the entry, tell the page; a session uses it, because it has its own places. */
   readonly jump = input(false);
   readonly jumped = output<EntryRef>();
